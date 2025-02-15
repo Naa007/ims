@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thymeleaf Demo</title>
+    <!-- Include CSS -->
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<!-- Include header fragment -->
+<th:block th:insert="fragments/header :: header"></th:block>
+
+<main>
+    <h1>Welcome to Thymeleaf Demo</h1>
+    <p>Content of the main page with CSS and JavaScript added.</p>
+</main>
+
+<!-- Include footer fragment -->
+<th:block th:insert="fragments/footer :: footer"></th:block>
+
+<!-- Include JS -->
+<script th:src="@{/js/scripts.js}"></script>
+</body>
+</html>
