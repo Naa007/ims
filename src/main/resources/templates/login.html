@@ -17,13 +17,13 @@
 
 </main>
 <br/>
-<h3>Inspectors Near You</h3>
-<div id="map"></div>
+<h3>Inspection Location: "Madhya Pradesh, India"</h3>
+<div id="map" allign="center" class="center-div"></div>
 <script>
     function initMap() {
-        fetch('/api/inspectors?address=New Delhi').then(response => response.json())
+        fetch('/api/inspectors?address=madhya pradesh').then(response => response.json())
           .then(data => {
-            const userLocation = { lat: 28.6139, lng: 77.2090 }; // Example: Replace with the user's geocoded location
+            const userLocation = { lat: 23.473324, lng: 77.947998 }; // Example: Replace with the user's geocoded location
             const map = new google.maps.Map(document.getElementById('map'), {
                 zoom: 5,
                 center: userLocation
@@ -32,7 +32,7 @@
             const userMarker = new google.maps.Marker({
                 position: userLocation,
                 map: map,
-                title: "User Location"
+                title: "Inspection Location"
             });
 
             data.forEach(inspector => {
@@ -42,7 +42,7 @@
                         lng: inspector.location.lng
                     },
                     map: map,
-                    title: `Distance: ${inspector.distance}, Duration: ${inspector.duration}`
+                    title: `${inspector.name}, Distance: ${inspector.distance}, Duration: ${inspector.duration}`
                 });
             });
         });

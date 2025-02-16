@@ -44,6 +44,7 @@ public class GoogleMapsService {
 
         for (int i = 0; i < destinations.length; i++) {
             distances.add(new InspectorDistance(
+                    "inspector" + (i + 1),
                     destinations[i],
                     result.rows[0].elements[i].distance.humanReadable,
                     result.rows[0].elements[i].duration.humanReadable
@@ -54,16 +55,19 @@ public class GoogleMapsService {
     }
 
     public static class InspectorDistance {
+        private String name;
         private LatLng location;
         private String distance;
         private String duration;
 
-        public InspectorDistance(LatLng location, String distance, String duration) {
+        public InspectorDistance(String name, LatLng location, String distance, String duration) {
+            this.name = name;
             this.location = location;
             this.distance = distance;
             this.duration = duration;
         }
 
+        public String getName() { return name; }
         public LatLng getLocation() { return location; }
         public String getDistance() { return distance; }
         public String getDuration() { return duration; }
