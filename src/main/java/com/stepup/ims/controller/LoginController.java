@@ -11,6 +11,6 @@ public class LoginController {
     @GetMapping("/")
     public String home(Model model) {
         model.addAttribute("title", "Welcome to Thymeleaf Demo");
-        return "login/login";
+        return "login";
     }
 }
