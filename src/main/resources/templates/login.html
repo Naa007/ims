@@ -6,6 +6,7 @@
     <title>Internation Inspection Services Pvt Ltd</title>
     <!-- Include CSS -->
     <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHwaHTTVcK5bvy2Vg36H6r3gdpSoIYcjY"></script>
 </head>
 <body>
 <!-- Include header fragment -->
@@ -15,7 +16,42 @@
     <h1>Welcome to Integrated Establishment System of IISPL Employees</h1>
 
 </main>
+<br/>
+<h3>Inspectors Near You</h3>
+<div id="map"></div>
+<script>
+    function initMap() {
+        fetch('/api/inspectors?address=New Delhi').then(response => response.json())
+          .then(data => {
+            const userLocation = { lat: 28.6139, lng: 77.2090 }; // Example: Replace with the user's geocoded location
+            const map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 5,
+                center: userLocation
+            });
 
+            const userMarker = new google.maps.Marker({
+                position: userLocation,
+                map: map,
+                title: "User Location"
+            });
+
+            data.forEach(inspector => {
+                const marker = new google.maps.Marker({
+                    position: {
+                        lat: inspector.location.lat,
+                        lng: inspector.location.lng
+                    },
+                    map: map,
+                    title: `Distance: ${inspector.distance}, Duration: ${inspector.duration}`
+                });
+            });
+        });
+    }
+
+    // Initialize Map
+    window.onload = initMap;
+</script>
+</body>
 <!-- Include footer fragment -->
 <th:block th:insert="fragments/footer :: footer"></th:block>
 

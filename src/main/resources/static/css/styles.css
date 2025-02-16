@@ -41,3 +41,7 @@
    main {
        margin: 20px;
    }
+   #map {
+      height: 300px;
+      width: 100%;
+  }
