@@ -1,4 +1,5 @@
 package com.stepup.ims.service;
+
 import com.google.maps.*;
 import com.google.maps.errors.ApiException;
 import com.google.maps.model.*;
@@ -16,9 +17,7 @@ public class GoogleMapsService {
     private final GeoApiContext geoApiContext;
 
     public GoogleMapsService(@Value("${google.maps.api.key}") String apiKey) {
-        this.geoApiContext = new GeoApiContext.Builder()
-                .apiKey(apiKey)
-                .build();
+        this.geoApiContext = new GeoApiContext.Builder().apiKey(apiKey).build();
     }
 
     // Geocode address to latitude and longitude
@@ -36,19 +35,10 @@ public class GoogleMapsService {
 
         LatLng[] destinations = inspectorLocations.toArray(new LatLng[0]);
 
-        DistanceMatrix result = DistanceMatrixApi.newRequest(geoApiContext)
-                .origins(userLocation)
-                .destinations(destinations)
-                .mode(TravelMode.DRIVING)
-                .await();
+        DistanceMatrix result = DistanceMatrixApi.newRequest(geoApiContext).origins(userLocation).destinations(destinations).mode(TravelMode.DRIVING).await();
 
         for (int i = 0; i < destinations.length; i++) {
-            distances.add(new InspectorDistance(
-                    "inspector" + (i + 1),
-                    destinations[i],
-                    result.rows[0].elements[i].distance.humanReadable,
-                    result.rows[0].elements[i].duration.humanReadable
-            ));
+            distances.add(new InspectorDistance("inspector" + (i + 1), destinations[i], result.rows[0].elements[i].distance.humanReadable, result.rows[0].elements[i].duration.humanReadable));
         }
 
         return distances;
@@ -67,9 +57,20 @@ public class GoogleMapsService {
             this.duration = duration;
         }
 
-        public String getName() { return name; }
-        public LatLng getLocation() { return location; }
-        public String getDistance() { return distance; }
-        public String getDuration() { return duration; }
+        public String getName() {
+            return name;
+        }
+
+        public LatLng getLocation() {
+            return location;
+        }
+
+        public String getDistance() {
+            return distance;
+        }
+
+        public String getDuration() {
+            return duration;
+        }
     }
 }
