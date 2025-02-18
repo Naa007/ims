@@ -3,6 +3,7 @@ package com.stepup.ims.controller;
 import com.google.maps.errors.ApiException;
 import com.google.maps.model.LatLng;
 import com.stepup.ims.service.GoogleMapsService;
+import com.stepup.ims.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,16 +20,8 @@ public class MapController {
 
     @Autowired
     private GoogleMapsService googleMapsService;
-
-    // Mock: Replace with real inspectors' locations from database
-    private final List<LatLng> inspectorLocations = List.of(new LatLng(12.9715987, 77.5945627), // Inspector 1: Bangalore
-            new LatLng(28.7040592, 77.1024902), // Inspector 2: Delhi
-            new LatLng(19.0760, 72.8777),        // Inspector 3: Mumbai
-            new LatLng(17.4968, 78.3614), // Inspector 4: Miyapur
-            new LatLng(16.5811, 77.7489), // Inspector 5: Ibrahimpatnam
-            new LatLng(17.3303179, 78.568278), // Inspector 6: Vanasthalipuram
-            new LatLng(16.5062, 80.6480), // Inspector 7: Vijayawada
-            new LatLng(17.3067, 78.1353));
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/inspectors")
     public List<GoogleMapsService.InspectorDistance> getInspectorsByAddress(Model model, @RequestParam String address) throws InterruptedException, ApiException, IOException {
@@ -36,6 +29,6 @@ public class MapController {
         LatLng userLocation = googleMapsService.geocodeAddress(address);
 
         // 2. Calculate distances from user location to all inspectors
-        return googleMapsService.getInspectorDistances(userLocation, inspectorLocations);
+        return googleMapsService.getInspectorDistances(userLocation, userService.getAllUsersLatLng());
     }
 }

@@ -24,6 +24,13 @@ public class User {
     @Column(nullable = false, unique = true, length = 255)
     private String email;
 
+    @Column(nullable = false)
+    private Double latitude;
+
+    @Column(nullable = false)
+    private Double longitude;
+
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;

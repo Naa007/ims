@@ -1,9 +1,11 @@
 package com.stepup.ims.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 
+@Data
 @Entity
 @Table(name = "Inspection_User")
 public class InspectionUser {
