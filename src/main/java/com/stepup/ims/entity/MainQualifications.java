@@ -27,7 +27,4 @@ public class MainQualifications {
     @Column(nullable = true)
     private Boolean electrical;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "inspector_id", nullable = false, referencedColumnName = "inspectorId")
-    private Inspector inspector;
 }

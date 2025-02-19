@@ -14,7 +14,6 @@ import java.util.List;
 public class Inspector {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Primary Key
     private Long inspectorId;
 
     @Column(nullable = false, length = 200)
@@ -32,10 +31,10 @@ public class Inspector {
     @Column(nullable = false, length = 100)
     private String country;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = true, length = 255)
     private String address;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = true, length = 100)
     private LatLng addressCoordinates;
 
     @Temporal(TemporalType.DATE) // To store the Date of Birth
@@ -49,32 +48,25 @@ public class Inspector {
     @Column(nullable = true, length = 1000)
     private String disciplines; // E.g., list or custom type separated by commas
 
-
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "inspector_id", referencedColumnName = "inspectorId")
     private List<Certificate> certificates;
 
-
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "special_qualification_id", referencedColumnName = "id", nullable = true)
     private SpecialQualification specialQualification; // Special Qualification like Aramco, SEC, etc.
 
-
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "main_qualification_id", referencedColumnName = "id", nullable = false)
     private MainQualifications mainQualificationCategory;
 
-    @Column (name = "inspector_status", nullable = false)
+    @Column(name = "inspector_status", nullable = false)
     private String inspectorStatus;
 
-
-
-    @Column(nullable = true) // Allow null for remarks
+    @Column(nullable = false) // Allow null for remarks
     private String remarks;
 
-    public enum InspectorType{
+    public enum InspectorType {
         INHOUSE_INSPECTOR, TECHNICAL_COORDINATOR, FREELANCER, PARTNER_INSPECTOR
     }
-
-
 }

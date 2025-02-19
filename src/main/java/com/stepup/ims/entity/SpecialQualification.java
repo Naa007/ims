@@ -12,10 +12,6 @@ public class SpecialQualification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "inspector_id", nullable = false, referencedColumnName = "inspectorId")
-    private Inspector assignedInspector;
-
     @Column(name = "aramco", nullable = false)
     private Boolean aramco;
 

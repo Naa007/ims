@@ -27,7 +27,4 @@ public class Certificate {
     private LocalDate expiryDate;
     @NotBlank
     private String issuer;
-    @ManyToOne
-    @JoinColumn(name = "inspector_id", nullable = false)
-    private Inspector inspector;
 }
