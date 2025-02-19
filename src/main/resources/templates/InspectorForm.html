@@ -62,18 +62,32 @@
                    placeholder="Enter disciplines (comma-separated)"/>
         </div>
 
-        <!-- Relevant Certificates -->
+        <!-- Certificates Section Updated as Table -->
         <div class="mb-3">
             <label class="form-label">Relevant Certificates</label>
-            <div id="certificatesContainer">
-                <div class="input-group mb-2">
-                    <input type="text" name="certificates" th:field="*{certificates}"
-                           class="form-control" placeholder="Enter certificate name"/>
-                    <button type="button" class="btn btn-danger removeCertificate" onclick="removeCertificate(this)">
-                        Remove
-                    </button>
-                </div>
-            </div>
+            <table class="table" id="certificatesTable">
+                <thead>
+                <tr>
+                    <th>Certificate Name</th>
+                    <th>Date Issued</th>
+                    <th>Expiry Date</th>
+                    <th>Issuer</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="certificate : *{certificates}">
+                    <td>
+                        <input type="text" th:field="*{certificates[__${certificate.index}__]}" class="form-control"
+                               placeholder="*{certificates[__${certificate.index}__]}"/>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger" onclick="removeCertificateRow(this)">Remove
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
             <button type="button" class="btn btn-success" onclick="addCertificate()">Add Certificate</button>
         </div>
 
