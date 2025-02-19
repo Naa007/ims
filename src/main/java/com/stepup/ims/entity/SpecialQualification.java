@@ -16,14 +16,13 @@ public class SpecialQualification {
     @JoinColumn(name = "inspector_id", nullable = false, referencedColumnName = "inspectorId")
     private Inspector assignedInspector;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = true)
-    private SpecialQualificationType type;
+    @Column(name = "aramco", nullable = false)
+    private Boolean aramco;
+
+    @Column(name = "sec", nullable = false)
+    private Boolean sec;
 
     @Column(nullable = true)
     private String specialQualificationDetails;
 
-    public enum SpecialQualificationType {
-        ARAMCO, SEC
-    }
 }

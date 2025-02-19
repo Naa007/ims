@@ -1,7 +1,6 @@
 package com.stepup.ims.controller;
 
-import com.stepup.ims.entity.Inspector;
-import com.stepup.ims.entity.SpecialQualification;
+import com.stepup.ims.model.Inspector;
 import com.stepup.ims.service.InspectorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -14,12 +13,8 @@ import java.util.List;
 @RequestMapping("/inspector")
 public class InspectorController {
 
-    private final InspectorService inspectorService;
-
     @Autowired
-    public InspectorController(InspectorService inspectorService) {
-        this.inspectorService = inspectorService;
-    }
+    private InspectorService inspectorService;
 
     /**
      * Display list of all inspectors.
@@ -27,9 +22,9 @@ public class InspectorController {
     @GetMapping("/list")
     public String listInspectors(Model model) {
         List<Inspector> inspectors = inspectorService.getAllInspectors();
+
         model.addAttribute("inspectors", inspectors);
-        model.addAttribute("specialQualificationTypes", SpecialQualification.SpecialQualificationType.values());
-        return "inspectorList"; // Corresponding Thymeleaf template should exist
+        return "inspectorList";
     }
 
     /**
@@ -38,7 +33,7 @@ public class InspectorController {
     @GetMapping("/form")
     public String showInspectorForm(Model model) {
         model.addAttribute("inspector", new Inspector());
-        return "InspectorForm"; // Corresponding Thymeleaf template for the form
+        return "InspectorForm";
     }
 
     /**

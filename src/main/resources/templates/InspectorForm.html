@@ -64,18 +64,54 @@
 
         <!-- Relevant Certificates -->
         <div class="mb-3">
-            <label for="relevantCertificates" class="form-label">Relevant Certificates</label>
-            <textarea id="relevantCertificates" th:field="*{relevantCertificates}" class="form-control" rows="3"
-                      placeholder="Enter relevant certificates"></textarea>
+            <label class="form-label">Relevant Certificates</label>
+            <div id="certificatesContainer">
+                <div class="input-group mb-2">
+                    <input type="text" name="certificates" th:field="*{certificates}"
+                           class="form-control" placeholder="Enter certificate name"/>
+                    <button type="button" class="btn btn-danger removeCertificate" onclick="removeCertificate(this)">
+                        Remove
+                    </button>
+                </div>
+            </div>
+            <button type="button" class="btn btn-success" onclick="addCertificate()">Add Certificate</button>
         </div>
 
+        <script>
+            // Function to add a new certificate input field
+            function addCertificate() {
+                const container = document.getElementById('certificatesContainer');
+                const newCertificate = document.createElement('div');
+                newCertificate.className = 'input-group mb-2';
+                newCertificate.innerHTML = `
+                    <input type="text" name="certificates" class="form-control" placeholder="Enter certificate name"/>
+                    <button type="button" class="btn btn-danger removeCertificate" onclick="removeCertificate(this)">Remove</button>
+                `;
+                container.appendChild(newCertificate);
+            }
 
-        <h5>Special Qualifications</h5>
-        <div th:each="qualification : ${specialQualificationTypes}">
-            <div class="form-check">
-                <input type="checkbox" th:field="*{specialQualificationTypes}" th:value="${qualification}" class="form-check-input"/>
-                <label th:for="${qualification}" th:text="${qualification}" class="form-check-label"></label>
-            </div>
+            // Function to remove a specific certificate input field
+            function removeCertificate(button) {
+                button.parentElement.remove();
+            }
+        </script>
+
+        <h5>Special Qualification</h5>
+        <div class="form-check">
+            <input type="checkbox" id="ARAMCO" th:field="*{specialQualification.aramco}"
+                   class="form-check-input" value="*{specialQualification.aramco}"/>
+            <label for="ARAMCO" class="form-check-label">ARAMCO</label>
+        </div>
+        <div class="form-check">
+            <input type="checkbox" id="SEC" th:field="*{specialQualification.sec}"
+                   class="form-check-input" value="*{specialQualification.sec}"/>
+            <label for="SEC" class="form-check-label">SEC</label>
+        </div>
+        <div class="form-check">
+
+            <input type="text" id="specialQualificationDetails" th:field="*{specialQualification.specialQualificationDetails}"
+                   class="form-control" placeholder="Enter Special Qualification Details"/>
+            <label for="specialQualificationDetails" class="form-check-label">Special Qualification Details</label>
         </div>
 
 

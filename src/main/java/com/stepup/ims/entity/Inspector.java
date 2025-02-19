@@ -3,6 +3,7 @@ package com.stepup.ims.entity;
 import com.google.maps.model.LatLng;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 import java.util.List;
@@ -25,6 +26,9 @@ public class Inspector {
     @Column(nullable = false, length = 15)
     private String phone;
 
+    @Column(name = "email", nullable = false, unique = true, length = 255)
+    private String email;
+
     @Column(nullable = false, length = 100)
     private String country;
 
@@ -35,6 +39,7 @@ public class Inspector {
     private LatLng addressCoordinates;
 
     @Temporal(TemporalType.DATE) // To store the Date of Birth
+    @DateTimeFormat(pattern = "dd/mm/yyyy")
     @Column(nullable = false)
     private Date dob;
 
@@ -47,7 +52,7 @@ public class Inspector {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "inspector_id", referencedColumnName = "inspectorId")
-    private List<Certificate> relevantCertificates;
+    private List<Certificate> certificates;
 
 
     @OneToOne
@@ -58,6 +63,11 @@ public class Inspector {
     @OneToOne
     @JoinColumn(name = "main_qualification_id", referencedColumnName = "id", nullable = false)
     private MainQualifications mainQualificationCategory;
+
+    @Column (name = "inspector_status", nullable = false)
+    private String inspectorStatus;
+
+
 
     @Column(nullable = true) // Allow null for remarks
     private String remarks;
