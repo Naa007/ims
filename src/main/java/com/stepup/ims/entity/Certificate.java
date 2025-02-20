@@ -36,7 +36,7 @@ public class Certificate {
     @Column(name = "issuer", nullable = true)
     private String issuer;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "inspector_id", referencedColumnName = "inspector_id", nullable = true)
+    @ManyToOne
+    @JoinColumn(name = "inspector_id", nullable = false)
     private Inspector inspector;
 }

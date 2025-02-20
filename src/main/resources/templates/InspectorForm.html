@@ -9,8 +9,13 @@
 <div class="container mt-5">
     <h2 class="text-center">Inspector Form</h2>
     <form th:action="@{/inspector/save}" th:object="${inspector}" method="post" class="mt-4">
-        <!-- Inspector Identifier (Hidden Field for ID) -->
-        <input type="hidden" th:field="*{inspectorId}"/>
+
+        <!-- Inspector ID -->
+        <div class="mb-3">
+            <label for="inspectorId" class="form-label">Inspector ID</label>
+            <input type="text" id="inspectorId" th:field="*{inspectorId}" class="form-control"
+                   placeholder="Enter Inspector ID" required/>
+        </div>
 
         <!-- Inspector Name -->
         <div class="mb-3">

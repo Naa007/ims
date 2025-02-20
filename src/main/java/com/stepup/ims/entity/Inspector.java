@@ -14,7 +14,6 @@ import java.util.List;
 public class Inspector {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Primary Key
     @Column(name = "inspector_id", nullable = false)
     private Long inspectorId;
 
@@ -50,16 +49,15 @@ public class Inspector {
     @Column(nullable = true, length = 1000)
     private String disciplines; // E.g., list or custom type separated by commas
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "certificate_id", referencedColumnName = "inspector_id")
+    @OneToMany(mappedBy = "inspector", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Certificate> certificates;
 
-    @OneToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name = "special_qualification_id", referencedColumnName = "id", nullable = true)
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "special_qualification_id")
     private SpecialQualification specialQualification; // Special Qualification like Aramco, SEC, etc.
 
-    @OneToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name = "main_qualification_id", referencedColumnName = "id", nullable = true)
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "main_qualification_id")
     private MainQualifications mainQualificationCategory;
 
     @Column(name = "inspector_status", nullable = false)

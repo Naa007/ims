@@ -10,4 +10,5 @@ public class MainQualification {
     private Boolean piping;
     private Boolean steelStructure;
     private Boolean electrical;
+    private Inspector inspector;
 }

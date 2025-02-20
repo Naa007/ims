@@ -8,4 +8,5 @@ public class SpecialQualification {
     private Boolean aramco;
     private Boolean sec;
     private String specialQualificationDetails;
+    private Inspector inspector;
 }

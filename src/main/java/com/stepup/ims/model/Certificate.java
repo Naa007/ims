@@ -12,4 +12,5 @@ public class Certificate {
     private LocalDate dateIssued;
     private LocalDate expiryDate;
     private String issuer;
+    private Inspector inspector;
 }
