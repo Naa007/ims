@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+<h1>Inspectors List</h1>
+<h1 class="header-title">Inspectors List</h1>
+<table class="table table-bordered">
+    <thead>
+    <tr>
+        <th class="table-header">#</th>
+        <th class="table-header">Inspector ID</th>
+        <th class="table-header">Inspector Name</th>
+        <th class="table-header">Email</th>
+        <th class="table-header">Phone</th>
+        <th class="table-header">Status</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Iterating over the inspectorList and generating rows with a button for details -->
+    <tr class="table-row" th:each="inspector, iterStat : ${inspectors}">
+        <td class="table-data" th:text="${iterStat.index + 1}"></td> <!-- Display index (starting from 1) -->
+        <td class="table-data" th:text="${inspector.inspectorId}"></td> <!-- Display inspector department -->
+        <td class="table-data" th:text="${inspector.inspectorName}"></td>    <!-- Display inspector name -->
+        <td class="table-data" th:text="${inspector.email}"></td>  <!-- Display inspector email -->
+        <td class="table-data" th:text="${inspector.phone}"></td>  <!-- Display inspector phone -->
+        <td class="table-data" th:text="${inspector.inspectorStatus}"></td> <!-- Display inspector status -->
+        <td class="table-data">
+            <!-- Button to open inspectorForm popup to view complete details -->
+            <button class="btn btn-details"
+                    onclick="viewInspectorDetails(th:href='@{/inspectorForm}/{inspector.id}' + ${inspector.id})">
+                Open
+            </button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

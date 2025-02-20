@@ -2,6 +2,7 @@ package com.stepup.ims.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 @Data
 @Entity
@@ -22,6 +23,7 @@ public class SpecialQualification {
     @Column(nullable = true)
     private String specialQualificationDetails;
 
+    @ToString.Exclude
     @OneToOne
     @JoinColumn(name = "inspector_id", referencedColumnName = "inspector_id", nullable = true)
     private Inspector inspector;

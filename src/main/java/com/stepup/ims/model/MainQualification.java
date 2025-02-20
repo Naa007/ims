@@ -1,6 +1,7 @@
 package com.stepup.ims.model;
 
 import lombok.Data;
+import lombok.ToString;
 
 @Data
 public class MainQualification {
@@ -10,5 +11,6 @@ public class MainQualification {
     private Boolean piping;
     private Boolean steelStructure;
     private Boolean electrical;
+    @ToString.Exclude
     private Inspector inspector;
 }
