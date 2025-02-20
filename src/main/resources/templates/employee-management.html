@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management - IISPL Console</title>
+    <!-- Include Bootstrap CSS for styling -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Include Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Include DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css">
+    <!-- Custom CSS -->
+    <style>
+        /* General Styles */
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1; /* Pushes the footer to the bottom */
+        }
+
+        footer {
+            background-color: #343a40;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            width: 100%;
+        }
+
+        #addEmployeeModal .modal-dialog {
+            max-width: 400px; /* Reduces the width */
+        }
+
+        #addEmployeeModal .modal-body {
+            padding: 15px;
+        }
+
+        #addEmployeeModal .form-group {
+            margin-bottom: 10px; /* Reduce space between form fields */
+        }
+
+		 #editEmployeeModal .modal-dialog {
+            max-width: 400px; /* Reduces the width */
+        }
+
+        #editEmployeeModal .modal-body {
+            padding: 15px;
+        }
+
+        #editEmployeeModal .form-group {
+            margin-bottom: 10px; /* Reduce space between form fields */
+        }
+
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #343a40;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-warning {
+            background-color: #ffc107;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .table {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+        }
+
+        .table th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0, 123, 255, 0.05);
+        }
+
+        .modal-content {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border-bottom: none;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .form-control {
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: none;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            color: #343a40;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-primary, .btn-warning, .btn-danger {
+            width: auto;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover, .btn-warning:hover, .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary:active, .btn-warning:active, .btn-danger:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        .btn-group .btn {
+            margin-right: 10px;
+        }
+
+        .btn-group .btn:last-child {
+            margin-right: 0;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .btn-primary, .btn-warning, .btn-danger {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .btn-group .btn {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+
+            .btn-group .btn:last-child {
+                margin-bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Header -->
+<header th:replace="fragments/header :: header"></header>
+
+<main class="container mt-5">
+    <h1 class="text-center mb-4">Manage Employee</h1>
+
+    <!-- Add Employee Button -->
+    <div class="text-center mb-4">
+        <button class="btn btn-primary" data-toggle="modal" data-target="#addEmployeeModal">
+            <i class="fas fa-plus"></i> Add Employee
+        </button>
+    </div>
+
+    <!-- Employee List Table -->
+    <div class="employee-list">
+        <table id="employeeTable" class="table table-striped table-hover">
+            <thead>
+            <tr>
+                <th>Employee Name</th>
+                <th>Employee ID</th>
+                <th>Role</th>
+                <th>Active</th>
+                <th>Email</th>
+                <th>Phone Number</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="employee : ${employees}">
+                <td th:text="${employee.empName}"></td>
+                <td th:text="${employee.empId}"></td>
+                <td th:text="${employee.role}"></td>
+                <td th:text="${employee.active}"></td>
+                <td th:text="${employee.email}"></td>
+                <td th:text="${employee.phoneNumber}"></td>
+                <td>
+                    <div class="btn-group">
+                        <button class="btn btn-warning" data-toggle="modal" data-target="#editEmployeeModal"
+                                th:data-id="${employee.id}"
+                                th:data-empname="${employee.empName}"
+                                th:data-empid="${employee.empId}"
+                                th:data-role="${employee.role}"
+                                th:data-active="${employee.active}"
+                                th:data-email="${employee.email}"
+                                th:data-phonenumber="${employee.phoneNumber}"
+                                onclick="loadEmployeeData(this)">
+                            <i class="fas fa-edit"></i> Modify
+                        </button>
+                        <button class="btn btn-danger" onclick="confirmDelete(this)" th:data-id="${employee.id}">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Deletion</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this employee?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Yes, Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Employee Modal -->
+<div class="modal fade" id="addEmployeeModal" tabindex="-1" aria-labelledby="addEmployeeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addEmployeeModalLabel">Add Employee</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Add Employee Form -->
+                <form th:action="@{/admin/save-employee}" th:object="${employee}" method="post">
+                    <div class="form-group">
+                        <label for="empName">Employee Name</label>
+                        <input type="text" class="form-control" id="empName" th:field="*{empName}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="empId">Employee ID</label>
+                        <input type="text" class="form-control" id="empId" th:field="*{empId}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="role">Role</label>
+                        <select class="form-control" id="role" th:field="*{role}" required>
+                            <option value="">Select Role</option>
+                            <option value="Co-Ordinator">Co-Ordinator</option>
+                            <option value="Inspector">Inspector</option>
+                            <option value="Technical Co-Ordinator">Technical Co-Ordinator</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="active">Active</label>
+                        <select class="form-control" id="active" th:field="*{active}" required>
+                            <option value="">Select Status</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" th:field="*{email}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phoneNumber">Phone Number</label>
+                        <input type="text" class="form-control" id="phoneNumber" th:field="*{phoneNumber}" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Employee Modal -->
+<div class="modal fade" id="editEmployeeModal" tabindex="-1" aria-labelledby="editEmployeeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editEmployeeModalLabel">Edit Employee</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Edit Employee Form -->
+                <form id="editEmployeeForm" method="post">
+                    <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                    <input type="hidden" id="editId" name="id">
+                    <div class="form-group">
+                        <label for="editEmpName">Employee Name</label>
+                        <input type="text" class="form-control" id="editEmpName" name="empName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editEmpId">Employee ID</label>
+                        <input type="text" class="form-control" id="editEmpId" name="empId" required readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="editRole">Role</label>
+                        <select class="form-control" id="editRole" name="role" required>
+                            <option value="">Select Role</option>
+                            <option value="Co-Ordinator">Co-Ordinator</option>
+                            <option value="Inspector">Inspector</option>
+                            <option value="Technical Co-Ordinator">Technical Co-Ordinator</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editActive">Active</label>
+                        <select class="form-control" id="editActive" name="active" required>
+                            <option value="">Select Status</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editEmail">Email</label>
+                        <input type="email" class="form-control" id="editEmail" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPhoneNumber">Phone Number</label>
+                        <input type="text" class="form-control" id="editPhoneNumber" name="phoneNumber" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- Include DataTables JS -->
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
+<!-- Custom JS -->
+<script>
+    // Initialize DataTable
+    $(document).ready(function () {
+        var table = $('#employeeTable').DataTable({
+            "paging": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "lengthMenu": [5, 10, 25, 50],
+            "pageLength": 10
+        });
+
+        // Custom search function to filter by employee name only
+        $('#employeeTable_filter input').on('keyup change', function () {
+            var searchTerm = this.value;
+            table.column(0).search(searchTerm).draw(); // Search only in the first column (Employee Name)
+        });
+    });
+    // Function to load employee data into the edit modal
+    function loadEmployeeData(button) {
+        const id = button.getAttribute("data-id");
+        const empName = button.getAttribute("data-empname");
+        const empId = button.getAttribute("data-empid");
+        const role = button.getAttribute("data-role");
+        const active = button.getAttribute("data-active");
+        const email = button.getAttribute("data-email");
+        const phoneNumber = button.getAttribute("data-phonenumber");
+
+        document.getElementById("editId").value = id;
+        document.getElementById("editEmpName").value = empName;
+        document.getElementById("editEmpId").value = empId;
+        document.getElementById("editRole").value = role;
+        document.getElementById("editActive").value = active;
+        document.getElementById("editEmail").value = email;
+        document.getElementById("editPhoneNumber").value = phoneNumber;
+        document.getElementById("editEmployeeForm").action = "/admin/update-employee/" + id;
+    }
+
+    function confirmDelete(button) {
+        const id = button.getAttribute("data-id");
+        $('#deleteConfirmationModal').modal('show');
+        document.getElementById("confirmDeleteBtn").setAttribute("data-id", id);
+    }
+
+    document.getElementById("confirmDeleteBtn").addEventListener("click", function () {
+        const id = this.getAttribute("data-id");
+        window.location.href = "/admin/delete-employee/" + id;
+    });
+</script>
+<footer th:replace="fragments/footer :: footer"></footer>
+</body>
+</html>
