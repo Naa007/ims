@@ -10,6 +10,7 @@ public class SpecialQualification {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private Long id;
 
     @Column(name = "aramco", nullable = false)
@@ -20,5 +21,9 @@ public class SpecialQualification {
 
     @Column(nullable = true)
     private String specialQualificationDetails;
+
+    @OneToOne
+    @JoinColumn(name = "inspector_id", referencedColumnName = "inspector_id", nullable = true)
+    private Inspector inspector;
 
 }

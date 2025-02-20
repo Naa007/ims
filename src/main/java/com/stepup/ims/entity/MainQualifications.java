@@ -9,6 +9,7 @@ import lombok.Data;
 public class MainQualifications {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private Long id;
 
     // Qualifications for various fields (e.g., Mechanical Static, Rotating, etc.)
@@ -26,5 +27,9 @@ public class MainQualifications {
 
     @Column(nullable = true)
     private Boolean electrical;
+
+    @OneToOne(fetch = FetchType.LAZY, optional = true) // Inspector is optional in this relationship
+    @JoinColumn(name = "inspector_id", referencedColumnName = "inspector_id", nullable = true)
+    private Inspector inspector;
 
 }

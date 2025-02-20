@@ -15,6 +15,7 @@ public class Inspector {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Primary Key
+    @Column(name = "inspector_id", nullable = false)
     private Long inspectorId;
 
     @Column(nullable = false, length = 200)
@@ -50,28 +51,24 @@ public class Inspector {
     private String disciplines; // E.g., list or custom type separated by commas
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "inspector_id", referencedColumnName = "inspectorId")
+    @JoinColumn(name = "certificate_id", referencedColumnName = "inspector_id")
     private List<Certificate> certificates;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "special_qualification_id", referencedColumnName = "id", nullable = true)
     private SpecialQualification specialQualification; // Special Qualification like Aramco, SEC, etc.
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "main_qualification_id", referencedColumnName = "id", nullable = false)
+    @OneToOne(cascade = CascadeType.MERGE)
+    @JoinColumn(name = "main_qualification_id", referencedColumnName = "id", nullable = true)
     private MainQualifications mainQualificationCategory;
 
     @Column(name = "inspector_status", nullable = false)
-    private InspectorStatusType inspectorStatus;
+    private String inspectorStatus;
 
     @Column(nullable = false) // Allow null for remarks
     private String remarks;
 
     public enum InspectorType {
         INHOUSE_INSPECTOR, TECHNICAL_COORDINATOR, FREELANCER, PARTNER_INSPECTOR
-    }
-
-    public enum InspectorStatusType {
-        ACTIVE, INACTIVE, DELETED
     }
 }

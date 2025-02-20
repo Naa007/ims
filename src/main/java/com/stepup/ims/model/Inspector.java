@@ -25,6 +25,10 @@ public class Inspector {
     private InspectorStatusType inspectorStatus;
     private String remarks;
 
+    // TODO replace with the google maps api call based on user location
+    public LatLng getAddressCoordinates() {
+        return new LatLng(17.4065,78.4772);
+    }
     public enum InspectorType {
         INHOUSE_INSPECTOR, TECHNICAL_COORDINATOR, FREELANCER, PARTNER_INSPECTOR
     }
