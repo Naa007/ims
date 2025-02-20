@@ -16,16 +16,20 @@ public class Inspector {
     private String country;
     private String address;
     private LatLng addressCoordinates;
-    private String dob; // Date represented as a formatted string in UI
+    private String dob; // Date for inspector's date of birth
     private String educationDetails;
     private String disciplines; // Comma-separated string for disciplines
     private List<Certificate> certificates;
     private SpecialQualification specialQualification;
     private MainQualification mainQualificationCategory;
-    private String inspectorStatus;
+    private InspectorStatusType inspectorStatus;
     private String remarks;
 
     public enum InspectorType {
         INHOUSE_INSPECTOR, TECHNICAL_COORDINATOR, FREELANCER, PARTNER_INSPECTOR
+    }
+
+    public enum InspectorStatusType {
+        ACTIVE, INACTIVE, DELETED
     }
 }

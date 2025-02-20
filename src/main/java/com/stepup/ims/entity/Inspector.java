@@ -14,6 +14,7 @@ import java.util.List;
 public class Inspector {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Primary Key
     private Long inspectorId;
 
     @Column(nullable = false, length = 200)
@@ -61,12 +62,16 @@ public class Inspector {
     private MainQualifications mainQualificationCategory;
 
     @Column(name = "inspector_status", nullable = false)
-    private String inspectorStatus;
+    private InspectorStatusType inspectorStatus;
 
     @Column(nullable = false) // Allow null for remarks
     private String remarks;
 
     public enum InspectorType {
         INHOUSE_INSPECTOR, TECHNICAL_COORDINATOR, FREELANCER, PARTNER_INSPECTOR
+    }
+
+    public enum InspectorStatusType {
+        ACTIVE, INACTIVE, DELETED
     }
 }

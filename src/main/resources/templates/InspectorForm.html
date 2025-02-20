@@ -21,7 +21,7 @@
 
         <!-- Inspector Type -->
         <h5>Inspector Type</h5>
-        <div th:each="type : ${T(com.stepup.ims.entity.Inspector.InspectorType).values()}">
+        <div th:each="type : ${T(com.stepup.ims.model.Inspector.InspectorType).values()}">
             <input type="checkbox" th:field="*{inspectorType}" th:value="${type}" class="form-check-input"/>
             <label th:for="${type}" th:text="${type}" class="form-check-label"></label>
         </div>
@@ -163,6 +163,12 @@
             <label for="steelStructure" class="form-check-label">Steel Structure</label>
         </div>
 
+        <h5>Inspector Status</h5>
+        <div th:each="status : ${T(com.stepup.ims.model.Inspector.InspectorStatusType).values()}">
+            <input type="checkbox" th:field="*{inspectorStatus}" th:value="${status}" class="form-check-input"/>
+            <label th:for="${status}" th:text="${status}" class="form-check-label"></label>
+        </div>
+      
         <!-- Remarks -->
         <div class="mb-3">
             <label for="remarks" class="form-label">Remarks</label>

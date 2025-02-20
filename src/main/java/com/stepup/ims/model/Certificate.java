@@ -7,6 +7,7 @@ import java.time.LocalDate;
 @Data
 public class Certificate {
 
+    private Long id;
     private String name;
     private LocalDate dateIssued;
     private LocalDate expiryDate;
