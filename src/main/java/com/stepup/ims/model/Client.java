@@ -8,6 +8,7 @@ import java.util.Locale;
 
 @Data
 public class Client {
+    private Long clientId;
     private String clientName;
     private String country;
     private String address;

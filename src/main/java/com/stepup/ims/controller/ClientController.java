@@ -14,7 +14,7 @@ public class ClientController {
     @Autowired
     private ClientService clientService;
 
-    @GetMapping("/list")
+     @GetMapping("/list")
     public String listClients(Model model) {
         model.addAttribute("clients", clientService.getAllClients());
         return "clientList";
