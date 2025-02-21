@@ -1,62 +1,89 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Internation Inspection Services Pvt Ltd</title>
-    <!-- Include CSS -->
-    <link rel="stylesheet" th:href="@{/css/styles.css}">
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHwaHTTVcK5bvy2Vg36H6r3gdpSoIYcjY"></script>
-
+    <title>Login</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
 <body>
-<!-- Include header fragment -->
-<th:block th:insert="fragments/header :: header"></th:block>
+<div class="container mt-5">
+    <h2 class="text-center">Login</h2>
+    <div class="card p-4 mx-auto" style="max-width: 400px;">
+        <!-- Request OTP Section -->
+        <div id="otp-request-section">
+            <form id="request-otp-form">
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
+                </div>
+                <button type="button" id="send-otp-btn" class="btn btn-primary w-100">Send OTP</button>
+            </form>
+        </div>
 
-<main>
-    <h1>Inspectors available near Inspection Location</h1>
+        <!-- Verify OTP Section (Hidden Initially) -->
+        <div id="otp-verify-section" style="display: none;">
+            <form id="verify-otp-form">
+                <div class="mb-3">
+                    <label for="otp" class="form-label">Enter OTP</label>
+                    <input type="text" id="otp" class="form-control" placeholder="Enter OTP" required>
+                </div>
+                <button type="button" id="verify-otp-btn" class="btn btn-success w-100">Verify OTP</button>
+            </form>
+        </div>
+    </div>
 
-</main>
-<br/>
-<h3>Inspection Location: "Hyderabad, India"</h3>
-<div id="map" allign="center" class="center-div"></div>
+    <div class="mt-3 text-center" id="status"></div>
+</div>
+
+<!-- Bootstrap JS & Dependencies -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Custom JavaScript -->
 <script>
-    function initMap() {
-        fetch('/api/inspectors?address=Hyderabad, India').then(response => response.json())
-          .then(data => {
-            const userLocation = { lat: 17.366, lng: 78.476 }; // Example: Replace with the user's geocoded location
-            const map = new google.maps.Map(document.getElementById('map'), {
-                zoom: 10,
-                center: userLocation
-            });
+    document.getElementById('send-otp-btn').addEventListener('click', function () {
+        const email = document.getElementById('email').value;
 
-            const userMarker = new google.maps.Marker({
-                position: userLocation,
-                map: map,
-                title: "Inspection Location"
-            });
+        // Call backend API to send OTP
+        fetch('/auth/send-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ email })
+        })
+        .then(response => response.text())
+        .then(responseMessage => {
+            document.getElementById('status').textContent = responseMessage;
 
-            data.forEach(inspector => {
-                const marker = new google.maps.Marker({
-                    position: {
-                        lat: inspector.location.lat,
-                        lng: inspector.location.lng
-                    },
-                    map: map,
-                    title: `${inspector.name}, Distance: ${inspector.distance}, Duration: ${inspector.duration}`
-                });
-            });
-        });
-    }
+            if (responseMessage.includes("OTP sent")) {
+                // Show the verify OTP section
+                document.getElementById('otp-request-section').style.display = 'none';
+                document.getElementById('otp-verify-section').style.display = 'block';
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
 
-    // Initialize Map
-    window.onload = initMap;
+    document.getElementById('verify-otp-btn').addEventListener('click', function () {
+        const email = document.getElementById('email').value;
+        const otp = document.getElementById('otp').value;
+
+        // Call backend API to verify OTP
+        fetch('/auth/verify-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ email, otpCode: otp })
+        })
+        .then(response => response.text())
+        .then(responseMessage => {
+            document.getElementById('status').textContent = responseMessage;
+
+            if (responseMessage.includes("Login successful")) {
+            
+                window.location.href = "/client/list"; // Redirect on successful login
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
 </script>
-</body>
-<!-- Include footer fragment -->
-<th:block th:insert="fragments/footer :: footer"></th:block>
-
-<!-- Include JS -->
-<script th:src="@{/js/scripts.js}"></script>
 </body>
 </html>

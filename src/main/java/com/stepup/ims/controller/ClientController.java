@@ -32,6 +32,13 @@ public class ClientController {
         return "redirect:/client/list";
     }
 
+    @GetMapping("/get/{id}")
+    @ResponseBody
+    public String getClientById(@PathVariable Long id, Model model) {
+        model.addAttribute("client", clientService.getClientById(id));
+        return "clientForm";
+    }
+
     @GetMapping("/delete/{id}")
     public String deleteClient(@PathVariable Long id) {
         clientService.deleteClientById(id);
