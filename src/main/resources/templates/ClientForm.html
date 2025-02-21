@@ -20,9 +20,10 @@
     <div class="form-group">
         <label for="country" class="form-label">Country:</label>
         <select id="country" class="form-select" th:field="*{country}">
-            <option value="" disabled selected>Select a country</option>
-            <option th:each="country : ${countriesList}" th:value="${country}" th:text="${country}"
-                    th:selected="${country == client.country}">
+            <option value="searchable" hidden>Type to search...</option>
+            <option value="" disabled selected>-- Select Country --</option>
+            <option th:each="countryName : *{countriesList}" th:value="${countryName}" th:text="${countryName}"
+                    th:selected="${client.country == countryName}">
             </option>
         </select>
     </div>
@@ -48,15 +49,16 @@
     </div>
     <br>
 
-    <div class="form-group">
-        <label for="reference" class="form-label">Reference :</label>
-        <input type="text" id="reference" class="form-control" th:field="*{reference}" readonly>
+    <div th:each="referenceType : ${T(com.stepup.ims.model.Client.ReferenceType).values()}">
+        <input type="checkbox" th:field="*{reference}" th:value="${referenceType}" class="form-check-input"/>
+        <label th:for="${referenceType}" th:text="${referenceType}" class="form-check-label"></label>
     </div>
+
     <br>
 
     <div class="form-group">
         <label for="employeeId" class="form-label">Employee ID:</label>
-        <input type="text" id="employeeId" class="form-control" th:field="*{employeeId}" required>
+        <input type="text" id="employeeId" class="form-control" th:field="*{employeeId}">
     </div>
     <br>
 

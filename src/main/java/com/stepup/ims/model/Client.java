@@ -17,13 +17,13 @@ public class Client {
     private Long employeeId;
     private String confirmationDate;
 
-    private List<String> countriesList = getCountriesList();
+    private List<String> countriesList;
 
     public enum ReferenceType {
         EMAIL_CONFIRMATION, PHONE_CONFIRMATION
     }
 
-    private List<String> getCountriesList(){
+    public List<String> getCountriesList() {
         return Arrays.stream(Locale.getISOCountries())
                 .map(countryCode -> new Locale("", countryCode).getDisplayCountry())
                 .toList();
