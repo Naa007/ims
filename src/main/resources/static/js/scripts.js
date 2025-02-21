@@ -30,3 +30,8 @@
           row.remove();
       }
   }
+
+  function viewclientDetails(url) {
+      // Open the client details in a new popup window
+      window.open(url, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
+  }

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Controller
-@RequestMapping("/client") // Updated request mapping
+@RequestMapping("/client")
 public class ClientController {
 
     @Autowired
@@ -54,12 +54,4 @@ public class ClientController {
         return "redirect:/client/clientList"; // Redirect to the client management page
     }
 
-    /**
-     * Handle the request to delete a client by ID.
-     */
-    @GetMapping("/delete-client/{id}")
-    public String deleteClient(@PathVariable Long id) {
-        clientService.deleteClientById(id);
-        return "redirect:/client/clientList"; // Redirect to the client management page
-    }
 }

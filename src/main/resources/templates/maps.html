@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internation Inspection Services Pvt Ltd</title>
+    <!-- Include CSS -->
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHwaHTTVcK5bvy2Vg36H6r3gdpSoIYcjY"></script>
+
+</head>
+<body>
+<!-- Include header fragment -->
+<th:block th:insert="fragments/header :: header"></th:block>
+
+<main>
+    <h1>Inspectors available near Inspection Location</h1>
+
+</main>
+<br/>
+<h3>Inspection Location: "Hyderabad, India"</h3>
+<div id="map" allign="center" class="center-div"></div>
+<script>
+    function initMap() {
+        fetch('/api/inspectors?address=Hyderabad, India').then(response => response.json())
+          .then(data => {
+            const userLocation = { lat: 17.366, lng: 78.476 }; // Example: Replace with the user's geocoded location
+            const map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 10,
+                center: userLocation
+            });
+
+            const userMarker = new google.maps.Marker({
+                position: userLocation,
+                map: map,
+                title: "Inspection Location"
+            });
+
+            data.forEach(inspector => {
+                const marker = new google.maps.Marker({
+                    position: {
+                        lat: inspector.location.lat,
+                        lng: inspector.location.lng
+                    },
+                    map: map,
+                    title: `${inspector.name}, Distance: ${inspector.distance}, Duration: ${inspector.duration}`
+                });
+            });
+        });
+    }
+
+    // Initialize Map
+    window.onload = initMap;
+</script>
+</body>
+<!-- Include footer fragment -->
+<th:block th:insert="fragments/footer :: footer"></th:block>
+
+<!-- Include JS -->
+<script th:src="@{/js/scripts.js}"></script>
+</body>
+</html>
