@@ -1,42 +1,341 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Client List</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <script th:src="@{/js/scripts.js}"></script>
-    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Management - IISPL Console</title>
+    <!-- Include Bootstrap CSS for styling -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Include Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Include DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css">
+    <!-- Custom CSS -->
+    <style>
+        /* General Styles */
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #343a40;
+            margin-bottom: 20px;
+        }
+
+        .table {
+            font-size: 0.9rem; /* Smaller font size */
+        }
+
+        .table th, .table td {
+            vertical-align: middle; /* Center align text */
+        }
+
+        .btn-sm {
+            padding: 5px 10px; /* Smaller button padding */
+            font-size: 0.8rem; /* Smaller font size */
+        }
+
+        .modal-content {
+            border-radius: 10px;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border-bottom: none;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+    </style>
 </head>
 <body>
-<h1 class="header-title">Client List</h1>
-<table class="table table-bordered">
-    <thead>
-    <tr>
-        <th class="table-header">#</th>
-        <th class="table-header">Client ID</th>
-        <th class="table-header">Client Name</th>
-        <th class="table-header">Email</th>
-        <th class="table-header">Phone</th>
-        <th class="table-header">Country</th>
-    </tr>
-    </thead>
-    <tbody>
-    <!-- Iterating over the clientList and generating rows with a button for details -->
-    <tr class="table-row" th:each="client, iterStat : ${clients}">
-        <td class="table-data" th:text="${iterStat.index + 1}"></td> <!-- Display index (starting from 1) -->
-        <td class="table-data" th:text="${client.clientId}"></td> <!-- Display client department -->
-        <td class="table-data" th:text="${client.clientName}"></td>    <!-- Display client name -->
-        <td class="table-data" th:text="${client.email}"></td>  <!-- Display client email -->
-        <td class="table-data" th:text="${client.phone}"></td>  <!-- Display client phone -->
-        <td class="table-data" th:text="${client.country}"></td> <!-- Display client status -->
-        <td class="table-data">
-            <!-- Button to open clientForm popup to view complete details -->
-            <button class="btn btn-details"
-                    onclick="viewclientDetails(th:href='@{/client/form}/{client.id}' + ${client.id})">
-                Open
-            </button>
-        </td>
-    </tr>
-    </tbody>
-</table>
+<!-- Header -->
+<header th:replace="fragments/header :: header"></header>
+
+<main class="container">
+    <h1 class="text-center">Manage Clients</h1>
+
+    <!-- Add Client Button -->
+    <div class="text-center mb-4">
+        <button class="btn btn-primary" data-toggle="modal" data-target="#addClientModal">
+            <i class="fas fa-plus"></i> Add Client
+        </button>
+    </div>
+
+    <!-- Client List Table -->
+    <div class="client-list">
+        <table id="clientTable" class="table table-striped table-hover table-sm">
+            <thead>
+            <tr>
+                <th style="width: 10%;">Client ID</th>
+                <th style="width: 20%;">Client Name</th>
+                <th style="width: 15%;">Country</th>
+                <th style="width: 20%;">Address</th>
+                <th style="width: 15%;">Email</th>
+                <th style="width: 15%;">Phone</th>
+                <th style="width: 10%;">Reference Type</th>
+                <th style="width: 10%;">Confirmation Date</th>
+                <th style="width: 5%;">Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="client : ${clients}">
+                <td th:text="${client.clientId}"></td>
+                <td th:text="${client.clientName}"></td>
+                <td th:text="${client.country}"></td>
+                <td th:text="${client.address}"></td>
+                <td th:text="${client.email}"></td>
+                <td th:text="${client.phone}"></td>
+                <td th:text="${client.reference}"></td>
+                <td th:text="${client.confirmationDate}"></td>
+                <td>
+                    <div class="btn-group">
+                        <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#editClientModal"
+                                th:data-id="${client.clientId}"
+                                th:data-clientname="${client.clientName}"
+                                th:data-country="${client.country}"
+                                th:data-address="${client.address}"
+                                th:data-email="${client.email}"
+                                th:data-phone="${client.phone}"
+                                th:data-reference="${client.reference}"
+                                th:data-confirmationdate="${client.confirmationDate}"
+                                onclick="loadClientData(this)">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#viewClientModal"
+                                th:data-clientname="${client.clientName}"
+                                th:data-country="${client.country}"
+                                th:data-address="${client.address}"
+                                th:data-email="${client.email}"
+                                th:data-phone="${client.phone}"
+                                th:data-reference="${client.reference}"
+                                th:data-confirmationdate="${client.confirmationDate}"
+                                onclick="viewClientData(this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<!-- Add Client Modal -->
+<div class="modal fade" id="addClientModal" tabindex="-1" aria-labelledby="addClientModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addClientModalLabel">Add Client</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form th:action="@{/client/save-client}" method="post">
+                    <!-- Client ID Field -->
+                    <div class="form-group">
+                        <label for="clientId">Client ID</label>
+                        <input type="text" class="form-control" id="clientId" name="clientId" required>
+                    </div>
+                    <!-- Rest of the form fields -->
+                    <div class="form-group">
+                        <label for="clientName">Client Name</label>
+                        <input type="text" class="form-control" id="clientName" name="clientName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="country">Country</label>
+                        <select class="form-control" id="country" name="country" required>
+                            <option value="">Select Country</option>
+                            <option th:each="country : ${client.countriesList}" th:value="${country}" th:text="${country}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Address</label>
+                        <input type="text" class="form-control" id="address" name="address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone</label>
+                        <input type="text" class="form-control" id="phone" name="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Reference Type</label><br>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="referenceEmail" name="reference" value="EMAIL_CONFIRMATION">
+                            <label class="form-check-label" for="referenceEmail">Email Confirmation</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="referencePhone" name="reference" value="PHONE_CONFIRMATION">
+                            <label class="form-check-label" for="referencePhone">Phone Confirmation</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmationDate">Confirmation Date</label>
+                        <input type="date" class="form-control" id="confirmationDate" name="confirmationDate" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Client Modal -->
+<div class="modal fade" id="editClientModal" tabindex="-1" aria-labelledby="editClientModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editClientModalLabel">Edit Client</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editClientForm" th:action="@{/client/update-client}" method="post">
+                    <!-- Client ID Field (Read-only) -->
+                    <div class="form-group">
+                        <label for="editClientId">Client ID</label>
+                        <input type="text" class="form-control" id="editClientId" name="clientId" readonly>
+                    </div>
+                    <!-- Rest of the form fields -->
+                    <div class="form-group">
+                        <label for="editClientName">Client Name</label>
+                        <input type="text" class="form-control" id="editClientName" name="clientName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editCountry">Country</label>
+                        <select class="form-control" id="editCountry" name="country" required>
+                            <option value="">Select Country</option>
+                            <option th:each="country : ${client.countriesList}" th:value="${country}" th:text="${country}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editAddress">Address</label>
+                        <input type="text" class="form-control" id="editAddress" name="address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editEmail">Email</label>
+                        <input type="email" class="form-control" id="editEmail" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPhone">Phone</label>
+                        <input type="text" class="form-control" id="editPhone" name="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Reference Type</label><br>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="editReferenceEmail" name="reference" value="EMAIL_CONFIRMATION">
+                            <label class="form-check-label" for="editReferenceEmail">Email Confirmation</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="editReferencePhone" name="reference" value="PHONE_CONFIRMATION">
+                            <label class="form-check-label" for="editReferencePhone">Phone Confirmation</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="editConfirmationDate">Confirmation Date</label>
+                        <input type="date" class="form-control" id="editConfirmationDate" name="confirmationDate" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- Include DataTables JS -->
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
+<!-- Custom JS -->
+<script>
+    // Initialize DataTable
+    $(document).ready(function () {
+        var table = $('#clientTable').DataTable({
+            "paging": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "lengthMenu": [5, 10, 25, 50],
+            "pageLength": 10
+        });
+
+        // Custom search function to filter by client name only
+        $('#clientTable_filter input').on('keyup change', function () {
+            var searchTerm = this.value;
+            table.column(0).search(searchTerm).draw(); // Search only in the first column (Client Name)
+        });
+    });
+
+    // Function to load client data into the edit modal
+    function loadClientData(button) {
+        const id = button.getAttribute("data-id");
+        const clientName = button.getAttribute("data-clientname");
+        const country = button.getAttribute("data-country");
+        const address = button.getAttribute("data-address");
+        const email = button.getAttribute("data-email");
+        const phone = button.getAttribute("data-phone");
+        const reference = button.getAttribute("data-reference");
+        const confirmationDate = button.getAttribute("data-confirmationdate");
+
+        // Populate the Client ID field
+        document.getElementById("editClientId").value = id;
+
+        // Populate other fields
+        document.getElementById("editClientName").value = clientName;
+        document.getElementById("editCountry").value = country;
+        document.getElementById("editAddress").value = address;
+        document.getElementById("editEmail").value = email;
+        document.getElementById("editPhone").value = phone;
+        document.getElementById("editConfirmationDate").value = confirmationDate;
+
+        // Set the reference checkboxes
+        const references = reference.split(",");
+        document.getElementById("editReferenceEmail").checked = references.includes("EMAIL_CONFIRMATION");
+        document.getElementById("editReferencePhone").checked = references.includes("PHONE_CONFIRMATION");
+    }
+
+    // Function to view client data in the view modal
+    function viewClientData(button) {
+        const clientName = button.getAttribute("data-clientname");
+        const country = button.getAttribute("data-country");
+        const address = button.getAttribute("data-address");
+        const email = button.getAttribute("data-email");
+        const phone = button.getAttribute("data-phone");
+        const reference = button.getAttribute("data-reference");
+        const confirmationDate = button.getAttribute("data-confirmationdate");
+
+        document.getElementById("viewClientName").textContent = clientName;
+        document.getElementById("viewCountry").textContent = country;
+        document.getElementById("viewAddress").textContent = address;
+        document.getElementById("viewEmail").textContent = email;
+        document.getElementById("viewPhone").textContent = phone;
+        document.getElementById("viewReference").textContent = reference;
+        document.getElementById("viewConfirmationDate").textContent = confirmationDate;
+    }
+</script>
+<footer th:replace="fragments/footer :: footer"></footer>
 </body>
 </html>
