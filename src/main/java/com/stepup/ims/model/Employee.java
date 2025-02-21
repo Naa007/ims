@@ -1,9 +1,6 @@
 package com.stepup.ims.model;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data
@@ -23,7 +20,7 @@ public class Employee {
     @Pattern(regexp = "true|false", message = "Value must be either 'true' or 'false'")
     private String active;
     @NotBlank
-    @jakarta.validation.constraints.Email(message = "Invalid email format")
+    @Email(message = "Invalid email format")
     private String email;
     @NotBlank
     @Pattern(regexp = "^\\d{10}$", message = "Phone number must be 10 digits")
