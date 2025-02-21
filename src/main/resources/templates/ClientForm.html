@@ -16,15 +16,17 @@
     </div>
     <br>
 
+
     <div class="form-group">
         <label for="country" class="form-label">Country:</label>
-        <select id="country" class="form-select" th:field="*{country}" required>
-            <option value="" disabled selected>Select your country</option>
-            <th:block th:each="country : ${countriesList}">
-                <option th:value="${country}" th:text="${country}"></option>
-            </th:block>
+        <select id="country" class="form-select" th:field="*{country}">
+            <option value="" disabled selected>Select a country</option>
+            <option th:each="country : ${countriesList}" th:value="${country}" th:text="${country}"
+                    th:selected="${country == client.country}">
+            </option>
         </select>
     </div>
+
     <br>
 
     <div class="form-group">
