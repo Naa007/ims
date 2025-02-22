@@ -7,9 +7,7 @@ import com.stepup.ims.service.OTPService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -35,11 +33,12 @@ public class AuthController {
     @PostMapping("/send-otp")
     @ResponseBody
     public String sendOTP(@RequestParam String email) {
-        String otp = otpService.generateOTP(email);
-
         // Send OTP via email
         try {
+            String otp = otpService.generateOTP(email);
             emailService.sendEmail(email, "Your OTP Code", "Your OTP is: " + otp);
+        } catch (RuntimeException re) {
+            return re.getMessage();
         } catch (Exception e) {
             return "Failed to send OTP: " + e.getMessage();
         }
@@ -59,10 +58,7 @@ public class AuthController {
             // Automatically log in the user
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authToken);
-            System.out.println("Authentication Set: " + SecurityContextHolder.getContext().getAuthentication());
-            System.out.println("Principal: " + SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-            System.out.println("Roles: " + SecurityContextHolder.getContext().getAuthentication().getAuthorities());
-//
+
             return ResponseEntity.status(HttpStatus.FOUND).header("Location", "/admin/dashboard").build();
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid OTP or OTP expired!");
