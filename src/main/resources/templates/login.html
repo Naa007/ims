@@ -73,15 +73,17 @@
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams({ email, otpCode: otp })
         })
-        .then(response => response.text())
-        .then(responseMessage => {
-            document.getElementById('status').textContent = responseMessage;
-
-            if (responseMessage.includes("Login successful")) {
-            
-                window.location.href = "/client/list"; // Redirect on successful login
+        .then(response => {
+            if (response.redirected) {
+                window.location.href = response.url; // Handle backend redirects
+            } else {
+                return response.text().then(text => {
+                    // Display validation errors
+                    console.error("Error:", text);
+                });
             }
         })
+
         .catch(error => console.error('Error:', error));
     });
 </script>

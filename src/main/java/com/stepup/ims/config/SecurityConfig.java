@@ -1,10 +1,14 @@
 package com.stepup.ims.config;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
+@EnableWebSecurity
 @Configuration
 public class SecurityConfig {
 
@@ -12,20 +16,24 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll() // Publicly accessible endpoints
-                        .anyRequest().authenticated() // All other requests require authentication
-                )
-                .csrf(csrf -> csrf.disable()) // Disable CSRF for simplicity
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated())
+                .csrf(csrf -> csrf.disable())
                 .formLogin(form -> form
-                        .loginPage("/login")               // Set custom login page
-                        .defaultSuccessUrl("/client/list")        // Redirect after successful login
-                        .permitAll()                       // Allow all to access the login page
-                )
+                        .loginPage("/auth/login")
+                        .defaultSuccessUrl("/admin/dashboard", true)
+                        .permitAll())
+                .sessionManagement(sessionManagement -> sessionManagement
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> response
+                                .sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication Required !")))
                 .logout(logout -> logout
-                        .logoutUrl("/logout")              // Logout URL
-                        .logoutSuccessUrl("/login?logout") // Redirect after logout
-                        .permitAll()                       // Allow all to log out successfully
-                );
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout")
+                        .permitAll());
+
         return http.build();
     }
 }

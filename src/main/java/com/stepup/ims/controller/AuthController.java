@@ -5,14 +5,16 @@ import com.stepup.ims.service.AppUserService;
 import com.stepup.ims.service.EmailOTPService;
 import com.stepup.ims.service.OTPService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 
-@RestController
+@Controller
 @RequestMapping("/auth")
 public class AuthController {
 
@@ -25,7 +27,13 @@ public class AuthController {
     @Autowired
     private AppUserService appUserService;
 
+    @GetMapping("/login")
+    public String loginPage() {
+        return "login";
+    }
+
     @PostMapping("/send-otp")
+    @ResponseBody
     public String sendOTP(@RequestParam String email) {
         String otp = otpService.generateOTP(email);
 
@@ -40,7 +48,7 @@ public class AuthController {
     }
 
     @PostMapping("/verify-otp")
-    public String verifyOTP(@RequestParam String email, @RequestParam String otpCode) {
+    public ResponseEntity<String> verifyOTP(@RequestParam String email, @RequestParam String otpCode) {
         if (otpService.validateOTP(email, otpCode)) {
             // Mark user as authenticated
             AppUser user = appUserService.findByEmail(email).orElse(new AppUser());
@@ -51,10 +59,13 @@ public class AuthController {
             // Automatically log in the user
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authToken);
-
-            return "Login successful";
+            System.out.println("Authentication Set: " + SecurityContextHolder.getContext().getAuthentication());
+            System.out.println("Principal: " + SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+            System.out.println("Roles: " + SecurityContextHolder.getContext().getAuthentication().getAuthorities());
+//
+            return ResponseEntity.status(HttpStatus.FOUND).header("Location", "/admin/dashboard").build();
         } else {
-            return "Invalid OTP or OTP expired!";
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid OTP or OTP expired!");
         }
     }
 }

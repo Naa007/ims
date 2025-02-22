@@ -13,10 +13,12 @@ public class AppUser implements UserDetails {
     private String email; // Email serving as the unique identifier
     private String password; // dummy
     private boolean isVerified; // Store if OTP is verified
+    private String role = "ADMIN";
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER")); // Assign roles as needed
+        return List.of(new SimpleGrantedAuthority("ROLE_" + this.role)); // Assign admin role for dashboard access
     }
 
     @Override
