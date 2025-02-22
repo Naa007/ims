@@ -75,6 +75,7 @@
         })
         .then(response => {
             if (response.redirected) {
+                credentials: 'include'
                 window.location.href = response.url; // Handle backend redirects
             } else {
                 return response.text().then(text => {
