@@ -10,4 +10,9 @@ public class LoginController {
     public String loginPage() {
         return "redirect:/auth/login";
     }
+
+    @GetMapping("/logout")
+    public String logoutPage() {
+        return "redirect:/auth/login";
+    }
 }

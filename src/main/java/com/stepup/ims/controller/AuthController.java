@@ -38,6 +38,11 @@ public class AuthController {
         return "login";
     }
 
+    @GetMapping("/logout")
+    public String logoutPage() {
+        return "redirect:/auth/login?logout=true";
+    }
+
     @PostMapping("/send-otp")
     @ResponseBody
     public String sendOTP(@RequestParam String email) {

@@ -32,7 +32,9 @@ public class SecurityConfig {
                                 .sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication Required !")))
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout")
+                        .logoutSuccessUrl("/auth/login?logout")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
                         .permitAll());
 
         return http.build();
