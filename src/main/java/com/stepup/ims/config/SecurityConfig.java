@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -16,12 +17,12 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/static/**").permitAll()
-//                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .anyRequest().permitAll())
-                .csrf(csrf -> csrf.disable())
+                        .requestMatchers(ACCESSIBLE_PATTERNS).permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest().denyAll())
+                .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(form -> form
-                        .loginPage("/login")
+                        .loginPage("/auth/login")
                         .defaultSuccessUrl("/admin/dashboard", true)
                         .permitAll())
                 .sessionManagement(sessionManagement -> sessionManagement
@@ -36,4 +37,6 @@ public class SecurityConfig {
 
         return http.build();
     }
+
+    private static final String[] ACCESSIBLE_PATTERNS = {"/auth/**", "/js/**", "/css/**", "/images/**", "/login", "/", "/error"};
 }

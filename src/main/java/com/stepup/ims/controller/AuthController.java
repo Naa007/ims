@@ -4,11 +4,16 @@ import com.stepup.ims.model.AppUser;
 import com.stepup.ims.service.AppUserService;
 import com.stepup.ims.service.EmailOTPService;
 import com.stepup.ims.service.OTPService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +29,9 @@ public class AuthController {
 
     @Autowired
     private AppUserService appUserService;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     @GetMapping("/login")
     public String loginPage() {
@@ -47,7 +55,7 @@ public class AuthController {
     }
 
     @PostMapping("/verify-otp")
-    public ResponseEntity<String> verifyOTP(@RequestParam String email, @RequestParam String otpCode) {
+    public ResponseEntity<String> verifyOTP(@RequestParam String email, @RequestParam String otpCode, HttpSession session) {
         if (otpService.validateOTP(email, otpCode)) {
             // Mark user as authenticated
             AppUser user = appUserService.findByEmail(email).orElse(new AppUser());
@@ -56,8 +64,17 @@ public class AuthController {
             appUserService.save(user);
 
             // Automatically log in the user
-            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authToken);
+            Authentication authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            user,
+                            null,
+                            user.getAuthorities()
+                    );
+
+            SecurityContext securityContext = SecurityContextHolder.getContext();
+            securityContext.setAuthentication(authentication);
+            session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
+
 
             return ResponseEntity.status(HttpStatus.FOUND).header("Location", "/admin/dashboard").build();
         } else {
