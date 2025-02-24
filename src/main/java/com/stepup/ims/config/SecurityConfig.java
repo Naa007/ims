@@ -19,7 +19,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(ACCESSIBLE_PATTERNS).permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .anyRequest().denyAll())
+                        .anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(form -> form
                         .loginPage("/auth/login")
@@ -35,10 +35,12 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/auth/login?logout")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
-                        .permitAll());
+                        .permitAll())
+                .headers(header -> header
+                        .cacheControl(config -> config.disable()));
 
         return http.build();
     }
 
-    private static final String[] ACCESSIBLE_PATTERNS = {"/auth/**", "/js/**", "/css/**", "/images/**", "/login", "/", "/error"};
+    private static final String[] ACCESSIBLE_PATTERNS = {"/auth/**", "/js/**", "/css/**", "/images/**", "/login", "/", "/error/**"};
 }

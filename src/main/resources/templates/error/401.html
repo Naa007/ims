@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Unauthorized</title>
+</head>
+<body>
+<h1 th:text="${errorTitle}">Unauthorized Access</h1>
+<p th:text="${errorMessage}">You are not authorized to access this resource.</p>
+<a th:href="@{/auth/login}">Go to Login Page</a>
+</body>
+</html>
