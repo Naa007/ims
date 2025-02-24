@@ -13,20 +13,28 @@
     <!-- Custom CSS -->
     <style>
         /* General Styles */
+        html, body {
+            height: 100%; /* Ensure the body takes full height */
+            margin: 0; /* Remove default margin */
+        }
+
         body {
+            display: flex;
+            flex-direction: column; /* Stack header, main, and footer vertically */
             background-color: #f8f9fa;
             font-family: 'Arial', sans-serif;
         }
 
         main {
-            padding: 20px;
+            flex: 1; /* Allow main to grow and fill available space */
+            padding: 70px 20px 20px; /* Increase padding-top to create more space below the header */
         }
 
         h1 {
             font-size: 2rem;
             font-weight: bold;
             color: #343a40;
-            margin-bottom: 20px;
+            margin: 40px 0 20px; /* Add margin-top to create space below the header */
         }
 
         .table {
@@ -61,11 +69,115 @@
         .modal-body {
             padding: 20px;
         }
+
+        /* Footer */
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            margin-top: auto;
+            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 14px;
+        }
+          /* Header */
+        header {
+            background: linear-gradient(135deg, rgba(44, 62, 80, 0.9), rgba(52, 73, 94, 0.9));
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 10%, transparent 10.01%);
+            background-size: 20px 20px;
+            transform: rotate(45deg);
+            pointer-events: none;
+        }
+
+        .logo {
+            height: 50px;
+            width: auto;
+            margin-right: 15px;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+        }
+
+        .company-name {
+            font-size: 20px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0;
+            background: linear-gradient(135deg, #ffffff, #e0e0e0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .logout-btn i {
+            font-size: 18px;
+        }
     </style>
 </head>
 <body>
 <!-- Header -->
-<header th:replace="fragments/header :: header"></header>
+<header style="background: linear-gradient(135deg, rgba(44, 62, 80, 0.9), rgba(52, 73, 94, 0.9)); backdrop-filter: blur(10px); color: white; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); border-bottom: 1px solid rgba(255, 255, 255, 0.1); position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;">
+    <div class="header-content" style="display: flex; align-items: center;">
+        <img alt="IISPL Logo" class="logo" src="/images/logo.png" style="height: 50px; width: auto; margin-right: 15px;">
+    </div>
+    <div style="flex: 1 1 70%; text-align: center; font-size: 1.5rem; font-weight: bold; color: white;">
+        <h1 class="company-name">Inspection Management Services</h1>
+    </div>
+    <button class="logout-btn" style="background: transparent; border: none; color: white; font-size: 16px; font-weight: 500; cursor: pointer; padding: 8px 15px; border-radius: 5px; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;">
+        <i class="fas fa-sign-out-alt"></i>
+        <a th:href="@{/logout}" th:onclick="return confirm('Are you sure you want to log out?');">
+        Logout
+        </a>
+    </button>
+</header>
 
 <main class="container">
     <h1 class="text-center">Manage Clients</h1>
@@ -90,6 +202,7 @@
                 <th style="width: 15%;">Phone</th>
                 <th style="width: 10%;">Reference Type</th>
                 <th style="width: 10%;">Confirmation Date</th>
+                <th style="width: 15%;">Coordinator</th>
                 <th style="width: 5%;">Action</th>
             </tr>
             </thead>
@@ -103,6 +216,7 @@
                 <td th:text="${client.phone}"></td>
                 <td th:text="${client.reference}"></td>
                 <td th:text="${client.confirmationDate}"></td>
+                <td th:text="${client.employee != null ? client.employee.empName : 'N/A'}"></td> <!-- Coordinator Name -->
                 <td>
                     <div class="btn-group">
                         <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#editClientModal"
@@ -114,10 +228,12 @@
                                 th:data-phone="${client.phone}"
                                 th:data-reference="${client.reference}"
                                 th:data-confirmationdate="${client.confirmationDate}"
+                                th:data-employeeid="${client.employee != null ? client.employee.employeeId : ''}"
                                 onclick="loadClientData(this)">
                             <i class="fas fa-edit"></i>
                         </button>
                         <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#viewClientModal"
+                                th:data-clientid="${client.clientId}"
                                 th:data-clientname="${client.clientName}"
                                 th:data-country="${client.country}"
                                 th:data-address="${client.address}"
@@ -125,6 +241,7 @@
                                 th:data-phone="${client.phone}"
                                 th:data-reference="${client.reference}"
                                 th:data-confirmationdate="${client.confirmationDate}"
+                                th:data-employeeid="${client.employee != null ? client.employee.employeeId : ''}"
                                 onclick="viewClientData(this)">
                             <i class="fas fa-eye"></i>
                         </button>
@@ -147,13 +264,8 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form th:action="@{/client/save-client}" method="post">
-                    <!-- Client ID Field -->
-                    <div class="form-group">
-                        <label for="clientId">Client ID</label>
-                        <input type="text" class="form-control" id="clientId" name="clientId" required>
-                    </div>
-                    <!-- Rest of the form fields -->
+                <form th:action="@{/client/save}" method="post">
+                    <!-- Client Name Field -->
                     <div class="form-group">
                         <label for="clientName">Client Name</label>
                         <input type="text" class="form-control" id="clientName" name="clientName" required>
@@ -179,18 +291,25 @@
                     </div>
                     <div class="form-group">
                         <label>Reference Type</label><br>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="referenceEmail" name="reference" value="EMAIL_CONFIRMATION">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="referenceEmail" name="reference" value="EMAIL_CONFIRMATION">
                             <label class="form-check-label" for="referenceEmail">Email Confirmation</label>
                         </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="referencePhone" name="reference" value="PHONE_CONFIRMATION">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="referencePhone" name="reference" value="PHONE_CONFIRMATION">
                             <label class="form-check-label" for="referencePhone">Phone Confirmation</label>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="confirmationDate">Confirmation Date</label>
                         <input type="date" class="form-control" id="confirmationDate" name="confirmationDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editEmployee">Coordinator</label>
+                        <select class="form-control" id="editEmployee" name="employee.employeeId" required>
+                            <option value="">Select Coordinator</option>
+                            <option th:each="employee : ${employees}" th:value="${employee.id}" th:text="${employee.empName}"></option>
+                        </select>
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
@@ -210,12 +329,9 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="editClientForm" th:action="@{/client/update-client}" method="post">
-                    <!-- Client ID Field (Read-only) -->
-                    <div class="form-group">
-                        <label for="editClientId">Client ID</label>
-                        <input type="text" class="form-control" id="editClientId" name="clientId" readonly>
-                    </div>
+                <form id="editClientForm" th:action="@{/client/update}" method="post">
+                    <!-- Client ID Field (Hidden) -->
+                    <input type="hidden" id="editClientId" name="clientId">
                     <!-- Rest of the form fields -->
                     <div class="form-group">
                         <label for="editClientName">Client Name</label>
@@ -242,12 +358,12 @@
                     </div>
                     <div class="form-group">
                         <label>Reference Type</label><br>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="editReferenceEmail" name="reference" value="EMAIL_CONFIRMATION">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="editReferenceEmail" name="reference" value="EMAIL_CONFIRMATION">
                             <label class="form-check-label" for="editReferenceEmail">Email Confirmation</label>
                         </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="editReferencePhone" name="reference" value="PHONE_CONFIRMATION">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="editReferencePhone" name="reference" value="PHONE_CONFIRMATION">
                             <label class="form-check-label" for="editReferencePhone">Phone Confirmation</label>
                         </div>
                     </div>
@@ -255,13 +371,50 @@
                         <label for="editConfirmationDate">Confirmation Date</label>
                         <input type="date" class="form-control" id="editConfirmationDate" name="confirmationDate" required>
                     </div>
+                    <div class="form-group">
+                        <label for="employee">Coordinator</label>
+                        <select class="form-control" id="employee" name="employee.employeeId" required>
+                            <option value="">Select Coordinator</option>
+                            <option th:each="employee : ${employees}" th:value="${employee.id}" th:text="${employee.empName}"></option>
+                        </select>
+                    </div>
                     <button type="submit" class="btn btn-primary">Save Changes</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
-
+<!-- View Client Modal -->
+<div aria-hidden="true" aria-labelledby="viewClientModalLabel" class="modal fade" id="viewClientModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewClientModalLabel">Client Details</h5>
+                <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-building"></i> <span id="viewClientName"></span></h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Client ID: <span id="viewClientId"></span></h6>
+                        <p class="card-text"><i class="fas fa-globe"></i> Country: <span id="viewCountry"></span></p>
+                        <p class="card-text"><i class="fas fa-map-marker-alt"></i> Address: <span id="viewAddress"></span></p>
+                        <p class="card-text"><i class="fas fa-envelope"></i> Email: <span id="viewEmail"></span></p>
+                        <p class="card-text"><i class="fas fa-phone"></i> Phone: <span id="viewPhone"></span></p>
+                        <p class="card-text"><i class="fas fa-file-alt"></i> Reference Type: <span id="viewReference"></span></p>
+                        <p class="card-text"><i class="fas fa-calendar-check"></i> Confirmation Date: <span id="viewConfirmationDate"></span></p>
+                        <p class="card-text"><i class="fas fa-user-tie"></i> Coordinator: <span id="viewCoordinator"></span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-dismiss="modal" type="button">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- Include Bootstrap JS and dependencies -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
@@ -290,35 +443,48 @@
     });
 
     // Function to load client data into the edit modal
-    function loadClientData(button) {
-        const id = button.getAttribute("data-id");
-        const clientName = button.getAttribute("data-clientname");
-        const country = button.getAttribute("data-country");
-        const address = button.getAttribute("data-address");
-        const email = button.getAttribute("data-email");
-        const phone = button.getAttribute("data-phone");
-        const reference = button.getAttribute("data-reference");
-        const confirmationDate = button.getAttribute("data-confirmationdate");
+  function loadClientData(button) {
+    const clientid = button.getAttribute("data-clientid");
+    const clientName = button.getAttribute("data-clientname");
+    const country = button.getAttribute("data-country");
+    const address = button.getAttribute("data-address");
+    const email = button.getAttribute("data-email");
+    const phone = button.getAttribute("data-phone");
+    const reference = button.getAttribute("data-reference");
+    const confirmationDate = button.getAttribute("data-confirmationdate");
+    const employeeId = button.getAttribute("data-employeeid");
 
-        // Populate the Client ID field
-        document.getElementById("editClientId").value = id;
+    // Populate the Client ID field
+    document.getElementById("editClientId").value = id;
 
-        // Populate other fields
-        document.getElementById("editClientName").value = clientName;
-        document.getElementById("editCountry").value = country;
-        document.getElementById("editAddress").value = address;
-        document.getElementById("editEmail").value = email;
-        document.getElementById("editPhone").value = phone;
-        document.getElementById("editConfirmationDate").value = confirmationDate;
+    // Populate other fields
+    document.getElementById("editClientName").value = clientName;
+    document.getElementById("editCountry").value = country;
+    document.getElementById("editAddress").value = address;
+    document.getElementById("editEmail").value = email;
+    document.getElementById("editPhone").value = phone;
+    document.getElementById("editConfirmationDate").value = confirmationDate;
 
-        // Set the reference checkboxes
-        const references = reference.split(",");
-        document.getElementById("editReferenceEmail").checked = references.includes("EMAIL_CONFIRMATION");
-        document.getElementById("editReferencePhone").checked = references.includes("PHONE_CONFIRMATION");
+    // Set the reference radio buttons based on the client's reference type
+    if (reference === "EMAIL_CONFIRMATION") {
+        document.getElementById("editReferenceEmail").checked = true;
+        document.getElementById("editReferencePhone").checked = false;
+    } else if (reference === "PHONE_CONFIRMATION") {
+        document.getElementById("editReferenceEmail").checked = false;
+        document.getElementById("editReferencePhone").checked = true;
     }
+
+    // Set the selected coordinator
+    if (employeeId) {
+        document.getElementById("editEmployee").value = employeeId;
+    } else {
+        document.getElementById("editEmployee").value = "";
+    }
+}
 
     // Function to view client data in the view modal
     function viewClientData(button) {
+        const clientid = button.getAttribute("data-clientid");
         const clientName = button.getAttribute("data-clientname");
         const country = button.getAttribute("data-country");
         const address = button.getAttribute("data-address");
@@ -327,6 +493,7 @@
         const reference = button.getAttribute("data-reference");
         const confirmationDate = button.getAttribute("data-confirmationdate");
 
+        document.getElementById("viewClientId").textContent = clientid;
         document.getElementById("viewClientName").textContent = clientName;
         document.getElementById("viewCountry").textContent = country;
         document.getElementById("viewAddress").textContent = address;
@@ -336,6 +503,9 @@
         document.getElementById("viewConfirmationDate").textContent = confirmationDate;
     }
 </script>
-<footer th:replace="fragments/footer :: footer"></footer>
+<!-- Footer -->
+<footer style="background: #2c3e50; color: white; text-align: center; padding: 15px 0; margin-top: auto; box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);">
+    <p>&copy; 2025 International Inspection Services Pvt Ltd. All Rights Reserved.</p>
+</footer>
 </body>
 </html>

@@ -23,6 +23,12 @@ public class EmployeeService {
         return employeeModelMapper.toModelList(employeeRepository.findAll());
     }
 
+    public List<Employee> getAllCoordinateEmployees() {
+        return employeeModelMapper.toModelList(employeeRepository.findAll().stream()
+                .filter(employee -> "Co-Ordinator".equalsIgnoreCase(employee.getRole()))
+                .toList());
+    }
+
     // Get employee by ID
     public Optional<Employee> getEmployeeById(Long id) {
         return employeeRepository.findById(id).map(employeeModelMapper::toModel);

@@ -36,8 +36,9 @@ public class Client {
     @Column(name = "confirmation_date")
     private LocalDate confirmationDate;
 
-    @Column(name = "employee_id")
-    private Long employeeId;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "employee_id", unique = true)
+    private Employee employee;
 
     public enum ReferenceType {
         EMAIL_CONFIRMATION,

@@ -19,7 +19,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(ACCESSIBLE_PATTERNS).permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .anyRequest().denyAll())
+                        .anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(form -> form
                         .loginPage("/auth/login")
