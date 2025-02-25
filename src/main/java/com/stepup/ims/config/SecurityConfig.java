@@ -1,17 +1,19 @@
 package com.stepup.ims.config;
 
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig {
+
+    private static final String[] ACCESSIBLE_PATTERNS = {"/auth/**", "/js/**", "/css/**", "/images/**", "/login", "/", "/error/**"};
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -29,7 +31,7 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> response
-                                .sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication Required !")))
+                                .sendRedirect("/error")))
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/auth/login?logout")
@@ -37,10 +39,8 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID")
                         .permitAll())
                 .headers(header -> header
-                        .cacheControl(config -> config.disable()));
+                        .cacheControl(HeadersConfigurer.CacheControlConfig::disable));
 
         return http.build();
     }
-
-    private static final String[] ACCESSIBLE_PATTERNS = {"/auth/**", "/js/**", "/css/**", "/images/**", "/login", "/", "/error/**"};
 }

@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 
+import static com.stepup.ims.constants.UIRountingConstants.RETURN_TO_DEFAULT_ERROR;
+
 @Configuration
 public class CustomErrorPageConfiguration {
 
@@ -15,9 +17,9 @@ public class CustomErrorPageConfiguration {
         return factory -> {
             factory.addErrorPages(
                     new ErrorPage(HttpStatus.UNAUTHORIZED, "/error/401"), // Map 401 errors
-                    new ErrorPage(HttpStatus.NOT_FOUND, "/error/default"), // Map 404 errors
-                    new ErrorPage(HttpStatus.INTERNAL_SERVER_ERROR, "/error/default"), // Map 500 errors
-                    new ErrorPage("/error/defualt") // Map all other errors
+                    new ErrorPage(HttpStatus.NOT_FOUND, RETURN_TO_DEFAULT_ERROR), // Map 404 errors
+                    new ErrorPage(HttpStatus.INTERNAL_SERVER_ERROR, RETURN_TO_DEFAULT_ERROR), // Map 500 errors
+                    new ErrorPage(RETURN_TO_DEFAULT_ERROR) // Map all other errors
             );
         };
     }
