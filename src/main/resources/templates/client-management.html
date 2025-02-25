@@ -309,7 +309,7 @@
                         <label for="addEmployee">Coordinator</label>
                         <select class="form-control" id="addEmployee" name="employee.empId" required>
                             <option value="">Select Coordinator</option>
-                            <option th:each="employee : ${employees}" th:value="${employee.id}" th:text="${employee.empName}"></option>
+                            <option th:each="employee : ${employees}" th:value="${employee.empId}" th:text="${employee.empName}"></option>
                         </select>
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
@@ -330,7 +330,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="editClientForm" th:action="@{/client/update}" method="post">
+                <form id="editClientForm" th:action="@{/client/save}" method="post">
                     <!-- Client ID Field (Hidden) -->
                     <input type="hidden" id="editClientId" name="clientId">
                     <!-- Rest of the form fields -->

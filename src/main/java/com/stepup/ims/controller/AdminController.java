@@ -38,17 +38,4 @@ public class AdminController {
         return REDIRECT_ADMIN_EMPLOYEE_MANAGEMENT;
     }
 
-
-    @PostMapping("/update-employee/{id}")
-    public String updateEmployee(@PathVariable Long id, @ModelAttribute Employee employee) {
-        employee.setId(id);
-        employeeService.saveEmployee(employee);
-        return REDIRECT_ADMIN_EMPLOYEE_MANAGEMENT;
-    }
-
-    @GetMapping("/delete-employee/{id}")
-    public String deleteEmployee(@PathVariable Long id) {
-        employeeService.deleteEmployee(id);
-        return REDIRECT_ADMIN_EMPLOYEE_MANAGEMENT;
-    }
 }

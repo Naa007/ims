@@ -262,7 +262,6 @@
                                 th:data-email="${employee.email}"
                                 th:data-empid="${employee.empId}"
                                 th:data-empname="${employee.empName}"
-                                th:data-id="${employee.id}"
                                 th:data-phonenumber="${employee.phoneNumber}"
                                 th:data-role="${employee.role}">
                             <i class="fas fa-edit"></i>
@@ -345,6 +344,8 @@
                             <option value="Co-Ordinator">Co-Ordinator</option>
                             <option value="Inspector">Inspector</option>
                             <option value="Technical Co-Ordinator">Technical Co-Ordinator</option>
+                            <option value="Admin">Admin</option>
+                            <option value="Business">Business</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -402,6 +403,8 @@
                             <option value="Co-Ordinator">Co-Ordinator</option>
                             <option value="Inspector">Inspector</option>
                             <option value="Technical Co-Ordinator">Technical Co-Ordinator</option>
+                            <option value="Admin">Admin</option>
+                            <option value="Business">Business</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -480,7 +483,7 @@
             document.getElementById("editActiveNo").checked = true;
         }
 
-        document.getElementById("editEmployeeForm").action = "/admin/update-employee/" + id;
+        document.getElementById("editEmployeeForm").action = "/admin/save-employee" ;
     }
 
     // Function to view employee data in the view modal
