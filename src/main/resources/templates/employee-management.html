@@ -328,7 +328,7 @@
             </div>
             <div class="modal-body">
                 <!-- Add Employee Form -->
-                <form method="post" th:action="@{/admin/save-employee}" th:object="${employee}">
+                <form method="post" th:action="@{/employee/save-employee}" th:object="${employee}">
                     <div class="form-group">
                         <label for="empName">Employee Name</label>
                         <input class="form-control" id="empName" required th:field="*{empName}" type="text">
@@ -483,7 +483,7 @@
             document.getElementById("editActiveNo").checked = true;
         }
 
-        document.getElementById("editEmployeeForm").action = "/admin/save-employee" ;
+        document.getElementById("editEmployeeForm").action = "/employee/save-employee" ;
     }
 
     // Function to view employee data in the view modal
