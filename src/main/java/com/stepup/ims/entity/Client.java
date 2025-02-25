@@ -36,8 +36,8 @@ public class Client {
     @Column(name = "confirmation_date")
     private LocalDate confirmationDate;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "employee_id", unique = true)
+    @ManyToOne
+    @JoinColumn(name = "emp_id", referencedColumnName = "emp_id")
     private Employee employee;
 
     public enum ReferenceType {

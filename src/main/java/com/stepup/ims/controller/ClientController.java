@@ -44,9 +44,7 @@ public class ClientController {
      * Handle the request to save a new client.
      */
     @PostMapping("/save")
-    public String saveClient(Client client, @RequestParam("employee.employeeId") Long employeeId) {
-        Employee employee = employeeService.getEmployeeById(employeeId).orElse(null);
-        client.setEmployee(employee);
+    public String saveClient(Client client) {
         clientService.saveClient(client);
         return "redirect:/client/list"; // Redirect to the client management page
     }

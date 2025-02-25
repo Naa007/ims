@@ -164,17 +164,17 @@
 </head>
 <body>
 <!-- Header -->
-<header style="background: linear-gradient(135deg, rgba(44, 62, 80, 0.9), rgba(52, 73, 94, 0.9)); backdrop-filter: blur(10px); color: white; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); border-bottom: 1px solid rgba(255, 255, 255, 0.1); position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;">
-    <div class="header-content" style="display: flex; align-items: center;">
-        <img alt="IISPL Logo" class="logo" src="/images/logo.png" style="height: 50px; width: auto; margin-right: 15px;">
+<header>
+    <div class="header-content">
+        <img alt="IISPL Logo" class="logo" src="/images/logo.png">
     </div>
     <div style="flex: 1 1 70%; text-align: center; font-size: 1.5rem; font-weight: bold; color: white;">
         <h1 class="company-name">Inspection Management Services</h1>
     </div>
-    <button class="logout-btn" style="background: transparent; border: none; color: white; font-size: 16px; font-weight: 500; cursor: pointer; padding: 8px 15px; border-radius: 5px; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;">
+    <button class="logout-btn">
         <i class="fas fa-sign-out-alt"></i>
         <a th:href="@{/logout}" th:onclick="return confirm('Are you sure you want to log out?');">
-        Logout
+            Logout
         </a>
     </button>
 </header>
@@ -202,7 +202,7 @@
                 <th style="width: 15%;">Phone</th>
                 <th style="width: 10%;">Reference Type</th>
                 <th style="width: 10%;">Confirmation Date</th>
-                <th style="width: 15%;">Coordinator</th>
+                <th style="width: 15%;">Coordinator</th> <!-- Coordinator Column -->
                 <th style="width: 5%;">Action</th>
             </tr>
             </thead>
@@ -216,7 +216,7 @@
                 <td th:text="${client.phone}"></td>
                 <td th:text="${client.reference}"></td>
                 <td th:text="${client.confirmationDate}"></td>
-                <td th:text="${client.employee != null ? client.employee.empName : 'N/A'}"></td> <!-- Coordinator Name -->
+                <td th:text="${client.employee != null ? client.employee.empName : 'N/A'}"></td> <!-- Display Coordinator Name or N/A -->
                 <td>
                     <div class="btn-group">
                         <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#editClientModal"
@@ -228,12 +228,12 @@
                                 th:data-phone="${client.phone}"
                                 th:data-reference="${client.reference}"
                                 th:data-confirmationdate="${client.confirmationDate}"
-                                th:data-employeeid="${client.employee != null ? client.employee.employeeId : ''}"
+                                th:data-coordinator="${client.employee != null ? client.employee.empName : 'N/A'}"
                                 onclick="loadClientData(this)">
                             <i class="fas fa-edit"></i>
                         </button>
                         <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#viewClientModal"
-                                th:data-clientid="${client.clientId}"
+                                th:data-id="${client.clientId}"
                                 th:data-clientname="${client.clientName}"
                                 th:data-country="${client.country}"
                                 th:data-address="${client.address}"
@@ -241,10 +241,11 @@
                                 th:data-phone="${client.phone}"
                                 th:data-reference="${client.reference}"
                                 th:data-confirmationdate="${client.confirmationDate}"
-                                th:data-employeeid="${client.employee != null ? client.employee.employeeId : ''}"
-                                onclick="viewClientData(this)">
-                            <i class="fas fa-eye"></i>
+                                th:data-coordinator="${client.employee != null ? client.employee.empName : 'N/A'}"
+                        onclick="viewClientData(this)">
+                        <i class="fas fa-eye"></i>
                         </button>
+
                     </div>
                 </td>
             </tr>
@@ -305,8 +306,8 @@
                         <input type="date" class="form-control" id="confirmationDate" name="confirmationDate" required>
                     </div>
                     <div class="form-group">
-                        <label for="editEmployee">Coordinator</label>
-                        <select class="form-control" id="editEmployee" name="employee.employeeId" required>
+                        <label for="addEmployee">Coordinator</label>
+                        <select class="form-control" id="addEmployee" name="employee.empId" required>
                             <option value="">Select Coordinator</option>
                             <option th:each="employee : ${employees}" th:value="${employee.id}" th:text="${employee.empName}"></option>
                         </select>
@@ -372,10 +373,11 @@
                         <input type="date" class="form-control" id="editConfirmationDate" name="confirmationDate" required>
                     </div>
                     <div class="form-group">
-                        <label for="employee">Coordinator</label>
-                        <select class="form-control" id="employee" name="employee.employeeId" required>
+                        <label for="editEmployee">Coordinator</label>
+                        <select class="form-control" id="editEmployee" name="employee.empId" required>
                             <option value="">Select Coordinator</option>
-                            <option th:each="employee : ${employees}" th:value="${employee.id}" th:text="${employee.empName}"></option>
+                            <option th:each="employee : ${employees}" th:value="${employee.empId}"
+                                    th:text="${employee.empName}">></option>
                         </select>
                     </div>
                     <button type="submit" class="btn btn-primary">Save Changes</button>
@@ -384,6 +386,7 @@
         </div>
     </div>
 </div>
+
 <!-- View Client Modal -->
 <div aria-hidden="true" aria-labelledby="viewClientModalLabel" class="modal fade" id="viewClientModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
@@ -415,9 +418,10 @@
         </div>
     </div>
 </div>
+
 <!-- Include Bootstrap JS and dependencies -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <!-- Include DataTables JS -->
 <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
@@ -438,53 +442,13 @@
         // Custom search function to filter by client name only
         $('#clientTable_filter input').on('keyup change', function () {
             var searchTerm = this.value;
-            table.column(0).search(searchTerm).draw(); // Search only in the first column (Client Name)
+            table.column(1).search(searchTerm).draw(); // Search only in the first column (Client Name)
         });
     });
 
     // Function to load client data into the edit modal
-  function loadClientData(button) {
-    const clientid = button.getAttribute("data-clientid");
-    const clientName = button.getAttribute("data-clientname");
-    const country = button.getAttribute("data-country");
-    const address = button.getAttribute("data-address");
-    const email = button.getAttribute("data-email");
-    const phone = button.getAttribute("data-phone");
-    const reference = button.getAttribute("data-reference");
-    const confirmationDate = button.getAttribute("data-confirmationdate");
-    const employeeId = button.getAttribute("data-employeeid");
-
-    // Populate the Client ID field
-    document.getElementById("editClientId").value = id;
-
-    // Populate other fields
-    document.getElementById("editClientName").value = clientName;
-    document.getElementById("editCountry").value = country;
-    document.getElementById("editAddress").value = address;
-    document.getElementById("editEmail").value = email;
-    document.getElementById("editPhone").value = phone;
-    document.getElementById("editConfirmationDate").value = confirmationDate;
-
-    // Set the reference radio buttons based on the client's reference type
-    if (reference === "EMAIL_CONFIRMATION") {
-        document.getElementById("editReferenceEmail").checked = true;
-        document.getElementById("editReferencePhone").checked = false;
-    } else if (reference === "PHONE_CONFIRMATION") {
-        document.getElementById("editReferenceEmail").checked = false;
-        document.getElementById("editReferencePhone").checked = true;
-    }
-
-    // Set the selected coordinator
-    if (employeeId) {
-        document.getElementById("editEmployee").value = employeeId;
-    } else {
-        document.getElementById("editEmployee").value = "";
-    }
-}
-
-    // Function to view client data in the view modal
-    function viewClientData(button) {
-        const clientid = button.getAttribute("data-clientid");
+    function loadClientData(button) {
+        const id = button.getAttribute("data-id");
         const clientName = button.getAttribute("data-clientname");
         const country = button.getAttribute("data-country");
         const address = button.getAttribute("data-address");
@@ -492,16 +456,61 @@
         const phone = button.getAttribute("data-phone");
         const reference = button.getAttribute("data-reference");
         const confirmationDate = button.getAttribute("data-confirmationdate");
+        const employeeId = button.getAttribute("data-employeeid");
+        const coordinator = button.getAttribute("data-coordinator");
+        // Populate the Client ID field
+        document.getElementById("editClientId").value = id;
 
-        document.getElementById("viewClientId").textContent = clientid;
-        document.getElementById("viewClientName").textContent = clientName;
-        document.getElementById("viewCountry").textContent = country;
-        document.getElementById("viewAddress").textContent = address;
-        document.getElementById("viewEmail").textContent = email;
-        document.getElementById("viewPhone").textContent = phone;
-        document.getElementById("viewReference").textContent = reference;
-        document.getElementById("viewConfirmationDate").textContent = confirmationDate;
+        // Populate other fields
+        document.getElementById("editClientName").value = clientName;
+        document.getElementById("editCountry").value = country;
+        document.getElementById("editAddress").value = address;
+        document.getElementById("editEmail").value = email;
+        document.getElementById("editPhone").value = phone;
+        document.getElementById("editConfirmationDate").value = confirmationDate;
+        document.getElementById("viewCoordinator").value = coordinator;
+
+        // Set the reference radio buttons based on the client's reference type
+        if (reference === "EMAIL_CONFIRMATION") {
+            document.getElementById("editReferenceEmail").checked = true;
+            document.getElementById("editReferencePhone").checked = false;
+        } else if (reference === "PHONE_CONFIRMATION") {
+            document.getElementById("editReferenceEmail").checked = false;
+            document.getElementById("editReferencePhone").checked = true;
+        }
+
+        // Set the selected coordinator
+        if (employeeId) {
+            document.getElementById("employee").value = employeeId;
+        } else {
+            document.getElementById("employee").value = "N/A"; // Default to N/A
+        }
     }
+
+ function viewClientData(button) {
+    // Get values from the button attributes
+    var clientId = button.getAttribute("data-id");
+    var clientName = button.getAttribute("data-clientname");
+    var country = button.getAttribute("data-country");
+    var address = button.getAttribute("data-address");
+    var email = button.getAttribute("data-email");
+    var phone = button.getAttribute("data-phone");
+    var reference = button.getAttribute("data-reference");
+    var confirmationDate = button.getAttribute("data-confirmationdate");
+    var coordinator = button.getAttribute("data-coordinator");
+
+    // Set values in modal fields
+    document.getElementById("viewClientId").textContent = clientId ? clientId : "N/A";
+    document.getElementById("viewClientName").textContent = clientName ? clientName : "N/A";
+    document.getElementById("viewCountry").textContent = country ? country : "N/A";
+    document.getElementById("viewAddress").textContent = address ? address : "N/A";
+    document.getElementById("viewEmail").textContent = email ? email : "N/A";
+    document.getElementById("viewPhone").textContent = phone ? phone : "N/A";
+    document.getElementById("viewReference").textContent = reference ? reference : "N/A";
+    document.getElementById("viewConfirmationDate").textContent = confirmationDate ? confirmationDate : "N/A";
+    document.getElementById("viewCoordinator").innerText = coordinator ? coordinator : "N/A";
+}
+
 </script>
 <!-- Footer -->
 <footer style="background: #2c3e50; color: white; text-align: center; padding: 15px 0; margin-top: auto; box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);">
