@@ -1,7 +1,9 @@
 package com.stepup.ims.model;
 
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -15,8 +17,9 @@ public class Client {
     private String email;
     private String phone;
     private ReferenceType reference;
-    private Long employeeId;
-    private String confirmationDate;
+    private Employee employee;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate confirmationDate;
 
     private List<String> countriesList;
 

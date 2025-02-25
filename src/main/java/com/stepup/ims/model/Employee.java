@@ -6,8 +6,6 @@ import lombok.Data;
 @Data
 public class Employee {
 
-    @NotNull
-    private Long id;
     @NotBlank
     @Size(max = 50)
     private String empName;

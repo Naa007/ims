@@ -9,15 +9,11 @@ import lombok.Data;
 public class Employee {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id") // Explicitly define the column name
-    private Long id;
+    @Column(name = "emp_id", unique = true, nullable = false) // Using empId as primary key
+    private String empId;
 
     @Column(name = "emp_name", nullable = false) // Explicitly define the column name and constraints
     private String empName;
-
-    @Column(name = "emp_id", unique = true, nullable = false)
-    private String empId;
 
     @Column(name = "role", nullable = false)
     private String role;

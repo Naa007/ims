@@ -36,8 +36,9 @@ public class Client {
     @Column(name = "confirmation_date")
     private LocalDate confirmationDate;
 
-    @Column(name = "employee_id")
-    private Long employeeId;
+    @ManyToOne
+    @JoinColumn(name = "emp_id", referencedColumnName = "emp_id")
+    private Employee employee;
 
     public enum ReferenceType {
         EMAIL_CONFIRMATION,
