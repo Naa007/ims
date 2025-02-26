@@ -9,8 +9,7 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static com.stepup.ims.constants.ApplicationConstants.ADMIN;
-import static com.stepup.ims.constants.ApplicationConstants.BUSINESS;
+import static com.stepup.ims.constants.ApplicationConstants.*;
 
 @EnableWebSecurity
 @Configuration
@@ -25,6 +24,9 @@ public class SecurityConfig {
                         .requestMatchers(ACCESSIBLE_PATTERNS).permitAll()
                         .requestMatchers("/admin/**").hasRole(ADMIN)
                         .requestMatchers("/business/**").hasRole(BUSINESS)
+                        .requestMatchers("/coordinator/**").hasAnyRole(COORDINATOR)
+                        .requestMatchers("/technical-coordinator/**").hasAnyRole(TECHNICAL_COORDINATOR)
+                        .requestMatchers("/inspector/**").hasAnyRole(INSPECTOR)
                         .anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(form -> form

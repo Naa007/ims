@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import static com.stepup.ims.constants.ApplicationConstants.COORDINATOR;
+
 @Service
 public class EmployeeService {
 
@@ -25,7 +27,7 @@ public class EmployeeService {
 
     public List<Employee> getAllCoordinateEmployees() {
         return employeeModelMapper.toModelList(employeeRepository.findAll().stream()
-                .filter(employee -> "Co-Ordinator".equalsIgnoreCase(employee.getRole()))
+                .filter(employee -> COORDINATOR.equalsIgnoreCase(employee.getRole()))
                 .toList());
     }
 
