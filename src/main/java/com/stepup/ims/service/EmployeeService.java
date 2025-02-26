@@ -45,4 +45,11 @@ public class EmployeeService {
     }
 
 
+    public String getRoleByEmail(String email) {
+        return employeeRepository.findAll().stream()
+                .filter(employee -> email.equalsIgnoreCase(employee.getEmail()))
+                .map(com.stepup.ims.entity.Employee::getRole)
+                .findFirst()
+                .orElse(null);
+    }
 }
