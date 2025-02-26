@@ -182,6 +182,8 @@
 <main class="container">
     <h1 class="text-center">Manage Clients</h1>
 
+    <!-- Hidden Employees Input -->
+    <input type="hidden" id="employees" name="employees" th:value="${employees}"/>
     <!-- Add Client Button -->
     <div class="text-center mb-4">
         <button class="btn btn-primary" data-toggle="modal" data-target="#addClientModal">
@@ -228,7 +230,7 @@
                                 th:data-phone="${client.phone}"
                                 th:data-reference="${client.reference}"
                                 th:data-confirmationdate="${client.confirmationDate}"
-                                th:data-coordinator="${client.employee != null ? client.employee.empName : 'N/A'}"
+                                th:data-coordinator="${client.employee != null ? client.employee.empId : 'N/A'}"
                                 onclick="loadClientData(this)">
                             <i class="fas fa-edit"></i>
                         </button>
@@ -480,10 +482,17 @@
         }
 
         // Set the selected coordinator
-        if (employeeId) {
-            document.getElementById("employee").value = employeeId;
+        if (coordinator != null) {
+            // Iterate over the select box options to find and set the coordinator as selected
+            let editEmployeeSelect = document.getElementById("editEmployee");
+            for (let i = 0; i < editEmployeeSelect.options.length; i++) {
+                if (editEmployeeSelect.options[i].value === coordinator) {
+                    editEmployeeSelect.options[i].selected = true;
+                    break;
+                }
+            }
         } else {
-            document.getElementById("employee").value = "N/A"; // Default to N/A
+            document.getElementById("editEmployee").value = "N/A"; // Default to N/A
         }
     }
 
