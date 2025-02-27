@@ -3,9 +3,6 @@ package com.stepup.ims.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.HashSet;
-import java.util.Set;
-
 @Data
 @Entity
 @Table(name = "User")
@@ -37,9 +34,6 @@ public class User {
 
     @Column(nullable = true)
     private Boolean eligibleForInspection;
-
-    @OneToMany(mappedBy = "coordinator", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Inspection> inspectionsCoordinated = new HashSet<>(); // Coordinator's assigned inspections
 
     public enum Role {
         COORDINATOR, TECHNICAL_COORDINATOR, INSPECTOR, FREELANCER, PARTNER_INSPECTOR

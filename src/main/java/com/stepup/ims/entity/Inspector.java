@@ -63,6 +63,10 @@ public class Inspector {
     @Column(name = "inspector_status", nullable = false)
     private String inspectorStatus;
 
+    @OneToOne(optional = true, cascade = CascadeType.ALL)
+    @JoinColumn(name = "pqr_id", referencedColumnName = "id")
+    private PQR pqr;
+
     @Column(nullable = false) // Allow null for remarks
     private String remarks;
 

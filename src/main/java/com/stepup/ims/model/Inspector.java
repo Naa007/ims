@@ -24,6 +24,7 @@ public class Inspector {
     private MainQualification mainQualificationCategory;
     private InspectorStatusType inspectorStatus;
     private String remarks;
+    private PQR pqr;
 
     // TODO replace with the google maps api call based on user location
     public LatLng getAddressCoordinates() {

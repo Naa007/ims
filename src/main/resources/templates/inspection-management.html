@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inspection Management</title>
+    <!-- Add any required CSS frameworks like Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+</head>
+<body>
+
+    <div class="container mt-5">
+        <h1>Inspection Management</h1>
+
+        <!-- Form to Add New Inspection -->
+        <div class="mt-5">
+            <h3>Add New Inspection</h3>
+            <form th:action="@{/inspection/add}" th:object="${inspection}" method="post" class="row g-3">
+
+                <!-- Inspection No -->
+                <div class="col-md-6">
+                    <label for="inspectionNo" class="form-label">Inspection No</label>
+                    <input type="text" id="inspectionNo" th:field="*{inspectionNo}" class="form-control" required />
+                </div>
+
+
+                <!-- Notification No -->
+                <div class="col-md-6">
+                    <label for="notificationNo" class="form-label">Notification No</label>
+                    <input type="text" id="notificationNo" th:field="*{notificationNo}" class="form-control" required/>
+                </div>
+
+                <!-- Client Name -->
+                <div class="col-md-6">
+                    <label for="clientName" class="form-label">Client Name</label>
+                    <input type="text" id="clientName" th:field="*{client.clientName}" class="form-control" required />
+                </div>
+
+                <!-- Notification Received Date and Time -->
+                <div class="col-md-6">
+                    <label for="notificationReceivedDateTime" class="form-label">Notification Received Date &
+                        Time</label>
+                    <input type="datetime-local" id="notificationReceivedDateTime"
+                           th:field="*{notificationReceivedDateTime}" class="form-control"/>
+                </div>
+
+                <!-- Inspection Countries -->
+                <div class="col-md-6">
+                    <label for="inspectionCountry" class="form-label">Inspection Country</label>
+                    <select class="form-control" id="inspectionCountry" name="inspectionCountry" required>
+                        <option value="">Select Country</option>
+                        <option th:each="country : ${countriesList}" th:value="${country}" th:text="${country}"></option>
+                    </select>
+                </div>
+
+                
+                <!-- Inspection Dates -->
+                <div class="col-md-6" id="inspectionDatesContainer">
+                    <label for="inspectionDate" class="form-label">Inspection Dates</label>
+                    <div class="input-group mb-2">
+                        <input type="date" id="inspectionDate1" name="inspectionDateAsPerNotification[]"
+                               th:field="*{inspectionDateAsPerNotification}" class="form-control" required/>
+                        <button type="button" class="btn btn-primary" onclick="addDateInput()">Add</button>
+                    </div>
+                </div>
+
+                <script>
+                    let dateCounter = 1;
+                    function addDateInput() {
+                        dateCounter++;
+                        const container = document.getElementById('inspectionDatesContainer');
+                        const newInputDiv = document.createElement('div');
+                        newInputDiv.classList.add('input-group', 'mb-2');
+                        newInputDiv.innerHTML = `
+                            <input type="date" id="inspectionDate${dateCounter}" name="inspectionDateAsPerNotification[]" class="form-control" required />
+                            <button type="button" class="btn btn-danger" onclick="removeDateInput(this)">Remove</button>
+                        `;
+                        container.appendChild(newInputDiv);
+                    }
+
+                    function removeDateInput(button) {
+                        button.parentElement.remove();
+                    }
+                </script>
+
+                <!-- Inspection Item -->
+                <div class="col-md-6">
+                    <label for="inspectionItem" class="form-label">Inspection Item</label>
+                    <input type="text" id="inspectionItem" th:field="*{inspectionItem}" class="form-control" />
+                </div>
+
+
+                <!-- Inspection Activity with Stages -->
+                <div class="col-md-6">
+                    <label for="inspectionActivityWithStages" class="form-label">Inspection Activity With Stages</label>
+                    <input type="text" id="inspectionActivityWithStages" th:field="*{inspectionActivityWithStages}"
+                           class="form-control"/>
+                </div>
+
+
+                <!-- Inspection Type Checkboxes -->
+                <div class="col-md-6">
+                    <label class="form-label">Inspection Type</label>
+                    <div th:each="type, iterStat : ${inspectionType}">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" th:id="'type_' + ${iterStat.index}"
+                                   th:field="*{inspectionType}" th:value="${type}"/>
+                            <label class="form-check-label" th:for="'type_' + ${iterStat.index}"
+                                   th:text="${type}"></label>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Inspection Location Details -->
+                <div class="col-md-6">
+                    <label for="inspectionLocationDetails" class="form-label">Inspection Location Details</label>
+                    <input type="text" id="inspectionLocationDetails" th:field="*{inspectionLocationDetails}"
+                           class="form-control" required/>
+                </div>
+
+                
+                <!-- Submit Button -->
+                <!-- Proposed CVs Iteration -->
+                <div class="col-md-12 mt-4">
+                    <label class="form-label">Proposed CVs</label>
+                    <table class="table table-bordered" id="proposedCVsTable">
+                        <thead>
+                        <tr>
+                            <th>Inspector Name</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!-- Existing CVs -->
+                        <tr th:each="cv, iterStat : ${proposedCVs}">
+                            <td>
+                                <input type="text" class="form-control" th:value="${cv}"
+                                       name="proposedCVs[__${iterStat.index}__].inspector.inspectorName" required/>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm" onclick="deleteCVRow(this)">Delete
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="addCVRow()">Add CV</button>
+                </div>
+
+                <script>
+                    function addCVRow() {
+                        const tableBody = document.querySelector("#proposedCVsTable tbody");
+                        const newRow = document.createElement("tr");
+
+                        newRow.innerHTML = `
+                            <td>
+                                <input type="text" class="form-control" name="proposedCVs[]" required />
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm" onclick="deleteCVRow(this)">Delete</button>
+                            </td>
+                        `;
+                        tableBody.appendChild(newRow);
+                    }
+
+                    function deleteCVRow(button) {
+                        const row = button.closest("tr");
+                        row.remove();
+                    }
+                </script>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-success">Add Inspection</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Optional JavaScript Frameworks -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

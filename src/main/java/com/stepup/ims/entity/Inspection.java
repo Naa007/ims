@@ -3,53 +3,131 @@ package com.stepup.ims.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 @Data
 @Entity
-@Table(name = "Inspection")
+@Table(name = "inspection")
 public class Inspection {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long inspectionId; // Primary Key
+    @Column(name = "inspection_id")
+    private Long id;
 
-    @Column(nullable = false, length = 255)
-    private String inspectionName; // Title of the inspection
+    @Column(name = "inspection_no")
+    private int inspectionNo;
 
-    @Column(columnDefinition = "TEXT")
-    private String description; // Detailed description of the inspection
+    @Column(name = "notification_no")
+    private String notificationNo;
 
-    @Column(nullable = false)
-    private LocalDate inspectionDate; // Scheduled date for the inspection
+    @OneToOne
+    @JoinColumn(name = "client_id", referencedColumnName = "client_id")
+    private Client client;
 
-    @ManyToOne
-    @JoinColumn(name = "coordinator_id", referencedColumnName = "userId", nullable = true)
-    private User coordinator; // Relation to User entity in the role of Coordinator
+    @Column(name = "notification_received_date_time")
+    private LocalDateTime notificationReceivedDateTime;
 
-    @ManyToOne
-    @JoinColumn(name = "status_id", referencedColumnName = "statusId", nullable = true)
-    private Status status; // Relation to StatusTable to track lifecycle status
+    @Column(name = "inspection_country")
+    private String inspectionCountry;
+
+    @ElementCollection
+    @CollectionTable(name = "inspection_dates", joinColumns = @JoinColumn(name = "inspection_id"))
+    @Column(name = "inspection_date_as_per_notification")
+    private List<LocalDateTime> inspectionDateAsPerNotification;
+
+    @Column(name = "inspection_item")
+    private String inspectionItem;
+
+    @Column(name = "inspection_activity_with_stages")
+    private String inspectionActivityWithStages;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "inspection_type")
+    private InspectionType inspectionType;
+
+    @Column(name = "inspection_location_details")
+    private String inspectionLocationDetails;
 
     @OneToMany(mappedBy = "inspection", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<InspectionUser> inspectionUsers = new HashSet<>(); // Relation to InspectionUser for participants
+    private List<ProposedCVs> proposedCVs;
 
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt; // Timestamp for creation
+    @Column(name = "approved_inspector_name")
+    private String approvedInspectorName;
 
-    // Constructors
-    public Inspection() {
+    @Column(name = "order_confirmation_date")
+    private LocalDateTime orderConfirmationDate;
+
+    @Column(name = "sector_scope")
+    private int sectorScope;
+
+    @Column(name = "end_client_name")
+    private String endClientName;
+
+    @Column(name = "project_name")
+    private String projectName;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "reference_documents_for_inspection_status")
+    private DocumentStatus referenceDocumentsForInspectionStatus;
+
+    @Column(name = "documents_reviewed_by_technical_coordinator")
+    private String documentsReviewedByTechnicalCoordinator;
+
+    @Column(name = "contract_review_prepared")
+    private boolean contractReviewPrepared;
+
+    @Column(name = "inspection_advise_note")
+    private String inspectionAdviseNote;
+
+    @Column(name = "instructions_to_inspector_date")
+    private LocalDateTime instructionsToInspectorDate;
+
+    @Column(name = "any_inspection_issues")
+    private boolean anyInspectionIssues;
+
+    @Column(name = "fr_sent_to_client_date")
+    private LocalDateTime frSentToClientDate;
+
+    @Column(name = "inspection_reports_received_date")
+    private LocalDateTime inspectionReportsReceivedDate;
+
+    @Column(name = "inspection_reviewed_by")
+    private String inspectionReviewedBy;
+
+    @Column(name = "inspection_support_documents_sent_date")
+    private LocalDateTime inspectionSupportDocumentsSentDate;
+
+    @Column(name = "inspection_report_number")
+    private String inspectionReportNumber;
+
+    @Column(name = "ncr_raised")
+    private boolean ncrRaised;
+
+    @Column(name = "irn_sent_date")
+    private LocalDateTime irnSentDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "imprint_and_confidentiality_status")
+    private AvailabilityStatus impartialityAndConfidentiality;
+
+    @Column(name = "job_folder_link")
+    private String jobFolderLink;
+
+
+    public enum InspectionType {
+        MECHANICAL,
+        ELECTRICAL
     }
 
-    public Inspection(String inspectionName, String description, LocalDate inspectionDate, User coordinator, Status status) {
-        this.inspectionName = inspectionName;
-        this.description = description;
-        this.inspectionDate = inspectionDate;
-        this.coordinator = coordinator;
-        this.status = status;
-        this.createdAt = LocalDateTime.now();
+    public enum DocumentStatus {
+        RECEIVED,
+        NOT_RECEIVED
+    }
+
+    public enum AvailabilityStatus {
+        AVAILABLE,
+        NOT_AVAILABLE
     }
 }
