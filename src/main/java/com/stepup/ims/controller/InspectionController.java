@@ -29,7 +29,7 @@ public class InspectionController {
         return "inspection-management";
     }
 
-    @PostMapping
+    @PostMapping("/save")
     public Inspection createInspection(@RequestBody Inspection inspection) {
         return inspectionModelMapper.toModel(inspectionService.saveInspection(inspectionModelMapper.toEntity(inspection)));
     }

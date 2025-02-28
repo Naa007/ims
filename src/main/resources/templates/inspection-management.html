@@ -15,7 +15,7 @@
         <!-- Form to Add New Inspection -->
         <div class="mt-5">
             <h3>Add New Inspection</h3>
-            <form th:action="@{/inspection/add}" th:object="${inspection}" method="post" class="row g-3">
+            <form th:action="@{/inspection/save}" th:object="${inspection}" method="post" class="row g-3">
 
                 <!-- Inspection No -->
                 <div class="col-md-6">
@@ -56,7 +56,7 @@
                 
                 <!-- Inspection Dates -->
                 <div class="col-md-6" id="inspectionDatesContainer">
-                    <label for="inspectionDate" class="form-label">Inspection Dates</label>
+                    <label for="inspectionDate1" class="form-label">Inspection Dates</label>
                     <div class="input-group mb-2">
                         <input type="date" id="inspectionDate1" name="inspectionDateAsPerNotification[]"
                                th:field="*{inspectionDateAsPerNotification}" class="form-control" required/>
@@ -128,6 +128,9 @@
                         <thead>
                         <tr>
                             <th>Inspector Name</th>
+                            <th>Country</th>
+                            <th>Is Certificate Available</th>
+                            <th>Technical Coordinator</th>
                             <th>Actions</th>
                         </tr>
                         </thead>
@@ -138,6 +141,28 @@
                                 <input type="text" class="form-control" th:value="${cv}"
                                        name="proposedCVs[__${iterStat.index}__].inspector.inspectorName" required/>
                             </td>
+                            <td>
+                                <input type="text" class="form-control" th:value="${cv}"
+                                       name="proposedCVs[__${iterStat.index}__].inspector.country" required/>
+                            </td>
+                            
+                            <td>
+                                <select class="form-control"
+                                        name="proposedCVs[__${iterStat.index}__].isCVCerticatesAvailable" required>
+                                    <option value="true" th:selected="${cv.isCVCerticatesAvailable == true}">Yes
+                                    </option>
+                                    <option value="false" th:selected="${cv.isCVCerticatesAvailable == false}">No
+                                    </option>
+                                </select>
+                            </td>
+                            
+                            <td>
+                                <input type="text" class="form-control"
+                                       th:value="${cv.cvReviewBytechnicalCoordinator.inspectorName}"
+                                       name="proposedCVs[__${iterStat.index}__].cvReviewBytechnicalCoordinator.inspectorName"
+                                       required/>
+                            </td>
+                            
                             <td>
                                 <button type="button" class="btn btn-danger btn-sm" onclick="deleteCVRow(this)">Delete
                                 </button>
