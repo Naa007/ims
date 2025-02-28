@@ -3,7 +3,9 @@ package com.stepup.ims.model;
 import com.google.maps.model.LatLng;
 import lombok.Data;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 @Data
 public class Inspector {
@@ -36,5 +38,11 @@ public class Inspector {
 
     public enum InspectorStatusType {
         ACTIVE, INACTIVE, DELETED
+    }
+
+    public List<String> getCountriesList() {
+        return Arrays.stream(Locale.getISOCountries())
+                .map(countryCode -> new Locale("", countryCode).getDisplayCountry())
+                .toList();
     }
 }
