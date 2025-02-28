@@ -93,7 +93,7 @@
 <body>
 <div class="container">
     <h2>Add Inspector</h2>
-    <form th:action="@{/inspector/save}" th:object="${inspector}" method="post">
+    <form th:action="@{/inspectors/save}" th:object="${inspector}" method="post">
         <div class="mb-3 input-group">
             <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
             <input type="text" id="inspectorId" th:field="*{inspectorId}" class="form-control" placeholder="Enter Inspector ID" required />

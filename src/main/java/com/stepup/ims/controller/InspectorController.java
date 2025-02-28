@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Controller
-@RequestMapping("/inspector")
+@RequestMapping("/inspectors")
 public class InspectorController {
 
     @Autowired
@@ -42,7 +42,7 @@ public class InspectorController {
     @PostMapping("/save")
     public String saveInspector(@ModelAttribute Inspector inspector) {
         inspectorService.saveInspector(inspector);
-        return "redirect:/inspector/list";
+        return "redirect:/inspectors/list";
     }
 
     /**
@@ -60,6 +60,6 @@ public class InspectorController {
     @GetMapping("/delete/{id}")
     public String deleteInspector(@PathVariable("id") Long id) {
         inspectorService.deleteInspector(id);
-        return "redirect:/inspector/list";
+        return "redirect:/inspectors/list";
     }
 }
