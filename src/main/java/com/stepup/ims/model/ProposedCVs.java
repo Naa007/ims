@@ -11,9 +11,9 @@ public class ProposedCVs {
 
     @ToString.Exclude
     private Inspector inspector;
-    private boolean isCVCerticatesAvailable;
+    private boolean isCVCertificatesAvailable;
     @ToString.Exclude
-    private Inspector cvReviewBytechnicalCoordinator;
+    private Inspector cvReviewByTechnicalCoordinator;
     private boolean isPQRAvailable;
     private LocalDateTime cvSubmittedToClientDate;
     private boolean cvStatus;

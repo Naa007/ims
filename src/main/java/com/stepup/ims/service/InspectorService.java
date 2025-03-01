@@ -30,6 +30,13 @@ public class InspectorService {
     }
 
     /**
+     * Fetch all inspectors of type TECHNICAL_COORDINATOR from the database.
+     */
+    public List<Inspector> getAllTechnicalCoordinators() {
+        return inspectorModelMapper.toModelList(inspectorRepository.findByInspectorType(com.stepup.ims.entity.Inspector.InspectorType.TECHNICAL_COORDINATOR));
+    }
+
+    /**
      * Fetch an Inspector by ID.
      */
     public Optional<Inspector> getInspectorById(Long id) {

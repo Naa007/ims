@@ -1,6 +1,7 @@
 package com.stepup.ims.service;
 
-import com.stepup.ims.entity.Inspection;
+import com.stepup.ims.model.Inspection;
+import com.stepup.ims.modelmapper.InspectionModelMapper;
 import com.stepup.ims.repository.InspectionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,32 +15,31 @@ public class InspectionService {
     @Autowired
     private InspectionRepository inspectionRepository;
 
+    @Autowired
+    private InspectionModelMapper inspectionModelMapper;
+
+
     /**
      * Get all inspections.
      */
     public List<Inspection> getAllInspections() {
-        return inspectionRepository.findAll();
+        return inspectionModelMapper.toModelList(inspectionRepository.findAll());
     }
 
     /**
      * Get an inspection by its ID.
      */
     public Optional<Inspection> getInspectionById(Long inspectionId) {
-        return inspectionRepository.findById(inspectionId);
+        return inspectionModelMapper.getOptionalModel(inspectionRepository.findById(inspectionId));
     }
 
     /**
      * Save or update an inspection.
      */
     public Inspection saveInspection(Inspection inspection) {
-        return inspectionRepository.save(inspection);
-    }
-
-    /**
-     * Delete an inspection by ID.
-     */
-    public void deleteInspectionById(Long inspectionId) {
-        inspectionRepository.deleteById(inspectionId);
+        var inspectionEntity = inspectionModelMapper.toEntity(inspection);
+        var savedInspectionEntity = inspectionRepository.save(inspectionEntity);
+        return inspectionModelMapper.toModel(savedInspectionEntity);
     }
 
 }
