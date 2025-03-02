@@ -13,7 +13,7 @@ public class ProposedCVs {
     private Inspector inspector;
     private boolean isCVCertificatesAvailable;
     @ToString.Exclude
-    private Inspector cvReviewByTechnicalCoordinator;
+    private Employee cvReviewByTechnicalCoordinator;
     private boolean isPQRAvailable;
     private LocalDateTime cvSubmittedToClientDate;
     private boolean cvStatus;

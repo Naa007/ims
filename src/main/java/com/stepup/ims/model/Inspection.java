@@ -47,13 +47,13 @@ public class Inspection {
 
     private String projectName;
 
-    private DocumentStatus referenceDocumentsForInspectionStatus;
+    private boolean referenceDocumentsForInspectionStatus;
 
     private String documentsReviewedByTechnicalCoordinator;
 
     private boolean contractReviewPrepared;
 
-    private String inspectionAdviseNote;
+    private boolean inspectionAdviseNote;
 
     private LocalDateTime instructionsToInspectorDate;
 
@@ -73,7 +73,7 @@ public class Inspection {
 
     private LocalDateTime irnSentDate;
 
-    private AvailabilityStatus impartialityAndConfidentiality;
+    private boolean impartialityAndConfidentiality;
 
     private String jobFolderLink;
 
@@ -83,19 +83,11 @@ public class Inspection {
 
     private List<Inspector> inspectorsList;
 
-    private List<Inspector> technicalCoordinatorsList;
+    private List<Employee> technicalCoordinatorsList;
 
 
     public enum InspectionType {
         MECHANICAL, ELECTRICAL
-    }
-
-    public enum DocumentStatus {
-        RECEIVED, NOT_RECEIVED
-    }
-
-    public enum AvailabilityStatus {
-        AVAILABLE, NOT_AVAILABLE
     }
 
     public List<String> getCountriesList() {

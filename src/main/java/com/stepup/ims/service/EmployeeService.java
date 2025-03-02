@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-import static com.stepup.ims.constants.ApplicationConstants.COORDINATOR;
+import static com.stepup.ims.constants.ApplicationConstants.*;
 
 @Service
 public class EmployeeService {
@@ -28,6 +28,14 @@ public class EmployeeService {
     public List<Employee> getAllCoordinateEmployees() {
         return employeeModelMapper.toModelList(employeeRepository.findAll().stream()
                 .filter(employee -> COORDINATOR.equalsIgnoreCase(employee.getRole()))
+                .filter(employee -> YES.equalsIgnoreCase(employee.getActive()))
+                .toList());
+    }
+
+    public List<Employee> getAllTechnicalCoordinateEmployees() {
+        return employeeModelMapper.toModelList(employeeRepository.findAll().stream()
+                .filter(employee -> TECHNICAL_COORDINATOR.equalsIgnoreCase(employee.getRole()))
+                .filter(employee -> YES.equalsIgnoreCase(employee.getActive()))
                 .toList());
     }
 

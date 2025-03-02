@@ -21,6 +21,13 @@ public class ApplicationConstants {
     public static final String INSPECTOR_DASHBOARD_URL = "/inspector/dashboard";
     public static final String DEFAULT_DASHBOARD_URL = "/admin/dashboard";
 
+    public static final String YES = "yes";
+    public static final String NO = "no";
+
+    public static final String ACTIVE = "active";
+    public static final String INACTIVE = "inactive";
+
+
     private ApplicationConstants() {
     }
 }

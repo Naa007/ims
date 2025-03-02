@@ -68,9 +68,8 @@ public class Inspection {
     @Column(name = "project_name")
     private String projectName;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "reference_documents_for_inspection_status")
-    private DocumentStatus referenceDocumentsForInspectionStatus;
+    private boolean referenceDocumentsForInspectionStatus;
 
     @Column(name = "documents_reviewed_by_technical_coordinator")
     private String documentsReviewedByTechnicalCoordinator;
@@ -79,7 +78,7 @@ public class Inspection {
     private boolean contractReviewPrepared;
 
     @Column(name = "inspection_advise_note")
-    private String inspectionAdviseNote;
+    private boolean inspectionAdviseNote;
 
     @Column(name = "instructions_to_inspector_date")
     private LocalDateTime instructionsToInspectorDate;
@@ -108,26 +107,14 @@ public class Inspection {
     @Column(name = "irn_sent_date")
     private LocalDateTime irnSentDate;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "imprint_and_confidentiality_status")
-    private AvailabilityStatus impartialityAndConfidentiality;
+    private boolean impartialityAndConfidentiality;
 
     @Column(name = "job_folder_link")
     private String jobFolderLink;
 
 
     public enum InspectionType {
-        MECHANICAL,
-        ELECTRICAL
-    }
-
-    public enum DocumentStatus {
-        RECEIVED,
-        NOT_RECEIVED
-    }
-
-    public enum AvailabilityStatus {
-        AVAILABLE,
-        NOT_AVAILABLE
+        MECHANICAL, ELECTRICAL
     }
 }

@@ -4,6 +4,7 @@ import com.stepup.ims.model.Inspection;
 import com.stepup.ims.model.ProposedCVs;
 import com.stepup.ims.modelmapper.InspectionModelMapper;
 import com.stepup.ims.service.ClientService;
+import com.stepup.ims.service.EmployeeService;
 import com.stepup.ims.service.InspectionService;
 import com.stepup.ims.service.InspectorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,9 @@ public class InspectionController {
     private InspectorService inspectorService;
 
     @Autowired
+    private EmployeeService employeeService;
+
+    @Autowired
     private InspectionModelMapper inspectionModelMapper;
 
     @GetMapping("/form")
@@ -42,7 +46,7 @@ public class InspectionController {
         inspection.setInspectorsList(inspectorService.getAllInspectors());
 
         // set technical coordinators for dropdown
-        inspection.setTechnicalCoordinatorsList(inspectorService.getAllTechnicalCoordinators());
+        inspection.setTechnicalCoordinatorsList(employeeService.getAllTechnicalCoordinateEmployees());
 
         ProposedCVs proposedCVs = new ProposedCVs();
 
