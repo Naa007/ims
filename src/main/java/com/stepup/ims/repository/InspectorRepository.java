@@ -11,4 +11,6 @@ public interface InspectorRepository extends JpaRepository<Inspector, Long> {
 
     List<Inspector> findByInspectorType(Inspector.InspectorType inspectorType);
 
+    List<Inspector> findAllByInspectorStatus(Inspector.InspectorStatusType inspectorStatusType);
+
 }

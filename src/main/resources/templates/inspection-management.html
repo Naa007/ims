@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inspection Management</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHwaHTTVcK5bvy2Vg36H6r3gdpSoIYcjY"></script>
+
     <!-- Add any required CSS frameworks like Bootstrap -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <style>
@@ -158,68 +160,98 @@
 
     </style>
     <script th:inline="javascript">
+        window.onload = initMap;
+                function initMap() {
+                fetch('/api/inspectors?address=Hyderabad, India').then(response => response.json())
+                  .then(data => {
+                    const userLocation = { lat: 17.366, lng: 78.476 }; // Example: Replace with the user's geocoded location
+                   
 
-        function addCVRow() {
-            const tableBody = document.querySelector("#proposedCVsTable tbody");
-            const newRow = document.createElement("tr");
-            newRow.innerHTML = `
-                <td>
-                    <select class="form-control" name="proposedCVs[newRow].inspector.inspectorName" required>
-                        <option value="" disabled selected>Select an Inspector</option>
-                        <option th:each="inspector : ${inspection.inspectorsList}" th:value="${inspector.inspectorName}"
-                                th:text="${inspector.inspectorName}"></option>
-                    </select>
-                </td>
-                <td>
-                    <select class="form-control" name="proposedCVs[newRow].inspector.country" required>
-                        <option value="">Select Country</option>
-                        <option th:each="country : ${inspection.countriesList}" th:value="${country}"
-                                th:text="${country}"></option>
-                    </select>
-                </td>
-                <td>
-                    <select class="form-control" name="proposedCVs[newRow].isCVCertificatesAvailable" required>
-                        <option value="true">Yes</option>
-                        <option value="false">No</option>
-                    </select>
-                </td>
-                <td>
-                    <select class="form-control" name="proposedCVs[newRow].cvReviewByTechnicalCoordinator.inspectorName"
-                            required>
-                        <option value="" disabled selected>Select a Technical Coordinator</option>
-                        <option th:each="coordinator : ${inspection.technicalCoordinatorsList}"
-                                th:value="${coordinator.inspectorName}"
-                                th:text="${coordinator.inspectorName}"></option>
-                    </select>
-                </td>
-                <td>
-                    <button type="button" class="btn btn-danger btn-sm" onclick="deleteCVRow(this)">Delete</button>
-                </td>
-            `;
-            tableBody.appendChild(newRow);
-        }
+                    const map = new google.maps.Map(document.getElementById('map'), {
+                        zoom: 10,
+                        center: userLocation
+                    });
 
-        function deleteCVRow(button) {
-            const row = button.closest("tr");
-            row.remove();
-        }
+                    const userMarker = new google.maps.Marker({
+                        position: userLocation,
+                        map: map,
+                        title: "Inspection Location"
+                    });
 
-        let dateCounter = 1;
-        function addDateInput() {
-            dateCounter++;
-            const container = document.getElementById('inspectionDatesContainer');
-            const newInputDiv = document.createElement('div');
-            newInputDiv.classList.add('input-group', 'mb-2');
-            newInputDiv.innerHTML = `
-                <input type="date" id="inspectionDate${dateCounter}" name="inspectionDateAsPerNotification[]" class="form-control" required />
-                <button type="button" class="btn btn-danger" onclick="removeDateInput(this)">Remove</button>
-            `;
-            container.appendChild(newInputDiv);
-        }
+                    data.forEach(inspector => {
+                        const marker = new google.maps.Marker({
+                            position: {
+                                lat: inspector.location.lat,
+                                lng: inspector.location.lng
+                            },
+                            map: map,
+                            title: `${inspector.name}, Distance: ${inspector.distance}, Duration: ${inspector.duration}`
+                        });
+                    });
+                });
+            }
 
-        function removeDateInput(button) {
-            button.parentElement.remove();
-        }
+            function addCVRow() {
+                const tableBody = document.querySelector("#proposedCVsTable tbody");
+                const newRow = document.createElement("tr");
+                newRow.innerHTML = `
+                    <td>
+                        <select class="form-control" name="proposedCVs[newRow].inspector.inspectorName" required>
+                            <option value="" disabled selected>Select an Inspector</option>
+                            <option th:each="inspector : ${inspection.inspectorsList}" th:value="${inspector.inspectorName}"
+                                    th:text="${inspector.inspectorName}"></option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-control" name="proposedCVs[newRow].inspector.country" required>
+                            <option value="">Select Country</option>
+                            <option th:each="country : ${inspection.countriesList}" th:value="${country}"
+                                    th:text="${country}"></option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-control" name="proposedCVs[newRow].isCVCertificatesAvailable" required>
+                            <option value="true">Yes</option>
+                            <option value="false">No</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-control" name="proposedCVs[newRow].cvReviewByTechnicalCoordinator.inspectorName"
+                                required>
+                            <option value="" disabled selected>Select a Technical Coordinator</option>
+                            <option th:each="coordinator : ${inspection.technicalCoordinatorsList}"
+                                    th:value="${coordinator.inspectorName}"
+                                    th:text="${coordinator.inspectorName}"></option>
+                        </select>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="deleteCVRow(this)">Delete</button>
+                    </td>
+                `;
+                tableBody.appendChild(newRow);
+            }
+
+            function deleteCVRow(button) {
+                const row = button.closest("tr");
+                row.remove();
+            }
+
+            let dateCounter = 1;
+            function addDateInput() {
+                dateCounter++;
+                const container = document.getElementById('inspectionDatesContainer');
+                const newInputDiv = document.createElement('div');
+                newInputDiv.classList.add('input-group', 'mb-2');
+                newInputDiv.innerHTML = `
+                    <input type="date" id="inspectionDate${dateCounter}" name="inspectionDateAsPerNotification[]" class="form-control" required />
+                    <button type="button" class="btn btn-danger" onclick="removeDateInput(this)">Remove</button>
+                `;
+                container.appendChild(newInputDiv);
+            }
+
+            function removeDateInput(button) {
+                button.parentElement.remove();
+            }
     </script>
 </head>
 <header style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background-color: #334e6b; border-bottom: 1px solid #ddd;">
@@ -352,6 +384,8 @@
                     </div>
                 </div>
 
+                <div id="map" allign="center" class="center-div"></div>
+
 
             </div>
 
@@ -390,20 +424,16 @@
                             </td>
                             
                             <td>
-                                <label>
-                                    <input type="radio"
+                                <input type="radio"
                                            name="proposedCVs[__${iterStat.index}__].isCVCertificatesAvailable"
                                            value="true"
                                            th:checked="${cv.isCVCertificatesAvailable == true}" required/>
                                     Yes
-                                </label>
-                                <label>
-                                    <input type="radio"
+                                <input type="radio"
                                            name="proposedCVs[__${iterStat.index}__].isCVCertificatesAvailable"
                                            value="false"
                                            th:checked="${cv.isCVCertificatesAvailable == false}" required/>
                                     No
-                                </label>
                             </td>
                             
 
@@ -419,21 +449,17 @@
                             </td>
 
                             <td>
-                                <label>
-                                    <input type="radio"
+                                <input type="radio"
                                            name="proposedCVs[__${iterStat.index}__].isPQRAvailable"
                                            value="true"
                                            th:checked="${cv.isPQRAvailable == true}" required/>
                                     Yes
-                                </label>
-                                <label>
-                                    <input type="radio"
+                                <input type="radio"
                                            name="proposedCVs[__${iterStat.index}__].isPQRAvailable"
                                            value="false"
                                            th:checked="${cv.isPQRAvailable == false}" required/>
                                     No
-                                </label>
-                            </td>
+                                </td>
 
                             <td>
                                 <input type="datetime-local" class="form-control"
@@ -443,16 +469,12 @@
 
 
                             <td>
-                                <label>
-                                    <input type="radio" name="proposedCVs[__${iterStat.index}__].cvStatus"
+                                <input type="radio" name="proposedCVs[__${iterStat.index}__].cvStatus"
                                            value="true" th:checked="${cv.cvStatus == true}" required/>
                                     Yes
-                                </label>
-                                <label>
-                                    <input type="radio" name="proposedCVs[__${iterStat.index}__].cvStatus"
+                               <input type="radio" name="proposedCVs[__${iterStat.index}__].cvStatus"
                                            value="false" th:checked="${cv.cvStatus == false}" required/>
                                     No
-                                </label>
                             </td>
 
                             <td>
@@ -510,13 +532,14 @@
                 <!-- Reference Documents for Inspection Status -->
                 <div class="col-md-4">
                     <label class="form-label">Reference Documents</label>
-                    <input type="radio" name="documentsStatus" value="true"
-                           th:checked="${inspection.referenceDocumentsForInspectionStatus == true}" required/>
-                    Avaialble
-                    <input type="radio" name="documentsStatus" value="false"
-                           th:checked="${inspection.referenceDocumentsForInspectionStatus == false}" required/>
-                    Not Aavailable
-
+                    <div>
+                        <input type="radio" name="documentsStatus" value="true"
+                               th:checked="${inspection.referenceDocumentsForInspectionStatus == true}" required/>
+                        Avaialble
+                        <input type="radio" name="documentsStatus" value="false"
+                               th:checked="${inspection.referenceDocumentsForInspectionStatus == false}" required/>
+                        Not Aavailable
+                    </div>
                 </div>
 
             </div>
@@ -541,34 +564,26 @@
                 <div class="col-md-4">
                     <label class="form-label">Contract Review Prepared</label>
                     <div>
-                        <label>
-                            <input type="radio" name="contractReviewPrepared" value="true"
+                        <input type="radio" name="contractReviewPrepared" value="true"
                                    th:checked="${contractReviewPrepared == true}" required/>
                             Yes
-                        </label>
-                        <label>
-                            <input type="radio" name="contractReviewPrepared" value="false"
+                        <input type="radio" name="contractReviewPrepared" value="false"
                                    th:checked="${contractReviewPrepared == false}" required/>
                             No
-                        </label>
-                    </div>
+                        </div>
                 </div>
 
                 <!-- Inspection Advise Note -->
                 <div class="col-md-4">
                     <label class="form-label">Inspection Advise Note</label>
                     <div>
-                        <label>
-                            <input type="radio" name="inspectionAdviseNote" value="true"
+                        <input type="radio" name="inspectionAdviseNote" value="true"
                                    th:checked="${inspectionAdviseNote == true}" required/>
                             Yes
-                        </label>
-                        <label>
-                            <input type="radio" name="inspectionAdviseNote" value="false"
+                        <input type="radio" name="inspectionAdviseNote" value="false"
                                    th:checked="${inspectionAdviseNote == false}" required/>
                             No
-                        </label>
-                    </div>
+                       </div>
                 </div>
 
 
@@ -589,16 +604,12 @@
                 <div class="col-md-4">
                     <label class="form-label">Any Inspection Issues</label>
                     <div>
-                        <label>
-                            <input type="radio" name="anyInspectionIssues" value="true"
+                       <input type="radio" name="anyInspectionIssues" value="true"
                                    th:checked="${anyInspectionIssues == true}" required/>
                             Yes
-                        </label>
-                        <label>
-                            <input type="radio" name="anyInspectionIssues" value="false"
+                       <input type="radio" name="anyInspectionIssues" value="false"
                                    th:checked="${anyInspectionIssues == false}" required/>
                             No
-                        </label>
                     </div>
                 </div>
 
@@ -656,14 +667,10 @@
                 <div class="col-md-4">
                     <label class="form-label">NCR Raised</label>
                     <div>
-                        <label>
-                            <input type="radio" name="ncrRaised" value="true" th:checked="${ncrRaised == true}" required/>
-                            Yes
-                        </label>
-                        <label>
-                            <input type="radio" name="ncrRaised" value="false" th:checked="${ncrRaised == false}" required/>
-                            No
-                        </label>
+                        <input type="radio" name="ncrRaised" value="true" th:checked="${ncrRaised == true}" required/>
+                        Yes
+                        <input type="radio" name="ncrRaised" value="false" th:checked="${ncrRaised == false}" required/>
+                        No
                     </div>
                 </div>
 
@@ -682,16 +689,12 @@
                 <div class="col-md-4">
                     <label class="form-label">Impartiality and Confidentiality</label>
                     <div>
-                        <label>
-                            <input type="radio" name="impartialityAndConfidentiality" value="true"
-                                   th:checked="${impartialityAndConfidentiality == true}" required/>
-                            Yes
-                        </label>
-                        <label>
-                            <input type="radio" name="impartialityAndConfidentiality" value="false"
-                                   th:checked="${impartialityAndConfidentiality == false}" required/>
-                            No
-                        </label>
+                        <input type="radio" name="impartialityAndConfidentiality" value="true"
+                               th:checked="${impartialityAndConfidentiality == true}" required/>
+                        Yes
+                        <input type="radio" name="impartialityAndConfidentiality" value="false"
+                               th:checked="${impartialityAndConfidentiality == false}" required/>
+                        No
                     </div>
                 </div>
                 

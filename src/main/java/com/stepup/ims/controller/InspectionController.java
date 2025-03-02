@@ -3,10 +3,7 @@ package com.stepup.ims.controller;
 import com.stepup.ims.model.Inspection;
 import com.stepup.ims.model.ProposedCVs;
 import com.stepup.ims.modelmapper.InspectionModelMapper;
-import com.stepup.ims.service.ClientService;
-import com.stepup.ims.service.EmployeeService;
-import com.stepup.ims.service.InspectionService;
-import com.stepup.ims.service.InspectorService;
+import com.stepup.ims.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,6 +28,9 @@ public class InspectionController {
 
     @Autowired
     private EmployeeService employeeService;
+
+    @Autowired
+    private GoogleMapsService googleMapsService;
 
     @Autowired
     private InspectionModelMapper inspectionModelMapper;

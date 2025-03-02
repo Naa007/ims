@@ -1,5 +1,6 @@
 package com.stepup.ims.service;
 
+import com.google.maps.model.LatLng;
 import com.stepup.ims.model.Inspector;
 import com.stepup.ims.modelmapper.InspectorModelMapper;
 import com.stepup.ims.repository.InspectorRepository;
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -26,7 +28,7 @@ public class InspectorService {
      * Fetch all inspectors from the database.
      */
     public List<Inspector> getAllInspectors() {
-        return inspectorModelMapper.toModelList(inspectorRepository.findAll());
+        return inspectorModelMapper.toModelList(inspectorRepository.findAllByInspectorStatus(com.stepup.ims.entity.Inspector.InspectorStatusType.ACTIVE));
     }
 
     /**
@@ -80,10 +82,8 @@ public class InspectorService {
         return inspectorModelMapper.toModel(savedEntity);
     }
 
-    /**
-     * Delete an inspector by ID.
-     */
-    public void deleteInspector(Long id) {
-        inspectorRepository.deleteById(id);
+
+    public List<LatLng> getActiveInspectorsLatLang() {
+        return inspectorRepository.findAllByInspectorStatus(com.stepup.ims.entity.Inspector.InspectorStatusType.ACTIVE).stream().map(inspectorModelMapper::toModel).map(Inspector::getAddressCoordinates).filter(Objects::nonNull).toList();
     }
 }

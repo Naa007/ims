@@ -27,6 +27,8 @@ public class ApplicationConstants {
     public static final String ACTIVE = "active";
     public static final String INACTIVE = "inactive";
 
+    public static final String DFAULT_MAP_ADDRESS = "Hyderabad, India";
+
 
     private ApplicationConstants() {
     }
