@@ -25,9 +25,9 @@ public class ProposedCVs {
     private boolean isCVCerticatesAvailable;
 
     @OneToOne
-    @JoinColumn(name = "technical_coordinator_id", referencedColumnName = "inspector_id")
+    @JoinColumn(name = "technical_coordinator_id", referencedColumnName = "emp_id")
     @Filter(name = "technicalCoordinatorFilter", condition = "inspector_type = 'TECHNICAL_COORDINATOR'")
-    private Inspector cvReviewBytechnicalCoordinator;
+    private Employee cvReviewBytechnicalCoordinator;
 
     @Column(name = "pqr_available")
     private boolean isPQRAvailable;

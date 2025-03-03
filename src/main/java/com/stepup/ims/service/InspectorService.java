@@ -1,8 +1,10 @@
 package com.stepup.ims.service;
 
+import com.google.maps.model.LatLng;
 import com.stepup.ims.model.Inspector;
 import com.stepup.ims.modelmapper.InspectorModelMapper;
 import com.stepup.ims.repository.InspectorRepository;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +28,14 @@ public class InspectorService {
      * Fetch all inspectors from the database.
      */
     public List<Inspector> getAllInspectors() {
-        return inspectorModelMapper.toModelList(inspectorRepository.findAll());
+        return inspectorModelMapper.toModelList(inspectorRepository.findAllByInspectorStatus(com.stepup.ims.entity.Inspector.InspectorStatusType.ACTIVE));
+    }
+
+    /**
+     * Fetch all inspectors of type TECHNICAL_COORDINATOR from the database.
+     */
+    public List<Inspector> getAllTechnicalCoordinators() {
+        return inspectorModelMapper.toModelList(inspectorRepository.findByInspectorType(com.stepup.ims.entity.Inspector.InspectorType.TECHNICAL_COORDINATOR));
     }
 
     /**
@@ -73,10 +82,12 @@ public class InspectorService {
         return inspectorModelMapper.toModel(savedEntity);
     }
 
-    /**
-     * Delete an inspector by ID.
-     */
-    public void deleteInspector(Long id) {
-        inspectorRepository.deleteById(id);
+
+    public List<Pair<String, LatLng>> getActiveInspectorsLatLang() {
+        return inspectorRepository.findAllByInspectorStatus(com.stepup.ims.entity.Inspector.InspectorStatusType.ACTIVE).stream()
+                .map(inspectorModelMapper::toModel)
+                .filter(inspector -> inspector.getAddressCoordinates() != null)
+                .map(inspector -> Pair.of(inspector.getInspectorName(), inspector.getAddressCoordinates()))
+                .toList();
     }
 }

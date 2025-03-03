@@ -2,7 +2,9 @@ package com.stepup.ims.model;
 
 import com.stepup.ims.utils.DataUtils;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -17,11 +19,13 @@ public class Inspection {
 
     private Client client;
 
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDateTime notificationReceivedDateTime;
 
     private String inspectionCountry;
-
-    private List<LocalDateTime> inspectionDateAsPerNotification;
+    
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private List<LocalDate> inspectionDateAsPerNotification;
 
     private String inspectionItem;
 
@@ -43,13 +47,13 @@ public class Inspection {
 
     private String projectName;
 
-    private DocumentStatus referenceDocumentsForInspectionStatus;
+    private boolean referenceDocumentsForInspectionStatus;
 
     private String documentsReviewedByTechnicalCoordinator;
 
     private boolean contractReviewPrepared;
 
-    private String inspectionAdviseNote;
+    private boolean inspectionAdviseNote;
 
     private LocalDateTime instructionsToInspectorDate;
 
@@ -69,23 +73,21 @@ public class Inspection {
 
     private LocalDateTime irnSentDate;
 
-    private AvailabilityStatus impartialityAndConfidentiality;
+    private boolean impartialityAndConfidentiality;
 
     private String jobFolderLink;
 
     private List<String> countriesList;
+    
+    private List<Client> clientsList;
+
+    private List<Inspector> inspectorsList;
+
+    private List<Employee> technicalCoordinatorsList;
 
 
     public enum InspectionType {
         MECHANICAL, ELECTRICAL
-    }
-
-    public enum DocumentStatus {
-        RECEIVED, NOT_RECEIVED
-    }
-
-    public enum AvailabilityStatus {
-        AVAILABLE, NOT_AVAILABLE
     }
 
     public List<String> getCountriesList() {

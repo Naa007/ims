@@ -1,9 +1,14 @@
 package com.stepup.ims.service;
 
-import com.google.maps.*;
+import com.google.maps.DistanceMatrixApi;
+import com.google.maps.GeoApiContext;
+import com.google.maps.GeocodingApi;
 import com.google.maps.errors.ApiException;
-import com.google.maps.model.*;
-
+import com.google.maps.model.DistanceMatrix;
+import com.google.maps.model.GeocodingResult;
+import com.google.maps.model.LatLng;
+import com.google.maps.model.TravelMode;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -30,15 +35,17 @@ public class GoogleMapsService {
     }
 
     // Calculate distances between a user location and a list of inspector locations
-    public List<InspectorDistance> getInspectorDistances(LatLng userLocation, List<LatLng> inspectorLocations) throws InterruptedException, ApiException, IOException {
+    public List<InspectorDistance> getInspectorDistances(LatLng inspectionLocation, List<Pair<String, LatLng>> inspectorLocations) throws InterruptedException, ApiException, IOException {
         List<InspectorDistance> distances = new ArrayList<>();
 
-        LatLng[] destinations = inspectorLocations.toArray(new LatLng[0]);
+        LatLng[] destinations = inspectorLocations.stream()
+                .map(Pair::getRight) // Extract the LatLng values from the Pair
+                .toArray(LatLng[]::new);
 
-        DistanceMatrix result = DistanceMatrixApi.newRequest(geoApiContext).origins(userLocation).destinations(destinations).mode(TravelMode.DRIVING).await();
+        DistanceMatrix result = DistanceMatrixApi.newRequest(geoApiContext).origins(inspectionLocation).destinations(destinations).mode(TravelMode.DRIVING).await();
 
         for (int i = 0; i < destinations.length; i++) {
-            distances.add(new InspectorDistance("inspector" + (i + 1), destinations[i], result.rows[0].elements[i].distance.humanReadable, result.rows[0].elements[i].duration.humanReadable));
+            distances.add(new InspectorDistance(inspectorLocations.get(i).getLeft(), destinations[i], result.rows[0].elements[i].distance.humanReadable, result.rows[0].elements[i].duration.humanReadable));
         }
 
         return distances;

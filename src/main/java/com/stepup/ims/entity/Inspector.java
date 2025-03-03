@@ -60,8 +60,9 @@ public class Inspector {
     @JoinColumn(name = "main_qualification_id")
     private MainQualifications mainQualificationCategory;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "inspector_status", nullable = false)
-    private String inspectorStatus;
+    private InspectorStatusType inspectorStatus;
 
     @OneToOne(optional = true, cascade = CascadeType.ALL)
     @JoinColumn(name = "pqr_id", referencedColumnName = "id")
@@ -72,5 +73,9 @@ public class Inspector {
 
     public enum InspectorType {
         INHOUSE_INSPECTOR, TECHNICAL_COORDINATOR, FREELANCER, PARTNER_INSPECTOR
+    }
+
+    public enum InspectorStatusType {
+        ACTIVE, INACTIVE, DELETED
     }
 }

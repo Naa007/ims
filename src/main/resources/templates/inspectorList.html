@@ -182,21 +182,77 @@
         <table id="inspectorTable" class="table table-striped table-hover table-sm">
             <thead>
             <tr>
-                <th style="width: 10%;">Inspector ID</th>
-                <th style="width: 20%;">Inspector Name</th>
-                <th style="width: 15%;">Email</th>
-                <th style="width: 15%;">Phone</th>
-                <th style="width: 10%;">Status</th>
-                <th style="width: 10%;">Action</th>
+                <th>Inspector ID</th>
+                <th>Inspector Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Date of Birth</th>
+                <th>Address</th>
+                <th>Country</th>
+                <th>Education Details</th>
+                <th>Disciplines</th>
+                <th>Inspector Type</th>
+                <th>Certificates</th>
+                <th>Special Qualification</th>
+                <th>Main Qualification</th>
+                <th>Inspector Status</th>
+                <th>Remarks</th>
+                <th>Actions</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="inspector : ${inspectors}">
+                <!-- Basic Information -->
                 <td th:text="${inspector.inspectorId}"></td>
                 <td th:text="${inspector.inspectorName}"></td>
                 <td th:text="${inspector.email}"></td>
                 <td th:text="${inspector.phone}"></td>
+                <td th:text="${inspector.dob}"></td>
+                <td th:text="${inspector.address}"></td>
+                <td th:text="${inspector.country}"></td>
+
+                <!-- Education and Disciplines -->
+                <td th:text="${inspector.educationDetails}"></td>
+                <td th:text="${inspector.disciplines}"></td>
+
+                <!-- Inspector Type -->
+                <td th:text="${inspector.inspectorType}"></td>
+
+                <!-- Certificates -->
+                <td>
+                    <ul>
+                        <li th:each="certificate : ${inspector.certificates}">
+                            <span th:text="${certificate.name}"></span> -
+                            <span th:text="${certificate.dateIssued}"></span> to
+                            <span th:text="${certificate.expiryDate}"></span> -
+                            <span th:text="${certificate.issuer}"></span>
+                        </li>
+                    </ul>
+                </td>
+
+                <!-- Special Qualification -->
+                <td>
+                    <span th:if="${inspector.specialQualification.aramco}">ARAMCO</span>
+                    <span th:if="${inspector.specialQualification.sec}">SEC</span>
+                    <span th:text="${inspector.specialQualification.specialQualificationDetails}"></span>
+                </td>
+
+                <!-- Main Qualification -->
+                <td>
+                    <span th:if="${inspector.mainQualificationCategory.mechStatic}">Mechanical Static</span>
+                    <span th:if="${inspector.mainQualificationCategory.mechRotating}">Mechanical Rotating</span>
+                    <span th:if="${inspector.mainQualificationCategory.electrical}">Electrical</span>
+                    <span th:if="${inspector.mainQualificationCategory.piping}">Piping</span>
+                    <span th:if="${inspector.mainQualificationCategory.steelStructure}">Steel Structure</span>
+                </td>
+
+                <!-- Inspector Status -->
                 <td th:text="${inspector.inspectorStatus}"></td>
+
+                <!-- Remarks -->
+                <td th:text="${inspector.remarks}"></td>
+
+                <!-- Actions -->
                 <td>
                     <div class="btn-group">
                         <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#editInspectorModal"
@@ -204,8 +260,23 @@
                                 th:data-inspectorname="${inspector.inspectorName}"
                                 th:data-email="${inspector.email}"
                                 th:data-phone="${inspector.phone}"
-                                th:data-status="${inspector.inspectorStatus}"
-                                th:data-inspector ="${inspector}"
+                                th:data-dob="${inspector.dob}"
+                                th:data-address="${inspector.address}"
+                                th:data-country="${inspector.country}"
+                                th:data-educationdetails="${inspector.educationDetails}"
+                                th:data-disciplines="${inspector.disciplines}"
+                                th:data-inspectortype="${inspector.inspectorType}"
+                                th:data-certificates="${#strings.listJoin(inspector.certificates, ',')}"
+                                th:data-aramco="${inspector.specialQualification.aramco}"
+                                th:data-sec="${inspector.specialQualification.sec}"
+                                th:data-specialqualificationdetails="${inspector.specialQualification.specialQualificationDetails}"
+                                th:data-mechstatic="${inspector.mainQualificationCategory.mechStatic}"
+                                th:data-mechrotating="${inspector.mainQualificationCategory.mechRotating}"
+                                th:data-electrical="${inspector.mainQualificationCategory.electrical}"
+                                th:data-piping="${inspector.mainQualificationCategory.piping}"
+                                th:data-steelstructure="${inspector.mainQualificationCategory.steelStructure}"
+                                th:data-inspectorstatus="${inspector.inspectorStatus}"
+                                th:data-remarks="${inspector.remarks}"
                                 onclick="loadInspectorData(this)">
                             <i class="fas fa-edit"></i>
                         </button>
@@ -228,7 +299,7 @@
 
 <!-- Add Inspector Modal -->
 <div class="modal fade" id="addInspectorModal" tabindex="-1" aria-labelledby="addInspectorModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addInspectorModalLabel">Add Inspector</h5>
@@ -237,28 +308,158 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form th:action="@{/inspector/save}" method="post">
-                    <!-- Inspector Name Field -->
-                    <div class="form-group">
-                        <label for="inspectorName">Inspector Name</label>
-                        <input type="text" class="form-control" id="inspectorName" name="inspectorName" required>
+                <form th:action="@{/inspector/save}" th:object="${inspector}" method="post">
+                    <!-- Inspector ID -->
+                    <div class="mb-3 input-group">
+                        <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
+                        <input type="text" id="inspectorId" th:field="*{inspectorId}" class="form-control" placeholder="Enter Inspector ID" required />
                     </div>
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
+
+                    <!-- Inspector Name -->
+                    <div class="mb-3 input-group">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <input type="text" id="inspectorName" th:field="*{inspectorName}" class="form-control" placeholder="Enter Inspector Name" required />
                     </div>
-                    <div class="form-group">
-                        <label for="phone">Phone</label>
-                        <input type="text" class="form-control" id="phone" name="phone" required>
+
+                    <!-- Date of Birth -->
+                    <div class="mb-3 input-group">
+                        <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                        <input type="date" id="dob" th:field="*{dob}" class="form-control" required />
                     </div>
-                    <div class="form-group">
-                        <label for="status">Status</label>
-                        <select class="form-control" id="status" name="inspectorStatus" required>
-                            <option value="ACTIVE">Active</option>
-                            <option value="INACTIVE">Inactive</option>
-                        </select>
+
+                    <!-- Phone -->
+                    <div class="mb-3 input-group">
+                        <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                        <input type="tel" id="phone" th:field="*{phone}" class="form-control" placeholder="Enter phone number" required />
                     </div>
-                    <button type="submit" class="btn btn-primary">Submit</button>
+
+                    <!-- Email -->
+                    <div class="mb-3 input-group">
+                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                        <input type="email" id="email" th:field="*{email}" class="form-control" placeholder="Enter email address" required />
+                    </div>
+
+                    <!-- Address and Country -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="mb-3 input-group">
+                                <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                                <input type="text" id="address" th:field="*{address}" class="form-control" placeholder="Enter address" required />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3 input-group">
+                                <span class="input-group-text"><i class="fas fa-globe"></i></span>
+                                <select id="country" th:field="*{country}" class="form-control" required>
+                                    <option value="">Select Country</option>
+                                    <option th:each="country : ${inspector.countriesList}" th:value="${country}" th:text="${country}"></option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Education Details -->
+                    <div class="mb-3">
+                        <label for="educationDetails" class="form-label">Education Details</label>
+                        <textarea id="educationDetails" th:field="*{educationDetails}" class="form-control" rows="3" placeholder="Enter education details" required></textarea>
+                    </div>
+
+                    <!-- Disciplines -->
+                    <div class="mb-3">
+                        <label for="disciplines" class="form-label">Disciplines</label>
+                        <input type="text" id="disciplines" th:field="*{disciplines}" class="form-control" placeholder="Enter disciplines (comma-separated)" />
+                    </div>
+
+                    <!-- Inspector Type -->
+                    <h5>Inspector Type</h5>
+                    <div class="d-flex flex-wrap mb-3">
+                        <div class="form-check me-3" th:each="type : ${T(com.stepup.ims.model.Inspector.InspectorType).values()}">
+                            <input type="radio" th:field="*{inspectorType}" th:value="${type}" class="form-check-input" name="inspectorType" />
+                            <label th:text="${type}" class="form-check-label"></label>
+                        </div>
+                    </div>
+
+                    <!-- Certificates -->
+                    <h5>Relevant Certificates</h5>
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Date Issued</th>
+                            <th>Expiry</th>
+                            <th>Issuer</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody id="certificatesBody">
+                        <tr th:each="certificate, iterStat : *{certificates}">
+                            <td><input type="text" th:field="*{certificates[__${iterStat.index}__].name}" class="form-control" placeholder="Certificate Name"/></td>
+                            <td><input type="date" th:field="*{certificates[__${iterStat.index}__].dateIssued}" class="form-control"/></td>
+                            <td><input type="date" th:field="*{certificates[__${iterStat.index}__].expiryDate}" class="form-control"/></td>
+                            <td><input type="text" th:field="*{certificates[__${iterStat.index}__].issuer}" class="form-control" placeholder="Issuer"/></td>
+                            <td><button type="button" class="btn btn-danger" onclick="removeCertificateRow(this)"><i class="fas fa-trash"></i></button></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <button type="button" class="btn btn-success" onclick="addCertificate()"><i class="fas fa-plus"></i> Add Certificate</button>
+
+                    <!-- Special Qualification -->
+                    <h5>Special Qualification</h5>
+                    <div class="form-check">
+                        <input type="checkbox" id="ARAMCO" th:field="*{specialQualification.aramco}" class="form-check-input" />
+                        <label for="ARAMCO" class="form-check-label">ARAMCO</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" id="SEC" th:field="*{specialQualification.sec}" class="form-check-input" />
+                        <label for="SEC" class="form-check-label">SEC</label>
+                    </div>
+                    <div class="mb-3">
+                        <label for="specialQualificationDetails" class="form-label">Special Qualification Details</label>
+                        <input type="text" id="specialQualificationDetails" th:field="*{specialQualification.specialQualificationDetails}" class="form-control" placeholder="Enter Special Qualification Details" />
+                    </div>
+
+                    <!-- Main Qualification -->
+                    <h5>Main Qualification</h5>
+                    <div class="form-check">
+                        <input type="checkbox" id="mechStatic" th:field="*{mainQualificationCategory.mechStatic}" class="form-check-input" />
+                        <label for="mechStatic" class="form-check-label">Mechanical Static</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" id="mechRotating" th:field="*{mainQualificationCategory.mechRotating}" class="form-check-input" />
+                        <label for="mechRotating" class="form-check-label">Mechanical Rotating</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" id="electrical" th:field="*{mainQualificationCategory.electrical}" class="form-check-input" />
+                        <label for="electrical" class="form-check-label">Electrical</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" id="piping" th:field="*{mainQualificationCategory.piping}" class="form-check-input" />
+                        <label for="piping" class="form-check-label">Piping</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" id="steelStructure" th:field="*{mainQualificationCategory.steelStructure}" class="form-check-input" />
+                        <label for="steelStructure" class="form-check-label">Steel Structure</label>
+                    </div>
+
+                    <!-- Inspector Status -->
+                    <h5>Inspector Status</h5>
+                    <div th:each="status : ${T(com.stepup.ims.model.Inspector.InspectorStatusType).values()}">
+                        <div class="form-check">
+                            <input type="radio" th:field="*{inspectorStatus}" th:value="${status}" class="form-check-input" name="inspectorStatus" />
+                            <label th:text="${status}" class="form-check-label"></label>
+                        </div>
+                    </div>
+
+                    <!-- Remarks -->
+                    <div class="mb-3">
+                        <label for="remarks" class="form-label">Remarks</label>
+                        <textarea id="remarks" th:field="*{remarks}" class="form-control" rows="3" placeholder="Enter any remarks"></textarea>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Submit</button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -267,7 +468,7 @@
 
 <!-- Edit Inspector Modal -->
 <div class="modal fade" id="editInspectorModal" tabindex="-1" aria-labelledby="editInspectorModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editInspectorModalLabel">Edit Inspector</h5>
@@ -277,34 +478,130 @@
             </div>
             <div class="modal-body">
                 <form id="editInspectorForm" th:action="@{/inspector/save}" method="post">
-                    <!-- Inspector ID Field (Hidden) -->
+                    <!-- Hidden Inspector ID -->
                     <input type="hidden" id="editInspectorId" name="inspectorId">
-                    <!-- Rest of the form fields -->
-                    <div class="form-group">
-                        <label for="editInspectorName">Inspector Name</label>
-                        <input type="text" class="form-control" id="editInspectorName" name="inspectorName" required>
+
+                    <!-- Basic Information -->
+                    <div class="mb-3 input-group">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <input type="text" id="editInspectorName" name="inspectorName" class="form-control" placeholder="Inspector Name" required>
                     </div>
-                    <div class="form-group">
-                        <label for="editEmail">Email</label>
-                        <input type="email" class="form-control" id="editEmail" name="email" required>
+                    <div class="mb-3 input-group">
+                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                        <input type="email" id="editEmail" name="email" class="form-control" placeholder="Email" required>
                     </div>
-                    <div class="form-group">
-                        <label for="editPhone">Phone</label>
-                        <input type="text" class="form-control" id="editPhone" name="phone" required>
+                    <div class="mb-3 input-group">
+                        <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                        <input type="tel" id="editPhone" name="phone" class="form-control" placeholder="Phone" required>
                     </div>
-                    <div class="form-group">
-                        <label for="editStatus">Status</label>
-                        <select class="form-control" id="editStatus" name="inspectorStatus" required>
-                            <option value="ACTIVE">Active</option>
-                            <option value="INACTIVE">Inactive</option>
+                    <div class="mb-3 input-group">
+                        <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                        <input type="date" id="editDob" name="dob" class="form-control" required>
+                    </div>
+                    <div class="mb-3 input-group">
+                        <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                        <input type="text" id="editAddress" name="address" class="form-control" placeholder="Address" required>
+                    </div>
+                    <div class="mb-3 input-group">
+                        <span class="input-group-text"><i class="fas fa-globe"></i></span>
+                        <select id="editCountry" name="country" class="form-control" required>
+                            <option value="">Select Country</option>
+                            <option th:each="country : ${inspector.countriesList}" th:value="${country}" th:text="${country}"></option>
                         </select>
                     </div>
 
-                    <div class="form-group">
-                        <label for="editDob">Status</label>
-                        <input type="date" id="editDob" name="dob" class="form-control" required />
+                    <!-- Education and Disciplines -->
+                    <div class="mb-3">
+                        <label for="editEducationDetails">Education Details</label>
+                        <textarea id="editEducationDetails" name="educationDetails" class="form-control" rows="3" required></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <div class="mb-3">
+                        <label for="editDisciplines">Disciplines</label>
+                        <input type="text" id="editDisciplines" name="disciplines" class="form-control" placeholder="Enter disciplines (comma-separated)">
+                    </div>
+
+                    <!-- Inspector Type -->
+                    <h5>Inspector Type</h5>
+                    <div class="d-flex flex-wrap mb-3">
+                        <div class="form-check me-3" th:each="type : ${T(com.stepup.ims.model.Inspector.InspectorType).values()}">
+                            <input type="radio" name="editInspectorType" th:value="${type}" class="form-check-input">
+                            <label th:text="${type}" class="form-check-label"></label>
+                        </div>
+                    </div>
+
+                    <!-- Certificates -->
+                    <h5>Relevant Certificates</h5>
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Date Issued</th>
+                            <th>Expiry</th>
+                            <th>Issuer</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody id="editCertificatesBody"></tbody>
+                    </table>
+                    <button type="button" class="btn btn-success" onclick="addCertificate('editCertificatesBody')"><i class="fas fa-plus"></i> Add Certificate</button>
+
+                    <!-- Special Qualification -->
+                    <h5>Special Qualification</h5>
+                    <div class="form-check">
+                        <input type="checkbox" id="editAramco" name="aramco" class="form-check-input">
+                        <label for="editAramco" class="form-check-label">ARAMCO</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" id="editSec" name="sec" class="form-check-input">
+                        <label for="editSec" class="form-check-label">SEC</label>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editSpecialQualificationDetails">Special Qualification Details</label>
+                        <input type="text" id="editSpecialQualificationDetails" name="specialQualificationDetails" class="form-control">
+                    </div>
+
+                    <!-- Main Qualification -->
+                    <h5>Main Qualification</h5>
+                    <div class="form-check">
+                        <input type="checkbox" id="editMechStatic" name="mechStatic" class="form-check-input">
+                        <label for="editMechStatic" class="form-check-label">Mechanical Static</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" id="editMechRotating" name="mechRotating" class="form-check-input">
+                        <label for="editMechRotating" class="form-check-label">Mechanical Rotating</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" id="editElectrical" name="electrical" class="form-check-input">
+                        <label for="editElectrical" class="form-check-label">Electrical</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" id="editPiping" name="piping" class="form-check-input">
+                        <label for="editPiping" class="form-check-label">Piping</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" id="editSteelStructure" name="steelStructure" class="form-check-input">
+                        <label for="editSteelStructure" class="form-check-label">Steel Structure</label>
+                    </div>
+
+                    <!-- Inspector Status -->
+                    <h5>Inspector Status</h5>
+                    <div th:each="status : ${T(com.stepup.ims.model.Inspector.InspectorStatusType).values()}">
+                        <div class="form-check">
+                            <input type="radio" name="editInspectorStatus" th:value="${status}" class="form-check-input">
+                            <label th:text="${status}" class="form-check-label"></label>
+                        </div>
+                    </div>
+
+                    <!-- Remarks -->
+                    <div class="mb-3">
+                        <label for="editRemarks">Remarks</label>
+                        <textarea id="editRemarks" name="remarks" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -368,22 +665,73 @@
 
     // Function to load inspector data into the edit modal
     function loadInspectorData(button) {
+        // Extract data attributes from the button
         const id = button.getAttribute("data-id");
         const inspectorName = button.getAttribute("data-inspectorname");
         const email = button.getAttribute("data-email");
         const phone = button.getAttribute("data-phone");
-        const status = button.getAttribute("data-status");
-        const inspector = button.getAttribute("data-inspector");
-        // Populate the Inspector ID field
-        document.getElementById("editInspectorId").value = id;
+        const dob = button.getAttribute("data-dob");
+        const address = button.getAttribute("data-address");
+        const country = button.getAttribute("data-country");
+        const educationDetails = button.getAttribute("data-educationdetails");
+        const disciplines = button.getAttribute("data-disciplines");
+        const inspectorType = button.getAttribute("data-inspectortype");
+        const certificates = JSON.parse(button.getAttribute("data-certificates"));
+        const aramco = button.getAttribute("data-aramco") === "true";
+        const sec = button.getAttribute("data-sec") === "true";
+        const specialQualificationDetails = button.getAttribute("data-specialqualificationdetails");
+        const mechStatic = button.getAttribute("data-mechstatic") === "true";
+        const mechRotating = button.getAttribute("data-mechrotating") === "true";
+        const electrical = button.getAttribute("data-electrical") === "true";
+        const piping = button.getAttribute("data-piping") === "true";
+        const steelStructure = button.getAttribute("data-steelstructure") === "true";
+        const inspectorStatus = button.getAttribute("data-inspectorstatus");
+        const remarks = button.getAttribute("data-remarks");
 
-        // Populate other fields
+        // Populate the form fields in the edit modal
+        document.getElementById("editInspectorId").value = id;
         document.getElementById("editInspectorName").value = inspectorName;
         document.getElementById("editEmail").value = email;
         document.getElementById("editPhone").value = phone;
-        document.getElementById("editStatus").value = status;
-        document.getElementById("editDob").value = inspector.dob;
+        document.getElementById("editDob").value = dob;
+        document.getElementById("editAddress").value = address;
+        document.getElementById("editCountry").value = country;
+        document.getElementById("editEducationDetails").value = educationDetails;
+        document.getElementById("editDisciplines").value = disciplines;
+        document.querySelector(`input[name="editInspectorType"][value="${inspectorType}"]`).checked = true;
 
+        // Populate Certificates
+        const certificatesBody = document.getElementById("editCertificatesBody");
+        certificatesBody.innerHTML = ""; // Clear existing rows
+        certificates.forEach((certificate, index) => {
+            const newRow = document.createElement("tr");
+            newRow.innerHTML = `
+                <td><input type="text" name="certificates[${index}].name" class="form-control" value="${certificate.name}" /></td>
+                <td><input type="date" name="certificates[${index}].dateIssued" class="form-control" value="${certificate.dateIssued}" /></td>
+                <td><input type="date" name="certificates[${index}].expiryDate" class="form-control" value="${certificate.expiryDate}" /></td>
+                <td><input type="text" name="certificates[${index}].issuer" class="form-control" value="${certificate.issuer}" /></td>
+                <td><button type="button" class="btn btn-danger" onclick="removeCertificateRow(this)"><i class="fas fa-trash"></i></button></td>
+            `;
+            certificatesBody.appendChild(newRow);
+        });
+
+        // Populate Special Qualification
+        document.getElementById("editAramco").checked = aramco;
+        document.getElementById("editSec").checked = sec;
+        document.getElementById("editSpecialQualificationDetails").value = specialQualificationDetails;
+
+        // Populate Main Qualification
+        document.getElementById("editMechStatic").checked = mechStatic;
+        document.getElementById("editMechRotating").checked = mechRotating;
+        document.getElementById("editElectrical").checked = electrical;
+        document.getElementById("editPiping").checked = piping;
+        document.getElementById("editSteelStructure").checked = steelStructure;
+
+        // Populate Inspector Status
+        document.querySelector(`input[name="editInspectorStatus"][value="${inspectorStatus}"]`).checked = true;
+
+        // Populate Remarks
+        document.getElementById("editRemarks").value = remarks;
     }
 
     // Function to view inspector data
@@ -400,6 +748,26 @@
         document.getElementById("viewEmail").textContent = email;
         document.getElementById("viewPhone").textContent = phone;
         document.getElementById("viewStatus").textContent = status;
+    }
+
+    // Function to add a certificate row
+    function addCertificate(tableBodyId) {
+        const tableBody = document.getElementById(tableBodyId);
+        const newRow = document.createElement("tr");
+        newRow.innerHTML = `
+            <td><input type="text" name="certificates[${tableBody.children.length}].name" class="form-control" placeholder="Certificate Name"/></td>
+            <td><input type="date" name="certificates[${tableBody.children.length}].dateIssued" class="form-control"/></td>
+            <td><input type="date" name="certificates[${tableBody.children.length}].expiryDate" class="form-control"/></td>
+            <td><input type="text" name="certificates[${tableBody.children.length}].issuer" class="form-control" placeholder="Issuer"/></td>
+            <td><button type="button" class="btn btn-danger" onclick="removeCertificateRow(this)"><i class="fas fa-trash"></i></button></td>
+        `;
+        tableBody.appendChild(newRow);
+    }
+
+    // Function to remove a certificate row
+    function removeCertificateRow(button) {
+        const row = button.closest("tr");
+        row.remove();
     }
 </script>
 <!-- Footer -->

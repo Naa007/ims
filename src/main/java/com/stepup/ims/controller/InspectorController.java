@@ -1,6 +1,8 @@
 package com.stepup.ims.controller;
 
+import com.google.maps.model.LatLng;
 import com.stepup.ims.model.Inspector;
+import com.stepup.ims.service.GoogleMapsService;
 import com.stepup.ims.service.InspectorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,13 +18,14 @@ public class InspectorController {
     @Autowired
     private InspectorService inspectorService;
 
+    @Autowired
+    private GoogleMapsService googleMapsService;
     /**
      * Display list of all inspectors.
      */
     @GetMapping("/list")
     public String listInspectors(Model model) {
         List<Inspector> inspectors = inspectorService.getAllInspectors();
-
         model.addAttribute("inspectors", inspectors);
         return "inspectorList";
     }
@@ -38,9 +41,24 @@ public class InspectorController {
 
     /**
      * Save or update the inspector.
+     * Handles exception when geocoding the address.
      */
     @PostMapping("/save")
     public String saveInspector(@ModelAttribute Inspector inspector) {
+        if (inspector.getAddress() != null && !inspector.getAddress().isEmpty()) {
+            try {
+                LatLng coordinates = googleMapsService.geocodeAddress(inspector.getAddress());
+                inspector.setAddressCoordinates(coordinates);
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+                System.err.println("Geocoding interrupted: " + ie.getMessage());
+                inspector.setAddressCoordinates(null);
+            } catch (Exception e) {
+                inspector.setAddressCoordinates(null);
+                // Log the exception (assumes a logger is available)
+                System.err.println("Cannot geocode address: " + e.getMessage());
+            }
+        }
         inspectorService.saveInspector(inspector);
         return "redirect:/inspectors/list";
     }
@@ -54,12 +72,4 @@ public class InspectorController {
         return "InspectorForm";
     }
 
-    /**
-     * Delete an inspector.
-     */
-    @GetMapping("/delete/{id}")
-    public String deleteInspector(@PathVariable("id") Long id) {
-        inspectorService.deleteInspector(id);
-        return "redirect:/inspectors/list";
-    }
 }

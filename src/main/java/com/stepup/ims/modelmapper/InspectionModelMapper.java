@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class InspectionModelMapper {
@@ -42,5 +43,13 @@ public class InspectionModelMapper {
             throw new IllegalArgumentException("Input InspectionEntity List cannot be null");
         }
         return entities.stream().map(this::toModel).toList();
+    }
+
+    public Optional<Inspection> getOptionalModel(Optional<com.stepup.ims.entity.Inspection> optionalInspectionEntity) {
+        return optionalInspectionEntity.map(this::toModel);
+    }
+
+    public Optional<com.stepup.ims.entity.Inspection> getOptionalEntity(Optional<Inspection> optionalInspection) {
+        return optionalInspection.map(this::toEntity);
     }
 }
