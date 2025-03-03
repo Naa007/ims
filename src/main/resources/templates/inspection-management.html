@@ -104,6 +104,11 @@
             border-radius: 8px; /* Optional: Slightly rounds the corners of the border */
         }
 
+        #inspectionDatesContainer .btn {
+                        height: calc(1.5em + 0.75rem + 2px); /* Match the computed input field height */
+                        line-height: normal; /* Center align button text */
+                    }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             
@@ -358,7 +363,6 @@
                                 th:text="${country}"></option>
                     </select>
                 </div>
-
 
                 <!-- Inspection Dates -->
                 <div class="col-md-4" id="inspectionDatesContainer">
