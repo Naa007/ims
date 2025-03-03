@@ -286,7 +286,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form th:action="@{/inspector/save}" th:object="${inspector}" method="post">
+                <form th:action="@{/inspectors/save}" th:object="${inspector}" method="post">
                     <!-- Inspector ID -->
                     <div class="mb-3 input-group">
                         <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
@@ -451,7 +451,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="editInspectorForm" th:action="@{/inspector/save}" method="post">
+                <form id="editInspectorForm" th:action="@{/inspectors/save}" method="post">
                     <!-- Hidden Inspector ID -->
                     <input type="hidden" id="editInspectorId" name="inspectorId">
 
@@ -561,7 +561,7 @@
                     <h5>Inspector Status</h5>
                     <div th:each="status : ${T(com.stepup.ims.model.Inspector.InspectorStatusType).values()}">
                         <div class="form-check">
-                            <input type="radio" name="editInspectorStatus" th:value="${status}" class="form-check-input">
+                            <input type="radio" id="editInspectorStatus" name="inspectorStatus" th:value="${status}" class="form-check-input">
                             <label th:text="${status}" class="form-check-label"></label>
                         </div>
                     </div>
