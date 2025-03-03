@@ -3,6 +3,7 @@ package com.stepup.ims.model;
 import com.google.maps.model.LatLng;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -21,9 +22,9 @@ public class Inspector {
     private String dob; // Date for inspector's date of birth
     private String educationDetails;
     private String disciplines; // Comma-separated string for disciplines
-    private List<Certificate> certificates;
-    private SpecialQualification specialQualification;
-    private MainQualification mainQualificationCategory;
+    private List<Certificate> certificates= new ArrayList<>();
+    private SpecialQualification specialQualification = new SpecialQualification();;
+    private MainQualification mainQualificationCategory = new MainQualification();
     private InspectorStatusType inspectorStatus;
     private String remarks;
     private PQR pqr;

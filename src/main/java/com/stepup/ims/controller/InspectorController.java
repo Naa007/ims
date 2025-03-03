@@ -26,7 +26,13 @@ public class InspectorController {
     @GetMapping("/list")
     public String listInspectors(Model model) {
         List<Inspector> inspectors = inspectorService.getAllInspectors();
+
+        // Add the list of inspectors to the model
         model.addAttribute("inspectors", inspectors);
+
+        // Add a new Inspector object to the model for the form
+        model.addAttribute("inspector", new Inspector());
+
         return "inspectorList";
     }
 
