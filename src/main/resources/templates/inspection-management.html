@@ -171,144 +171,144 @@
 
     </style>
     <script th:inline="javascript">
-        
-        function initMap(inspectionLocation) {
 
-           fetch('/api/inspectors?address=' + inspectionLocation )
-            .then(response => response.json())
-            .then(data => {
-                for (const [locationKey, inspectors] of Object.entries(data)) {
-                    const userLocationArray = locationKey.split(',').map(Number); // Split and convert to numbers
-                    const userLocation = new google.maps.LatLng(userLocationArray[0], userLocationArray[1]); // Create LatLng object
+         function initMap(inspectionLocation) {
+
+             fetch('/api/inspectors?address=' + inspectionLocation )
+             .then(response => response.json())
+             .then(data => {
+                 for (const [locationKey, inspectors] of Object.entries(data)) {
+                     const userLocationArray = locationKey.split(',').map(Number); // Split and convert to numbers
+                     const userLocation = new google.maps.LatLng(userLocationArray[0], userLocationArray[1]); // Create LatLng object
 
                     const map = new google.maps.Map(document.getElementById('map'), {
                         zoom: 10,
                         center: userLocation
                     });
 
-                    // Add marker for user location
-                    const userMarker = new google.maps.Marker({
-                        position: userLocation,
-                        map: map,
-                        title: "Inspection Location"
-                    });
+                     // Add marker for user location
+                     const userMarker = new google.maps.Marker({
+                         position: userLocation,
+                         map: map,
+                         title: "Inspection Location"
+                     });
 
-                    // Plot all inspectors for the current user location
-                    inspectors.forEach(inspector => {
-                        const marker = new google.maps.Marker({
-                            position: {
-                                lat: inspector.location.lat,
-                                lng: inspector.location.lng
-                            },
-                            map: map,
-                            title: `${inspector.name}, Distance: ${inspector.distance}, Duration: ${inspector.duration}`,
-                            icon: {
-                                url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png" // Green marker icon
-                            }
-                        });
-                    });
-                }
-            });
+                     // Plot all inspectors for the current user location
+                     inspectors.forEach(inspector => {
+                         const marker = new google.maps.Marker({
+                             position: {
+                                 lat: inspector.location.lat,
+                                 lng: inspector.location.lng
+                             },
+                             map: map,
+                             title: `${inspector.name}, Distance: ${inspector.distance}, Duration: ${inspector.duration}`,
+                             icon: {
+                                 url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png" // Green marker icon
+                             }
+                         });
+                     });
+                 }
+                     });
 
-       }
-        
-        function showMapLoadingMessage() {
-                    const mapLoadingMessage = document.getElementById('mapLoadingMessage');
-                    mapLoadingMessage.style.display = 'block';
+         }
 
-                    // Assuming 'initMap' will handle the map loading process
-                    // Add a timeout or any custom logic to hide the message after map loading completes
-                    setTimeout(() => {
-                        mapLoadingMessage.style.display = 'none';
-                    }, 5000); // Adjust the time as per map loading logic
-                }
-       
-       function addCVRow() {
-           const tableBody = document.querySelector("#proposedCVsTable tbody");
-           const newRow = document.createElement("tr");
-           newRow.innerHTML = `
-               <td>
-                   <select class="form-control" name="proposedCVs[newRow].inspector.inspectorName" required>
-                       <option value="" disabled selected>Select an Inspector</option>
-                       <option th:each="inspector : ${inspection.inspectorsList}" th:value="${inspector.inspectorName}"
-                               th:text="${inspector.inspectorName}"></option>
-                   </select>
-               </td>
+         function showMapLoadingMessage() {
+                     const mapLoadingMessage = document.getElementById('mapLoadingMessage');
+                     mapLoadingMessage.style.display = 'block';
 
-               <td>
+                     // Assuming 'initMap' will handle the map loading process
+                     // Add a timeout or any custom logic to hide the message after map loading completes
+                     setTimeout(() => {
+                         mapLoadingMessage.style.display = 'none';
+                     }, 5000); // Adjust the time as per map loading logic
+                 }
+
+        function addCVRow() {
+            const tableBody = document.querySelector("#proposedCVsTable tbody");
+            const newRow = document.createElement("tr");
+            newRow.innerHTML = `
+                <td>
+                    <select class="form-control" name="proposedCVs[newRow].inspector.inspectorName" required>
+                        <option value="" disabled selected>Select an Inspector</option>
+                        <option th:each="inspector : ${inspection.inspectorsList}" th:value="${inspector.inspectorName}"
+                                th:text="${inspector.inspectorName}"></option>
+                    </select>
+                </td>
+
+                <td>
+                     <input type="radio"
+                            name="proposedCVs[newRow].isCVCertificatesAvailable"
+                            value="true" required/>
+                     Yes
+                     <input type="radio"
+                            name="proposedCVs[newRow].isCVCertificatesAvailable"
+                            value="false" required/>
+                     No
+                </td>
+
+                <td>
+                    <select class="form-control" name="proposedCVs[newRow].cvReviewByTechnicalCoordinator.inspectorName"
+                            required>
+                        <option value="" disabled selected>Select a Technical Coordinator</option>
+
+                    </select>
+                </td>
+
+                <td>
                     <input type="radio"
-                           name="proposedCVs[newRow].isCVCertificatesAvailable"
-                           value="true" required/>
-                    Yes
-                    <input type="radio"
-                           name="proposedCVs[newRow].isCVCertificatesAvailable"
-                           value="false" required/>
-                    No
-               </td>
+                        name="proposedCVs[newRow].isPQRAvailable"
+                        value="true" required/>
+                     Yes
+                     <input type="radio"
+                            name="proposedCVs[newRow].isPQRAvailable"
+                            value="false"  required/>
+                     No
+                </td>
 
-               <td>
-                   <select class="form-control" name="proposedCVs[newRow].cvReviewByTechnicalCoordinator.inspectorName"
-                           required>
-                       <option value="" disabled selected>Select a Technical Coordinator</option>
+                <td>
+                    <input type="datetime-local" class="form-control"
+                           name="proposedCVs[newRow].cvSubmittedToClientDate" required/>
+                </td>
 
-                   </select>
-               </td>
+                <td>
+                     <input type="radio" name="proposedCVs[newRow].cvStatus"
+                            value="true" required/>
+                     Yes
+                     <input type="radio" name="proposedCVs[newRow].cvStatus"
+                            value="false"  required/>
+                     No
+                </td>
 
-               <td>
-                   <input type="radio"
-                       name="proposedCVs[newRow].isPQRAvailable"
-                       value="true" required/>
-                    Yes
-                    <input type="radio"
-                           name="proposedCVs[newRow].isPQRAvailable"
-                           value="false"  required/>
-                    No
-               </td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="deleteCVRow(this)">Delete</button>
+                </td>
+            `;
+            tableBody.appendChild(newRow);
+        }
 
-               <td>
-                   <input type="datetime-local" class="form-control"
-                          name="proposedCVs[newRow].cvSubmittedToClientDate" required/>
-               </td>
+        function deleteCVRow(button) {
+            const row = button.closest("tr");
+            row.remove();
+        }
 
-               <td>
-                    <input type="radio" name="proposedCVs[newRow].cvStatus"
-                           value="true" required/>
-                    Yes
-                    <input type="radio" name="proposedCVs[newRow].cvStatus"
-                           value="false"  required/>
-                    No
-               </td>
+        let dateCounter = 1;
+        function addDateInput() {
+            dateCounter++;
+            const container = document.getElementById('inspectionDatesContainer');
+            const newInputDiv = document.createElement('div');
+            newInputDiv.classList.add('input-group', 'mb-2');
+            newInputDiv.innerHTML = `
+                <input type="date" id="inspectionDate${dateCounter}" name="inspectionDateAsPerNotification[]" class="form-control" required />
+                <button type="button" class="btn btn-danger" onclick="removeDateInput(this)">Remove</button>
+            `;
+            container.appendChild(newInputDiv);
+        }
 
-               <td>
-                   <button type="button" class="btn btn-danger btn-sm" onclick="deleteCVRow(this)">Delete</button>
-               </td>
-           `;
-           tableBody.appendChild(newRow);
-       }
-
-       function deleteCVRow(button) {
-           const row = button.closest("tr");
-           row.remove();
-       }
-
-       let dateCounter = 1;
-       function addDateInput() {
-           dateCounter++;
-           const container = document.getElementById('inspectionDatesContainer');
-           const newInputDiv = document.createElement('div');
-           newInputDiv.classList.add('input-group', 'mb-2');
-           newInputDiv.innerHTML = `
-               <input type="date" id="inspectionDate${dateCounter}" name="inspectionDateAsPerNotification[]" class="form-control" required />
-               <button type="button" class="btn btn-danger" onclick="removeDateInput(this)">Remove</button>
-           `;
-           container.appendChild(newInputDiv);
-       }
-
-       function removeDateInput(button) {
-           button.parentElement.remove();
-       }
-         // Initialize Map
-       window.onload = initMap('Hyderabad, India');
+        function removeDateInput(button) {
+            button.parentElement.remove();
+        }
+          // Initialize Map
+        window.onload = initMap('Hyderabad, India');
 
     </script>
 </head>
@@ -511,7 +511,7 @@
                             <td>
                                 <label>
                                     <select class="form-control"
-                                            th:field="*{proposedCVs[__${iterStat.index}__].cvReviewTechnicalCoordinator.empName}"
+                                            name="proposedCVs[__${iterStat.index}__].cvReviewTechnicalCoordinator.empName"
                                             required>
                                         <option value="" disabled selected>Select a Technical Coordinator</option>
                                         <option th:each="coordinator : ${inspection.technicalCoordinatorsList}"

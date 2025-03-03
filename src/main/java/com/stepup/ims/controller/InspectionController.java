@@ -43,7 +43,7 @@ public class InspectionController {
         inspection.setClientsList(clientService.getAllClients());
 
         // set inspectors for dropdown
-        inspection.setInspectorsList(inspectorService.getAllInspectors());
+        inspection.setInspectorsList(inspectorService.getAllActiveInspectors());
 
         // set technical coordinators for dropdown
         inspection.setTechnicalCoordinatorsList(employeeService.getAllTechnicalCoordinateEmployees());

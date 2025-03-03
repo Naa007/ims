@@ -23,16 +23,12 @@ public class Inspector {
     private String educationDetails;
     private String disciplines; // Comma-separated string for disciplines
     private List<Certificate> certificates= new ArrayList<>();
-    private SpecialQualification specialQualification = new SpecialQualification();;
+    private SpecialQualification specialQualification = new SpecialQualification();
     private MainQualification mainQualificationCategory = new MainQualification();
     private InspectorStatusType inspectorStatus;
     private String remarks;
     private PQR pqr;
 
-    // TODO replace with the google maps api call based on user location
-    public LatLng getAddressCoordinates() {
-        return new LatLng(17.4065,78.4772);
-    }
     public enum InspectorType {
         INHOUSE_INSPECTOR, TECHNICAL_COORDINATOR, FREELANCER, PARTNER_INSPECTOR
     }
