@@ -99,6 +99,11 @@
             background-color: #0056b3; /* Darker blue for hover effect */
         }
 
+        #map {
+            border: 2px solid #000; /* Adds a black border with 2px thickness */
+            border-radius: 8px; /* Optional: Slightly rounds the corners of the border */
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             
@@ -161,16 +166,7 @@
 
     </style>
     <script th:inline="javascript">
-        function showMapLoadingMessage() {
-                        const mapLoadingMessage = document.getElementById('mapLoadingMessage');
-                        mapLoadingMessage.style.display = 'block';
-
-                        // Assuming 'initMap' will handle the map loading process
-                        // Add a timeout or any custom logic to hide the message after map loading completes
-                        setTimeout(() => {
-                            mapLoadingMessage.style.display = 'none';
-                        }, 5000); // Adjust the time as per map loading logic
-                    }
+        
         function initMap(inspectionLocation) {
 
            fetch('/api/inspectors?address=' + inspectionLocation )
@@ -200,14 +196,28 @@
                                 lng: inspector.location.lng
                             },
                             map: map,
-                            title: `${inspector.name}, Distance: ${inspector.distance}, Duration: ${inspector.duration}`
+                            title: `${inspector.name}, Distance: ${inspector.distance}, Duration: ${inspector.duration}`,
+                            icon: {
+                                url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png" // Green marker icon
+                            }
                         });
                     });
                 }
             });
 
        }
+        
+        function showMapLoadingMessage() {
+                    const mapLoadingMessage = document.getElementById('mapLoadingMessage');
+                    mapLoadingMessage.style.display = 'block';
 
+                    // Assuming 'initMap' will handle the map loading process
+                    // Add a timeout or any custom logic to hide the message after map loading completes
+                    setTimeout(() => {
+                        mapLoadingMessage.style.display = 'none';
+                    }, 5000); // Adjust the time as per map loading logic
+                }
+       
        function addCVRow() {
            const tableBody = document.querySelector("#proposedCVsTable tbody");
            const newRow = document.createElement("tr");
@@ -364,48 +374,51 @@
 
             </div>
 
-            <div class="row">
+            <div class="row" style="height:470px">
 
-                <!-- Inspection Item -->
                 <div class="col-md-4">
-                    <label for="inspectionItem" class="form-label">Inspection Item</label>
-                    <input type="text" id="inspectionItem" th:field="*{inspectionItem}" class="form-control"/>
-                </div>
 
+                    <!-- Inspection Item -->
+                    <div>
+                        <label for="inspectionItem" class="form-label">Inspection Item</label>
+                        <input type="text" id="inspectionItem" th:field="*{inspectionItem}" class="form-control"/>
+                    </div>
 
-                <!-- Inspection Activity with Stages -->
-                <div class="col-md-4">
-                    <label for="inspectionActivityWithStages" class="form-label">Inspection Activity With Stages</label>
-                    <textarea id="inspectionActivityWithStages" th:field="*{inspectionActivityWithStages}"
-                              class="form-control" rows="3"></textarea>
-                </div>
-
-                <!-- Inspection Type -->
-                <div class="col-md-4">
-                    <label class="form-label">Inspection Type</label>
-                    <div th:each="type : ${T(com.stepup.ims.model.Inspection.InspectionType).values()}">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" th:id="${type.name()}"
-                                   th:field="*{inspectionType}" th:value="${type.name()}"/>
-                            <label class="form-check-label" th:for="${type.name()}" th:text="${type.name()}"></label>
+                    <!-- Inspection Type -->
+                    <div>
+                        <label class="form-label">Inspection Type</label>
+                        <div>
+                            <input type="checkbox" class="form-check-input" id="MECHANICAL"
+                                   th:field="*{inspectionType}" value="MECHANICAL"/>
+                            <label class="form-check-label" for="MECHANICAL">Mechanical</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" class="form-check-input" id="ELECTRICAL"
+                                   th:field="*{inspectionType}" value="ELECTRICAL"/>
+                            <label class="form-check-label" for="ELECTRICAL">Electrical</label>
                         </div>
                     </div>
-                </div>
 
 
-            </div>
-
-            <div class="row" style="height:200px">
-
-                <!-- Inspection Location Details -->
-                <div class="col-md-4">
-                    <label for="inspectionLocationDetails" class="form-label">Inspection Location Details</label>
-                    <textarea id="inspectionLocationDetails" th:field="*{inspectionLocationDetails}"
-                              class="form-control" rows="3" onchange="initMap(this.value); showMapLoadingMessage(); "></textarea>
-
-                    <div id="mapLoadingMessage" class="mt-2 text-warning fw-bold" style="display: none;">
-                        Wait for the map to load nearby inspectors...
+                    <!-- Inspection Stages -->
+                    <div>
+                        <label for="inspectionActivityWithStages" class="form-label">Inspection Stages</label>
+                        <textarea id="inspectionActivityWithStages" th:field="*{inspectionActivityWithStages}"
+                                  class="form-control" rows="3"></textarea>
                     </div>
+
+                    
+                    <!-- Inspection Location Details -->
+                    <div>
+                        <label for="inspectionLocationDetails" class="form-label">Inspection Location Details</label>
+                        <textarea id="inspectionLocationDetails" th:field="*{inspectionLocationDetails}"
+                                  class="form-control" rows="3" onchange="initMap(this.value); showMapLoadingMessage(); "></textarea>
+
+                        <div id="mapLoadingMessage" class="mt-2 text-warning fw-bold" style="display: none;">
+                            Wait for the map to load nearby inspectors...
+                        </div>
+                    </div>
+
                 </div>
 
                 <!-- Inspectors Location Map -->
