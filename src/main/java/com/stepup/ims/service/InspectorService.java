@@ -27,8 +27,15 @@ public class InspectorService {
     /**
      * Fetch all inspectors from the database.
      */
-    public List<Inspector> getAllInspectors() {
+    public List<Inspector> getAllActiveInspectors() {
         return inspectorModelMapper.toModelList(inspectorRepository.findAllByInspectorStatus(com.stepup.ims.entity.Inspector.InspectorStatusType.ACTIVE));
+    }
+
+    /**
+     * Fetch all inspectors from the database.
+     */
+    public List<Inspector> getAllInspectors() {
+        return inspectorModelMapper.toModelList(inspectorRepository.findAll());
     }
 
     /**

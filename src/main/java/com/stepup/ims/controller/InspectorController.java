@@ -7,7 +7,10 @@ import com.stepup.ims.service.InspectorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
@@ -20,23 +23,21 @@ public class InspectorController {
 
     @Autowired
     private GoogleMapsService googleMapsService;
+
     /**
      * Display list of all inspectors.
      */
     @GetMapping("/list")
     public String listInspectors(Model model) {
         List<Inspector> inspectors = inspectorService.getAllInspectors();
-        model.addAttribute("inspectors", inspectors);
-        return "inspectorList";
-    }
 
-    /**
-     * Show the form to add a new inspector.
-     */
-    @GetMapping("/form")
-    public String showInspectorForm(Model model) {
+        // Add the list of inspectors to the model
+        model.addAttribute("inspectors", inspectors);
+
+        // Add a new Inspector object to the model for the form
         model.addAttribute("inspector", new Inspector());
-        return "InspectorForm";
+
+        return "inspector-management";
     }
 
     /**
@@ -61,15 +62,6 @@ public class InspectorController {
         }
         inspectorService.saveInspector(inspector);
         return "redirect:/inspectors/list";
-    }
-
-    /**
-     * Show the form to edit an existing inspector.
-     */
-    @GetMapping("/edit/{id}")
-    public String editInspector(@PathVariable("id") Long id, Model model) {
-        inspectorService.getInspectorById(id).ifPresent(inspector -> model.addAttribute("inspector", inspector));
-        return "InspectorForm";
     }
 
 }
