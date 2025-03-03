@@ -234,28 +234,51 @@
                                th:text="${inspector.inspectorName}"></option>
                    </select>
                </td>
+
                <td>
-                   <select class="form-control" name="proposedCVs[newRow].inspector.country" required>
-                       <option value="">Select Country</option>
-                       <option th:each="country : ${inspection.countriesList}" th:value="${country}"
-                               th:text="${country}"></option>
-                   </select>
+                    <input type="radio"
+                           name="proposedCVs[newRow].isCVCertificatesAvailable"
+                           value="true" required/>
+                    Yes
+                    <input type="radio"
+                           name="proposedCVs[newRow].isCVCertificatesAvailable"
+                           value="false" required/>
+                    No
                </td>
-               <td>
-                   <select class="form-control" name="proposedCVs[newRow].isCVCertificatesAvailable" required>
-                       <option value="true">Yes</option>
-                       <option value="false">No</option>
-                   </select>
-               </td>
+
                <td>
                    <select class="form-control" name="proposedCVs[newRow].cvReviewByTechnicalCoordinator.inspectorName"
                            required>
                        <option value="" disabled selected>Select a Technical Coordinator</option>
-                       <option th:each="coordinator : ${inspection.technicalCoordinatorsList}"
-                               th:value="${coordinator.inspectorName}"
-                               th:text="${coordinator.inspectorName}"></option>
+
                    </select>
                </td>
+
+               <td>
+                   <input type="radio"
+                       name="proposedCVs[newRow].isPQRAvailable"
+                       value="true" required/>
+                    Yes
+                    <input type="radio"
+                           name="proposedCVs[newRow].isPQRAvailable"
+                           value="false"  required/>
+                    No
+               </td>
+
+               <td>
+                   <input type="datetime-local" class="form-control"
+                          name="proposedCVs[newRow].cvSubmittedToClientDate" required/>
+               </td>
+
+               <td>
+                    <input type="radio" name="proposedCVs[newRow].cvStatus"
+                           value="true" required/>
+                    Yes
+                    <input type="radio" name="proposedCVs[newRow].cvStatus"
+                           value="false"  required/>
+                    No
+               </td>
+
                <td>
                    <button type="button" class="btn btn-danger btn-sm" onclick="deleteCVRow(this)">Delete</button>
                </td>
@@ -416,7 +439,8 @@
                     <div>
                         <label for="inspectionLocationDetails" class="form-label">Inspection Location Details</label>
                         <textarea id="inspectionLocationDetails" th:field="*{inspectionLocationDetails}"
-                                  class="form-control" rows="3" onchange="initMap(this.value); showMapLoadingMessage(); "></textarea>
+                                  class="form-control" rows="3"
+                                  onchange="initMap(this.value); showMapLoadingMessage(); "></textarea>
 
                         <div id="mapLoadingMessage" class="mt-2 text-warning fw-bold" style="display: none;">
                             Wait for the map to load nearby inspectors...
@@ -458,8 +482,8 @@
                                     <select class="form-control"
                                             th:field="*{proposedCVs[__${iterStat.index}__].inspector.inspectorName}"
                                             required>
-                                        <option value="" disabled selected>Select an Inspector</option>
-                                        <option th:each="inspector : ${inspection.inspectorsList}"
+                                            <option value="" disabled selected>Select an Inspector</option>
+                                            <option th:each="inspector : ${inspection.inspectorsList}"
                                                 th:value="${inspector.inspectorName}"
                                                 th:text="${inspector.inspectorName}"></option>
                                     </select>
@@ -467,56 +491,72 @@
                             </td>
 
                             <td>
-                                <input type="radio"
-                                       name="proposedCVs[__${iterStat.index}__].isCVCertificatesAvailable"
-                                       value="true"
-                                       th:checked="${cv.isCVCertificatesAvailable == true}" required/>
+                                <label>
+                                    <input type="radio"
+                                           name="proposedCVs[__${iterStat.index}__].isCVCertificatesAvailable"
+                                           value="true"
+                                           th:checked="${cv.isCVCertificatesAvailable == true}" required/>
+                                </label>
                                 Yes
-                                <input type="radio"
-                                       name="proposedCVs[__${iterStat.index}__].isCVCertificatesAvailable"
-                                       value="false"
-                                       th:checked="${cv.isCVCertificatesAvailable == false}" required/>
+                                <label>
+                                    <input type="radio"
+                                           name="proposedCVs[__${iterStat.index}__].isCVCertificatesAvailable"
+                                           value="false"
+                                           th:checked="${cv.isCVCertificatesAvailable == false}" required/>
+                                </label>
                                 No
                             </td>
 
 
                             <td>
-                                <select class="form-control"
-                                        name="proposedCVs[__${iterStat.index}__].cvReviewTechnicalCoordinator.empName"
-                                        required>
-                                    <option value="" disabled selected>Select a Technical Coordinator</option>
-                                    <option th:each="coordinator : ${inspection.technicalCoordinatorsList}"
-                                            th:value="${coordinator.empName}"
-                                            th:text="${coordinator.empName}"></option>
-                                </select>
+                                <label>
+                                    <select class="form-control"
+                                            th:field="*{proposedCVs[__${iterStat.index}__].cvReviewTechnicalCoordinator.empName}"
+                                            required>
+                                        <option value="" disabled selected>Select a Technical Coordinator</option>
+                                        <option th:each="coordinator : ${inspection.technicalCoordinatorsList}"
+                                                th:value="${coordinator.empName}"
+                                                th:text="${coordinator.empName}"></option>
+                                    </select>
+                                </label>
                             </td>
 
                             <td>
-                                <input type="radio"
-                                       name="proposedCVs[__${iterStat.index}__].isPQRAvailable"
-                                       value="true"
-                                       th:checked="${cv.isPQRAvailable == true}" required/>
+                                <label>
+                                    <input type="radio"
+                                           name="proposedCVs[__${iterStat.index}__].isPQRAvailable"
+                                           value="true"
+                                           th:checked="${cv.isPQRAvailable == true}" required/>
+                                </label>
                                 Yes
-                                <input type="radio"
-                                       name="proposedCVs[__${iterStat.index}__].isPQRAvailable"
-                                       value="false"
-                                       th:checked="${cv.isPQRAvailable == false}" required/>
+                                <label>
+                                    <input type="radio"
+                                           name="proposedCVs[__${iterStat.index}__].isPQRAvailable"
+                                           value="false"
+                                           th:checked="${cv.isPQRAvailable == false}" required/>
+                                </label>
                                 No
                             </td>
 
                             <td>
-                                <input type="datetime-local" class="form-control"
-                                       th:field="*{proposedCVs[__${iterStat.index}__].cvSubmittedToClientDate}"
-                                       required/>
+                                <label>
+                                    <input type="datetime-local" class="form-control"
+                                           th:field="*{proposedCVs[__${iterStat.index}__].cvSubmittedToClientDate}"
+                                           required/>
+                                </label>
                             </td>
 
 
                             <td>
-                                <input type="radio" name="proposedCVs[__${iterStat.index}__].cvStatus"
-                                       value="true" th:checked="${cv.cvStatus == true}" required/>
+                                <label>
+                                    <input type="radio" name="proposedCVs[__${iterStat.index}__].cvStatus"
+                                           value="true" th:checked="${cv.cvStatus == true}" required/>
+                                </label>
                                 Yes
-                                <input type="radio" name="proposedCVs[__${iterStat.index}__].cvStatus"
-                                       value="false" th:checked="${cv.cvStatus == false}" required/>
+                                <label>
+                                    <input type="radio" name="proposedCVs[__${iterStat.index}__].cvStatus"
+                                           value="false" th:checked="${cv.cvStatus == false}" required/>
+                                </label>
                                 No
                             </td>
 
@@ -525,6 +565,7 @@
                                 </button>
                             </td>
                         </tr>
+
                         </tbody>
                     </table>
 
@@ -578,10 +619,10 @@
                     <div>
                         <input type="radio" name="documentsStatus" value="true"
                                th:checked="${inspection.referenceDocumentsForInspectionStatus == true}" required/>
-                        Avaialble
+                        Available
                         <input type="radio" name="documentsStatus" value="false"
                                th:checked="${inspection.referenceDocumentsForInspectionStatus == false}" required/>
-                        Not Aavailable
+                        Not Available
                     </div>
                 </div>
 
@@ -709,12 +750,10 @@
                 <!-- NCR Raised -->
                 <div class="col-md-4">
                     <label class="form-label">NCR Raised</label>
-                    <div>
-                        <input type="radio" name="ncrRaised" value="true" th:checked="${ncrRaised == true}" required/>
-                        Yes
-                        <input type="radio" name="ncrRaised" value="false" th:checked="${ncrRaised == false}" required/>
-                        No
-                    </div>
+                    <input type="radio" name="ncrRaised" value="true" th:checked="${ncrRaised == true}" required/>
+                    Yes
+                    <input type="radio" name="ncrRaised" value="false" th:checked="${ncrRaised == false}" required/>
+                    No
                 </div>
 
                 <!-- IRN Sent Date -->
