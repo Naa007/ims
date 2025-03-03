@@ -30,13 +30,13 @@ public class MapController {
     private UserService userService;
 
     @GetMapping("/inspectors")
-    public Map<LatLng, List<GoogleMapsService.InspectorDistance>> getInspectorsByAddress(Model model, @RequestParam String address) throws InterruptedException, ApiException, IOException {
+    public Map<String, List<GoogleMapsService.InspectorDistance>> getInspectorsByAddress(Model model, @RequestParam String address) throws InterruptedException, ApiException, IOException {
         // 1. Geocode the user's input address
         LatLng inspectionLocation = googleMapsService.geocodeAddress(address);
 
         // 2. Calculate distances from user location to all inspectors
-        return  Map.of(
-                inspectionLocation, googleMapsService.getInspectorDistances(inspectionLocation, inspectorService.getActiveInspectorsLatLang())
+        return Map.of(
+                inspectionLocation.toString(), googleMapsService.getInspectorDistances(inspectionLocation, inspectorService.getActiveInspectorsLatLang())
         );
     }
 }

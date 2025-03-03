@@ -168,7 +168,9 @@
             .then(response => response.json())
             .then(data => {
                 for (const [locationKey, inspectors] of Object.entries(data)) {
-                    const userLocation = JSON.parse(locationKey); // Parse the location key (assumed to be a JSON string) into coordinates
+                    const userLocationArray = locationKey.split(',').map(Number); // Split and convert to numbers
+                    const userLocation = new google.maps.LatLng(userLocationArray[0], userLocationArray[1]); // Create LatLng object
+
                     const map = new google.maps.Map(document.getElementById('map'), {
                         zoom: 10,
                         center: userLocation
