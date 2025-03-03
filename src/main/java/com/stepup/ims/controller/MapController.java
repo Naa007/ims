@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -29,11 +30,13 @@ public class MapController {
     private UserService userService;
 
     @GetMapping("/inspectors")
-    public List<GoogleMapsService.InspectorDistance> getInspectorsByAddress(Model model, @RequestParam String address) throws InterruptedException, ApiException, IOException {
+    public Map<LatLng, List<GoogleMapsService.InspectorDistance>> getInspectorsByAddress(Model model, @RequestParam String address) throws InterruptedException, ApiException, IOException {
         // 1. Geocode the user's input address
-        LatLng userLocation = googleMapsService.geocodeAddress(address);
+        LatLng inspectionLocation = googleMapsService.geocodeAddress(address);
 
         // 2. Calculate distances from user location to all inspectors
-        return googleMapsService.getInspectorDistances(userLocation, inspectorService.getActiveInspectorsLatLang());
+        return  Map.of(
+                inspectionLocation, googleMapsService.getInspectorDistances(inspectionLocation, inspectorService.getActiveInspectorsLatLang())
+        );
     }
 }

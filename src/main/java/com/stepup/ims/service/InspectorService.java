@@ -4,11 +4,11 @@ import com.google.maps.model.LatLng;
 import com.stepup.ims.model.Inspector;
 import com.stepup.ims.modelmapper.InspectorModelMapper;
 import com.stepup.ims.repository.InspectorRepository;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -83,7 +83,11 @@ public class InspectorService {
     }
 
 
-    public List<LatLng> getActiveInspectorsLatLang() {
-        return inspectorRepository.findAllByInspectorStatus(com.stepup.ims.entity.Inspector.InspectorStatusType.ACTIVE).stream().map(inspectorModelMapper::toModel).map(Inspector::getAddressCoordinates).filter(Objects::nonNull).toList();
+    public List<Pair<String, LatLng>> getActiveInspectorsLatLang() {
+        return inspectorRepository.findAllByInspectorStatus(com.stepup.ims.entity.Inspector.InspectorStatusType.ACTIVE).stream()
+                .map(inspectorModelMapper::toModel)
+                .filter(inspector -> inspector.getAddressCoordinates() != null)
+                .map(inspector -> Pair.of(inspector.getInspectorName(), inspector.getAddressCoordinates()))
+                .toList();
     }
 }
