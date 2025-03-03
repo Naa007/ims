@@ -161,7 +161,16 @@
 
     </style>
     <script th:inline="javascript">
-        
+        function showMapLoadingMessage() {
+                        const mapLoadingMessage = document.getElementById('mapLoadingMessage');
+                        mapLoadingMessage.style.display = 'block';
+
+                        // Assuming 'initMap' will handle the map loading process
+                        // Add a timeout or any custom logic to hide the message after map loading completes
+                        setTimeout(() => {
+                            mapLoadingMessage.style.display = 'none';
+                        }, 5000); // Adjust the time as per map loading logic
+                    }
         function initMap(inspectionLocation) {
 
            fetch('/api/inspectors?address=' + inspectionLocation )
@@ -392,7 +401,11 @@
                 <div class="col-md-4">
                     <label for="inspectionLocationDetails" class="form-label">Inspection Location Details</label>
                     <textarea id="inspectionLocationDetails" th:field="*{inspectionLocationDetails}"
-                              class="form-control" rows="3" onchange="initMap(this.value)"></textarea>
+                              class="form-control" rows="3" onchange="initMap(this.value); showMapLoadingMessage(); "></textarea>
+
+                    <div id="mapLoadingMessage" class="mt-2 text-warning fw-bold" style="display: none;">
+                        Wait for the map to load nearby inspectors...
+                    </div>
                 </div>
 
                 <!-- Inspectors Location Map -->
