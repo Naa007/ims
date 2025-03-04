@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -45,7 +44,7 @@ public class InspectorController {
      * Handles exception when geocoding the address.
      */
     @PostMapping("/save")
-    public String saveInspector(@ModelAttribute Inspector inspector) {
+    public String saveInspector(Inspector inspector) {
         if (inspector.getAddress() != null && !inspector.getAddress().isEmpty()) {
             try {
                 LatLng coordinates = googleMapsService.geocodeAddress(inspector.getAddress());

@@ -480,7 +480,7 @@
                             <td>
                                 <label>
                                     <select class="form-control"
-                                            th:field="*{proposedCVs[__${iterStat.index}__].inspector.inspectorName}"
+                                            th:field="*{proposedCVs[__${iterStat.index}__].inspector.inspectorId}"
                                             required>
                                             <option value="" disabled selected>Select an Inspector</option>
                                             <option th:each="inspector : ${inspection.inspectorsList}"
@@ -510,7 +510,7 @@
                             <td>
                                 <label>
                                     <select class="form-control"
-                                            th:field="*{proposedCVs[__${iterStat.index}__].cvReviewByTechnicalCoordinator.empName}"
+                                            th:field="*{proposedCVs[__${iterStat.index}__].cvReviewByTechnicalCoordinator.empId}"
                                             required>
                                         <option value="" disabled selected>Select a Technical Coordinator</option>
                                         <option th:each="coordinator : ${inspection.technicalCoordinatorsList}"

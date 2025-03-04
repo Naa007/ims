@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -59,7 +60,7 @@ public class InspectionController {
     }
 
     @PostMapping(value = "/save")
-    public String createInspection(Inspection inspection) {
+    public String createInspection(@ModelAttribute Inspection inspection) {
         inspectionService.saveInspection(inspection);
         return "redirect:/inspection/form";
     }

@@ -23,8 +23,9 @@ public class Inspection {
     @Column(name = "notification_no")
     private String notificationNo;
 
+    
     @OneToOne
-    @JoinColumn(name = "client_id", referencedColumnName = "client_id")
+    @JoinColumn(name = "client_id", referencedColumnName = "client_id", unique = false)
     private Client client;
 
     @Column(name = "notification_received_date_time")
