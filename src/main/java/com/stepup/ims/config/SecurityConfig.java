@@ -15,18 +15,23 @@ import static com.stepup.ims.constants.ApplicationConstants.*;
 @Configuration
 public class SecurityConfig {
 
-    private static final String[] ACCESSIBLE_PATTERNS = {"/auth/**", "/js/**", "/css/**", "/images/**", "/login", "/", "/error/**"};
+    private static final String[] OPEN_ACCESS = {"/auth/**", "/js/**", "/css/**", "/images/**", "/login", "/", "/error/**"};
+    private static final String[] ADMIN_ACCESS = {"/admin/**", "/employee/**", "/inspectors/**", "/client/**"};
+    private static final String[] BUSINESS_ACCESS = {"/business/**"};
+    private static final String[] COORDINATOR_ACCESS = {"/coordinator/**", "/inspection/**"};
+    private static final String[] TECHNICAL_COORDINATOR_ACCESS = {"/technical-coordinator/**"};
+    private static final String[] INSPECTOR_ACCESS = {"/inspector/**"};
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(ACCESSIBLE_PATTERNS).permitAll()
-                        .requestMatchers("/admin/**").hasRole(ADMIN)
-                        .requestMatchers("/business/**").hasRole(BUSINESS)
-                        .requestMatchers("/coordinator/**").hasAnyRole(COORDINATOR)
-                        .requestMatchers("/technical-coordinator/**").hasAnyRole(TECHNICAL_COORDINATOR)
-                        .requestMatchers("/inspector/**").hasAnyRole(INSPECTOR)
+                        .requestMatchers(OPEN_ACCESS).permitAll()
+                        .requestMatchers(ADMIN_ACCESS).hasRole(ADMIN)
+                        .requestMatchers(BUSINESS_ACCESS).hasRole(BUSINESS)
+                        .requestMatchers(COORDINATOR_ACCESS).hasAnyRole(COORDINATOR)
+                        .requestMatchers(TECHNICAL_COORDINATOR_ACCESS).hasAnyRole(TECHNICAL_COORDINATOR)
+                        .requestMatchers(INSPECTOR_ACCESS).hasAnyRole(INSPECTOR)
                         .anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(form -> form
@@ -49,4 +54,5 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 }

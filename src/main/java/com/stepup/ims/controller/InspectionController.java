@@ -5,6 +5,7 @@ import com.stepup.ims.model.ProposedCVs;
 import com.stepup.ims.modelmapper.InspectionModelMapper;
 import com.stepup.ims.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/inspection")
+@PreAuthorize( "hasRole('ROLE_COORDINATOR')")
 public class InspectionController {
 
     @Autowired
