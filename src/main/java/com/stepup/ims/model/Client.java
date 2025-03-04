@@ -1,5 +1,6 @@
 package com.stepup.ims.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.stepup.ims.utils.DataUtils;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -20,6 +21,7 @@ public class Client {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate confirmationDate;
 
+    @JsonIgnore
     private List<String> countriesList;
 
     public List<String> getCountriesList() {

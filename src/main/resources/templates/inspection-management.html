@@ -369,9 +369,9 @@
                 <!-- Client Name -->
                 <div class="col-md-4">
                     <label for="clientName" class="form-label">Client Name</label>
-                    <select id="clientName" th:field="*{client.clientName}" class="form-control" required>
+                    <select id="clientName" th:field="*{client.clientId}" class="form-control" required>
                         <option value="">Select Client</option>
-                        <option th:each="client : ${inspection.clientsList}" th:value="${client.clientName}"
+                        <option th:each="client : ${inspection.clientsList}" th:value="${client.clientId}"
                                 th:text="${client.clientName}"></option>
                     </select>
                 </div>
@@ -484,7 +484,7 @@
                                             required>
                                             <option value="" disabled selected>Select an Inspector</option>
                                             <option th:each="inspector : ${inspection.inspectorsList}"
-                                                th:value="${inspector.inspectorName}"
+                                                th:value="${inspector.inspectorId}"
                                                 th:text="${inspector.inspectorName}"></option>
                                     </select>
                                 </label>
@@ -493,29 +493,28 @@
                             <td>
                                 <label>
                                     <input type="radio"
-                                           name="proposedCVs[__${iterStat.index}__].isCVCertificatesAvailable"
+                                           th:name="proposedCVs[__${iterStat.index}__].isCVCertificatesAvailable"
                                            value="true"
                                            th:checked="${cv.isCVCertificatesAvailable == true}" required/>
                                 </label>
                                 Yes
                                 <label>
                                     <input type="radio"
-                                           name="proposedCVs[__${iterStat.index}__].isCVCertificatesAvailable"
+                                           th:name="proposedCVs[__${iterStat.index}__].isCVCertificatesAvailable"
                                            value="false"
                                            th:checked="${cv.isCVCertificatesAvailable == false}" required/>
                                 </label>
                                 No
                             </td>
 
-
                             <td>
                                 <label>
                                     <select class="form-control"
-                                            name="proposedCVs[__${iterStat.index}__].cvReviewTechnicalCoordinator.empName"
+                                            th:field="*{proposedCVs[__${iterStat.index}__].cvReviewByTechnicalCoordinator.empName}"
                                             required>
                                         <option value="" disabled selected>Select a Technical Coordinator</option>
                                         <option th:each="coordinator : ${inspection.technicalCoordinatorsList}"
-                                                th:value="${coordinator.empName}"
+                                                th:value="${coordinator.empId}"
                                                 th:text="${coordinator.empName}"></option>
                                     </select>
                                 </label>
@@ -524,14 +523,14 @@
                             <td>
                                 <label>
                                     <input type="radio"
-                                           name="proposedCVs[__${iterStat.index}__].isPQRAvailable"
+                                           th:name="proposedCVs[__${iterStat.index}__].isPQRAvailable"
                                            value="true"
                                            th:checked="${cv.isPQRAvailable == true}" required/>
                                 </label>
                                 Yes
                                 <label>
                                     <input type="radio"
-                                           name="proposedCVs[__${iterStat.index}__].isPQRAvailable"
+                                           th:name="proposedCVs[__${iterStat.index}__].isPQRAvailable"
                                            value="false"
                                            th:checked="${cv.isPQRAvailable == false}" required/>
                                 </label>
@@ -549,13 +548,17 @@
 
                             <td>
                                 <label>
-                                    <input type="radio" name="proposedCVs[__${iterStat.index}__].cvStatus"
-                                           value="true" th:checked="${cv.cvStatus == true}" required/>
+                                    <input type="radio"
+                                           th:name="proposedCVs[__${iterStat.index}__].cvStatus"
+                                           value="true"
+                                           th:checked="${cv.cvStatus == true}" required/>
                                 </label>
                                 Yes
                                 <label>
-                                    <input type="radio" name="proposedCVs[__${iterStat.index}__].cvStatus"
-                                           value="false" th:checked="${cv.cvStatus == false}" required/>
+                                    <input type="radio"
+                                           th:name="proposedCVs[__${iterStat.index}__].cvStatus"
+                                           value="false"
+                                           th:checked="${cv.cvStatus == false}" required/>
                                 </label>
                                 No
                             </td>

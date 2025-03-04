@@ -1,5 +1,6 @@
 package com.stepup.ims.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.stepup.ims.utils.DataUtils;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -19,12 +20,12 @@ public class Inspection {
 
     private Client client;
 
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "dd/MM/yyyy HH:mm")
     private LocalDateTime notificationReceivedDateTime;
 
     private String inspectionCountry;
-    
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "dd/MM/yyyy")
     private List<LocalDate> inspectionDateAsPerNotification;
 
     private String inspectionItem;
@@ -39,7 +40,8 @@ public class Inspection {
 
     private String approvedInspectorName;
 
-    private LocalDateTime orderConfirmationDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "dd/MM/yyyy")
+    private LocalDate orderConfirmationDate;
 
     private int sectorScope;
 
@@ -55,34 +57,44 @@ public class Inspection {
 
     private boolean inspectionAdviseNote;
 
-    private LocalDateTime instructionsToInspectorDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "dd/MM/yyyy HH:mm")
+    private LocalDate instructionsToInspectorDate;
 
     private boolean anyInspectionIssues;
 
-    private LocalDateTime frSentToClientDate;
 
-    private LocalDateTime inspectionReportsReceivedDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "dd/MM/yyyy")
+    private LocalDate frSentToClientDate;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "dd/MM/yyyy")
+    private LocalDate inspectionReportsReceivedDate;
 
     private String inspectionReviewedBy;
 
-    private LocalDateTime inspectionSupportDocumentsSentDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "dd/MM/yyyy")
+    private LocalDate inspectionSupportDocumentsSentDate;
 
     private String inspectionReportNumber;
 
     private boolean ncrRaised;
 
-    private LocalDateTime irnSentDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "dd/MM/yyyy")
+    private LocalDate irnSentDate;
 
     private boolean impartialityAndConfidentiality;
 
     private String jobFolderLink;
 
+    @JsonIgnore
     private List<String> countriesList;
-    
+
+    @JsonIgnore
     private List<Client> clientsList;
 
+    @JsonIgnore
     private List<Inspector> inspectorsList;
 
+    @JsonIgnore
     private List<Employee> technicalCoordinatorsList;
 
 

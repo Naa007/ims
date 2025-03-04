@@ -3,6 +3,7 @@ package com.stepup.ims.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -35,7 +36,7 @@ public class Inspection {
     @ElementCollection
     @CollectionTable(name = "inspection_dates", joinColumns = @JoinColumn(name = "inspection_id"))
     @Column(name = "inspection_date_as_per_notification")
-    private List<LocalDateTime> inspectionDateAsPerNotification;
+    private List<LocalDate> inspectionDateAsPerNotification;
 
     @Column(name = "inspection_item")
     private String inspectionItem;
@@ -57,7 +58,7 @@ public class Inspection {
     private String approvedInspectorName;
 
     @Column(name = "order_confirmation_date")
-    private LocalDateTime orderConfirmationDate;
+    private LocalDate orderConfirmationDate;
 
     @Column(name = "sector_scope")
     private int sectorScope;
@@ -81,22 +82,22 @@ public class Inspection {
     private boolean inspectionAdviseNote;
 
     @Column(name = "instructions_to_inspector_date")
-    private LocalDateTime instructionsToInspectorDate;
+    private LocalDate instructionsToInspectorDate;
 
     @Column(name = "any_inspection_issues")
     private boolean anyInspectionIssues;
 
     @Column(name = "fr_sent_to_client_date")
-    private LocalDateTime frSentToClientDate;
+    private LocalDate frSentToClientDate;
 
     @Column(name = "inspection_reports_received_date")
-    private LocalDateTime inspectionReportsReceivedDate;
+    private LocalDate inspectionReportsReceivedDate;
 
     @Column(name = "inspection_reviewed_by")
     private String inspectionReviewedBy;
 
     @Column(name = "inspection_support_documents_sent_date")
-    private LocalDateTime inspectionSupportDocumentsSentDate;
+    private LocalDate inspectionSupportDocumentsSentDate;
 
     @Column(name = "inspection_report_number")
     private String inspectionReportNumber;
@@ -105,7 +106,7 @@ public class Inspection {
     private boolean ncrRaised;
 
     @Column(name = "irn_sent_date")
-    private LocalDateTime irnSentDate;
+    private LocalDate irnSentDate;
 
     @Column(name = "imprint_and_confidentiality_status")
     private boolean impartialityAndConfidentiality;
