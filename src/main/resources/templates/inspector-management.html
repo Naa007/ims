@@ -498,7 +498,7 @@
                     <h5>Inspector Type</h5>
                     <div class="d-flex flex-wrap mb-3">
                         <div class="form-check me-3" th:each="type : ${T(com.stepup.ims.model.Inspector.InspectorType).values()}">
-                            <input type="radio" name="editInspectorType" th:value="${type}" class="form-check-input">
+                            <input type="radio" name="inspectorType" th:value="${type}" class="form-check-input">
                             <label th:text="${type}" class="form-check-label"></label>
                         </div>
                     </div>
@@ -699,7 +699,13 @@
     document.getElementById("editCountry").value = country;
     document.getElementById("editEducationDetails").value = educationDetails;
     document.getElementById("editDisciplines").value = disciplines;
-    document.querySelector(`input[name="editInspectorType"][value="${inspectorType}"]`).checked = true;
+
+   const inspectorTypeRadioButtons = document.querySelectorAll('input[name="inspectorType"]');
+    inspectorTypeRadioButtons.forEach(radio => {
+        if (radio.value === inspectorType) {
+            radio.checked = true; // Set the radio button as checked if it matches the inspectorStatus
+        }
+    });
 
     // Populate Certificates
     const certificatesBody = document.getElementById("editCertificatesBody");
