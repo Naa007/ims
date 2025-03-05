@@ -5,19 +5,18 @@ import com.stepup.ims.model.ProposedCVs;
 import com.stepup.ims.modelmapper.InspectionModelMapper;
 import com.stepup.ims.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.stepup.ims.constants.ApplicationConstants.INSPECTION;
+import static com.stepup.ims.constants.ApplicationConstants.INSPECTIONS;
+import static com.stepup.ims.constants.UIRountingConstants.*;
+
 @Controller
 @RequestMapping("/inspection")
-@PreAuthorize( "hasRole('ROLE_COORDINATOR')")
 public class InspectionController {
 
     @Autowired
@@ -38,7 +37,7 @@ public class InspectionController {
     @Autowired
     private InspectionModelMapper inspectionModelMapper;
 
-    @GetMapping("/form")
+    @GetMapping("/new")
     public String showInspectorForm(Model model) {
         Inspection inspection = new Inspection();
 
@@ -55,19 +54,51 @@ public class InspectionController {
 
         inspection.setProposedCVs(List.of(proposedCVs));
 
-        model.addAttribute("inspection", inspection);
-        return "inspection-management";
+        model.addAttribute(INSPECTION, inspection);
+        return RETURN_TO_INSPECTION_NEW;
     }
+
 
     @PostMapping(value = "/save")
     public String createInspection(@ModelAttribute Inspection inspection) {
         inspectionService.saveInspection(inspection);
-        return "redirect:/inspection/form";
+        return REDIRECT_INSPECTION_MANAGEMENT;
     }
 
-    @GetMapping
-    public List<Inspection> getAllInspections() {
-        return inspectionService.getAllInspections();
+    @GetMapping(value = "/edit/{inspectionId}")
+    public String editInspection(@PathVariable String inspectionId, Model model) {
+
+        Inspection inspection = inspectionService.getInspectionById(Long.valueOf(inspectionId))
+                .orElseThrow(() -> new IllegalArgumentException("Inspection not found for ID: " + inspectionId));
+
+        // set clients for dropdown
+        inspection.setClientsList(clientService.getAllClients());
+
+        // set inspectors for dropdown
+        inspection.setInspectorsList(inspectorService.getAllActiveInspectors());
+
+        // set technical coordinators for dropdown
+        inspection.setTechnicalCoordinatorsList(employeeService.getAllTechnicalCoordinateEmployees());
+
+        model.addAttribute(INSPECTION, inspection);
+        return RETURN_TO_INSPECTION_NEW;
+    }
+
+    @GetMapping(value = "/view/{inspectionId}")
+    public String viewInspection(@PathVariable String inspectionId, Model model) {
+        Inspection inspection = inspectionService.getInspectionById(Long.valueOf(inspectionId))
+                .orElseThrow(() -> new IllegalArgumentException("Inspection not found for ID: " + inspectionId));
+
+        model.addAttribute(INSPECTION, inspection);
+        return RETURN_TO_INSPECTION_NEW;
+    }
+
+
+    @GetMapping("/inspection-management")
+    public String getAllInspections(Model model) {
+        List<Inspection> inspections = inspectionService.getAllInspections();
+        model.addAttribute(INSPECTIONS, inspections);
+        return RETURN_TO_INSPECTION_MANAGEMENT;
     }
 
 }

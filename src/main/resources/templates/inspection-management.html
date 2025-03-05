@@ -9,6 +9,13 @@
 
     <!-- Add any required CSS frameworks like Bootstrap -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Include Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <!-- Include DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css" rel="stylesheet">
+
     <style>
         /* Global Styles */
        body {
@@ -172,143 +179,37 @@
     </style>
     <script th:inline="javascript">
 
-         function initMap(inspectionLocation) {
 
-             fetch('/api/inspectors?address=' + inspectionLocation )
-             .then(response => response.json())
-             .then(data => {
-                 for (const [locationKey, inspectors] of Object.entries(data)) {
-                     const userLocationArray = locationKey.split(',').map(Number); // Split and convert to numbers
-                     const userLocation = new google.maps.LatLng(userLocationArray[0], userLocationArray[1]); // Create LatLng object
-
-                    const map = new google.maps.Map(document.getElementById('map'), {
-                        zoom: 10,
-                        center: userLocation
-                    });
-
-                     // Add marker for user location
-                     const userMarker = new google.maps.Marker({
-                         position: userLocation,
-                         map: map,
-                         title: "Inspection Location"
-                     });
-
-                     // Plot all inspectors for the current user location
-                     inspectors.forEach(inspector => {
-                         const marker = new google.maps.Marker({
-                             position: {
-                                 lat: inspector.location.lat,
-                                 lng: inspector.location.lng
-                             },
-                             map: map,
-                             title: `${inspector.name}, Distance: ${inspector.distance}, Duration: ${inspector.duration}`,
-                             icon: {
-                                 url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png" // Green marker icon
-                             }
-                         });
-                     });
-                 }
-                     });
-
-         }
-
-         function showMapLoadingMessage() {
-                     const mapLoadingMessage = document.getElementById('mapLoadingMessage');
-                     mapLoadingMessage.style.display = 'block';
-
-                     // Assuming 'initMap' will handle the map loading process
-                     // Add a timeout or any custom logic to hide the message after map loading completes
-                     setTimeout(() => {
-                         mapLoadingMessage.style.display = 'none';
-                     }, 5000); // Adjust the time as per map loading logic
-                 }
-
-        function addCVRow() {
-            const tableBody = document.querySelector("#proposedCVsTable tbody");
-            const newRow = document.createElement("tr");
-            newRow.innerHTML = `
-                <td>
-                    <select class="form-control" name="proposedCVs[newRow].inspector.inspectorName" required>
-                        <option value="" disabled selected>Select an Inspector</option>
-                        <option th:each="inspector : ${inspection.inspectorsList}" th:value="${inspector.inspectorName}"
-                                th:text="${inspector.inspectorName}"></option>
-                    </select>
-                </td>
-
-                <td>
-                     <input type="radio"
-                            name="proposedCVs[newRow].isCVCertificatesAvailable"
-                            value="true" required/>
-                     Yes
-                     <input type="radio"
-                            name="proposedCVs[newRow].isCVCertificatesAvailable"
-                            value="false" required/>
-                     No
-                </td>
-
-                <td>
-                    <select class="form-control" name="proposedCVs[newRow].cvReviewByTechnicalCoordinator.inspectorName"
-                            required>
-                        <option value="" disabled selected>Select a Technical Coordinator</option>
-
-                    </select>
-                </td>
-
-                <td>
-                    <input type="radio"
-                        name="proposedCVs[newRow].isPQRAvailable"
-                        value="true" required/>
-                     Yes
-                     <input type="radio"
-                            name="proposedCVs[newRow].isPQRAvailable"
-                            value="false"  required/>
-                     No
-                </td>
-
-                <td>
-                    <input type="datetime-local" class="form-control"
-                           name="proposedCVs[newRow].cvSubmittedToClientDate" required/>
-                </td>
-
-                <td>
-                     <input type="radio" name="proposedCVs[newRow].cvStatus"
-                            value="true" required/>
-                     Yes
-                     <input type="radio" name="proposedCVs[newRow].cvStatus"
-                            value="false"  required/>
-                     No
-                </td>
-
-                <td>
-                    <button type="button" class="btn btn-danger btn-sm" onclick="deleteCVRow(this)">Delete</button>
-                </td>
-            `;
-            tableBody.appendChild(newRow);
+        function redirectToNewInspection() {
+            window.location.href = '/inspection/new';
         }
 
-        function deleteCVRow(button) {
-            const row = button.closest("tr");
-            row.remove();
+
+        function redirectToEditInspection(inspectionId) {
+            window.location.href = '/inspection/edit/' + inspectionId;
         }
 
-        let dateCounter = 1;
-        function addDateInput() {
-            dateCounter++;
-            const container = document.getElementById('inspectionDatesContainer');
-            const newInputDiv = document.createElement('div');
-            newInputDiv.classList.add('input-group', 'mb-2');
-            newInputDiv.innerHTML = `
-                <input type="date" id="inspectionDate${dateCounter}" name="inspectionDateAsPerNotification[]" class="form-control" required />
-                <button type="button" class="btn btn-danger" onclick="removeDateInput(this)">Remove</button>
-            `;
-            container.appendChild(newInputDiv);
+
+        function redirectToViewInspection(inspectionId) {
+            window.location.href = '/inspection/view/' + inspectionId;
         }
 
-        function removeDateInput(button) {
-            button.parentElement.remove();
+         function filterTable() {
+            const searchInput = document.getElementById("searchInput").value.toLowerCase();
+            const table = document.getElementById("inspectionsTable");
+            const rows = table.getElementsByTagName("tr");
+            for (let i = 1; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName("td");
+                let matches = false;
+                for (let j = 0; j < cells.length - 1; j++) {
+                    if (cells[j].textContent.toLowerCase().includes(searchInput)) {
+                        matches = true;
+                        break;
+                    }
+                }
+                rows[i].style.display = matches ? "" : "none";
+            }
         }
-          // Initialize Map
-        window.onload = initMap('Hyderabad, India');
 
     </script>
 </head>
@@ -324,489 +225,75 @@
     </div>
 
     <!-- Right Section: Empty -->
-    <div style="flex: 1 1 20%;"></div>
+    <div style="flex: 1 1 20%;">
+        <button class="logout-btn" style="flex: 1 1 10%;">
+            <i class="fas fa-sign-out-alt"></i>
+            <a th:href="@{/logout}" th:onclick="return confirm('Are you sure you want to log out?');">
+                Logout
+            </a>
+
+        </button>
+    </div>
 </header>
 <body>
 
 
 <div class="container mt-5">
 
-    <!-- Form to Add New Inspection -->
-    <div class="mt-5">
-        <form th:action="@{/inspection/save}" th:object="${inspection}" method="post" class="row g-3">
-
-            <div class="row">
-
-                <!-- Inspection No -->
-                <div class="col-md-4">
-                    <label for="inspectionNo" class="form-label">IISPL No</label>
-                    <input type="text" id="inspectionNo" th:field="*{inspectionNo}" class="form-control" required/>
-                </div>
-
-
-                <!-- Notification No -->
-                <div class="col-md-4">
-                    <label for="notificationNo" class="form-label">Notification No</label>
-                    <input type="text" id="notificationNo" th:field="*{notificationNo}" class="form-control" required/>
-                </div>
-
-
-                <!-- Notification Received Date and Time -->
-                <div class="col-md-4">
-                    <label for="notificationReceivedDateTime" class="form-label">Notification Received Date &
-                        Time</label>
-                    <input type="datetime-local" id="notificationReceivedDateTime"
-                           th:field="*{notificationReceivedDateTime}" class="form-control"/>
-                </div>
-
-
-            </div>
-
-
-            <div class="row">
-
-
-                <!-- Client Name -->
-                <div class="col-md-4">
-                    <label for="clientName" class="form-label">Client Name</label>
-                    <select id="clientName" th:field="*{client.clientId}" class="form-control" required>
-                        <option value="">Select Client</option>
-                        <option th:each="client : ${inspection.clientsList}" th:value="${client.clientId}"
-                                th:text="${client.clientName}"></option>
-                    </select>
-                </div>
-
-
-                <!-- Inspection Countries -->
-                <div class="col-md-4">
-                    <label for="inspectionCountry" class="form-label">Inspection Country</label>
-                    <select class="form-control" id="inspectionCountry" name="inspectionCountry" required>
-                        <option value="">Select Country</option>
-                        <option th:each="country : ${inspection.countriesList}" th:value="${country}"
-                                th:text="${country}"></option>
-                    </select>
-                </div>
-
-                <!-- Inspection Dates -->
-                <div class="col-md-4" id="inspectionDatesContainer">
-                    <label for="inspectionDate1" class="form-label">Inspection Dates</label>
-                    <div class="input-group mb-2">
-                        <input type="date" id="inspectionDate1" name="inspectionDateAsPerNotification[]"
-                               th:field="*{inspectionDateAsPerNotification}" class="form-control" required/>
-                        <button type="button" class="btn btn-primary" onclick="addDateInput()">Add</button>
-                    </div>
-
-                </div>
-
-
-            </div>
-
-            <div class="row" style="height:470px">
-
-                <div class="col-md-4">
-
-                    <!-- Inspection Item -->
-                    <div>
-                        <label for="inspectionItem" class="form-label">Inspection Item</label>
-                        <input type="text" id="inspectionItem" th:field="*{inspectionItem}" class="form-control"/>
-                    </div>
-
-                    <!-- Inspection Type -->
-                    <div>
-                        <label class="form-label">Inspection Type</label>
-                        <div>
-                            <input type="checkbox" class="form-check-input" id="MECHANICAL"
-                                   th:field="*{inspectionType}" value="MECHANICAL"/>
-                            <label class="form-check-label" for="MECHANICAL">Mechanical</label>
-                        </div>
-                        <div>
-                            <input type="checkbox" class="form-check-input" id="ELECTRICAL"
-                                   th:field="*{inspectionType}" value="ELECTRICAL"/>
-                            <label class="form-check-label" for="ELECTRICAL">Electrical</label>
-                        </div>
-                    </div>
-
-
-                    <!-- Inspection Stages -->
-                    <div>
-                        <label for="inspectionActivityWithStages" class="form-label">Inspection Stages</label>
-                        <textarea id="inspectionActivityWithStages" th:field="*{inspectionActivityWithStages}"
-                                  class="form-control" rows="3"></textarea>
-                    </div>
-
-                    
-                    <!-- Inspection Location Details -->
-                    <div>
-                        <label for="inspectionLocationDetails" class="form-label">Inspection Location Details</label>
-                        <textarea id="inspectionLocationDetails" th:field="*{inspectionLocationDetails}"
-                                  class="form-control" rows="3"
-                                  onchange="initMap(this.value); showMapLoadingMessage(); "></textarea>
-
-                        <div id="mapLoadingMessage" class="mt-2 text-warning fw-bold" style="display: none;">
-                            Wait for the map to load nearby inspectors...
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- Inspectors Location Map -->
-
-                <div class="col-md-6" id="map"
-                     style="width: 65%; height: 100%; position: relative; overflow: hidden;"></div>
-
-            </div>
-
-            <div class="row">
-
-                <!-- Proposed CVs Iteration -->
-                <div class="col-md-12 mt-4">
-                    <label class="form-label">Proposed CVs</label>
-                    <table class="table table-bordered" id="proposedCVsTable">
-                        <thead>
-                        <tr>
-                            <th>Inspector Name</th>
-                            <th>CV Available</th>
-                            <th>Technical Coordinator Name</th>
-                            <th>PQRAvailable</th>
-                            <th>CV Submitted To Client Date</th>
-                            <th>CV Approved</th>
-                            <th>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <!-- Existing CVs -->
-                        <tr th:each="cv, iterStat : ${inspection.proposedCVs}">
-
-                            <td>
-                                <label>
-                                    <select class="form-control"
-                                            th:field="*{proposedCVs[__${iterStat.index}__].inspector.inspectorId}"
-                                            required>
-                                            <option value="" disabled selected>Select an Inspector</option>
-                                            <option th:each="inspector : ${inspection.inspectorsList}"
-                                                th:value="${inspector.inspectorId}"
-                                                th:text="${inspector.inspectorName}"></option>
-                                    </select>
-                                </label>
-                            </td>
-
-                            <td>
-                                <label>
-                                    <input type="radio"
-                                           th:name="proposedCVs[__${iterStat.index}__].isCVCertificatesAvailable"
-                                           value="true"
-                                           th:checked="${cv.isCVCertificatesAvailable == true}" required/>
-                                </label>
-                                Yes
-                                <label>
-                                    <input type="radio"
-                                           th:name="proposedCVs[__${iterStat.index}__].isCVCertificatesAvailable"
-                                           value="false"
-                                           th:checked="${cv.isCVCertificatesAvailable == false}" required/>
-                                </label>
-                                No
-                            </td>
-
-                            <td>
-                                <label>
-                                    <select class="form-control"
-                                            th:field="*{proposedCVs[__${iterStat.index}__].cvReviewByTechnicalCoordinator.empId}"
-                                            required>
-                                        <option value="" disabled selected>Select a Technical Coordinator</option>
-                                        <option th:each="coordinator : ${inspection.technicalCoordinatorsList}"
-                                                th:value="${coordinator.empId}"
-                                                th:text="${coordinator.empName}"></option>
-                                    </select>
-                                </label>
-                            </td>
-
-                            <td>
-                                <label>
-                                    <input type="radio"
-                                           th:name="proposedCVs[__${iterStat.index}__].isPQRAvailable"
-                                           value="true"
-                                           th:checked="${cv.isPQRAvailable == true}" required/>
-                                </label>
-                                Yes
-                                <label>
-                                    <input type="radio"
-                                           th:name="proposedCVs[__${iterStat.index}__].isPQRAvailable"
-                                           value="false"
-                                           th:checked="${cv.isPQRAvailable == false}" required/>
-                                </label>
-                                No
-                            </td>
-
-                            <td>
-                                <label>
-                                    <input type="datetime-local" class="form-control"
-                                           th:field="*{proposedCVs[__${iterStat.index}__].cvSubmittedToClientDate}"
-                                           required/>
-                                </label>
-                            </td>
-
-
-                            <td>
-                                <label>
-                                    <input type="radio"
-                                           th:name="proposedCVs[__${iterStat.index}__].cvStatus"
-                                           value="true"
-                                           th:checked="${cv.cvStatus == true}" required/>
-                                </label>
-                                Yes
-                                <label>
-                                    <input type="radio"
-                                           th:name="proposedCVs[__${iterStat.index}__].cvStatus"
-                                           value="false"
-                                           th:checked="${cv.cvStatus == false}" required/>
-                                </label>
-                                No
-                            </td>
-
-                            <td>
-                                <button type="button" class="btn btn-danger btn-sm" onclick="deleteCVRow(this)">Delete
-                                </button>
-                            </td>
-                        </tr>
-
-                        </tbody>
-                    </table>
-
-                    <!-- Add CV Button -->
-                    <button type="button" class="btn btn-primary btn-sm" onclick="addCVRow()">Add CV</button>
-                </div>
-
-            </div>
-
-            <div class="row">
-
-                <!-- Approved Inspector Name -->
-                <div class="col-md-4">
-                    <label for="approvedInspectorName" class="form-label">Approved Inspector Name</label>
-                    <input type="text" id="approvedInspectorName" th:field="*{approvedInspectorName}"
-                           class="form-control" disabled/>
-                </div>
-
-                <!-- Order Confirmation Date -->
-                <div class="col-md-4">
-                    <label for="orderConfirmationDate" class="form-label">Date of Order Confirmation</label>
-                    <input type="date" id="orderConfirmationDate" th:field="*{orderConfirmationDate}"
-                           class="form-control" required/>
-                </div>
-
-                <!--- Sector Scope -->
-                <div class="col-md-4">
-                    <label for="sectorScope" class="form-label">Sector Scope</label>
-                    <input type="text" id="sectorScope" th:field="*{sectorScope}" class="form-control" required/>
-                </div>
-
-            </div>
-
-            <div class="row">
-
-                <!--- End Client Name -->
-                <div class="col-md-4">
-                    <label for="endClientName" class="form-label">End Client Name</label>
-                    <input type="text" id="endClientName" th:field="*{endClientName}" class="form-control" required/>
-                </div>
-
-                <!-- Project Name -->
-                <div class="col-md-4">
-                    <label for="projectName" class="form-label">Project Name</label>
-                    <input type="text" id="projectName" th:field="*{projectName}" class="form-control" required/>
-                </div>
-
-                <!-- Reference Documents for Inspection Status -->
-                <div class="col-md-4">
-                    <label class="form-label">Reference Documents</label>
-                    <div>
-                        <input type="radio" name="documentsStatus" value="true"
-                               th:checked="${inspection.referenceDocumentsForInspectionStatus == true}" required/>
-                        Available
-                        <input type="radio" name="documentsStatus" value="false"
-                               th:checked="${inspection.referenceDocumentsForInspectionStatus == false}" required/>
-                        Not Available
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="row">
-
-                <!-- Documents Reviewed By Technical Coordinator -->
-                <div class="col-md-4">
-                    <label for="documentsReviewedByTechnicalCoordinator" class="form-label">Documents Reviewed By
-                        Technical Coordinator</label>
-                    <select id="documentsReviewedByTechnicalCoordinator" class="form-control"
-                            th:field="*{documentsReviewedByTechnicalCoordinator}" required>
-                        <option value="" disabled selected>Select Technical Coordinator</option>
-                        <option th:each="coordinator : ${inspection.technicalCoordinatorsList}"
-                                th:value="${coordinator.empName}"
-                                th:text="${coordinator.empName}"></option>
-                    </select>
-                </div>
-
-
-                <!-- Contract Review Prepared -->
-                <div class="col-md-4">
-                    <label class="form-label">Contract Review Prepared</label>
-                    <div>
-                        <input type="radio" name="contractReviewPrepared" value="true"
-                               th:checked="${contractReviewPrepared == true}" required/>
-                        Yes
-                        <input type="radio" name="contractReviewPrepared" value="false"
-                               th:checked="${contractReviewPrepared == false}" required/>
-                        No
-                    </div>
-                </div>
-
-                <!-- Inspection Advise Note -->
-                <div class="col-md-4">
-                    <label class="form-label">Inspection Advise Note</label>
-                    <div>
-                        <input type="radio" name="inspectionAdviseNote" value="true"
-                               th:checked="${inspectionAdviseNote == true}" required/>
-                        Yes
-                        <input type="radio" name="inspectionAdviseNote" value="false"
-                               th:checked="${inspectionAdviseNote == false}" required/>
-                        No
-                    </div>
-                </div>
-
-
-            </div>
-
-
-            <div class="row">
-
-
-                <!-- Instructions to Inspector Date -->
-                <div class="col-md-4">
-                    <label for="instructionsToInspectorDate" class="form-label">Instructions to Inspector Date</label>
-                    <input type="date" id="instructionsToInspectorDate" th:field="*{instructionsToInspectorDate}"
-                           class="form-control" required/>
-                </div>
-
-                <!-- Any Inspection Issues -->
-                <div class="col-md-4">
-                    <label class="form-label">Any Inspection Issues</label>
-                    <div>
-                        <input type="radio" name="anyInspectionIssues" value="true"
-                               th:checked="${anyInspectionIssues == true}" required/>
-                        Yes
-                        <input type="radio" name="anyInspectionIssues" value="false"
-                               th:checked="${anyInspectionIssues == false}" required/>
-                        No
-                    </div>
-                </div>
-
-                <!-- FR Sent To Client Date -->
-                <div class="col-md-4">
-                    <label for="frSentToClientDate" class="form-label">FR Sent To Client Date</label>
-                    <input type="date" id="frSentToClientDate" th:field="*{frSentToClientDate}" class="form-control"
-                           required/>
-                </div>
-
-            </div>
-
-
-            <div class="row">
-
-                <!-- Inspection Reports Received Date -->
-                <div class="col-md-4">
-                    <label for="inspectionReportsReceivedDate" class="form-label">Inspection Reports Received
-                        Date</label>
-                    <input type="date" id="inspectionReportsReceivedDate" th:field="*{inspectionReportsReceivedDate}"
-                           class="form-control" required/>
-                </div>
-
-                <!-- Inspection Reviewed By -->
-                <div class="col-md-4">
-                    <label for="inspectionReviewedBy" class="form-label">Inspection Reviewed By</label>
-                    <select id="inspectionReviewedBy" class="form-control" th:field="*{inspectionReviewedBy}" required>
-                        <option value="" disabled selected>Select Reviewer</option>
-                        <option th:each="coordinator : ${inspection.technicalCoordinatorsList}"
-                                th:value="${coordinator.empName}"
-                                th:text="${coordinator.empName}"></option>
-                    </select>
-                </div>
-
-                <!-- Inspection Support Documents Sent Date -->
-                <div class="col-md-4">
-                    <label for="inspectionSupportDocumentsSentDate" class="form-label">Inspection Support Documents
-                        Sent Date</label>
-                    <input type="date" id="inspectionSupportDocumentsSentDate"
-                           th:field="*{inspectionSupportDocumentsSentDate}" class="form-control" required/>
-                </div>
-
-            </div>
-
-            <div class="row">
-
-                <!-- Inspection Report Number -->
-                <div class="col-md-4">
-                    <label for="inspectionReportNumber" class="form-label">Inspection Report Number</label>
-                    <input type="text" id="inspectionReportNumber"
-                           th:field="*{inspectionReportNumber}" class="form-control" required/>
-                </div>
-
-                <!-- NCR Raised -->
-                <div class="col-md-4">
-                    <label class="form-label">NCR Raised</label>
-                    <input type="radio" name="ncrRaised" value="true" th:checked="${ncrRaised == true}" required/>
-                    Yes
-                    <input type="radio" name="ncrRaised" value="false" th:checked="${ncrRaised == false}" required/>
-                    No
-                </div>
-
-                <!-- IRN Sent Date -->
-                <div class="col-md-4">
-                    <label for="irnSentDate" class="form-label">IRN Sent Date</label>
-                    <input type="date" id="irnSentDate" th:field="*{irnSentDate}" class="form-control" required/>
-                </div>
-
-
-            </div>
-
-            <div class="row">
-
-                <!-- Impartiality and Confidentiality -->
-                <div class="col-md-4">
-                    <label class="form-label">Impartiality and Confidentiality</label>
-                    <div>
-                        <input type="radio" name="impartialityAndConfidentiality" value="true"
-                               th:checked="${impartialityAndConfidentiality == true}" required/>
-                        Yes
-                        <input type="radio" name="impartialityAndConfidentiality" value="false"
-                               th:checked="${impartialityAndConfidentiality == false}" required/>
-                        No
-                    </div>
-                </div>
-
-
-                <!-- Job Folder Link -->
-                <div class="col-md-4">
-                    <label for="jobFolderLink" class="form-label">Job Folder Link</label>
-                    <input type="url" id="jobFolderLink" th:field="*{jobFolderLink}" class="form-control"
-                           placeholder="Enter the URL" required/>
-                </div>
-
-            </div>
-
-
-            <!-- Submit Button -->
-            <div class="col-12">
-                <button type="submit" class="btn btn-success">Add Inspection</button>
-            </div>
-        </form>
+    <!-- Add Inspection Button -->
+
+    <div class="text-center mb-4">
+        <button class="btn btn-primary" th:onclick="redirectToNewInspection()">
+            <i class="fas fa-plus"></i> Add Inspection
+        </button>
     </div>
+
+
+    <div class="container mt-5">
+        <h2>List of Inspections</h2>
+        <div class="mb-3">
+
+            <input type="text" id="searchInput" class="form-control" style="max-width: 300px; margin: 0 left;"
+                   placeholder="Search inspections..."
+                   onkeyup="filterTable()">
+
+        </div>
+        <table id="inspectionsTable" class="table table-striped">
+            <thead>
+            <tr>
+                <th>Notification NO</th>
+                <th>Client Name</th>
+                <th>Inspection Date</th>
+                <th>Inspection Item</th>
+                <th>Inspector Name</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Assuming inspections data comes from backend -->
+            <tr th:each="inspection : ${inspections}">
+                <td th:text="${inspection.notificationNo}"></td>
+                <td th:text="${inspection.client.clientName}"></td>
+                <td th:text="${inspection.inspectionDateAsPerNotification}"></td>
+                <td th:text="${inspection.inspectionItem}"></td>
+                <td th:text="${inspection.proposedCVs[0].inspector.inspectorName}"></td>
+                <td>
+                    <button class="btn btn-primary btn-sm"
+                            th:onclick="|redirectToViewInspection(${inspection.id})|">View
+                    </button>
+                    <button class="btn btn-warning btn-sm"
+                            th:onclick="|redirectToEditInspection(${inspection.id})|">Edit
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
 </div>
 
 <!-- Optional JavaScript Frameworks -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-<!--<footer>-->
-<!--    <p class="mb-0" style="font-size: 1rem;">&copy; 2025 International Inspection Services Pvt Ltd. All Rights-->
-<!--        Reserved.</p>-->
-<!--</footer>-->
+
 </html>
