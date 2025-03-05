@@ -1,5 +1,7 @@
 package com.stepup.ims.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.maps.model.LatLng;
 import com.stepup.ims.model.Inspector;
 import com.stepup.ims.service.GoogleMapsService;
@@ -23,13 +25,24 @@ public class InspectorController {
     @Autowired
     private GoogleMapsService googleMapsService;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     /**
      * Display list of all inspectors.
      */
     @GetMapping("/list")
     public String listInspectors(Model model) {
         List<Inspector> inspectors = inspectorService.getAllInspectors();
-
+        for (Inspector inspector : inspectors) {
+            try {
+                // Convert certificates list to JSON
+                String certificatesJson = objectMapper.writeValueAsString(inspector.getCertificates());
+                inspector.setCertificatesJson(certificatesJson); // Set the JSON string in the inspector
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        }
         // Add the list of inspectors to the model
         model.addAttribute("inspectors", inspectors);
 

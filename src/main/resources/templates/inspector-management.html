@@ -228,7 +228,7 @@
                                 th:data-educationdetails="${inspector.educationDetails}"
                                 th:data-disciplines="${inspector.disciplines}"
                                 th:data-inspectortype="${inspector.inspectorType}"
-                                th:data-certificates="${#strings.listJoin(inspector.certificates, ',')}"
+                                th:data-certificates="${inspector.certificatesJson}"
                                 th:data-aramco="${inspector.specialQualification.aramco}"
                                 th:data-sec="${inspector.specialQualification.sec}"
                                 th:data-specialqualificationdetails="${inspector.specialQualification.specialQualificationDetails}"
@@ -253,7 +253,7 @@
                                 th:data-educationdetails="${inspector.educationDetails}"
                                 th:data-disciplines="${inspector.disciplines}"
                                 th:data-inspectortype="${inspector.inspectorType}"
-                                th:data-certificates="${#strings.listJoin(inspector.certificates, ',')}"
+                                th:data-certificates="${inspector.certificatesJson}"
                                 th:data-aramco="${inspector.specialQualification.aramco}"
                                 th:data-sec="${inspector.specialQualification.sec}"
                                 th:data-specialqualificationdetails="${inspector.specialQualification.specialQualificationDetails}"
@@ -561,8 +561,8 @@
                     <h5>Inspector Status</h5>
                     <div th:each="status : ${T(com.stepup.ims.model.Inspector.InspectorStatusType).values()}">
                         <div class="form-check">
-                            <input type="radio" id="editInspectorStatus" name="inspectorStatus" th:value="${status}" class="form-check-input">
-                            <label th:text="${status}" class="form-check-label"></label>
+                            <input type="radio" id="editInspectorStatus{status}" name="inspectorStatus" th:value="${status}" class="form-check-input">
+                            <label th:for="'editInspectorStatus' + ${status}" th:text="${status}" class="form-check-label"></label>
                         </div>
                     </div>
 
@@ -728,8 +728,13 @@
     document.getElementById("editPiping").checked = piping;
     document.getElementById("editSteelStructure").checked = steelStructure;
 
-    // Populate Inspector Status
-    document.querySelector(`input[name="editInspectorStatus"][value="${inspectorStatus}"]`).checked = true;
+   // Populate Inspector Status
+    const statusRadioButtons = document.querySelectorAll('input[name="inspectorStatus"]');
+    statusRadioButtons.forEach(radio => {
+        if (radio.value === inspectorStatus) {
+            radio.checked = true; // Set the radio button as checked if it matches the inspectorStatus
+        }
+    });
 
     // Populate Remarks
     document.getElementById("editRemarks").value = remarks;

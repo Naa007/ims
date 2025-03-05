@@ -1,5 +1,6 @@
 package com.stepup.ims.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.google.maps.model.LatLng;
 import lombok.Data;
 
@@ -22,12 +23,14 @@ public class Inspector {
     private String dob; // Date for inspector's date of birth
     private String educationDetails;
     private String disciplines; // Comma-separated string for disciplines
+    @JsonManagedReference
     private List<Certificate> certificates= new ArrayList<>();
     private SpecialQualification specialQualification = new SpecialQualification();
     private MainQualification mainQualificationCategory = new MainQualification();
     private InspectorStatusType inspectorStatus;
     private String remarks;
     private PQR pqr;
+    private String certificatesJson;
 
     public enum InspectorType {
         INHOUSE_INSPECTOR, TECHNICAL_COORDINATOR, FREELANCER, PARTNER_INSPECTOR
