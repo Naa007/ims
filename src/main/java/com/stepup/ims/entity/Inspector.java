@@ -56,8 +56,9 @@ public class Inspector {
     @JoinColumn(name = "special_qualification_id")
     private SpecialQualification specialQualification; // Special Qualification like Aramco, SEC, etc.
 
+
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "main_qualification_id")
+    @JoinColumn(name = "main_qualification_id", unique = false)
     private MainQualifications mainQualificationCategory;
 
     @Enumerated(EnumType.STRING)

@@ -248,18 +248,16 @@
 
                 </div>
 
-                <div class="row" style="height:470px">
-
-                    <div class="col-md-4">
+                <div class="row">
 
                         <!-- Inspection Item -->
-                        <div>
+                        <div class="col-md-4">
                             <label class="form-label">Inspection Item</label>
                             <p th:text="${inspection.inspectionItem}" class="form-control-static"></p>
                         </div>
 
                         <!-- Inspection Type -->
-                        <div>
+                        <div class="col-md-4">
                             <label class="form-label">Inspection Type</label>
                             <ul>
                                 <li th:each="type : ${inspection.inspectionType}" th:text="${type}"></li>
@@ -268,7 +266,7 @@
 
 
                         <!-- Inspection Stages -->
-                        <div>
+                        <div class="col-md-4">
                             <label for="inspectionActivityWithStages" class="form-label">Inspection Stages</label>
                             <p id="inspectionActivityWithStages" th:text="${inspection.inspectionActivityWithStages}"
                                class="form-control-static"></p>
@@ -276,19 +274,12 @@
                         
 
                         <!-- Inspection Location Details -->
-                        <div>
+                        <div class="col-md-4">
                             <label for="inspectionLocationDetails" class="form-label">Inspection Location
                                 Details</label>
                             <p id="inspectionLocationDetails" th:text="${inspection.inspectionLocationDetails}"
                                class="form-control-static"></p>
                         </div>
-
-                    </div>
-
-                    
-                    <!-- Inspectors Location Map -->
-                    <div class="col-md-6" id="map"
-                         style="width: 65%; height: 100%; position: relative; overflow: hidden;"></div>
 
                 </div>
 
@@ -344,20 +335,20 @@
                     <!-- Approved Inspector Name -->
                     <div class="col-md-4">
                         <label class="form-label">Approved Inspector Name</label>
-                        <p th:text="${approvedInspectorName}" class="form-control-static"></p>
+                        <p th:text="${inspection.approvedInspectorName}" class="form-control-static"></p>
                     </div>
 
                     <!-- Order Confirmation Date -->
                     <div class="col-md-4">
                         <label class="form-label">Date of Order Confirmation</label>
-                        <p th:text="${orderConfirmationDate}"
+                        <p th:text="${inspection.orderConfirmationDate}"
                            class="form-control-static"></p>
                     </div>
 
                     <!-- Sector Scope -->
                     <div class="col-md-4">
                         <label class="form-label">Sector Scope</label>
-                        <p th:text="${sectorScope}" class="form-control-static"></p>
+                        <p th:text="${inspection.sectorScope}" class="form-control-static"></p>
                     </div>
                 </div>
 
@@ -367,13 +358,13 @@
                     <!-- End Client Name -->
                     <div class="col-md-4">
                         <label class="form-label">End Client Name</label>
-                        <p th:text="${endClientName}" class="form-control-static"></p>
+                        <p th:text="${inspection.endClientName}" class="form-control-static"></p>
                     </div>
 
                     <!-- Project Name -->
                     <div class="col-md-4">
                         <label class="form-label">Project Name</label>
-                        <p th:text="${projectName}" class="form-control-static"></p>
+                        <p th:text="${inspection.projectName}" class="form-control-static"></p>
                     </div>
 
                     <!-- Reference Documents for Inspection Status -->
@@ -389,14 +380,14 @@
                     <!-- Documents Reviewed By Technical Coordinator -->
                     <div class="col-md-4">
                         <label class="form-label">Documents Reviewed By Technical Coordinator</label>
-                        <p th:text="${documentsReviewedByTechnicalCoordinator}" class="form-control-static"></p>
+                        <p th:text="${inspection.documentsReviewedByTechnicalCoordinator}" class="form-control-static"></p>
                     </div>
 
                     <!-- Contract Review Prepared -->
                     <div class="col-md-4">
                         <label class="form-label">Contract Review Prepared</label>
 
-                        <p th:text="${contractReviewPrepared != null && contractReviewPrepared ? 'Yes' : 'No'}"
+                        <p th:text="${inspection.contractReviewPrepared != null && inspection.contractReviewPrepared ? 'Yes' : 'No'}"
                            class="form-control-static"></p>
                     </div>
 
@@ -404,7 +395,7 @@
                     <div class="col-md-4">
                         <label class="form-label">Inspection Advise Note</label>
 
-                        <p th:text="${inspectionAdviseNote != null && inspectionAdviseNote ? 'Yes' : 'No'}"
+                        <p th:text="${inspection.inspectionAdviseNote != null && inspection.inspectionAdviseNote ? 'Yes' : 'No'}"
                            class="form-control-static"></p>
                     </div>
                 </div>
@@ -414,20 +405,20 @@
                     <!-- Instructions to Inspector Date -->
                     <div class="col-md-4">
                         <label class="form-label">Instructions to Inspector Date</label>
-                        <p th:text="${instructionsToInspectorDate}"
+                        <p th:text="${inspection.instructionsToInspectorDate}"
                            class="form-control-static"></p>
                     </div>
                     <!-- Any Inspection Issues -->
                     <div class="col-md-4">
                         <label class="form-label">Any Inspection Issues</label>
                         
-                        <p th:text="${anyInspectionIssues != null && anyInspectionIssues ? 'Yes' : 'No'}"
+                        <p th:text="${inspection.anyInspectionIssues != null && inspection.anyInspectionIssues ? 'Yes' : 'No'}"
                            class="form-control-static"></p>
                     </div>
                     <!-- FR Sent To Client Date -->
                     <div class="col-md-4">
                         <label class="form-label">FR Sent To Client Date</label>
-                        <p th:text="${frSentToClientDate}" class="form-control-static"></p>
+                        <p th:text="${inspection.frSentToClientDate}" class="form-control-static"></p>
                     </div>
                 </div>
 
@@ -436,21 +427,21 @@
                     <!-- Inspection Reports Received Date -->
                     <div class="col-md-4">
                         <label class="form-label">Inspection Reports Received Date</label>
-                        <p th:text="${inspectionReportsReceivedDate}"
+                        <p th:text="${inspection.inspectionReportsReceivedDate}"
                            class="form-control-static"></p>
                     </div>
 
                     <!-- Inspection Reviewed By -->
                     <div class="col-md-4">
                         <label class="form-label">Inspection Reviewed By</label>
-                        <p th:text="${inspectionReviewedBy}"
+                        <p th:text="${inspection.inspectionReviewedBy}"
                            class="form-control-static"></p>
                     </div>
 
                     <!-- Inspection Support Documents Sent Date -->
                     <div class="col-md-4">
                         <label class="form-label">Inspection Support Documents Sent Date</label>
-                        <p th:text="${inspectionSupportDocumentsSentDate}"
+                        <p th:text="${inspection.inspectionSupportDocumentsSentDate}"
                            class="form-control-static"></p>
                     </div>
                 </div>
@@ -460,20 +451,20 @@
                     <!-- Inspection Report Number -->
                     <div class="col-md-4">
                         <label class="form-label">Inspection Report Number</label>
-                        <p th:text="${inspectionReportNumber}" class="form-control-static"></p>
+                        <p th:text="${inspection.inspectionReportNumber}" class="form-control-static"></p>
                     </div>
 
                     <!-- NCR Raised -->
                     <div class="col-md-4">
                         <label class="form-label">NCR Raised</label>
 
-                        <p th:text="${ncrRaised != null && ncrRaised ? 'Yes' : 'No'}" class="form-control-static"></p>
+                        <p th:text="${inspection.ncrRaised != null && inspection.ncrRaised ? 'Yes' : 'No'}" class="form-control-static"></p>
                     </div>
 
                     <!-- IRN Sent Date -->
                     <div class="col-md-4">
                         <label class="form-label">IRN Sent Date</label>
-                        <p th:text="${irnSentDate}" class="form-control-static"></p>
+                        <p th:text="${inspection.irnSentDate}" class="form-control-static"></p>
                     </div>
                 </div>
 
@@ -483,7 +474,7 @@
                         <div class="col-md-4">
                             <label class="form-label">Impartiality and Confidentiality</label>
                             <div>
-                                <span th:text="${impartialityAndConfidentiality != null && impartialityAndConfidentiality ? 'Yes' : 'No'}"></span>
+                                <span th:text="${inspection.impartialityAndConfidentiality != null && inspection.impartialityAndConfidentiality ? 'Yes' : 'No'}"></span>
                             </div>
                         </div>
 
@@ -491,8 +482,7 @@
                         <div class="col-md-4">
                             <label for="viewJobFolderLink" class="form-label">Job Folder Link</label>
                             <div>
-                                <a id="viewJobFolderLink" th:href="${jobFolderLink}" target="_blank"
-                                   class="btn btn-primary">View Job Folder</a>
+                                <a id="viewJobFolderLink" th:href="${inspection.jobFolderLink}" target="_blank">View Job Folder</a>
                             </div>
                         </div>
 
