@@ -90,7 +90,7 @@ public class InspectionController {
                 .orElseThrow(() -> new IllegalArgumentException("Inspection not found for ID: " + inspectionId));
 
         model.addAttribute(INSPECTION, inspection);
-        return RETURN_TO_INSPECTION_NEW;
+        return RETURN_TO_INSPECTION_VIEW;
     }
 
 

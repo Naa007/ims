@@ -9,6 +9,7 @@ public class UIRountingConstants {
     public static final String RETURN_TO_DEFAULT_ERROR = "/error/default";
 
     public static final String RETURN_TO_INSPECTION_NEW = "/inspection-new";
+    public static final String RETURN_TO_INSPECTION_VIEW = "/inspection-view";
     public static final String RETURN_TO_INSPECTION_MANAGEMENT = "/inspection-management";
     public static final String REDIRECT_INSPECTION_MANAGEMENT = "redirect:/inspection/inspection-management";
 
