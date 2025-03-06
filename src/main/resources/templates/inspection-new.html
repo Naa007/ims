@@ -350,7 +350,8 @@
                 <!-- Inspection No -->
                 <div class="col-md-4">
                     <label for="inspectionNo" class="form-label">IISPL No</label>
-                    <input type="text" id="inspectionNo" th:field="*{inspectionNo}" class="form-control" required/>
+                    <input type="text" id="inspectionNo" th:field="*{inspectionNo}" class="form-control" required
+                           th:disabled="${edit}"/>
                 </div>
 
 
@@ -366,7 +367,8 @@
                     <label for="notificationReceivedDateTime" class="form-label">Notification Received Date &
                         Time</label>
                     <input type="datetime-local" id="notificationReceivedDateTime"
-                           th:field="*{notificationReceivedDateTime}" class="form-control"/>
+                           th:field="*{notificationReceivedDateTime}" class="form-control"
+                           th:value="${#dates.format(inspection.notificationReceivedDateTime, 'yyyy-MM-dd''T''HH:mm')}"/>
                 </div>
 
 

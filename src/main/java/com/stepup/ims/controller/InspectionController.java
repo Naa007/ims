@@ -55,6 +55,7 @@ public class InspectionController {
         inspection.setProposedCVs(List.of(proposedCVs));
 
         model.addAttribute(INSPECTION, inspection);
+        model.addAttribute("edit", false);
         return RETURN_TO_INSPECTION_NEW;
     }
 
@@ -71,7 +72,6 @@ public class InspectionController {
         Inspection inspection = inspectionService.getInspectionById(Long.valueOf(inspectionId))
                 .orElseThrow(() -> new IllegalArgumentException("Inspection not found for ID: " + inspectionId));
 
-        // set clients for dropdown
         inspection.setClientsList(clientService.getAllClients());
 
         // set inspectors for dropdown
@@ -80,8 +80,13 @@ public class InspectionController {
         // set technical coordinators for dropdown
         inspection.setTechnicalCoordinatorsList(employeeService.getAllTechnicalCoordinateEmployees());
 
+        ProposedCVs proposedCVs = new ProposedCVs();
+        inspection.setProposedCVs(List.of(proposedCVs));
+
         model.addAttribute(INSPECTION, inspection);
+        model.addAttribute("edit", true);
         return RETURN_TO_INSPECTION_NEW;
+
     }
 
     @GetMapping(value = "/view/{inspectionId}")
