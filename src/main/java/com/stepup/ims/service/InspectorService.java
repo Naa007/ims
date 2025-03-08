@@ -58,35 +58,105 @@ public class InspectorService {
     public Inspector saveInspector(Inspector inspector) {
         var inspectorEntity = inspectorModelMapper.toEntity(inspector);
 
-        // Nullify references before saving inspectorEntity
-        var certificates = inspectorEntity.getCertificates();
-        var mainQualification = inspectorEntity.getMainQualificationCategory();
-        var specialQualification = inspectorEntity.getSpecialQualification();
+        Optional<com.stepup.ims.entity.Inspector> existingInspectorOpt = inspectorRepository.findById(inspectorEntity.getInspectorId());
 
-        inspectorEntity.setCertificates(null);
-        inspectorEntity.setMainQualificationCategory(null);
-        inspectorEntity.setSpecialQualification(null);
+        if (existingInspectorOpt.isPresent()) {
+            // ✅ Updating existing record
+            com.stepup.ims.entity.Inspector existingEntity = existingInspectorOpt.get();
 
-        // Save inspectorEntity without references
-        var savedInspectorEntity = inspectorRepository.save(inspectorEntity);
+            // ✅ Update inspector fields
+            existingEntity.setInspectorName(inspectorEntity.getInspectorName());
+            existingEntity.setPhone(inspectorEntity.getPhone());
+            existingEntity.setCountry(inspectorEntity.getCountry());
+            existingEntity.setInspectorType(inspectorEntity.getInspectorType());
+            existingEntity.setInspectorStatus(inspectorEntity.getInspectorStatus());
+            existingEntity.setDob(inspectorEntity.getDob());
+            existingEntity.setEmail(inspectorEntity.getEmail());
+            existingEntity.setEducationDetails(inspectorEntity.getEducationDetails());
+            existingEntity.setDisciplines(inspectorEntity.getDisciplines());
+            existingEntity.setAddress(inspectorEntity.getAddress());
+            existingEntity.setAddressCoordinates(inspectorEntity.getAddressCoordinates());
+            existingEntity.setRemarks(inspectorEntity.getRemarks());
 
-        // Restore references and set back associations
-        if (certificates != null) {
-            certificates.forEach(c -> c.setInspector(savedInspectorEntity));
-            savedInspectorEntity.setCertificates(certificates);
+            // ✅ Update Main Qualifications
+            if (inspectorEntity.getMainQualificationCategory() != null) {
+                MainQualifications newMainQualification = inspectorEntity.getMainQualificationCategory();
+                if (existingEntity.getMainQualificationCategory() != null) {
+                    MainQualifications existingMainQualification = existingEntity.getMainQualificationCategory();
+                    existingMainQualification.setElectrical(newMainQualification.getElectrical());
+                    existingMainQualification.setMechRotating(newMainQualification.getMechRotating());
+                    existingMainQualification.setMechStatic(newMainQualification.getMechStatic());
+                    existingMainQualification.setPiping(newMainQualification.getPiping());
+                    existingMainQualification.setSteelStructure(newMainQualification.getSteelStructure());
+                } else {
+                    newMainQualification.setInspector(existingEntity);
+                    existingEntity.setMainQualificationCategory(newMainQualification);
+                }
+            }
+
+            // ✅ Update Special Qualifications
+            if (inspectorEntity.getSpecialQualification() != null) {
+                SpecialQualification newSpecialQualification = inspectorEntity.getSpecialQualification();
+
+                if (existingEntity.getSpecialQualification() != null) {
+                    SpecialQualification existingSpecialQualification = existingEntity.getSpecialQualification();
+                    existingSpecialQualification.setAramco(newSpecialQualification.getAramco() != null
+                            ? newSpecialQualification.getAramco()
+                            : existingSpecialQualification.getAramco());
+                    existingSpecialQualification.setSec(newSpecialQualification.getSec() != null
+                            ? newSpecialQualification.getSec()
+                            : existingSpecialQualification.getSec());
+                    existingSpecialQualification.setSpecialQualificationDetails(newSpecialQualification.getSpecialQualificationDetails() != null
+                            ? newSpecialQualification.getSpecialQualificationDetails()
+                            : existingSpecialQualification.getSpecialQualificationDetails());
+                } else {
+                    newSpecialQualification.setInspector(existingEntity);
+                    existingEntity.setSpecialQualification(newSpecialQualification);
+                }
+            }
+
+            // ✅ Update Certificates
+            if (inspectorEntity.getCertificates() != null) {
+                existingEntity.getCertificates().clear();
+                existingEntity.getCertificates().addAll(inspectorEntity.getCertificates());
+                existingEntity.getCertificates().forEach(c -> c.setInspector(existingEntity));
+            }
+
+            // ✅ Save updated entity
+            var savedEntity = inspectorRepository.save(existingEntity);
+            return inspectorModelMapper.toModel(savedEntity);
+        } else {
+
+            // Nullify references before saving inspectorEntity
+            var certificates = inspectorEntity.getCertificates();
+            var mainQualification = inspectorEntity.getMainQualificationCategory();
+            var specialQualification = inspectorEntity.getSpecialQualification();
+
+            inspectorEntity.setCertificates(null);
+            inspectorEntity.setMainQualificationCategory(null);
+            inspectorEntity.setSpecialQualification(null);
+
+            // Save inspectorEntity without references
+            var savedInspectorEntity = inspectorRepository.save(inspectorEntity);
+
+            // Restore references and set back associations
+            if (certificates != null) {
+                certificates.forEach(c -> c.setInspector(savedInspectorEntity));
+                savedInspectorEntity.setCertificates(certificates);
+            }
+            if (mainQualification != null) {
+                mainQualification.setInspector(savedInspectorEntity);
+                savedInspectorEntity.setMainQualificationCategory(mainQualification);
+            }
+            if (specialQualification != null) {
+                specialQualification.setInspector(savedInspectorEntity);
+                savedInspectorEntity.setSpecialQualification(specialQualification);
+            }
+
+            // Save the entity again with all references properly associated
+            var savedEntity = inspectorRepository.save(savedInspectorEntity);
+            return inspectorModelMapper.toModel(savedEntity);
         }
-        if (mainQualification != null) {
-            mainQualification.setInspector(savedInspectorEntity);
-            savedInspectorEntity.setMainQualificationCategory(mainQualification);
-        }
-        if (specialQualification != null) {
-            specialQualification.setInspector(savedInspectorEntity);
-            savedInspectorEntity.setSpecialQualification(specialQualification);
-        }
-
-        // Save the entity again with all references properly associated
-        var savedEntity = inspectorRepository.save(savedInspectorEntity);
-        return inspectorModelMapper.toModel(savedEntity);
     }
 
 

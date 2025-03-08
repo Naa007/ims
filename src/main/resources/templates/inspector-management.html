@@ -521,41 +521,74 @@
 
                     <!-- Special Qualification -->
                     <h5>Special Qualification</h5>
+
+                    <!-- ARAMCO Checkbox -->
                     <div class="form-check">
-                        <input type="checkbox" id="editAramco" name="aramco" class="form-check-input">
+                        <input type="hidden" id="hiddenAramco" name="specialQualification.aramco" value="false">
+                        <input type="checkbox" id="editAramco" name="specialQualification.aramco" class="form-check-input" value="true"
+                               th:checked="${inspector.specialQualification.aramco}"
+                               onclick="document.getElementById('hiddenAramco').disabled = this.checked;">
                         <label for="editAramco" class="form-check-label">ARAMCO</label>
                     </div>
+
+                    <!-- SEC Checkbox -->
                     <div class="form-check">
-                        <input type="checkbox" id="editSec" name="sec" class="form-check-input">
+                        <input type="hidden" id="hiddenSec" name="specialQualification.sec" value="false">
+                        <input type="checkbox" id="editSec" name="specialQualification.sec" class="form-check-input" value="true"
+                               th:checked="${inspector.specialQualification.sec}"
+                               onclick="document.getElementById('hiddenSec').disabled = this.checked;">
                         <label for="editSec" class="form-check-label">SEC</label>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editSpecialQualificationDetails">Special Qualification Details</label>
-                        <input type="text" id="editSpecialQualificationDetails" name="specialQualificationDetails" class="form-control">
                     </div>
 
                     <!-- Main Qualification -->
                     <h5>Main Qualification</h5>
+
+                    <!-- Mechanical Static -->
                     <div class="form-check">
-                        <input type="checkbox" id="editMechStatic" name="mechStatic" class="form-check-input">
+                        <input type="hidden" id="hiddenMechStatic" name="mainQualificationCategory.mechStatic" value="false">
+                        <input type="checkbox" id="editMechStatic" name="mainQualificationCategory.mechStatic" class="form-check-input" value="true"
+                               th:checked="${inspector.mainQualificationCategory.mechStatic}"
+                               onclick="document.getElementById('hiddenMechStatic').disabled = this.checked;">
                         <label for="editMechStatic" class="form-check-label">Mechanical Static</label>
                     </div>
+
+                    <!-- Mechanical Rotating -->
                     <div class="form-check">
-                        <input type="checkbox" id="editMechRotating" name="mechRotating" class="form-check-input">
+                        <input type="hidden" id="hiddenMechRotating" name="mainQualificationCategory.mechRotating" value="false">
+                        <input type="checkbox" id="editMechRotating" name="mainQualificationCategory.mechRotating" class="form-check-input" value="true"
+                               th:checked="${inspector.mainQualificationCategory.mechRotating}"
+                               onclick="document.getElementById('hiddenMechRotating').disabled = this.checked;">
                         <label for="editMechRotating" class="form-check-label">Mechanical Rotating</label>
                     </div>
+
+                    <!-- Electrical -->
                     <div class="form-check">
-                        <input type="checkbox" id="editElectrical" name="electrical" class="form-check-input">
+                        <input type="hidden" id="hiddenElectrical" name="mainQualificationCategory.electrical" value="false">
+                        <input type="checkbox" id="editElectrical" name="mainQualificationCategory.electrical" class="form-check-input" value="true"
+                               th:checked="${inspector.mainQualificationCategory.electrical}"
+                               onclick="document.getElementById('hiddenElectrical').disabled = this.checked;">
                         <label for="editElectrical" class="form-check-label">Electrical</label>
                     </div>
+
+                    <!-- Piping -->
                     <div class="form-check">
-                        <input type="checkbox" id="editPiping" name="piping" class="form-check-input">
+                        <input type="hidden" id="hiddenPiping" name="mainQualificationCategory.piping" value="false">
+                        <input type="checkbox" id="editPiping" name="mainQualificationCategory.piping" class="form-check-input" value="true"
+                               th:checked="${inspector.mainQualificationCategory.piping}"
+                               onclick="document.getElementById('hiddenPiping').disabled = this.checked;">
                         <label for="editPiping" class="form-check-label">Piping</label>
                     </div>
+
+                    <!-- Steel Structure -->
                     <div class="form-check">
-                        <input type="checkbox" id="editSteelStructure" name="steelStructure" class="form-check-input">
+                        <input type="hidden" id="hiddenSteelStructure" name="mainQualificationCategory.steelStructure" value="false">
+                        <input type="checkbox" id="editSteelStructure" name="mainQualificationCategory.steelStructure" class="form-check-input" value="true"
+                               th:checked="${inspector.mainQualificationCategory.steelStructure}"
+                               onclick="document.getElementById('hiddenSteelStructure').disabled = this.checked;">
                         <label for="editSteelStructure" class="form-check-label">Steel Structure</label>
                     </div>
+
+
 
                     <!-- Inspector Status -->
                     <h5>Inspector Status</h5>
@@ -664,8 +697,8 @@
         });
     });
 
-    // Functions for loading and viewing inspector data
-   function loadInspectorData(button) {
+  // Functions for loading and viewing inspector data
+function loadInspectorData(button) {
     // Extract data attributes from the button
     const id = button.getAttribute("data-id");
     const inspectorName = button.getAttribute("data-inspectorname");
@@ -689,61 +722,64 @@
     const inspectorStatus = button.getAttribute("data-inspectorstatus");
     const remarks = button.getAttribute("data-remarks");
 
-    // Populate the form fields in the edit modal
-    document.getElementById("editInspectorId").value = id;
-    document.getElementById("editInspectorName").value = inspectorName;
-    document.getElementById("editEmail").value = email;
-    document.getElementById("editPhone").value = phone;
-    document.getElementById("editDob").value = dob;
-    document.getElementById("editAddress").value = address;
-    document.getElementById("editCountry").value = country;
-    document.getElementById("editEducationDetails").value = educationDetails;
-    document.getElementById("editDisciplines").value = disciplines;
+    // ✅ Only set values if the element exists
+    if (document.getElementById("editInspectorId")) document.getElementById("editInspectorId").value = id;
+    if (document.getElementById("editInspectorName")) document.getElementById("editInspectorName").value = inspectorName;
+    if (document.getElementById("editEmail")) document.getElementById("editEmail").value = email;
+    if (document.getElementById("editPhone")) document.getElementById("editPhone").value = phone;
+    if (document.getElementById("editDob")) document.getElementById("editDob").value = dob;
+    if (document.getElementById("editAddress")) document.getElementById("editAddress").value = address;
+    if (document.getElementById("editCountry")) document.getElementById("editCountry").value = country;
+    if (document.getElementById("editEducationDetails")) document.getElementById("editEducationDetails").value = educationDetails;
+    if (document.getElementById("editDisciplines")) document.getElementById("editDisciplines").value = disciplines;
 
-   const inspectorTypeRadioButtons = document.querySelectorAll('input[name="inspectorType"]');
+    // ✅ Inspector Type (Radio Buttons)
+    const inspectorTypeRadioButtons = document.querySelectorAll('input[name="inspectorType"]');
     inspectorTypeRadioButtons.forEach(radio => {
         if (radio.value === inspectorType) {
-            radio.checked = true; // Set the radio button as checked if it matches the inspectorStatus
+            radio.checked = true;
         }
     });
 
-    // Populate Certificates
+    // ✅ Populate Certificates
     const certificatesBody = document.getElementById("editCertificatesBody");
-    certificatesBody.innerHTML = ""; // Clear existing rows
-    certificates.forEach((certificate, index) => {
-        const newRow = document.createElement("tr");
-        newRow.innerHTML = `
-            <td><input type="text" name="certificates[${index}].name" class="form-control" value="${certificate.name}" /></td>
-            <td><input type="date" name="certificates[${index}].dateIssued" class="form-control" value="${certificate.dateIssued}" /></td>
-            <td><input type="date" name="certificates[${index}].expiryDate" class="form-control" value="${certificate.expiryDate}" /></td>
-            <td><input type="text" name="certificates[${index}].issuer" class="form-control" value="${certificate.issuer}" /></td>
-            <td><button type="button" class="btn btn-danger" onclick="removeCertificateRow(this)"><i class="fas fa-trash"></i></button></td>
-        `;
-        certificatesBody.appendChild(newRow);
-    });
+    if (certificatesBody) {
+        certificatesBody.innerHTML = ""; // Clear existing rows
+        certificates.forEach((certificate, index) => {
+            const newRow = document.createElement("tr");
+            newRow.innerHTML = `
+                <td><input type="text" name="certificates[${index}].name" class="form-control" value="${certificate.name}" /></td>
+                <td><input type="date" name="certificates[${index}].dateIssued" class="form-control" value="${certificate.dateIssued}" /></td>
+                <td><input type="date" name="certificates[${index}].expiryDate" class="form-control" value="${certificate.expiryDate}" /></td>
+                <td><input type="text" name="certificates[${index}].issuer" class="form-control" value="${certificate.issuer}" /></td>
+                <td><button type="button" class="btn btn-danger" onclick="removeCertificateRow(this)"><i class="fas fa-trash"></i></button></td>
+            `;
+            certificatesBody.appendChild(newRow);
+        });
+    }
 
-    // Populate Special Qualification
-    document.getElementById("editAramco").checked = aramco;
-    document.getElementById("editSec").checked = sec;
-    document.getElementById("editSpecialQualificationDetails").value = specialQualificationDetails;
+    // ✅ Special Qualification (Checkboxes)
+    if (document.getElementById("editAramco")) document.getElementById("editAramco").checked = aramco;
+    if (document.getElementById("editSec")) document.getElementById("editSec").checked = sec;
+    if (document.getElementById("editSpecialQualificationDetails")) document.getElementById("editSpecialQualificationDetails").value = specialQualificationDetails;
 
-    // Populate Main Qualification
-    document.getElementById("editMechStatic").checked = mechStatic;
-    document.getElementById("editMechRotating").checked = mechRotating;
-    document.getElementById("editElectrical").checked = electrical;
-    document.getElementById("editPiping").checked = piping;
-    document.getElementById("editSteelStructure").checked = steelStructure;
+    // ✅ Main Qualification (Checkboxes)
+    if (document.getElementById("editMechStatic")) document.getElementById("editMechStatic").checked = mechStatic;
+    if (document.getElementById("editMechRotating")) document.getElementById("editMechRotating").checked = mechRotating;
+    if (document.getElementById("editElectrical")) document.getElementById("editElectrical").checked = electrical;
+    if (document.getElementById("editPiping")) document.getElementById("editPiping").checked = piping;
+    if (document.getElementById("editSteelStructure")) document.getElementById("editSteelStructure").checked = steelStructure;
 
-   // Populate Inspector Status
+    // ✅ Inspector Status (Radio Buttons)
     const statusRadioButtons = document.querySelectorAll('input[name="inspectorStatus"]');
     statusRadioButtons.forEach(radio => {
         if (radio.value === inspectorStatus) {
-            radio.checked = true; // Set the radio button as checked if it matches the inspectorStatus
+            radio.checked = true;
         }
     });
 
-    // Populate Remarks
-    document.getElementById("editRemarks").value = remarks;
+    // ✅ Remarks
+    if (document.getElementById("editRemarks")) document.getElementById("editRemarks").value = remarks;
 }
 
    function viewInspectorData(button) {
