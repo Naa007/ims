@@ -39,6 +39,6 @@ public class Certificate {
 
     @ToString.Exclude
     @ManyToOne
-    @JoinColumn(name = "inspector_id", nullable = false)
+    @JoinColumn(name = "inspector_id", nullable = false, unique = false)
     private Inspector inspector;
 }

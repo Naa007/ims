@@ -25,7 +25,7 @@ public class SpecialQualification {
 
     @ToString.Exclude
     @OneToOne
-    @JoinColumn(name = "inspector_id", referencedColumnName = "inspector_id", nullable = true)
+    @JoinColumn(name = "inspector_id", referencedColumnName = "inspector_id", nullable = true, unique = false)
     private Inspector inspector;
 
 }

@@ -31,7 +31,7 @@ public class MainQualifications {
 
     @ToString.Exclude
     @OneToOne(fetch = FetchType.LAZY, optional = true) // Inspector is optional in this relationship
-    @JoinColumn(name = "inspector_id", referencedColumnName = "inspector_id", nullable = true)
+    @JoinColumn(name = "inspector_id", referencedColumnName = "inspector_id", nullable = true, unique = false)
     private Inspector inspector;
 
 }

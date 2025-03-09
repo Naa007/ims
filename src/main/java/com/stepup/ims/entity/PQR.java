@@ -16,7 +16,7 @@ public class PQR {
     
     @ToString.Exclude
     @OneToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "inspector_id", referencedColumnName = "inspector_id", nullable = true)
+    @JoinColumn(name = "inspector_id", referencedColumnName = "inspector_id", nullable = true, unique = false)
     private Inspector inspector;
 
     @Column(name = "skills", nullable = true)

@@ -53,7 +53,7 @@ public class Inspector {
     private List<Certificate> certificates;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "special_qualification_id")
+    @JoinColumn(name = "special_qualification_id", unique = false)
     private SpecialQualification specialQualification; // Special Qualification like Aramco, SEC, etc.
 
 

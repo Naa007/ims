@@ -1,5 +1,6 @@
 package com.stepup.ims.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
@@ -19,15 +20,17 @@ public class ProposedCVs {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "inspector_id", referencedColumnName = "inspector_id")
+    @JoinColumn(name = "inspector_id", referencedColumnName = "inspector_id", unique = false)
+    @ToString.Exclude
     private Inspector inspector;
 
     @Column(name = "cv_certificates_available")
     private boolean isCVCerticatesAvailable;
 
     @OneToOne
-    @JoinColumn(name = "technical_coordinator_id", referencedColumnName = "emp_id")
+    @JoinColumn(name = "technical_coordinator_id", referencedColumnName = "emp_id", unique = false)
     @Filter(name = "technicalCoordinatorFilter", condition = "inspector_type = 'TECHNICAL_COORDINATOR'")
+    @ToString.Exclude
     private Employee cvReviewBytechnicalCoordinator;
 
     @Column(name = "pqr_available")
@@ -42,6 +45,7 @@ public class ProposedCVs {
 
     @ToString.Exclude
     @ManyToOne
-    @JoinColumn(name = "inspection_id", referencedColumnName = "inspection_id")
+    @JoinColumn(name = "inspection_id", referencedColumnName = "inspection_id", unique = false)
+    @JsonIgnore
     private Inspection inspection;
 }

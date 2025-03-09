@@ -37,7 +37,7 @@ public class Client {
     private LocalDate confirmationDate;
 
     @ManyToOne
-    @JoinColumn(name = "emp_id", referencedColumnName = "emp_id")
+    @JoinColumn(name = "emp_id", referencedColumnName = "emp_id", unique = false)
     private Employee employee;
 
     public enum ReferenceType {
