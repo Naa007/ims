@@ -3,7 +3,6 @@ package com.stepup.ims.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
-import lombok.ToString;
 
 @Entity
 @Data
@@ -13,11 +12,6 @@ public class PQR {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @ToString.Exclude
-    @OneToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "inspector_id", referencedColumnName = "inspector_id", nullable = true, unique = false)
-    private Inspector inspector;
 
     @Column(name = "skills", nullable = true)
     private Skills skills;

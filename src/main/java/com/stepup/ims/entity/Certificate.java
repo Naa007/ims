@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import lombok.ToString;
 
 import java.time.LocalDate;
 
@@ -37,8 +36,4 @@ public class Certificate {
     @Column(name = "issuer", nullable = true)
     private String issuer;
 
-    @ToString.Exclude
-    @ManyToOne
-    @JoinColumn(name = "inspector_id", nullable = false, unique = false)
-    private Inspector inspector;
 }

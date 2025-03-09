@@ -1,7 +1,6 @@
 package com.stepup.ims.model;
 
 import lombok.Data;
-import lombok.ToString;
 
 import java.time.LocalDate;
 
@@ -13,6 +12,5 @@ public class Certificate {
     private LocalDate dateIssued;
     private LocalDate expiryDate;
     private String issuer;
-    @ToString.Exclude
-    private Inspector inspector;
+
 }

@@ -20,7 +20,5 @@ public class ProposedCVs {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime cvSubmittedToClientDate;
     private boolean cvStatus;
-    @ToString.Exclude
-    private Inspection inspection;
 
 }

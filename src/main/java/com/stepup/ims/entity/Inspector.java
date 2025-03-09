@@ -47,26 +47,26 @@ public class Inspector {
     private String educationDetails;
 
     @Column(nullable = true, length = 1000)
-    private String disciplines; // E.g., list or custom type separated by commas
+    private String disciplines;
 
-    @OneToMany(mappedBy = "inspector", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "inspector_id", referencedColumnName = "inspector_id")
     private List<Certificate> certificates;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval = true)
     @JoinColumn(name = "special_qualification_id", unique = false)
-    private SpecialQualification specialQualification; // Special Qualification like Aramco, SEC, etc.
+    private SpecialQualification specialQualification;
 
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "main_qualification_id", unique = false)
+    @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval = true)
+    @JoinColumn(name = "main_qualification_id")
     private MainQualifications mainQualificationCategory;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "inspector_status", nullable = false)
     private InspectorStatusType inspectorStatus;
 
-    @OneToOne(optional = true, cascade = CascadeType.ALL)
-    @JoinColumn(name = "pqr_id", referencedColumnName = "id")
+    @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval = true)
+    @JoinColumn(name = "pqr_id")
     private PQR pqr;
 
     @Column(nullable = false) // Allow null for remarks

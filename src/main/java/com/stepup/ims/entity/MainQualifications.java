@@ -2,7 +2,6 @@ package com.stepup.ims.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.ToString;
 
 @Data
 @Entity
@@ -28,10 +27,5 @@ public class MainQualifications {
 
     @Column(nullable = true)
     private Boolean electrical;
-
-    @ToString.Exclude
-    @OneToOne(fetch = FetchType.LAZY, optional = true) // Inspector is optional in this relationship
-    @JoinColumn(name = "inspector_id", referencedColumnName = "inspector_id", nullable = true, unique = false)
-    private Inspector inspector;
 
 }

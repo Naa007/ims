@@ -1,16 +1,12 @@
 package com.stepup.ims.model;
 
-import com.stepup.ims.entity.Inspector;
 import lombok.Data;
 import lombok.Getter;
-import lombok.ToString;
 
 @Data
 public class PQR {
 
     private Long id;
-    @ToString.Exclude
-    private Inspector inspector;
     private Skills skills;
     private Education education;
     private EnglishSkills english;

@@ -58,35 +58,9 @@ public class InspectorService {
     public Inspector saveInspector(Inspector inspector) {
         var inspectorEntity = inspectorModelMapper.toEntity(inspector);
 
-        // Nullify references before saving inspectorEntity
-        var certificates = inspectorEntity.getCertificates();
-        var mainQualification = inspectorEntity.getMainQualificationCategory();
-        var specialQualification = inspectorEntity.getSpecialQualification();
-
-        inspectorEntity.setCertificates(null);
-        inspectorEntity.setMainQualificationCategory(null);
-        inspectorEntity.setSpecialQualification(null);
-
-        // Save inspectorEntity without references
         var savedInspectorEntity = inspectorRepository.save(inspectorEntity);
 
-        // Restore references and set back associations
-        if (certificates != null) {
-            certificates.forEach(c -> c.setInspector(savedInspectorEntity));
-            savedInspectorEntity.setCertificates(certificates);
-        }
-        if (mainQualification != null) {
-            mainQualification.setInspector(savedInspectorEntity);
-            savedInspectorEntity.setMainQualificationCategory(mainQualification);
-        }
-        if (specialQualification != null) {
-            specialQualification.setInspector(savedInspectorEntity);
-            savedInspectorEntity.setSpecialQualification(specialQualification);
-        }
-
-        // Save the entity again with all references properly associated
-        var savedEntity = inspectorRepository.save(savedInspectorEntity);
-        return inspectorModelMapper.toModel(savedEntity);
+        return inspectorModelMapper.toModel(savedInspectorEntity);
     }
 
 

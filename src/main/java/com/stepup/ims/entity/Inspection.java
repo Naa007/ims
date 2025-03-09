@@ -24,8 +24,8 @@ public class Inspection {
     @Column(name = "notification_no")
     private String notificationNo;
 
-    
-    @OneToOne
+
+    @ManyToOne
     @JoinColumn(name = "client_id", referencedColumnName = "client_id", unique = false)
     private Client client;
 
@@ -55,7 +55,8 @@ public class Inspection {
     @Column(name = "inspection_location_details")
     private String inspectionLocationDetails;
 
-    @OneToMany(mappedBy = "inspection", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "inspection_id", referencedColumnName = "inspection_id")
     private List<ProposedCVs> proposedCVs;
 
     @Column(name = "approved_inspector_name")
