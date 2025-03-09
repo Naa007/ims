@@ -38,18 +38,17 @@ public class InspectionService {
      */
     public Inspection saveInspection(Inspection inspection) {
         var inspectionEntity = inspectionModelMapper.toEntity(inspection);
-
         var proposedCVs = inspectionEntity.getProposedCVs();
-        inspectionEntity.setProposedCVs(null);
-
+    
         var savedInspectionEntity = inspectionRepository.save(inspectionEntity);
-
-        if (proposedCVs != null) {
+    
+        if (proposedCVs != null && !proposedCVs.isEmpty()) {
             proposedCVs.forEach(cv -> cv.setInspection(savedInspectionEntity));
             savedInspectionEntity.setProposedCVs(proposedCVs);
+            inspectionRepository.save(savedInspectionEntity);
         }
-
-        return inspectionModelMapper.toModel(inspectionRepository.save(savedInspectionEntity));
+    
+        return inspectionModelMapper.toModel(savedInspectionEntity);
     }
 
 }

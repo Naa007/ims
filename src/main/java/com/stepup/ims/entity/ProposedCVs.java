@@ -34,7 +34,7 @@ public class ProposedCVs {
     private boolean isPQRAvailable;
 
     @Column(name = "cv_submitted_date_time")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime cvSubmittedToClientDate;
 
     @Column(name = "cv_status")

@@ -19,7 +19,7 @@ public class Inspection {
     private Long id;
 
     @Column(name = "inspection_no")
-    private int inspectionNo;
+    private Long inspectionNo;
 
     @Column(name = "notification_no")
     private String notificationNo;
@@ -87,8 +87,8 @@ public class Inspection {
     private boolean inspectionAdviseNote;
 
     @Column(name = "instructions_to_inspector_date")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd HH:mm")
-    private LocalDateTime instructionsToInspectorDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
+    private LocalDate instructionsToInspectorDate;
 
     @Column(name = "any_inspection_issues")
     private boolean anyInspectionIssues;

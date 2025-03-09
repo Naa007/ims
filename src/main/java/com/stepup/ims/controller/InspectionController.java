@@ -56,7 +56,7 @@ public class InspectionController {
 
         model.addAttribute(INSPECTION, inspection);
         model.addAttribute("edit", false);
-        return RETURN_TO_INSPECTION_NEW;
+        return RETURN_TO_INSPECTION_FORM;
     }
 
 
@@ -82,7 +82,7 @@ public class InspectionController {
 
         model.addAttribute(INSPECTION, inspection);
         model.addAttribute("edit", true);
-        return RETURN_TO_INSPECTION_NEW;
+        return RETURN_TO_INSPECTION_FORM;
 
     }
 

@@ -10,13 +10,14 @@ import java.time.LocalDateTime;
 @Data
 public class ProposedCVs {
 
+    private Long id;
     @ToString.Exclude
     private Inspector inspector;
     private boolean isCVCertificatesAvailable;
     @ToString.Exclude
     private Employee cvReviewByTechnicalCoordinator;
     private boolean isPQRAvailable;
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime cvSubmittedToClientDate;
     private boolean cvStatus;
     @ToString.Exclude

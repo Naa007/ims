@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Add New Inspection</title>
+    
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHwaHTTVcK5bvy2Vg36H6r3gdpSoIYcjY"></script>
     <script th:src="@{/js/scripts.js}"></script>
 
@@ -173,143 +175,151 @@
 
     <script th:inline="javascript">
 
-        function initMap(inspectionLocation) {
+        /* Dynamically Set Page Title Based on 'edit' Parameter */
+       const urlParams = new URLSearchParams(window.location.search);
+       const isEdit = urlParams.get('edit') === 'true';
 
-            fetch('/api/inspectors?address=' + inspectionLocation )
-            .then(response => response.json())
-            .then(data => {
-                for (const [locationKey, inspectors] of Object.entries(data)) {
-                    const userLocationArray = locationKey.split(',').map(Number); // Split and convert to numbers
-                    const userLocation = new google.maps.LatLng(userLocationArray[0], userLocationArray[1]); // Create LatLng object
+       document.title = isEdit ? 'Edit Inspection' : 'Add New Inspection';
 
-                   const map = new google.maps.Map(document.getElementById('map'), {
-                       zoom: 10,
-                       center: userLocation
+       function initMap(inspectionLocation) {
+
+           fetch('/api/inspectors?address=' + inspectionLocation )
+           .then(response => response.json())
+           .then(data => {
+               for (const [locationKey, inspectors] of Object.entries(data)) {
+                   const userLocationArray = locationKey.split(',').map(Number); // Split and convert to numbers
+                   const userLocation = new google.maps.LatLng(userLocationArray[0], userLocationArray[1]); // Create LatLng object
+
+                  const map = new google.maps.Map(document.getElementById('map'), {
+                      zoom: 10,
+                      center: userLocation
+                  });
+
+                   // Add marker for user location
+                   const userMarker = new google.maps.Marker({
+                       position: userLocation,
+                       map: map,
+                       title: "Inspection Location"
                    });
 
-                    // Add marker for user location
-                    const userMarker = new google.maps.Marker({
-                        position: userLocation,
-                        map: map,
-                        title: "Inspection Location"
-                    });
+                   // Plot all inspectors for the current user location
+                   inspectors.forEach(inspector => {
+                       const marker = new google.maps.Marker({
+                           position: {
+                               lat: inspector.location.lat,
+                               lng: inspector.location.lng
+                           },
+                           map: map,
+                           title: `${inspector.name}, Distance: ${inspector.distance}, Duration: ${inspector.duration}`,
+                           icon: {
+                               url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png" // Green marker icon
+                           }
+                       });
+                   });
+               }
+                   });
 
-                    // Plot all inspectors for the current user location
-                    inspectors.forEach(inspector => {
-                        const marker = new google.maps.Marker({
-                            position: {
-                                lat: inspector.location.lat,
-                                lng: inspector.location.lng
-                            },
-                            map: map,
-                            title: `${inspector.name}, Distance: ${inspector.distance}, Duration: ${inspector.duration}`,
-                            icon: {
-                                url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png" // Green marker icon
-                            }
-                        });
-                    });
-                }
-                    });
+       }
 
-        }
+       function showMapLoadingMessage() {
+                   const mapLoadingMessage = document.getElementById('mapLoadingMessage');
+                   mapLoadingMessage.style.display = 'block';
 
-        function showMapLoadingMessage() {
-                    const mapLoadingMessage = document.getElementById('mapLoadingMessage');
-                    mapLoadingMessage.style.display = 'block';
+                   // Assuming 'initMap' will handle the map loading process
+                   // Add a timeout or any custom logic to hide the message after map loading completes
+                   setTimeout(() => {
+                       mapLoadingMessage.style.display = 'none';
+                   }, 5000); // Adjust the time as per map loading logic
+               }
 
-                    // Assuming 'initMap' will handle the map loading process
-                    // Add a timeout or any custom logic to hide the message after map loading completes
-                    setTimeout(() => {
-                        mapLoadingMessage.style.display = 'none';
-                    }, 5000); // Adjust the time as per map loading logic
-                }
+      function addCVRow() {
+          const tableBody = document.querySelector("#proposedCVsTable tbody");
+          const newRow = document.createElement("tr");
+          newRow.innerHTML = `
+              <td>
+                  <select class="form-control" name="proposedCVs[newRow].inspector.inspectorName" required>
+                      <option value="" disabled selected>Select an Inspector</option>
+                      <option th:each="inspector : ${inspection.inspectorsList}" th:value="${inspector.inspectorName}"
+                              th:text="${inspector.inspectorName}"></option>
+                  </select>
+              </td>
 
-       function addCVRow() {
-           const tableBody = document.querySelector("#proposedCVsTable tbody");
-           const newRow = document.createElement("tr");
-           newRow.innerHTML = `
-               <td>
-                   <select class="form-control" name="proposedCVs[newRow].inspector.inspectorName" required>
-                       <option value="" disabled selected>Select an Inspector</option>
-                       <option th:each="inspector : ${inspection.inspectorsList}" th:value="${inspector.inspectorName}"
-                               th:text="${inspector.inspectorName}"></option>
-                   </select>
-               </td>
-
-               <td>
-                    <input type="radio"
-                           name="proposedCVs[newRow].isCVCertificatesAvailable"
-                           value="true" required/>
-                    Yes
-                    <input type="radio"
-                           name="proposedCVs[newRow].isCVCertificatesAvailable"
-                           value="false" required/>
-                    No
-               </td>
-
-               <td>
-                   <select class="form-control" name="proposedCVs[newRow].cvReviewByTechnicalCoordinator.inspectorName"
-                           required>
-                       <option value="" disabled selected>Select a Technical Coordinator</option>
-
-                   </select>
-               </td>
-
-               <td>
+              <td>
                    <input type="radio"
-                       name="proposedCVs[newRow].isPQRAvailable"
-                       value="true" required/>
-                    Yes
-                    <input type="radio"
-                           name="proposedCVs[newRow].isPQRAvailable"
-                           value="false"  required/>
-                    No
-               </td>
+                          name="proposedCVs[newRow].isCVCertificatesAvailable"
+                          value="true" required/>
+                   Yes
+                   <input type="radio"
+                          name="proposedCVs[newRow].isCVCertificatesAvailable"
+                          value="false" required/>
+                   No
+              </td>
 
-               <td>
-                   <input type="datetime-local" class="form-control"
-                          name="proposedCVs[newRow].cvSubmittedToClientDate" required/>
-               </td>
+              <td>
+                  <select class="form-control" name="proposedCVs[newRow].cvReviewByTechnicalCoordinator.inspectorName"
+                          required>
+                      <option value="" disabled selected>Select a Technical Coordinator</option>
 
-               <td>
-                    <input type="radio" name="proposedCVs[newRow].cvStatus"
-                           value="true" required/>
-                    Yes
-                    <input type="radio" name="proposedCVs[newRow].cvStatus"
-                           value="false"  required/>
-                    No
-               </td>
+                  </select>
+              </td>
 
-               <td>
-                   <button type="button" class="btn btn-danger btn-sm" onclick="deleteCVRow(this)">Delete</button>
-               </td>
-           `;
-           tableBody.appendChild(newRow);
-       }
+              <td>
+                  <input type="radio"
+                      name="proposedCVs[newRow].isPQRAvailable"
+                      value="true" required/>
+                   Yes
+                   <input type="radio"
+                          name="proposedCVs[newRow].isPQRAvailable"
+                          value="false"  required/>
+                   No
+              </td>
 
-       function deleteCVRow(button) {
-           const row = button.closest("tr");
-           row.remove();
-       }
+              <td>
+                  <input type="datetime-local" class="form-control"
+                         name="proposedCVs[newRow].cvSubmittedToClientDate" required/>
+              </td>
 
-       let dateCounter = 1;
-       function addDateInput() {
-           dateCounter++;
-           const container = document.getElementById('inspectionDatesContainer');
-           const newInputDiv = document.createElement('div');
-           newInputDiv.classList.add('input-group', 'mb-2');
-           newInputDiv.innerHTML = `
-               <input type="date" id="inspectionDate${dateCounter}" name="inspectionDateAsPerNotification[]" class="form-control" required />
-               <button type="button" class="btn btn-danger" onclick="removeDateInput(this)">Remove</button>
-           `;
-           container.appendChild(newInputDiv);
-       }
+              <td>
+                   <input type="radio" name="proposedCVs[newRow].cvStatus"
+                          value="true" required/>
+                   Yes
+                   <input type="radio" name="proposedCVs[newRow].cvStatus"
+                          value="false"  required/>
+                   No
+              </td>
 
-       function removeDateInput(button) {
-           button.parentElement.remove();
-       }
-         // Initialize Map
-       window.onload = initMap('Hyderabad, India');
+              <td>
+                  <button type="button" class="btn btn-danger btn-sm" onclick="deleteCVRow(this)">Delete</button>
+              </td>
+          `;
+          tableBody.appendChild(newRow);
+      }
+
+      function deleteCVRow(button) {
+          const row = button.closest("tr");
+          row.remove();
+      }
+
+      let dateCounter = 1;
+      function addDateInput() {
+          dateCounter++;
+          const container = document.getElementById('inspectionDatesContainer');
+          const newInputDiv = document.createElement('div');
+          newInputDiv.classList.add('input-group', 'mb-2');
+          newInputDiv.innerHTML = `
+              <input type="date" id="inspectionDate${dateCounter}" name="inspectionDateAsPerNotification[]" class="form-control" required />
+              <button type="button" class="btn btn-danger" onclick="removeDateInput(this)">Remove</button>
+          `;
+          container.appendChild(newInputDiv);
+      }
+
+      function removeDateInput(button) {
+          button.parentElement.remove();
+      }
+
+       // Initialize Map with condition
+       const locationDetails = document.getElementById('inspectionLocationDetails');
+       initMap(locationDetails ? locationDetails : 'Hyderabad, India');
 
     </script>
 </head>
@@ -345,6 +355,8 @@
     <div class="mt-5">
         <form th:action="@{/inspection/save}" th:object="${inspection}" method="post" class="row g-3">
 
+            <input type="hidden" th:field="*{id}" id="id" />
+
             <div class="row">
 
                 <!-- Inspection No -->
@@ -352,8 +364,9 @@
                     <label for="inspectionNo" class="form-label">IISPL No</label>
                     <input type="text" id="inspectionNo" th:field="*{inspectionNo}" class="form-control" required
                            th:disabled="${edit}"/>
+                    <!-- Hidden field to ensure the value is sent even when the input is disabled -->
+                    <input type="hidden" th:field="*{inspectionNo}" th:if="${edit}"/>
                 </div>
-
 
                 <!-- Notification No -->
                 <div class="col-md-4">
@@ -367,16 +380,13 @@
                         Time</label>
                     <input type="datetime-local" id="notificationReceivedDateTime"
                            th:field="*{notificationReceivedDateTime}"
-                           th:value="*{notificationReceivedDateTime != null ? notificationReceivedDateTime : ''}"
                            class="form-control"/>
                 </div>
-
 
             </div>
 
 
             <div class="row">
-
 
                 <!-- Client Name -->
                 <div class="col-md-4">
@@ -388,13 +398,12 @@
                     </select>
                 </div>
 
-
                 <!-- Inspection Countries -->
                 <div class="col-md-4">
                     <label for="inspectionCountry" class="form-label">Inspection Country</label>
-                    <select class="form-control" id="inspectionCountry" name="inspectionCountry" required>
+                    <select class="form-control" id="inspectionCountry" th:field="*{inspectionCountry}" required>
                         <option value="">Select Country</option>
-                        <option th:each="country : ${inspection.countriesList}" th:value="${country}"
+                        <option th:each="country : ${inspection.countriesList}" th:value="${country}" 
                                 th:text="${country}"></option>
                     </select>
                 </div>
@@ -409,7 +418,6 @@
                     </div>
 
                 </div>
-
 
             </div>
 
@@ -438,14 +446,12 @@
                         </div>
                     </div>
 
-
                     <!-- Inspection Stages -->
                     <div>
                         <label for="inspectionActivityWithStages" class="form-label">Inspection Stages</label>
                         <textarea id="inspectionActivityWithStages" th:field="*{inspectionActivityWithStages}"
                                   class="form-control" rows="3"></textarea>
                     </div>
-
 
                     <!-- Inspection Location Details -->
                     <div>
@@ -489,6 +495,10 @@
                         <!-- Existing CVs -->
                         <tr th:each="cv, iterStat : ${inspection.proposedCVs}">
 
+                            <!-- Hidden field for Proposed CVs ID -->
+                            <input type="hidden"
+                                   th:field="*{proposedCVs[__${iterStat.index}__].id}"
+                                   th:value="${cv.id}"/>
                             <td>
                                 <label>
                                     <select class="form-control"
@@ -698,9 +708,8 @@
                 <!-- Instructions to Inspector Date -->
                 <div class="col-md-4">
                     <label for="instructionsToInspectorDate" class="form-label">Instructions to Inspector Date</label>
-                    <input type="date" id="instructionsToInspectorDate" th:field="*{instructionsToInspectorDate}"
-                           th:value="*{instructionsToInspectorDate != null ? instructionsToInspectorDate : ''}"
-                           class="form-control" required/>
+                    <input type="date" id="instructionsToInspectorDate" th:field="*{instructionsToInspectorDate}" class="form-control"
+                           required/>
                 </div>
 
                 <!-- Any Inspection Issues -->
@@ -809,11 +818,14 @@
 
             </div>
 
-
+            
             <!-- Submit Button -->
             <div class="col-12">
-                <button type="submit" class="btn btn-success">Add Inspection</button>
+                <button type="submit" class="btn btn-success" th:text="${edit ? 'Edit Inspection' : 'Add Inspection'}">
+                    Add Inspection
+                </button>
             </div>
+            
         </form>
     </div>
 </div>

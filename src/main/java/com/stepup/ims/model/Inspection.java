@@ -14,7 +14,7 @@ public class Inspection {
 
     private Long id;
 
-    private int inspectionNo;
+    private Long inspectionNo;
 
     private String notificationNo;
 
@@ -57,8 +57,8 @@ public class Inspection {
 
     private boolean inspectionAdviseNote;
 
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd HH:mm")
-    private LocalDateTime instructionsToInspectorDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
+    private LocalDate instructionsToInspectorDate;
 
     private boolean anyInspectionIssues;
 

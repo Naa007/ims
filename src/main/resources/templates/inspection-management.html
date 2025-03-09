@@ -265,7 +265,7 @@
                 <th>Client Name</th>
                 <th>Inspection Date</th>
                 <th>Inspection Item</th>
-                <th>Inspector Name</th>
+<!--                <th>Inspector Name</th>-->
                 <th>Actions</th>
             </tr>
             </thead>
@@ -276,7 +276,7 @@
                 <td th:text="${inspection.client.clientName}"></td>
                 <td th:text="${inspection.inspectionDateAsPerNotification}"></td>
                 <td th:text="${inspection.inspectionItem}"></td>
-                <td th:text="${inspection.proposedCVs[0].inspector.inspectorName}"></td>
+<!--                <td th:text="${inspection.proposedCVs[0].inspector.inspectorName}"></td>-->
                 <td>
                     <button class="btn btn-primary btn-sm"
                             th:onclick="|redirectToViewInspection(${inspection.id})|">View
