@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
 import org.hibernate.annotations.Filter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -33,6 +34,7 @@ public class ProposedCVs {
     private boolean isPQRAvailable;
 
     @Column(name = "cv_submitted_date_time")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
     private LocalDateTime cvSubmittedToClientDate;
 
     @Column(name = "cv_status")

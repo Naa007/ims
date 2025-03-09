@@ -361,14 +361,14 @@
                     <input type="text" id="notificationNo" th:field="*{notificationNo}" class="form-control" required/>
                 </div>
 
-
                 <!-- Notification Received Date and Time -->
                 <div class="col-md-4">
                     <label for="notificationReceivedDateTime" class="form-label">Notification Received Date &
                         Time</label>
                     <input type="datetime-local" id="notificationReceivedDateTime"
-                           th:field="*{notificationReceivedDateTime}" class="form-control"
-                           th:value="${#dates.format(inspection.notificationReceivedDateTime, 'yyyy-MM-dd''T''HH:mm')}"/>
+                           th:field="*{notificationReceivedDateTime}"
+                           th:value="*{notificationReceivedDateTime != null ? notificationReceivedDateTime : ''}"
+                           class="form-control"/>
                 </div>
 
 
@@ -553,6 +553,7 @@
                                 <label>
                                     <input type="datetime-local" class="form-control"
                                            th:field="*{proposedCVs[__${iterStat.index}__].cvSubmittedToClientDate}"
+                                           th:value="*{proposedCVs[__${iterStat.index}__].cvSubmittedToClientDate != null ? proposedCVs[__${iterStat.index}__].cvSubmittedToClientDate : ''}"
                                            required/>
                                 </label>
                             </td>
@@ -603,6 +604,7 @@
                 <div class="col-md-4">
                     <label for="orderConfirmationDate" class="form-label">Date of Order Confirmation</label>
                     <input type="date" id="orderConfirmationDate" th:field="*{orderConfirmationDate}"
+                           th:value="*{orderConfirmationDate != null ? orderConfirmationDate : ''}"
                            class="form-control" required/>
                 </div>
 
@@ -664,23 +666,24 @@
                     <label class="form-label">Contract Review Prepared</label>
                     <div>
                         <input type="radio" name="contractReviewPrepared" value="true"
-                               th:checked="${contractReviewPrepared == true}" required/>
+                               th:checked="${inspection.contractReviewPrepared == true}" required/>
                         Yes
                         <input type="radio" name="contractReviewPrepared" value="false"
-                               th:checked="${contractReviewPrepared == false}" required/>
+                               th:checked="${inspection.contractReviewPrepared == false}" required/>
                         No
                     </div>
                 </div>
+
 
                 <!-- Inspection Advise Note -->
                 <div class="col-md-4">
                     <label class="form-label">Inspection Advise Note</label>
                     <div>
                         <input type="radio" name="inspectionAdviseNote" value="true"
-                               th:checked="${inspectionAdviseNote == true}" required/>
+                               th:checked="${inspection.inspectionAdviseNote == true}" required/>
                         Yes
                         <input type="radio" name="inspectionAdviseNote" value="false"
-                               th:checked="${inspectionAdviseNote == false}" required/>
+                               th:checked="${inspection.inspectionAdviseNote == false}" required/>
                         No
                     </div>
                 </div>
@@ -696,6 +699,7 @@
                 <div class="col-md-4">
                     <label for="instructionsToInspectorDate" class="form-label">Instructions to Inspector Date</label>
                     <input type="date" id="instructionsToInspectorDate" th:field="*{instructionsToInspectorDate}"
+                           th:value="*{instructionsToInspectorDate != null ? instructionsToInspectorDate : ''}"
                            class="form-control" required/>
                 </div>
 
@@ -704,10 +708,10 @@
                     <label class="form-label">Any Inspection Issues</label>
                     <div>
                         <input type="radio" name="anyInspectionIssues" value="true"
-                               th:checked="${anyInspectionIssues == true}" required/>
+                               th:checked="${inspection.anyInspectionIssues == true}" required/>
                         Yes
                         <input type="radio" name="anyInspectionIssues" value="false"
-                               th:checked="${anyInspectionIssues == false}" required/>
+                               th:checked="${inspection.anyInspectionIssues == false}" required/>
                         No
                     </div>
                 </div>
@@ -765,9 +769,9 @@
                 <!-- NCR Raised -->
                 <div class="col-md-4">
                     <label class="form-label">NCR Raised</label>
-                    <input type="radio" name="ncrRaised" value="true" th:checked="${ncrRaised == true}" required/>
+                    <input type="radio" name="ncrRaised" value="true" th:checked="${inspection.ncrRaised == true}" required/>
                     Yes
-                    <input type="radio" name="ncrRaised" value="false" th:checked="${ncrRaised == false}" required/>
+                    <input type="radio" name="ncrRaised" value="false" th:checked="${inspection.ncrRaised == false}" required/>
                     No
                 </div>
 
@@ -787,10 +791,10 @@
                     <label class="form-label">Impartiality and Confidentiality</label>
                     <div>
                         <input type="radio" name="impartialityAndConfidentiality" value="true"
-                               th:checked="${impartialityAndConfidentiality == true}" required/>
+                               th:checked="${inspection.impartialityAndConfidentiality == true}" required/>
                         Yes
                         <input type="radio" name="impartialityAndConfidentiality" value="false"
-                               th:checked="${impartialityAndConfidentiality == false}" required/>
+                               th:checked="${inspection.impartialityAndConfidentiality == false}" required/>
                         No
                     </div>
                 </div>

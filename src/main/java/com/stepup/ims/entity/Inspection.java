@@ -2,6 +2,7 @@ package com.stepup.ims.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,6 +30,7 @@ public class Inspection {
     private Client client;
 
     @Column(name = "notification_received_date_time")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime notificationReceivedDateTime;
 
     @Column(name = "inspection_country")
@@ -37,6 +39,7 @@ public class Inspection {
     @ElementCollection
     @CollectionTable(name = "inspection_dates", joinColumns = @JoinColumn(name = "inspection_id"))
     @Column(name = "inspection_date_as_per_notification")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
     private List<LocalDate> inspectionDateAsPerNotification;
 
     @Column(name = "inspection_item")
@@ -59,6 +62,7 @@ public class Inspection {
     private String approvedInspectorName;
 
     @Column(name = "order_confirmation_date")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
     private LocalDate orderConfirmationDate;
 
     @Column(name = "sector_scope")
@@ -83,21 +87,25 @@ public class Inspection {
     private boolean inspectionAdviseNote;
 
     @Column(name = "instructions_to_inspector_date")
-    private LocalDate instructionsToInspectorDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime instructionsToInspectorDate;
 
     @Column(name = "any_inspection_issues")
     private boolean anyInspectionIssues;
 
     @Column(name = "fr_sent_to_client_date")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
     private LocalDate frSentToClientDate;
 
     @Column(name = "inspection_reports_received_date")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
     private LocalDate inspectionReportsReceivedDate;
 
     @Column(name = "inspection_reviewed_by")
     private String inspectionReviewedBy;
 
     @Column(name = "inspection_support_documents_sent_date")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
     private LocalDate inspectionSupportDocumentsSentDate;
 
     @Column(name = "inspection_report_number")
@@ -107,6 +115,7 @@ public class Inspection {
     private boolean ncrRaised;
 
     @Column(name = "irn_sent_date")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
     private LocalDate irnSentDate;
 
     @Column(name = "imprint_and_confidentiality_status")

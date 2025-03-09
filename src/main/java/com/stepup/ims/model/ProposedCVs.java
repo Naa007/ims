@@ -16,7 +16,7 @@ public class ProposedCVs {
     @ToString.Exclude
     private Employee cvReviewByTechnicalCoordinator;
     private boolean isPQRAvailable;
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "dd/mm/yyyy")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
     private LocalDateTime cvSubmittedToClientDate;
     private boolean cvStatus;
     @ToString.Exclude

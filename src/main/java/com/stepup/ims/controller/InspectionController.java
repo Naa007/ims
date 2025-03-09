@@ -80,9 +80,6 @@ public class InspectionController {
         // set technical coordinators for dropdown
         inspection.setTechnicalCoordinatorsList(employeeService.getAllTechnicalCoordinateEmployees());
 
-        ProposedCVs proposedCVs = new ProposedCVs();
-        inspection.setProposedCVs(List.of(proposedCVs));
-
         model.addAttribute(INSPECTION, inspection);
         model.addAttribute("edit", true);
         return RETURN_TO_INSPECTION_NEW;

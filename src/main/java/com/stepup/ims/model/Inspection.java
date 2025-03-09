@@ -20,12 +20,12 @@ public class Inspection {
 
     private Client client;
 
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "dd/MM/yyyy HH:mm")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime notificationReceivedDateTime;
 
     private String inspectionCountry;
 
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "dd/MM/yyyy")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
     private List<LocalDate> inspectionDateAsPerNotification;
 
     private String inspectionItem;
@@ -40,7 +40,7 @@ public class Inspection {
 
     private String approvedInspectorName;
 
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "dd/MM/yyyy")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
     private LocalDate orderConfirmationDate;
 
     private int sectorScope;
@@ -57,28 +57,28 @@ public class Inspection {
 
     private boolean inspectionAdviseNote;
 
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "dd/MM/yyyy HH:mm")
-    private LocalDate instructionsToInspectorDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime instructionsToInspectorDate;
 
     private boolean anyInspectionIssues;
 
 
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "dd/MM/yyyy")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
     private LocalDate frSentToClientDate;
 
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "dd/MM/yyyy")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
     private LocalDate inspectionReportsReceivedDate;
 
     private String inspectionReviewedBy;
 
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "dd/MM/yyyy")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
     private LocalDate inspectionSupportDocumentsSentDate;
 
     private String inspectionReportNumber;
 
     private boolean ncrRaised;
 
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "dd/MM/yyyy")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
     private LocalDate irnSentDate;
 
     private boolean impartialityAndConfidentiality;
