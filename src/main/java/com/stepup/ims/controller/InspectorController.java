@@ -5,16 +5,15 @@ import com.stepup.ims.model.Inspector;
 import com.stepup.ims.service.GoogleMapsService;
 import com.stepup.ims.service.InspectorService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
-import static com.stepup.ims.constants.UIRoutingConstants.REDIRECT_TO_INSPECTOR_MANAGEMENT;
-import static com.stepup.ims.constants.UIRoutingConstants.RETURN_TO_INSPECTOR_MANAGEMENT;
+import static com.stepup.ims.constants.UIRoutingConstants.*;
 
 @Controller
 @RequestMapping("/inspectors")
@@ -63,4 +62,37 @@ public class InspectorController {
         return REDIRECT_TO_INSPECTOR_MANAGEMENT;
     }
 
+    /**
+     * Fetch inspector details for editing .
+     */
+    @GetMapping("/edit/{id}")
+    public String editInspector(@PathVariable Long id, Model model) {
+        Inspector inspector = inspectorService.getInspectorById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Inspector not found for ID: " + id));
+
+        model.addAttribute("inspector", inspector);
+        model.addAttribute("edit", true);
+        return REDIRECT_TO_INSPECTOR_FORM; // Return the name of the Thymeleaf template for the inspector form
+    }
+
+    /**
+     * Fetch inspector details for viewing .
+     */
+    @GetMapping("/view/{id}")
+    public String viewInspector(@PathVariable Long id, Model model) {
+        Inspector inspector = inspectorService.getInspectorById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Inspector not found for ID: " + id));
+
+        model.addAttribute("inspector", inspector);
+        return REDIRECT_TO_INSPECTOR_VIEW; // Thymeleaf template name
+    }
+
+    /**
+     * Show the form to add a new inspector.
+     */
+    @GetMapping("/form")
+    public String showInspectorForm(Model model) {
+        model.addAttribute("inspector", new Inspector());
+        return REDIRECT_TO_INSPECTOR_FORM;
+    }
 }

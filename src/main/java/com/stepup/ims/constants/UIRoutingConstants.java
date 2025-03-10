@@ -16,6 +16,8 @@ public class UIRoutingConstants {
     // Inspector Management
     public static final String RETURN_TO_INSPECTOR_MANAGEMENT = "inspectors/inspector-management";
     public static final String REDIRECT_TO_INSPECTOR_MANAGEMENT = "redirect:/inspectors/list";
+    public static final String REDIRECT_TO_INSPECTOR_FORM = "inspectors/inspector-form";
+    public static final String REDIRECT_TO_INSPECTOR_VIEW = "inspectors/inspector-view";
 
     // Inspection Management
     public static final String RETURN_TO_INSPECTION_FORM = "inspections/inspection-form";

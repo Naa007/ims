@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Inspector - IISPL Console</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* Custom styles */
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
+        .card {
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+<main class="container">
+    <h1 class="text-center">Inspector Details</h1>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title"><i class="fas fa-user"></i> <span th:text="${inspector.inspectorName}">Inspector Name</span></h5>
+            <h6 class="card-subtitle mb-2 text-muted">Inspector ID: <span th:text="${inspector.inspectorId}">Inspector ID</span></h6>
+            <p class="card-text"><i class="fas fa-envelope"></i> Email: <span th:text="${inspector.email}">Email</span></p>
+            <p class="card-text"><i class="fas fa-phone"></i> Phone: <span th:text="${inspector.phone}">Phone</span></p>
+            <p class="card-text"><i class="fas fa-calendar-alt"></i> Date of Birth: <span th:text="${inspector.dob}">Date of Birth</span></p>
+            <p class="card-text"><i class="fas fa-map-marker-alt"></i> Address: <span th:text="${inspector.address}">Address</span></p>
+            <p class="card-text"><i class="fas fa-globe"></i> Country: <span th:text="${inspector.country}">Country</span></p>
+            <p class="card-text"><i class="fas fa-graduation-cap"></i> Education Details: <span th:text="${inspector.educationDetails}">Education Details</span></p>
+            <p class="card-text"><i class="fas fa-book"></i> Disciplines: <span th:text="${inspector.disciplines}">Disciplines</span></p>
+            <p class="card-text"><i class="fas fa-id-card"></i> Inspector Type: <span th:text="${inspector.inspectorType}">Inspector Type</span></p>
+            <p class="card-text"><i class="fas fa-certificate"></i> Certificates:</p>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Date Issued</th>
+                    <th>Expiry</th>
+                    <th>Issuer</th>
+                </tr>
+                </thead>
+                <tbody id="viewCertificatesBody">
+                <tr th:each="certificate : ${inspector.certificates}">
+                    <td th:text="${certificate.name}">Certificate Name</td>
+                    <td th:text="${certificate.dateIssued}">Date Issued</td>
+                    <td th:text="${certificate.expiryDate}">Expiry</td>
+                    <td th:text="${certificate.issuer}">Issuer</td>
+                </tr>
+                </tbody>
+            </table>
+            <p class="card-text"><i class="fas fa-star"></i> Special Qualification: <span th:text="${inspector.specialQualification}">Special Qualification</span></p>
+            <p class="card-text"><i class="fas fa-tools"></i> Main Qualification: <span th:text="${inspector.mainQualificationCategory}">Main Qualification</span></p>
+            <p class="card-text"><i class="fas fa-info-circle"></i> Status: <span th:text="${inspector.inspectorStatus}">Status</span></p>
+            <p class="card-text"><i class="fas fa-comment"></i> Remarks: <span th:text="${inspector.remarks}">Remarks</span></p>
+        </div>
+    </div>
+
+    <div class="text-center">
+        <a href="/inspectors/list" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to List</a>
+    </div>
+</main>
+
+<!-- Include Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
