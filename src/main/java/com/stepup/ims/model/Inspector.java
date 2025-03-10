@@ -11,7 +11,6 @@ import java.util.Locale;
 @Data
 public class Inspector {
 
-    private Long id;
     private Long inspectorId;
     private String inspectorName;
     private InspectorType inspectorType;

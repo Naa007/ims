@@ -14,10 +14,7 @@ import java.util.List;
 public class Inspector {
 
     @Id
-    @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Column(name = "inspector_id", nullable = false)
     private Long inspectorId;
 
