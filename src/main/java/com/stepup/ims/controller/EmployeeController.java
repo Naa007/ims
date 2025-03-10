@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import static com.stepup.ims.constants.UIRountingConstants.REDIRECT_ADMIN_EMPLOYEE_MANAGEMENT;
-import static com.stepup.ims.constants.UIRountingConstants.RETURN_TO_EMPLOYEE_MANAGEMENT;
+import static com.stepup.ims.constants.UIRoutingConstants.REDIRECT_ADMIN_EMPLOYEE_MANAGEMENT;
+import static com.stepup.ims.constants.UIRoutingConstants.RETURN_TO_EMPLOYEE_MANAGEMENT;
 
 @Controller
 @RequestMapping("/employee")

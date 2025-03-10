@@ -18,7 +18,7 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import static com.stepup.ims.constants.UIRountingConstants.*;
+import static com.stepup.ims.constants.UIRoutingConstants.*;
 import static com.stepup.ims.constants.ApplicationConstants.*;
 
 

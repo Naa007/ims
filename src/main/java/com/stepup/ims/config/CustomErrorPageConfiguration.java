@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 
-import static com.stepup.ims.constants.UIRountingConstants.RETURN_TO_DEFAULT_ERROR;
+import static com.stepup.ims.constants.UIRoutingConstants.RETURN_TO_DEFAULT_ERROR;
 
 @Configuration
 public class CustomErrorPageConfiguration {

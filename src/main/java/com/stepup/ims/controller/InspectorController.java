@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
+import static com.stepup.ims.constants.UIRoutingConstants.REDIRECT_TO_INSPECTOR_MANAGEMENT;
+import static com.stepup.ims.constants.UIRoutingConstants.RETURN_TO_INSPECTOR_MANAGEMENT;
+
 @Controller
 @RequestMapping("/inspectors")
 public class InspectorController {
@@ -36,7 +39,7 @@ public class InspectorController {
         // Add a new Inspector object to the model for the form
         model.addAttribute("inspector", new Inspector());
 
-        return "inspector-management";
+        return RETURN_TO_INSPECTOR_MANAGEMENT;
     }
 
     /**
@@ -51,16 +54,13 @@ public class InspectorController {
                 inspector.setAddressCoordinates(coordinates);
             } catch (InterruptedException ie) {
                 Thread.currentThread().interrupt();
-                System.err.println("Geocoding interrupted: " + ie.getMessage());
                 inspector.setAddressCoordinates(null);
             } catch (Exception e) {
                 inspector.setAddressCoordinates(null);
-                // Log the exception (assumes a logger is available)
-                System.err.println("Cannot geocode address: " + e.getMessage());
             }
         }
         inspectorService.saveInspector(inspector);
-        return "redirect:/inspectors/list";
+        return REDIRECT_TO_INSPECTOR_MANAGEMENT;
     }
 
 }

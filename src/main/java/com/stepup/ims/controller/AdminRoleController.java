@@ -6,6 +6,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import static com.stepup.ims.constants.UIRoutingConstants.RETURN_TO_ADMIN_DASHBOARD;
+
 @Controller
 @RequestMapping("/admin")
 @PreAuthorize("hasRole('ADMIN')")
@@ -14,7 +16,7 @@ public class AdminRoleController {
     // Dashboard
     @GetMapping("/dashboard")
     public String showDashboard(Model model) {
-        return "admin-dashboard";
+        return RETURN_TO_ADMIN_DASHBOARD;
     }
 
 }

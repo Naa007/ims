@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
+import static com.stepup.ims.constants.UIRoutingConstants.REDIRECT_TO_CLIENT_MANAGEMENT;
+import static com.stepup.ims.constants.UIRoutingConstants.RETURN_TO_CLIENT_MANAGEMENT;
+
 
 @Controller
 @RequestMapping("/client")
@@ -33,7 +36,7 @@ public class ClientController {
         model.addAttribute("clients", clients);
         model.addAttribute("client", new Client()); // For the add client form
         model.addAttribute("employees", employeeService.getAllCoordinateEmployees());// For the country dropdown
-        return "client-management"; // Thymeleaf template name
+        return RETURN_TO_CLIENT_MANAGEMENT; // Thymeleaf template name
     }
 
     /**
@@ -42,7 +45,7 @@ public class ClientController {
     @PostMapping("/save")
     public String saveClient(Client client) {
         clientService.saveClient(client);
-        return "redirect:/client/list"; // Redirect to the client management page
+        return REDIRECT_TO_CLIENT_MANAGEMENT; // Redirect to the client management page
     }
 
     /**

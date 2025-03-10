@@ -13,7 +13,7 @@ import java.util.List;
 
 import static com.stepup.ims.constants.ApplicationConstants.INSPECTION;
 import static com.stepup.ims.constants.ApplicationConstants.INSPECTIONS;
-import static com.stepup.ims.constants.UIRountingConstants.*;
+import static com.stepup.ims.constants.UIRoutingConstants.*;
 
 @Controller
 @RequestMapping("/inspection")
