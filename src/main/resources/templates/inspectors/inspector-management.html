@@ -246,6 +246,23 @@
       function redirectToViewForm(inspectorId) {
             window.location.href = '/inspectors/view/' + inspectorId;
         }
+     // Initialize DataTable with responsive extension
+     $(document).ready(function () {
+        var table = $('#inspectorTable').DataTable({
+            "paging": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "lengthMenu": [5, 10, 25, 50],
+            "pageLength": 10
+        });
+
+        // Custom search function to filter by client name only
+        $('#clientTable_filter input').on('keyup change', function () {
+            var searchTerm = this.value;
+            table.column(1).search(searchTerm).draw(); // Search only in the first column (Client Name)
+        });
+    });
 </script>
 <!-- Footer -->
 <footer>
