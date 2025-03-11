@@ -2,7 +2,9 @@ package com.stepup.ims.model;
 
 import com.google.maps.model.LatLng;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,7 +21,8 @@ public class Inspector {
     private String country;
     private String address;
     private LatLng addressCoordinates;
-    private String dob; // Date for inspector's date of birth
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
+    private LocalDate dob; // Date for inspector's date of birth
     private String educationDetails;
     private String disciplines; // Comma-separated string for disciplines
     private List<Certificate> certificates= new ArrayList<>();

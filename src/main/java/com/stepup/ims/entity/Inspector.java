@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -40,9 +40,9 @@ public class Inspector {
     private LatLng addressCoordinates;
 
     @Temporal(TemporalType.DATE) // To store the Date of Birth
-    @DateTimeFormat(pattern = "dd/mm/yyyy")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
     @Column(nullable = false)
-    private Date dob;
+    private LocalDate dob;
 
     @Column(nullable = false, length = 500)
     private String educationDetails;
