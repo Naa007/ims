@@ -13,10 +13,10 @@ public class ProposedCVs {
     private Long id;
     @ToString.Exclude
     private Inspector inspector;
-    private boolean isCVCertificatesAvailable;
+    private boolean cvCertificatesAvailable;
     @ToString.Exclude
     private Employee cvReviewByTechnicalCoordinator;
-    private boolean isPQRAvailable;
+    private boolean pqrAvailable;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime cvSubmittedToClientDate;
     private boolean cvStatus;

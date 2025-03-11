@@ -266,11 +266,11 @@
 
               <td>
                    <input type="radio"
-                          name="proposedCVs[newRow].isCVCertificatesAvailable"
+                          name="proposedCVs[newRow].cvCertificatesAvailable"
                           value="true" required/>
                    Yes
                    <input type="radio"
-                          name="proposedCVs[newRow].isCVCertificatesAvailable"
+                          name="proposedCVs[newRow].cvCertificatesAvailable"
                           value="false" required/>
                    No
               </td>
@@ -285,11 +285,11 @@
 
               <td>
                   <input type="radio"
-                      name="proposedCVs[newRow].isPQRAvailable"
+                      name="proposedCVs[newRow].pqrAvailable"
                       value="true" required/>
                    Yes
                    <input type="radio"
-                          name="proposedCVs[newRow].isPQRAvailable"
+                          name="proposedCVs[newRow].pqrAvailable"
                           value="false"  required/>
                    No
               </td>
@@ -542,16 +542,16 @@
                             <td>
                                 <label>
                                     <input type="radio"
-                                           th:name="proposedCVs[__${iterStat.index}__].isCVCertificatesAvailable"
+                                           th:name="proposedCVs[__${iterStat.index}__].cvCertificatesAvailable"
                                            value="true"
-                                           th:checked="${cv.isCVCertificatesAvailable == true}" required/>
+                                           th:checked="${cv.cvCertificatesAvailable == true}" required/>
                                 </label>
                                 Yes
                                 <label>
                                     <input type="radio"
-                                           th:name="proposedCVs[__${iterStat.index}__].isCVCertificatesAvailable"
+                                           th:name="proposedCVs[__${iterStat.index}__].cvCertificatesAvailable"
                                            value="false"
-                                           th:checked="${cv.isCVCertificatesAvailable == false}" required/>
+                                           th:checked="${cv.cvCertificatesAvailable == false}" required/>
                                 </label>
                                 No
                             </td>
@@ -572,16 +572,16 @@
                             <td>
                                 <label>
                                     <input type="radio"
-                                           th:name="proposedCVs[__${iterStat.index}__].isPQRAvailable"
+                                           th:name="proposedCVs[__${iterStat.index}__].pqrAvailable"
                                            value="true"
-                                           th:checked="${cv.isPQRAvailable == true}" required/>
+                                           th:checked="${cv.pqrAvailable == true}" required/>
                                 </label>
                                 Yes
                                 <label>
                                     <input type="radio"
-                                           th:name="proposedCVs[__${iterStat.index}__].isPQRAvailable"
+                                           th:name="proposedCVs[__${iterStat.index}__].pqrAvailable"
                                            value="false"
-                                           th:checked="${cv.isPQRAvailable == false}" required/>
+                                           th:checked="${cv.pqrAvailable == false}" required/>
                                 </label>
                                 No
                             </td>

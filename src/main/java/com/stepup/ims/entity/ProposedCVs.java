@@ -24,7 +24,7 @@ public class ProposedCVs {
     private Inspector inspector;
 
     @Column(name = "cv_certificates_available")
-    private boolean isCVCerticatesAvailable;
+    private boolean cvCertificatesAvailable;
 
     @ManyToOne
     @JoinColumn(name = "technical_coordinator_id", referencedColumnName = "emp_id", unique = false)
@@ -33,7 +33,7 @@ public class ProposedCVs {
     private Employee cvReviewBytechnicalCoordinator;
 
     @Column(name = "pqr_available")
-    private boolean isPQRAvailable;
+    private boolean pqrAvailable;
 
     @Column(name = "cv_submitted_date_time")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd HH:mm")
