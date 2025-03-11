@@ -52,8 +52,25 @@
                 </tr>
                 </tbody>
             </table>
-            <p class="card-text"><i class="fas fa-star"></i> Special Qualification: <span th:text="${inspector.specialQualification}">Special Qualification</span></p>
-            <p class="card-text"><i class="fas fa-tools"></i> Main Qualification: <span th:text="${inspector.mainQualificationCategory}">Main Qualification</span></p>
+            <!-- Special Qualification -->
+            <p class="card-text"><i class="fas fa-star"></i> Special Qualification:</p>
+            <ul>
+                <li th:if="${inspector.specialQualification.aramco}">ARAMCO</li>
+                <li th:if="${inspector.specialQualification.sec}">SEC</li>
+                <li th:if="${inspector.specialQualification.specialQualificationDetails != null and !inspector.specialQualification.specialQualificationDetails.isEmpty()}">
+                    Details: <span th:text="${inspector.specialQualification.specialQualificationDetails}"></span>
+                </li>
+            </ul>
+
+            <!-- Main Qualification -->
+            <p class="card-text"><i class="fas fa-tools"></i> Main Qualification:</p>
+            <ul>
+                <li th:if="${inspector.mainQualificationCategory.mechStatic}">Mechanical Static</li>
+                <li th:if="${inspector.mainQualificationCategory.mechRotating}">Mechanical Rotating</li>
+                <li th:if="${inspector.mainQualificationCategory.electrical}">Electrical</li>
+                <li th:if="${inspector.mainQualificationCategory.piping}">Piping</li>
+                <li th:if="${inspector.mainQualificationCategory.steelStructure}">Steel Structure</li>
+            </ul>
             <p class="card-text"><i class="fas fa-info-circle"></i> Status: <span th:text="${inspector.inspectorStatus}">Status</span></p>
             <p class="card-text"><i class="fas fa-comment"></i> Remarks: <span th:text="${inspector.remarks}">Remarks</span></p>
         </div>
