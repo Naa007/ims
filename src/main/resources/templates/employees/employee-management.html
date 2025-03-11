@@ -224,7 +224,10 @@
 
 <main class="container">
     <h1 class="text-center">Manage Employee</h1>
-
+    <!-- Display Error Message -->
+    <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+        <span th:text="${errorMessage}"></span>
+    </div>
     <!-- Add Employee Button -->
     <div class="text-center mb-4">
         <button class="btn btn-primary" data-target="#addEmployeeModal" data-toggle="modal">
@@ -351,11 +354,11 @@
                     <div class="form-group">
                         <label>Active</label><br>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" id="activeYes" th:field="*{active}" type="radio" value="Yes">
+                            <input class="form-check-input" id="activeYes" th:field="*{active}" type="radio" value="Yes" required>
                             <label class="form-check-label" for="activeYes">Yes</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" id="activeNo" th:field="*{active}" type="radio" value="No">
+                            <input class="form-check-input" id="activeNo" th:field="*{active}" type="radio" value="No" required>
                             <label class="form-check-label" for="activeNo">No</label>
                         </div>
                     </div>
@@ -483,7 +486,7 @@
             document.getElementById("editActiveNo").checked = true;
         }
 
-        document.getElementById("editEmployeeForm").action = "/employee/save-employee" ;
+        document.getElementById("editEmployeeForm").action = "/employee/update-employee" ;
     }
 
     // Function to view employee data in the view modal
