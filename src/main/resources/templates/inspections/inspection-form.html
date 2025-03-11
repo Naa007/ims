@@ -174,6 +174,26 @@
     </style>
 
     <script th:inline="javascript">
+        // if CVStatus is approved then the inspector becomes approvedInspector
+        function approvedInspector(index, approved) {
+            if(!approved) {
+                document.getElementById("approvedInspectorName").value = "";
+            }else{
+                const proposedCVsTable = document.querySelector("#proposedCVsTable tbody");
+                const row = proposedCVsTable.querySelector(`tr:nth-child(${index + 1})`);
+                if (row) {
+                    const selectedOption = row.querySelector("select").selectedOptions[0];
+                    if (selectedOption) {
+                        document.getElementById("approvedInspectorName").value = "";
+                        document.getElementById("approvedInspectorName").value = selectedOption.textContent.trim()
+                    } else {
+                        alert("No Inspector is selected.");
+                    }
+                } else {
+                    console.log("Specified row not found in the proposedCVsTable.");
+                }
+            }
+        }
 
         /* Dynamically Set Page Title Based on 'edit' Parameter */
        const urlParams = new URLSearchParams(window.location.search);
@@ -317,10 +337,16 @@
           button.parentElement.remove();
       }
 
-       // Initialize Map with condition
-       const locationDetails = document.getElementById('inspectionLocationDetails');
-       initMap(locationDetails ? locationDetails : 'Hyderabad, India');
+      document.addEventListener("DOMContentLoaded", function () {
+            // Dynamically Set Page Title Based on 'edit' Parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const isEdit = urlParams.get('edit') === 'true';
+            document.title = isEdit ? 'Edit Inspection' : 'Add New Inspection';
 
+            // Initialize Map with default or provided location
+            const locationDetails = document.getElementById('inspectionLocationDetails');
+            initMap(locationDetails ? locationDetails.value : 'Hyderabad, India');
+        });
     </script>
 </head>
 <header style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background-color: #334e6b; border-bottom: 1px solid #ddd;">
@@ -435,14 +461,14 @@
                     <div>
                         <label class="form-label">Inspection Type</label>
                         <div>
-                            <input type="checkbox" class="form-check-input" id="MECHANICAL"
-                                   th:field="*{inspectionType}" value="MECHANICAL"/>
-                            <label class="form-check-label" for="MECHANICAL">Mechanical</label>
+                            <input type="radio" id="MECHANICAL"
+                                   name="inspectionType" th:field="*{inspectionType}" value="MECHANICAL" required/>
+                            Mechanical
                         </div>
                         <div>
-                            <input type="checkbox" class="form-check-input" id="ELECTRICAL"
-                                   th:field="*{inspectionType}" value="ELECTRICAL"/>
-                            <label class="form-check-label" for="ELECTRICAL">Electrical</label>
+                            <input type="radio" id="ELECTRICAL"
+                                   name="inspectionType" th:field="*{inspectionType}" value="ELECTRICAL" required/>
+                            Electrical
                         </div>
                     </div>
 
@@ -499,17 +525,18 @@
                             <input type="hidden"
                                    th:field="*{proposedCVs[__${iterStat.index}__].id}"
                                    th:value="${cv.id}"/>
+                            
                             <td>
                                 <label>
                                     <select class="form-control"
-                                            th:field="*{proposedCVs[__${iterStat.index}__].inspector.inspectorId}"
-                                            required>
+                                            th:field="*{proposedCVs[__${iterStat.index}__].inspector.inspectorId}" required>
                                         <option value="" disabled selected>Select an Inspector</option>
                                         <option th:each="inspector : ${inspection.inspectorsList}"
                                                 th:value="${inspector.inspectorId}"
                                                 th:text="${inspector.inspectorName}"></option>
                                     </select>
                                 </label>
+                                
                             </td>
 
                             <td>
@@ -569,11 +596,13 @@
                             </td>
 
 
+                            
                             <td>
                                 <label>
                                     <input type="radio"
                                            th:name="proposedCVs[__${iterStat.index}__].cvStatus"
                                            value="true"
+                                           th:onclick="'approvedInspector('+ ${iterStat.index} +', true)'"
                                            th:checked="${cv.cvStatus == true}" required/>
                                 </label>
                                 Yes
@@ -581,6 +610,7 @@
                                     <input type="radio"
                                            th:name="proposedCVs[__${iterStat.index}__].cvStatus"
                                            value="false"
+                                           th:onclick="'approvedInspector('+ ${iterStat.index} +', false)'"
                                            th:checked="${cv.cvStatus == false}" required/>
                                 </label>
                                 No
@@ -607,7 +637,7 @@
                 <div class="col-md-4">
                     <label for="approvedInspectorName" class="form-label">Approved Inspector Name</label>
                     <input type="text" id="approvedInspectorName" th:field="*{approvedInspectorName}"
-                           class="form-control" disabled/>
+                           class="form-control" readonly/>
                 </div>
 
                 <!-- Order Confirmation Date -->
@@ -644,10 +674,10 @@
                 <div class="col-md-4">
                     <label class="form-label">Reference Documents</label>
                     <div>
-                        <input type="radio" name="documentsStatus" value="true"
+                        <input type="radio" name="referenceDocumentsForInspectionStatus" value="true"
                                th:checked="${inspection.referenceDocumentsForInspectionStatus == true}" required/>
                         Available
-                        <input type="radio" name="documentsStatus" value="false"
+                        <input type="radio" name="referenceDocumentsForInspectionStatus" value="false"
                                th:checked="${inspection.referenceDocumentsForInspectionStatus == false}" required/>
                         Not Available
                     </div>
@@ -778,10 +808,12 @@
                 <!-- NCR Raised -->
                 <div class="col-md-4">
                     <label class="form-label">NCR Raised</label>
-                    <input type="radio" name="ncrRaised" value="true" th:checked="${inspection.ncrRaised == true}" required/>
-                    Yes
-                    <input type="radio" name="ncrRaised" value="false" th:checked="${inspection.ncrRaised == false}" required/>
-                    No
+                    <div>
+                        <input type="radio" name="ncrRaised" value="true" th:checked="${inspection.ncrRaised == true}" required/>
+                        Yes
+                        <input type="radio" name="ncrRaised" value="false" th:checked="${inspection.ncrRaised == false}" required/>
+                        No
+                    </div>
                 </div>
 
                 <!-- IRN Sent Date -->
