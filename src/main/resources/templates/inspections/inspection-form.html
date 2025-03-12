@@ -520,12 +520,12 @@
                             <input type="hidden"
                                    th:field="*{proposedCVs[__${iterStat.index}__].id}"
                                    th:value="${cv.id}"/>
-                            
+
                             <td>
                                 <label>
                                     <select class="form-control"
-                                            th:field="*{proposedCVs[__${iterStat.index}__].inspector.inspectorId}" required>
-                                        <option value="" disabled selected>Select an Inspector</option>
+                                            th:field="*{proposedCVs[__${iterStat.index}__].inspector.inspectorId}">
+                                        <option value="">Select an Inspector</option>
                                         <option th:each="inspector : ${inspection.inspectorsList}"
                                                 th:value="${inspector.inspectorId}"
                                                 th:text="${inspector.inspectorName}"></option>
@@ -539,14 +539,14 @@
                                     <input type="radio"
                                            th:name="proposedCVs[__${iterStat.index}__].cvCertificatesAvailable"
                                            value="true"
-                                           th:checked="${cv.cvCertificatesAvailable == true}" required/>
+                                           th:checked="${cv.cvCertificatesAvailable == true}"/>
                                 </label>
                                 Yes
                                 <label>
                                     <input type="radio"
                                            th:name="proposedCVs[__${iterStat.index}__].cvCertificatesAvailable"
                                            value="false"
-                                           th:checked="${cv.cvCertificatesAvailable == false}" required/>
+                                           th:checked="${cv.cvCertificatesAvailable == false}"/>
                                 </label>
                                 No
                             </td>
@@ -554,9 +554,8 @@
                             <td>
                                 <label>
                                     <select class="form-control"
-                                            th:field="*{proposedCVs[__${iterStat.index}__].cvReviewByTechnicalCoordinator.empId}"
-                                            required>
-                                        <option value="" disabled selected>Select a Technical Coordinator</option>
+                                            th:field="*{proposedCVs[__${iterStat.index}__].cvReviewByTechnicalCoordinator.empId}">
+                                        <option value="">Select a Technical Coordinator</option>
                                         <option th:each="coordinator : ${inspection.technicalCoordinatorsList}"
                                                 th:value="${coordinator.empId}"
                                                 th:text="${coordinator.empName}"></option>
@@ -569,14 +568,14 @@
                                     <input type="radio"
                                            th:name="proposedCVs[__${iterStat.index}__].pqrAvailable"
                                            value="true"
-                                           th:checked="${cv.pqrAvailable == true}" required/>
+                                           th:checked="${cv.pqrAvailable == true}" />
                                 </label>
                                 Yes
                                 <label>
                                     <input type="radio"
                                            th:name="proposedCVs[__${iterStat.index}__].pqrAvailable"
                                            value="false"
-                                           th:checked="${cv.pqrAvailable == false}" required/>
+                                           th:checked="${cv.pqrAvailable == false}" />
                                 </label>
                                 No
                             </td>
@@ -585,8 +584,7 @@
                                 <label>
                                     <input type="datetime-local" class="form-control"
                                            th:field="*{proposedCVs[__${iterStat.index}__].cvSubmittedToClientDate}"
-                                           th:value="*{proposedCVs[__${iterStat.index}__].cvSubmittedToClientDate != null ? proposedCVs[__${iterStat.index}__].cvSubmittedToClientDate : ''}"
-                                           required/>
+                                           th:value="*{proposedCVs[__${iterStat.index}__].cvSubmittedToClientDate != null ? proposedCVs[__${iterStat.index}__].cvSubmittedToClientDate : ''}"/>
                                 </label>
                             </td>
 
@@ -598,7 +596,7 @@
                                            th:name="proposedCVs[__${iterStat.index}__].cvStatus"
                                            value="true"
                                            th:onclick="'approvedInspector('+ ${iterStat.index} +', true)'"
-                                           th:checked="${cv.cvStatus == true}" required/>
+                                           th:checked="${cv.cvStatus == true}" />
                                 </label>
                                 Yes
                                 <label>
@@ -606,7 +604,7 @@
                                            th:name="proposedCVs[__${iterStat.index}__].cvStatus"
                                            value="false"
                                            th:onclick="'approvedInspector('+ ${iterStat.index} +', false)'"
-                                           th:checked="${cv.cvStatus == false}" required/>
+                                           th:checked="${cv.cvStatus == false}" />
                                 </label>
                                 No
                             </td>
@@ -640,13 +638,13 @@
                     <label for="orderConfirmationDate" class="form-label">Date of Order Confirmation</label>
                     <input type="date" id="orderConfirmationDate" th:field="*{orderConfirmationDate}"
                            th:value="*{orderConfirmationDate != null ? orderConfirmationDate : ''}"
-                           class="form-control" required/>
+                           class="form-control" />
                 </div>
 
                 <!--- Sector Scope -->
                 <div class="col-md-4">
                     <label for="sectorScope" class="form-label">Sector Scope</label>
-                    <input type="text" id="sectorScope" th:field="*{sectorScope}" class="form-control" required/>
+                    <input type="text" id="sectorScope" th:field="*{sectorScope}" class="form-control" />
                 </div>
 
             </div>
@@ -656,13 +654,13 @@
                 <!--- End Client Name -->
                 <div class="col-md-4">
                     <label for="endClientName" class="form-label">End Client Name</label>
-                    <input type="text" id="endClientName" th:field="*{endClientName}" class="form-control" required/>
+                    <input type="text" id="endClientName" th:field="*{endClientName}" class="form-control" />
                 </div>
 
                 <!-- Project Name -->
                 <div class="col-md-4">
                     <label for="projectName" class="form-label">Project Name</label>
-                    <input type="text" id="projectName" th:field="*{projectName}" class="form-control" required/>
+                    <input type="text" id="projectName" th:field="*{projectName}" class="form-control" />
                 </div>
 
                 <!-- Reference Documents for Inspection Status -->
@@ -670,10 +668,10 @@
                     <label class="form-label">Reference Documents</label>
                     <div>
                         <input type="radio" name="referenceDocumentsForInspectionStatus" value="true"
-                               th:checked="${inspection.referenceDocumentsForInspectionStatus == true}" required/>
+                               th:checked="${inspection.referenceDocumentsForInspectionStatus == true}" />
                         Available
                         <input type="radio" name="referenceDocumentsForInspectionStatus" value="false"
-                               th:checked="${inspection.referenceDocumentsForInspectionStatus == false}" required/>
+                               th:checked="${inspection.referenceDocumentsForInspectionStatus == false}" />
                         Not Available
                     </div>
                 </div>
@@ -687,8 +685,8 @@
                     <label for="documentsReviewedByTechnicalCoordinator" class="form-label">Documents Reviewed By
                         Technical Coordinator</label>
                     <select id="documentsReviewedByTechnicalCoordinator" class="form-control"
-                            th:field="*{documentsReviewedByTechnicalCoordinator}" required>
-                        <option value="" disabled selected>Select Technical Coordinator</option>
+                            th:field="*{documentsReviewedByTechnicalCoordinator}" >
+                        <option value="">Select Technical Coordinator</option>
                         <option th:each="coordinator : ${inspection.technicalCoordinatorsList}"
                                 th:value="${coordinator.empName}"
                                 th:text="${coordinator.empName}"></option>
@@ -701,10 +699,10 @@
                     <label class="form-label">Contract Review Prepared</label>
                     <div>
                         <input type="radio" name="contractReviewPrepared" value="true"
-                               th:checked="${inspection.contractReviewPrepared == true}" required/>
+                               th:checked="${inspection.contractReviewPrepared == true}" />
                         Yes
                         <input type="radio" name="contractReviewPrepared" value="false"
-                               th:checked="${inspection.contractReviewPrepared == false}" required/>
+                               th:checked="${inspection.contractReviewPrepared == false}" />
                         No
                     </div>
                 </div>
@@ -715,10 +713,10 @@
                     <label class="form-label">Inspection Advise Note</label>
                     <div>
                         <input type="radio" name="inspectionAdviseNote" value="true"
-                               th:checked="${inspection.inspectionAdviseNote == true}" required/>
+                               th:checked="${inspection.inspectionAdviseNote == true}" />
                         Yes
                         <input type="radio" name="inspectionAdviseNote" value="false"
-                               th:checked="${inspection.inspectionAdviseNote == false}" required/>
+                               th:checked="${inspection.inspectionAdviseNote == false}" />
                         No
                     </div>
                 </div>
@@ -733,8 +731,7 @@
                 <!-- Instructions to Inspector Date -->
                 <div class="col-md-4">
                     <label for="instructionsToInspectorDate" class="form-label">Instructions to Inspector Date</label>
-                    <input type="date" id="instructionsToInspectorDate" th:field="*{instructionsToInspectorDate}" class="form-control"
-                           required/>
+                    <input type="date" id="instructionsToInspectorDate" th:field="*{instructionsToInspectorDate}" class="form-control"/>
                 </div>
 
                 <!-- Any Inspection Issues -->
@@ -742,10 +739,10 @@
                     <label class="form-label">Any Inspection Issues</label>
                     <div>
                         <input type="radio" name="anyInspectionIssues" value="true"
-                               th:checked="${inspection.anyInspectionIssues == true}" required/>
+                               th:checked="${inspection.anyInspectionIssues == true}" />
                         Yes
                         <input type="radio" name="anyInspectionIssues" value="false"
-                               th:checked="${inspection.anyInspectionIssues == false}" required/>
+                               th:checked="${inspection.anyInspectionIssues == false}" />
                         No
                     </div>
                 </div>
@@ -753,8 +750,7 @@
                 <!-- FR Sent To Client Date -->
                 <div class="col-md-4">
                     <label for="frSentToClientDate" class="form-label">FR Sent To Client Date</label>
-                    <input type="date" id="frSentToClientDate" th:field="*{frSentToClientDate}" class="form-control"
-                           required/>
+                    <input type="date" id="frSentToClientDate" th:field="*{frSentToClientDate}" class="form-control"/>
                 </div>
 
             </div>
@@ -767,13 +763,13 @@
                     <label for="inspectionReportsReceivedDate" class="form-label">Inspection Reports Received
                         Date</label>
                     <input type="date" id="inspectionReportsReceivedDate" th:field="*{inspectionReportsReceivedDate}"
-                           class="form-control" required/>
+                           class="form-control" />
                 </div>
 
                 <!-- Inspection Reviewed By -->
                 <div class="col-md-4">
                     <label for="inspectionReviewedBy" class="form-label">Inspection Reviewed By</label>
-                    <select id="inspectionReviewedBy" class="form-control" th:field="*{inspectionReviewedBy}" required>
+                    <select id="inspectionReviewedBy" class="form-control" th:field="*{inspectionReviewedBy}" >
                         <option value="" disabled selected>Select Reviewer</option>
                         <option th:each="coordinator : ${inspection.technicalCoordinatorsList}"
                                 th:value="${coordinator.empName}"
@@ -786,7 +782,7 @@
                     <label for="inspectionSupportDocumentsSentDate" class="form-label">Inspection Support Documents
                         Sent Date</label>
                     <input type="date" id="inspectionSupportDocumentsSentDate"
-                           th:field="*{inspectionSupportDocumentsSentDate}" class="form-control" required/>
+                           th:field="*{inspectionSupportDocumentsSentDate}" class="form-control" />
                 </div>
 
             </div>
@@ -797,16 +793,16 @@
                 <div class="col-md-4">
                     <label for="inspectionReportNumber" class="form-label">Inspection Report Number</label>
                     <input type="text" id="inspectionReportNumber"
-                           th:field="*{inspectionReportNumber}" class="form-control" required/>
+                           th:field="*{inspectionReportNumber}" class="form-control" />
                 </div>
 
                 <!-- NCR Raised -->
                 <div class="col-md-4">
                     <label class="form-label">NCR Raised</label>
                     <div>
-                        <input type="radio" name="ncrRaised" value="true" th:checked="${inspection.ncrRaised == true}" required/>
+                        <input type="radio" name="ncrRaised" value="true" th:checked="${inspection.ncrRaised == true}" />
                         Yes
-                        <input type="radio" name="ncrRaised" value="false" th:checked="${inspection.ncrRaised == false}" required/>
+                        <input type="radio" name="ncrRaised" value="false" th:checked="${inspection.ncrRaised == false}" />
                         No
                     </div>
                 </div>
@@ -814,7 +810,7 @@
                 <!-- IRN Sent Date -->
                 <div class="col-md-4">
                     <label for="irnSentDate" class="form-label">IRN Sent Date</label>
-                    <input type="date" id="irnSentDate" th:field="*{irnSentDate}" class="form-control" required/>
+                    <input type="date" id="irnSentDate" th:field="*{irnSentDate}" class="form-control" />
                 </div>
 
 
@@ -827,10 +823,10 @@
                     <label class="form-label">Impartiality and Confidentiality</label>
                     <div>
                         <input type="radio" name="impartialityAndConfidentiality" value="true"
-                               th:checked="${inspection.impartialityAndConfidentiality == true}" required/>
+                               th:checked="${inspection.impartialityAndConfidentiality == true}" />
                         Yes
                         <input type="radio" name="impartialityAndConfidentiality" value="false"
-                               th:checked="${inspection.impartialityAndConfidentiality == false}" required/>
+                               th:checked="${inspection.impartialityAndConfidentiality == false}" />
                         No
                     </div>
                 </div>
@@ -840,7 +836,7 @@
                 <div class="col-md-4">
                     <label for="jobFolderLink" class="form-label">Job Folder Link</label>
                     <input type="url" id="jobFolderLink" th:field="*{jobFolderLink}" class="form-control"
-                           placeholder="Enter the URL" required/>
+                           placeholder="Enter the URL" />
                 </div>
 
             </div>
