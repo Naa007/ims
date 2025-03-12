@@ -247,70 +247,58 @@
                }
 
       function addCVRow() {
-          const tableBody = document.querySelector("#proposedCVsTable tbody");
-          const newRow = document.createElement("tr");
-          newRow.innerHTML = `
-              <td>
-                  <select class="form-control" name="proposedCVs[newRow].inspector.inspectorName" required>
-                      <option value="" disabled selected>Select an Inspector</option>
-                      <option th:each="inspector : ${inspection.inspectorsList}" th:value="${inspector.inspectorName}"
-                              th:text="${inspector.inspectorName}"></option>
-                  </select>
-              </td>
 
-              <td>
-                   <input type="radio"
-                          name="proposedCVs[newRow].cvCertificatesAvailable"
-                          value="true" required/>
-                   Yes
-                   <input type="radio"
-                          name="proposedCVs[newRow].cvCertificatesAvailable"
-                          value="false" required/>
-                   No
-              </td>
+        const tableBody = document.querySelector("#proposedCVsTable tbody");
+        const previousRow = tableBody.querySelector("tr:last-child");
+        const index = tableBody.querySelectorAll("tr").length -1;
+        
+        if (previousRow) {
+            const lastRadioInput = [...previousRow.querySelectorAll("input[type='radio']")].pop();
+            if (lastRadioInput && lastRadioInput.value === "false" && !lastRadioInput.checked) {
+                alert("Inspector is already approved.");
+                return;
+            }
 
-              <td>
-                  <select class="form-control" name="proposedCVs[newRow].cvReviewByTechnicalCoordinator.inspectorName"
-                          required>
-                      <option value="" disabled selected>Select a Technical Coordinator</option>
+            const newRow = previousRow.cloneNode(true); // Clone the previous row
 
-                  </select>
-              </td>
+            newRow.querySelectorAll("input, select").forEach(input => {
 
-              <td>
-                  <input type="radio"
-                      name="proposedCVs[newRow].pqrAvailable"
-                      value="true" required/>
-                   Yes
-                   <input type="radio"
-                          name="proposedCVs[newRow].pqrAvailable"
-                          value="false"  required/>
-                   No
-              </td>
+                input.id = input.id.replace(index, index + 1);
+                input.name = input.name.replace(index, index + 1);
 
-              <td>
-                  <input type="datetime-local" class="form-control"
-                         name="proposedCVs[newRow].cvSubmittedToClientDate" required/>
-              </td>
+                if (input.tagName === "SELECT") {
+                    input.selectedIndex = 0; // Reset dropdowns
+                } else if (input.type === "radio") {
+                    // Reset radio buttons
+                    if (input.value === "true") {
+                        input.checked = false;
+                    }
+                    if (input.value === "false") {
+                        input.checked = true;
+                    }
+                } else if (input.type === "datetime-local") {
+                    input.value = ""; // Reset datetime-local input
+                }
+            });
+            tableBody.appendChild(newRow); // Append the cloned row as a new row
+        }
 
-              <td>
-                   <input type="radio" name="proposedCVs[newRow].cvStatus"
-                          value="true" required/>
-                   Yes
-                   <input type="radio" name="proposedCVs[newRow].cvStatus"
-                          value="false"  required/>
-                   No
-              </td>
-
-              <td>
-                  <button type="button" class="btn btn-danger btn-sm" onclick="deleteCVRow(this)">Delete</button>
-              </td>
-          `;
-          tableBody.appendChild(newRow);
       }
 
       function deleteCVRow(button) {
+          const tableBody = document.querySelector("#proposedCVsTable tbody");
+          const rows = tableBody.querySelectorAll("tr");
           const row = button.closest("tr");
+          if (row === rows[0]) {
+              alert("At least one Inspector should be assigned to the Inspection !");
+              return;
+          }
+          if (row) {
+            const lastRadioInput = [...row.querySelectorAll("input[type='radio']")].pop();
+            if (lastRadioInput && lastRadioInput.value === "false" && !lastRadioInput.checked) {
+               document.getElementById("approvedInspectorName").value = "";
+            }
+          }
           row.remove();
       }
 
