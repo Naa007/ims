@@ -343,9 +343,10 @@
             const isEdit = urlParams.get('edit') === 'true';
             document.title = isEdit ? 'Edit Inspection' : 'Add New Inspection';
 
+
             // Initialize Map with default or provided location
-            const locationDetails = document.getElementById('inspectionLocationDetails');
-            initMap(locationDetails ? locationDetails.value : 'Hyderabad, India');
+            const locationDetails = document.getElementById('inspectionLocationDetails').value;
+            initMap(locationDetails ? locationDetails : 'Hyderabad, India');
         });
     </script>
 </head>
@@ -420,7 +421,7 @@
                     <select id="clientName" th:field="*{client.clientId}" class="form-control" required>
                         <option value="">Select Client</option>
                         <option th:each="client : ${inspection.clientsList}" th:value="${client.clientId}"
-                                th:text="${client.clientName}"></option>
+                                th:text="${client.clientName + ' - ' + client.country}"></option>
                     </select>
                 </div>
 
