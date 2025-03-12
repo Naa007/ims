@@ -409,14 +409,15 @@
                         <option th:each="country : ${inspection.countriesList}" th:value="${country}" 
                                 th:text="${country}"></option>
                     </select>
-                </div>
-
+                </div>               
+                
                 <!-- Inspection Dates -->
                 <div class="col-md-4" id="inspectionDatesContainer">
                     <label for="inspectionDateAsPerNotification">Inspection Dates</label>
                     <input id="inspectionDateAsPerNotification" name="inspectionDateAsPerNotification"
                            th:field="*{inspectionDateAsPerNotification}" class="form-control"
-                           type="text" placeholder="Pick dates">
+                           type="text" placeholder="Pick dates"
+                           th:value="${#strings.arrayJoin(inspectionDateAsPerNotification, ', ')}">
                 </div>
             
             </div>
