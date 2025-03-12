@@ -195,12 +195,6 @@
             }
         }
 
-        /* Dynamically Set Page Title Based on 'edit' Parameter */
-       const urlParams = new URLSearchParams(window.location.search);
-       const isEdit = urlParams.get('edit') === 'true';
-
-       document.title = isEdit ? 'Edit Inspection' : 'Add New Inspection';
-
        function initMap(inspectionLocation) {
 
            fetch('/api/inspectors?address=' + inspectionLocation )
@@ -339,8 +333,8 @@
 
       document.addEventListener("DOMContentLoaded", function () {
             // Dynamically Set Page Title Based on 'edit' Parameter
-            const urlParams = new URLSearchParams(window.location.search);
-            const isEdit = urlParams.get('edit') === 'true';
+            const href = new URL(window.location.href);
+            const isEdit = href.pathname.includes('edit');
             document.title = isEdit ? 'Edit Inspection' : 'Add New Inspection';
 
 
