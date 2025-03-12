@@ -319,7 +319,7 @@
         });
 
       document.addEventListener("DOMContentLoaded", function () {
-            flatpickr("#calendar", {
+            flatpickr("#inspectionDateAsPerNotification", {
                 mode: "multiple",
                 dateFormat: "d/m/Y"
             });
@@ -413,12 +413,12 @@
 
                 <!-- Inspection Dates -->
                 <div class="col-md-4" id="inspectionDatesContainer">
-                    <label for="calendar">Inspection Dates</label>
-                    <input id="calendar" name="inspectionDateAsPerNotification"
+                    <label for="inspectionDateAsPerNotification">Inspection Dates</label>
+                    <input id="inspectionDateAsPerNotification" name="inspectionDateAsPerNotification"
                            th:field="*{inspectionDateAsPerNotification}" class="form-control"
                            type="text" placeholder="Pick dates">
                 </div>
-
+            
             </div>
 
             <div class="row" style="height:470px">
