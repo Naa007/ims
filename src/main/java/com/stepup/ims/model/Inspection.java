@@ -25,8 +25,7 @@ public class Inspection {
 
     private String inspectionCountry;
 
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
-    private List<LocalDate> inspectionDateAsPerNotification;
+    private List<String> inspectionDateAsPerNotification;
 
     private String inspectionItem;
 

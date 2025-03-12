@@ -39,6 +39,11 @@ public class InspectionService {
     public Inspection saveInspection(Inspection inspection) {
         var inspectionEntity = inspectionModelMapper.toEntity(inspection);
 
+        if (inspectionEntity.getProposedCVs().size() == 1 &&
+                inspectionEntity.getProposedCVs().get(0).getId() == null &&
+                inspectionEntity.getProposedCVs().get(0).getInspector().getInspectorId() == null) {
+            inspectionEntity.setProposedCVs(null);
+        }
         var savedInspectionEntity = inspectionRepository.save(inspectionEntity);
 
         return inspectionModelMapper.toModel(savedInspectionEntity);

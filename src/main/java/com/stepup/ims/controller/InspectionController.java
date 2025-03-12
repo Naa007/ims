@@ -72,6 +72,10 @@ public class InspectionController {
         Inspection inspection = inspectionService.getInspectionById(Long.valueOf(inspectionId))
                 .orElseThrow(() -> new IllegalArgumentException("Inspection not found for ID: " + inspectionId));
 
+        if (inspection.getProposedCVs() == null || inspection.getProposedCVs().isEmpty()) {
+            inspection.setProposedCVs(List.of(new ProposedCVs()));
+        }
+        
         inspection.setClientsList(clientService.getAllClients());
 
         // set inspectors for dropdown

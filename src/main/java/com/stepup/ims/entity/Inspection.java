@@ -39,8 +39,7 @@ public class Inspection {
     @ElementCollection
     @CollectionTable(name = "inspection_dates", joinColumns = @JoinColumn(name = "inspection_id"))
     @Column(name = "inspection_date_as_per_notification")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
-    private List<LocalDate> inspectionDateAsPerNotification;
+    private List<String> inspectionDateAsPerNotification;
 
     @Column(name = "inspection_item")
     private String inspectionItem;
