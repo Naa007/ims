@@ -43,6 +43,7 @@
 
         body {
             display: flex;
+             font-family: 'Poppins', sans-serif;
             flex-direction: column; /* Stack header, main, and footer vertically */
         }
 
@@ -260,7 +261,7 @@
             border-top: 1px solid var(--input-border);
         }
          /* Button Styles */
-        .btn-primary {
+        .btn-primary,.btn-secondary {
             background: var(--button-gradient);
             border: none;
             color: white;
@@ -270,7 +271,7 @@
             transition: all 0.3s ease;
         }
 
-        .btn-primary:hover {
+        .btn-primary:hover,.btn-secondary:hover {
             background: var(--button-hover);
             transform: translateY(-2px);
         }
@@ -285,6 +286,101 @@
         .btn-warning:hover {
             transform: translateY(-2px);
         }
+ .custom-modal {
+    max-width: 750px; /* Set your desired width */
+    width: 80%; /* Ensure it takes full width on smaller screens */
+}
+ .custom-editModal {
+    max-width: 750px; /* Set your desired width */
+    width: 80%; /* Ensure it takes full width on smaller screens */
+}
+         .info-section {
+    margin-bottom: 20px; /* Space below the info section */
+}
+
+.info-item {
+    display: flex; /* Flexbox for alignment */
+    align-items: center; /* Center items vertically */
+    padding: 10px; /* Padding for each item */
+    border-radius: 10px; /* Rounded corners */
+    transition: all 0.3s ease; /* Smooth transition */
+}
+
+.info-item i {
+    background-color: #e1f0fa; /* Light background for icons */
+    color: #3498db; /* Icon color */
+    padding: 10px; /* Padding for icons */
+    border-radius: 10px; /* Rounded corners for icons */
+    margin-right: 15px; /* Space between icon and text */
+    width: 40px; /* Fixed width for icons */
+    height: 40px; /* Fixed height for icons */
+    display: flex; /* Flexbox for centering */
+    align-items: center; /* Center icon */
+    justify-content: center; /* Center icon */
+}
+
+.info-content {
+    flex: 1; /* Allow content to take available space */
+}
+
+.info-label {
+    font-size: 0.85rem; /* Smaller font size for labels */
+    color: #95a5a6; /* Light gray color for labels */
+    margin-bottom: 2px; /* Space below labels */
+}
+
+/* Ensure email wraps properly */
+.info-value {
+    font-size: 1rem; /* Normal font size for values */
+    font-weight: 500; /* Medium weight for values */
+    color: #2c3e50; /* Dark color for values */
+    word-wrap: break-word; /* Allow long words to break */
+}
+        /* Style for the section title */
+.section-title {
+           font-size: 1.3rem;
+           font-weight: 600;
+           color: #2c3e50;
+           margin: 30px 0 20px;
+           padding-bottom: 10px;
+           border-bottom: 2px solid #3498db;
+           display: flex;
+           align-items: center;
+       }
+
+       .section-title i {
+           margin-right: 10px;
+           color: #3498db;
+       }
+         .card-title {
+           font-size: 1.75rem;
+           font-weight: 700;
+           color: #2c3e50;
+           margin-bottom: 1.5rem;
+           display: flex;
+           align-items: center;
+       }
+
+       .card-title i {
+           background-color: #3498db;
+           color: white;
+           padding: 10px;
+           border-radius: 50%;
+           margin-right: 15px;
+           width: 40px;
+           height: 40px;
+           display: flex;
+           align-items: center;
+           justify-content: center;
+       }
+.icon-blue {
+    color: #3498db; /* Blue color */
+}
+        .custom-select {
+    font-family: 'Poppins', sans-serif; /* Ensure the same font family */
+    font-size: 1rem; /* Set the same font size */
+    color: #2c3e50; /* Set the text color */
+}
     </style>
 </head>
 <body>
@@ -377,7 +473,7 @@
 <!-- View Employee Modal -->
 <div aria-hidden="true" aria-labelledby="viewEmployeeModalLabel" class="modal fade" id="viewEmployeeModal"
      tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered custom-modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="viewEmployeeModalLabel">Employee Details</h5>
@@ -388,7 +484,7 @@
             <div class="modal-body">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title"><i class="fas fa-user"></i> <span id="viewEmpName"></span></h5>
+                        <h5 class="card-title" style="margin-right: 10px;"><i class="fas fa-user"></i> <span id="viewEmpName"></span></h5>
 
                         <!-- Personal Information -->
                         <div class="section-title"><i class="fas fa-address-card"></i> Personal Information</div>
@@ -511,7 +607,7 @@
 
 <!-- Edit Employee Modal -->
 <div aria-hidden="true" aria-labelledby="editEmployeeModalLabel" class="modal fade" id="editEmployeeModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered custom-editModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editEmployeeModalLabel">Edit Employee</h5>
@@ -520,49 +616,85 @@
                 </button>
             </div>
             <div class="modal-body">
-                <!-- Edit Employee Form -->
-                <form id="editEmployeeForm" method="post">
-                    <input id="editId" name="id" type="hidden">
-                    <div class="form-group">
-                        <label for="editEmpName">Employee Name</label>
-                        <input class="form-control" id="editEmpName" name="empName" required type="text">
+                <div class="form-card">
+                    <div class="form-header">
+                        <p class="form-subtitle">Please update the information below</p>
                     </div>
-                    <div class="form-group">
-                        <label for="editEmpId">Employee ID</label>
-                        <input class="form-control" id="editEmpId" name="empId" readonly required type="text">
-                    </div>
-                    <div class="form-group">
-                        <label for="editRole">Role</label>
-                        <select class="form-control" id="editRole" name="role" required>
-                            <option value="">Select Role</option>
-                            <option value="COORDINATOR">COORDINATOR</option>
-                            <option value="INSPECTOR">INSPECTOR</option>
-                            <option value="TECHNICAL_COORDINATOR">TECHNICAL COORDINATOR</option>
-                            <option value="ADMIN">ADMIN</option>
-                            <option value="BUSINESS">BUSINESS</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Active</label><br>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" id="editActiveYes" name="active" type="radio" value="Yes">
-                            <label class="form-check-label" for="editActiveYes">Yes</label>
+                    <!-- Edit Employee Form -->
+                    <form id="editEmployeeForm" method="post">
+                        <input id="editId" name="id" type="hidden">
+                        <div class="row">
+                            <!-- Employee Name -->
+                            <div class="col-md-6 mb-3">
+                                <label for="editEmpName">Employee Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user icon-blue"></i></span>
+                                    <input class="form-control" id="editEmpName" name="empName" required type="text">
+                                </div>
+                            </div>
+                            <!-- Employee ID -->
+                            <div class="col-md-6 mb-3">
+                                <label for="editEmpId">Employee ID</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-id-badge icon-blue"></i></span>
+                                    <input type="text" id="editEmpId" name="empId" class="form-control" readonly required />
+                                </div>
+                            </div>
+                            <!-- Role -->
+                            <div class="col-md-6 mb-3">
+                                <label for="editRole">Role</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-briefcase icon-blue"></i></span>
+                                    <select id="editRole" name="role" class="custom-select" required>
+                                        <option value="">Select Role</option>
+                                        <option value="COORDINATOR">COORDINATOR</option>
+                                        <option value="INSPECTOR">INSPECTOR</option>
+                                        <option value="TECHNICAL_COORDINATOR">TECHNICAL COORDINATOR</option>
+                                        <option value="ADMIN">ADMIN</option>
+                                        <option value="BUSINESS">BUSINESS</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <!-- Active Status -->
+                            <div class="col-md-6 mb-3">
+                                <label>Active</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"> <i class="fas fa-info-circle me-2 icon-blue"></i></span>
+                                    <div class="form-check form-check-inline" style="margin-left: 10px;">
+                                        <input class="form-check-input" id="editActiveYes" name="active" type="radio" value="Yes" required>
+                                        <label class="form-check-label" for="editActiveYes">Yes</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" id="editActiveNo" name="active" type="radio" value="No" required>
+                                        <label class="form-check-label" for="editActiveNo">No</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Email -->
+                            <div class="col-md-6 mb-3">
+                                <label for="editEmail">Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-envelope icon-blue"></i></span>
+                                    <input type="email" id="editEmail" name="email" class="form-control" required />
+                                </div>
+                            </div>
+                            <!-- Phone Number -->
+                            <div class="col-md-6 mb-3">
+                                <label for="editPhoneNumber">Phone Number</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-phone icon-blue"></i></span>
+                                    <input type="text" id="editPhoneNumber" name="phoneNumber" class="form-control" required />
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" id="editActiveNo" name="active" type="radio" value="No">
-                            <label class="form-check-label" for="editActiveNo">No</label>
+                        <!-- Submit Button -->
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save me-2"></i> Save Changes
+                            </button>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="editEmail">Email</label>
-                        <input class="form-control" id="editEmail" name="email" required type="email">
-                    </div>
-                    <div class="form-group">
-                        <label for="editPhoneNumber">Phone Number</label>
-                        <input class="form-control" id="editPhoneNumber" name="phoneNumber" required type="text">
-                    </div>
-                    <button class="btn btn-primary" type="submit">Save Changes</button>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
