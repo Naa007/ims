@@ -33,11 +33,36 @@ public class Inspector {
     private PQR pqr;
 
     public enum InspectorType {
-        INHOUSE_INSPECTOR, TECHNICAL_COORDINATOR, FREELANCER, PARTNER_INSPECTOR
+        INHOUSE_INSPECTOR("Inhouse Inspector"),
+        TECHNICAL_COORDINATOR("Technical Coordinator"),
+        FREELANCER("Freelancer"),
+        PARTNER_INSPECTOR("Partner Inspector");
+
+        private final String description;
+
+        InspectorType(String description) {
+            this.description = description;
+        }
+
+        public String getDescription() {
+            return description;
+        }
     }
 
     public enum InspectorStatusType {
-        ACTIVE, INACTIVE, DELETED
+        ACTIVE("Active"),
+        INACTIVE("Inactive"),
+        BLOCKED("BLOCKED");
+
+        private final String description;
+
+        InspectorStatusType(String description) {
+            this.description = description;
+        }
+
+        public String getDescription() {
+            return description;
+        }
     }
 
     public List<String> getCountriesList() {

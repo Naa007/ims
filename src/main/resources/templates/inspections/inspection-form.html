@@ -417,7 +417,7 @@
                     <input id="inspectionDateAsPerNotification" name="inspectionDateAsPerNotification"
                            th:field="*{inspectionDateAsPerNotification}" class="form-control"
                            type="text" placeholder="Pick dates"
-                           th:value="${#strings.arrayJoin(inspectionDateAsPerNotification, ', ')}">
+                           th:value="${inspectionDateAsPerNotification}">
                 </div>
             
             </div>
