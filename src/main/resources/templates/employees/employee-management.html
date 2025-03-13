@@ -13,39 +13,46 @@
     <link href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css" rel="stylesheet">
     <!-- Custom CSS -->
     <style>
+        /* Root Variables for Consistent Design System */
+        :root {
+            --primary-color: #4a90e2; /* Soft blue */
+            --primary-dark: #2980b9; /* Darker blue for gradients */
+            --secondary-color: #50e3c2; /* Teal */
+            --accent-color: #f39c12; /* Orange */
+            --light-bg: #f0f4f8; /* Light background */
+            --dark-text: #2c3e50; /* Darker text */
+            --light-text: #ffffff; /* White text */
+            --input-border: #d1d8e0; /* Light border */
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --header-bg: linear-gradient(135deg, rgba(44, 62, 80, 0.95), rgba(52, 73, 94, 0.95));
+            --footer-bg: #2c3e50;
+            --button-gradient: linear-gradient(135deg, #4a90e2, #2980b9);
+            --button-hover: linear-gradient(135deg, #2980b9, #4a90e2);
+            --table-header-bg: linear-gradient(135deg, #4a90e2, #2980b9);
+        }
+
         /* General Styles */
         html, body {
             height: 100%; /* Ensure the body takes full height */
             margin: 0; /* Remove default margin */
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            line-height: 1.6;
         }
 
         body {
             display: flex;
             flex-direction: column; /* Stack header, main, and footer vertically */
-            background-color: #f8f9fa;
-            font-family: 'Arial', sans-serif;
         }
 
-        main {
-            flex: 1; /* Allow main to grow and fill available space */
-            padding-top: 70px; /* Add padding to prevent content from being hidden behind the fixed header */
-            padding-bottom: 50px; /* Add padding to prevent content from being hidden behind the fixed footer */
-        }
-
-        h1 {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #343a40;
-            margin: 40px 0 20px; /* Add margin-top to create space below the header */
-        }
-
-        .table {
-            font-size: 0.9rem; /* Smaller font size */
-        }
-
-        .table th, .table td {
-            vertical-align: middle; /* Center align text */
-        }
+  main {
+    flex: 1; /* Allow main to grow and fill available space */
+    padding: 80px 20px 30px; /* Adjust the top padding to ensure content is below the header */
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
 
         .btn-sm {
             padding: 5px 10px; /* Smaller button padding */
@@ -95,9 +102,9 @@
                 font-size: 1.2rem; /* Smaller modal title */
             }
         }
-       /* Header */
+        /* Header Styles */
         header {
-            background: linear-gradient(135deg, rgba(44, 62, 80, 0.9), rgba(52, 73, 94, 0.9));
+            background: var(--header-bg);
             backdrop-filter: blur(10px);
             color: white;
             padding: 15px 20px;
@@ -171,6 +178,11 @@
         .logout-btn i {
             font-size: 18px;
         }
+
+        .logout-btn a {
+            color: white;
+            text-decoration: none;
+        }
    /* Footer */
         footer {
             background: #2c3e50;
@@ -202,6 +214,77 @@
                 font-size: 1rem; /* Smaller modal title */
             }
         }
+
+           /* Card & Form Styles */
+        .form-card, .data-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+          .form-header {
+            border-bottom: 2px solid var(--secondary-color);
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+        }
+
+        .form-title, h1 {
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+           /* Table Styles */
+        .table {
+            font-size: 0.9rem;
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+            padding: 0.75rem 1rem;
+        }
+
+        .table thead {
+            background: var(--table-header-bg);
+            color: white;
+        }
+
+        .table td {
+            border-top: 1px solid var(--input-border);
+        }
+         /* Button Styles */
+        .btn-primary {
+            background: var(--button-gradient);
+            border: none;
+            color: white;
+            padding: 0.6rem 1.5rem;
+            font-weight: 500;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: var(--button-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-warning {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            color: #212529;
+            transition: all 0.3s ease;
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
@@ -222,8 +305,11 @@
 </header>
 
 
-<main class="container">
+<main>
+    <div class="data-card">
+        <div class="form-header">
     <h1 class="text-center">Manage Employee</h1>
+        </div>
     <!-- Display Error Message -->
     <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
         <span th:text="${errorMessage}"></span>
@@ -285,6 +371,7 @@
             </tbody>
         </table>
     </div>
+    </div>
 </main>
 
 <!-- View Employee Modal -->
@@ -302,13 +389,58 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title"><i class="fas fa-user"></i> <span id="viewEmpName"></span></h5>
-                        <h6 class="card-subtitle mb-2 text-muted">Employee ID: <span id="viewEmpId"></span></h6>
-                        <p class="card-text"><i class="fas fa-briefcase"></i> Role: <span id="viewRole"></span></p>
-                        <p class="card-text"><i class="fas fa-check-circle"></i> Active: <span id="viewActive"></span>
-                        </p>
-                        <p class="card-text"><i class="fas fa-envelope"></i> Email: <span id="viewEmail"></span></p>
-                        <p class="card-text"><i class="fas fa-phone"></i> Phone Number: <span
-                                id="viewPhoneNumber"></span></p>
+
+                        <!-- Personal Information -->
+                        <div class="section-title"><i class="fas fa-address-card"></i> Personal Information</div>
+                        <div class="info-section">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="info-item">
+                                        <i class="fas fa-id-badge"></i>
+                                        <div class="info-content">
+                                            <div class="info-label">Employee ID</div>
+                                            <div class="info-value" id="viewEmpId"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-item">
+                                        <i class="fas fa-briefcase"></i>
+                                        <div class="info-content">
+                                            <div class="info-label">Role</div>
+                                            <div class="info-value" id="viewRole"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-item">
+                                        <i class="fas fa-check-circle"></i>
+                                        <div class="info-content">
+                                            <div class="info-label">Active</div>
+                                            <div class="info-value" id="viewActive"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-item">
+                                        <i class="fas fa-envelope"></i>
+                                        <div class="info-content">
+                                            <div class="info-label">Email Address</div>
+                                            <div class="info-value" id="viewEmail"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-item">
+                                        <i class="fas fa-phone"></i>
+                                        <div class="info-content">
+                                            <div class="info-label">Phone Number</div>
+                                            <div class="info-value" id="viewPhoneNumber"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

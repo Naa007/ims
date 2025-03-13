@@ -6,33 +6,458 @@
     <title>View Inspector - IISPL Console</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Custom styles */
-        body {
-            background-color: #f8f9fa;
-            font-family: 'Arial', sans-serif;
+
+       main {
+            flex: 1;
+            padding: 90px 20px 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
         }
-        .card {
-            margin: 20px;
+
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, rgba(44, 62, 80, 0.9), rgba(52, 73, 94, 0.9));
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
         }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 10%, transparent 10.01%);
+            background-size: 20px 20px;
+            transform: rotate(45deg);
+            pointer-events: none;
+        }
+
+        .logo {
+            height: 50px;
+            width: auto;
+            margin-right: 15px;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+        }
+
+        .company-name {
+            font-size: 20px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0;
+            background: linear-gradient(135deg, #ffffff, #e0e0e0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .logout-btn i {
+            font-size: 18px;
+        }
+
+        .logout-btn a {
+            color: white;
+            text-decoration: none;
+        }
+   /* Footer Styles */
+        footer {
+             background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            margin-top: auto;
+            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 14px;
+        }
+       /* Custom styles */
+       body {
+           background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+           font-family: 'Poppins', sans-serif;
+           color: #343a40;
+       }
+
+       .page-header {
+           background-color: #2c3e50;
+           color: white;
+           padding: 20px 0;
+           margin-bottom: 30px;
+           border-radius: 0 0 15px 15px;
+           box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+       }
+
+       .logo {
+           font-size: 1.8rem;
+           font-weight: 700;
+       }
+
+       .logo i {
+           color: #3498db;
+           margin-right: 10px;
+       }
+
+       .card {
+           margin: 20px auto;
+           border: none;
+           border-radius: 15px;
+           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+           background: white;
+           overflow: hidden;
+       }
+
+       .card-header {
+           background: linear-gradient(135deg, #3498db, #2980b9);
+           color: white;
+           padding: 1.5rem;
+           font-weight: 600;
+           border-bottom: none;
+       }
+
+       .card-body {
+           padding: 2rem;
+       }
+
+       .card-title {
+           font-size: 1.75rem;
+           font-weight: 700;
+           color: #2c3e50;
+           margin-bottom: 1.5rem;
+           display: flex;
+           align-items: center;
+       }
+
+       .card-title i {
+           background-color: #3498db;
+           color: white;
+           padding: 10px;
+           border-radius: 50%;
+           margin-right: 15px;
+           width: 40px;
+           height: 40px;
+           display: flex;
+           align-items: center;
+           justify-content: center;
+       }
+
+       .card-subtitle {
+           font-size: 1.25rem;
+           color: #7f8c8d;
+           margin-bottom: 1.5rem;
+           padding-left: 55px;
+       }
+
+       .info-section {
+           display: grid;
+           grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+           gap: 20px;
+           margin-bottom: 30px;
+       }
+
+       .info-item {
+           display: flex;
+           align-items: center;
+           padding: 10px;
+           border-radius: 10px;
+           transition: all 0.3s ease;
+       }
+
+       .info-item:hover {
+           background-color: #f8f9fa;
+           transform: translateY(-2px);
+       }
+
+       .info-item i {
+           background-color: #e1f0fa;
+           color: #3498db;
+           padding: 10px;
+           border-radius: 10px;
+           margin-right: 15px;
+           width: 40px;
+           height: 40px;
+           display: flex;
+           align-items: center;
+           justify-content: center;
+       }
+
+       .info-content {
+           flex: 1;
+       }
+
+       .info-label {
+           font-size: 0.85rem;
+           color: #95a5a6;
+           margin-bottom: 2px;
+       }
+
+       .info-value {
+           font-size: 1rem;
+           font-weight: 500;
+           color: #2c3e50;
+       }
+
+       .section-title {
+           font-size: 1.3rem;
+           font-weight: 600;
+           color: #2c3e50;
+           margin: 30px 0 20px;
+           padding-bottom: 10px;
+           border-bottom: 2px solid #3498db;
+           display: flex;
+           align-items: center;
+       }
+
+       .section-title i {
+           margin-right: 10px;
+           color: #3498db;
+       }
+
+       .table-responsive {
+           border-radius: 10px;
+           overflow: hidden;
+           box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+           margin-bottom: 30px;
+       }
+
+       .table {
+           margin-bottom: 0;
+       }
+
+       .table thead {
+           background: linear-gradient(135deg, #3498db, #2980b9);
+           color: white;
+       }
+
+       .table th {
+           padding: 15px;
+           font-weight: 500;
+           text-transform: uppercase;
+           font-size: 0.85rem;
+           letter-spacing: 0.5px;
+           border: none;
+       }
+
+       .table td {
+           padding: 15px;
+           vertical-align: middle;
+           border-top: 1px solid #ecf0f1;
+       }
+
+       .table tbody tr:hover {
+           background-color: rgba(52, 152, 219, 0.05);
+       }
+
+       .badge {
+           font-size: 0.85rem;
+           padding: 0.5em 0.75em;
+           border-radius: 30px;
+           font-weight: 500;
+       }
+
+       .badge-primary {
+           background: #3498db;
+       }
+
+       .badge-success {
+           background: #2ecc71;
+       }
+
+       .badge-warning {
+           background: #f39c12;
+       }
+
+       .badge-danger {
+           background: #e74c3c;
+       }
+
+       .qualification-list {
+           display: grid;
+           grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+           gap: 15px;
+           margin-bottom: 20px;
+       }
+
+       .qualification-item {
+           display: flex;
+           align-items: center;
+           padding: 10px 15px;
+           background-color: #f8f9fa;
+           border-radius: 10px;
+           transition: all 0.3s ease;
+       }
+
+       .qualification-item:hover {
+           transform: translateY(-2px);
+           box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+       }
+
+       .qualification-item i {
+           color: #2ecc71;
+           margin-right: 10px;
+       }
+
+       .btn-back {
+           background: linear-gradient(135deg, #3498db, #2980b9);
+           border: none;
+           padding: 12px 25px;
+           border-radius: 50px;
+           font-size: 1rem;
+           font-weight: 500;
+           transition: all 0.3s ease;
+           box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+           color: white;
+       }
+
+       .btn-back:hover {
+           background: linear-gradient(135deg, #2980b9, #3498db);
+           transform: translateY(-2px);
+           box-shadow: 0 6px 15px rgba(52, 152, 219, 0.4);
+       }
+
+       .btn-back i {
+           margin-right: 8px;
+       }
+
+       .remarks-box {
+           background-color: #f8f9fa;
+           border-left: 4px solid #3498db;
+           padding: 15px;
+           border-radius: 5px;
+           margin-top: 20px;
+       }
     </style>
 </head>
 <body>
-<main class="container">
-    <h1 class="text-center">Inspector Details</h1>
+<!-- Header -->
+<header>
+    <div class="header-content" style="flex: 1 1 20%; display: flex; align-items: center;">
+        <img src="/images/logo.png" alt="IISPL Logo" class="logo">
+    </div>
+    <div style="flex: 1 1 70%; text-align: center; font-size: 1.5rem; font-weight: bold; color: white;">
+        <h1 class="company-name">Inspection Management Services</h1>
+    </div>
+    <button class="logout-btn" style="flex: 1 1 10%;">
+        <i class="fas fa-sign-out-alt"></i>
+        <a th:href="@{/logout}" th:onclick="return confirm('Are you sure you want to log out?');">
+            Logout
+        </a>
+    </button>
+</header>
 
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title"><i class="fas fa-user"></i> <span th:text="${inspector.inspectorName}">Inspector Name</span></h5>
-            <p class="card-text"><i class="fas fa-envelope"></i> Email: <span th:text="${inspector.email}">Email</span></p>
-            <p class="card-text"><i class="fas fa-phone"></i> Phone: <span th:text="${inspector.phone}">Phone</span></p>
-            <p class="card-text"><i class="fas fa-calendar-alt"></i> Date of Birth: <span th:text="${inspector.dob}">Date of Birth</span></p>
-            <p class="card-text"><i class="fas fa-map-marker-alt"></i> Address: <span th:text="${inspector.address}">Address</span></p>
-            <p class="card-text"><i class="fas fa-globe"></i> Country: <span th:text="${inspector.country}">Country</span></p>
-            <p class="card-text"><i class="fas fa-graduation-cap"></i> Education Details: <span th:text="${inspector.educationDetails}">Education Details</span></p>
-            <p class="card-text"><i class="fas fa-book"></i> Disciplines: <span th:text="${inspector.disciplines}">Disciplines</span></p>
-            <p class="card-text"><i class="fas fa-id-card"></i> Inspector Type: <span th:text="${inspector.inspectorType}">Inspector Type</span></p>
-            <p class="card-text"><i class="fas fa-certificate"></i> Certificates:</p>
+<main class="container">
+
+    <div class="card-body">
+        <h5 class="card-title"><i class="fas fa-user"></i> <span th:text="${inspector.inspectorName}">Inspector Name</span></h5>
+        <!-- Personal Information -->
+        <div class="section-title"><i class="fas fa-address-card"></i> Personal Information</div>
+        <div class="info-section">
+            <div class="info-item">
+                <i class="fas fa-envelope"></i>
+                <div class="info-content">
+                    <div class="info-label">Email Address</div>
+                    <div class="info-value" th:text="${inspector.email}">johndoe@example.com</div>
+                </div>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-phone"></i>
+                <div class="info-content">
+                    <div class="info-label">Phone Number</div>
+                    <div class="info-value" th:text="${inspector.phone}">+1 234 567 8900</div>
+                </div>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-calendar-alt"></i>
+                <div class="info-content">
+                    <div class="info-label">Date of Birth</div>
+                    <div class="info-value" th:text="${inspector.dob}">12 Jan 1985</div>
+                </div>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <div class="info-content">
+                    <div class="info-label">Address</div>
+                    <div class="info-value" th:text="${inspector.address}">123 Main St, City</div>
+                </div>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-globe"></i>
+                <div class="info-content">
+                    <div class="info-label">Country</div>
+                    <div class="info-value" th:text="${inspector.country}">United States</div>
+                </div>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-id-card"></i>
+                <div class="info-content">
+                    <div class="info-label">Inspector Type</div>
+                    <div class="info-value" th:text="${inspector.inspectorType}">Senior Inspector</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Education & Qualifications -->
+        <div class="section-title"><i class="fas fa-graduation-cap"></i> Education & Disciplines</div>
+        <div class="info-section">
+            <div class="info-item">
+                <i class="fas fa-university"></i>
+                <div class="info-content">
+                    <div class="info-label">Education Details</div>
+                    <div class="info-value" th:text="${inspector.educationDetails}">Bachelor of Engineering, Mechanical</div>
+                </div>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-book"></i>
+                <div class="info-content">
+                    <div class="info-label">Disciplines</div>
+                    <div class="info-value" th:text="${inspector.disciplines}">Mechanical, Structural</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Certificates -->
+        <div class="section-title"><i class="fas fa-certificate"></i> Certification Details</div>
+        <div class="table-responsive">
             <table class="table">
                 <thead>
                 <tr>
@@ -44,42 +469,82 @@
                 </thead>
                 <tbody id="viewCertificatesBody">
                 <tr th:each="certificate : ${inspector.certificates}">
-                    <td th:text="${certificate.name}">Certificate Name</td>
+                    <td>
+                        <i class="fas fa-certificate text-primary mr-2"></i>
+                        <span th:text="${certificate.name}">Certificate Name</span>
+                    </td>
                     <td th:text="${certificate.dateIssued}">Date Issued</td>
                     <td th:text="${certificate.expiryDate}">Expiry</td>
                     <td th:text="${certificate.issuer}">Issuer</td>
                 </tr>
                 </tbody>
             </table>
-            <!-- Special Qualification -->
-            <p class="card-text"><i class="fas fa-star"></i> Special Qualification:</p>
-            <ul>
-                <li th:if="${inspector.specialQualification.aramco}">ARAMCO</li>
-                <li th:if="${inspector.specialQualification.sec}">SEC</li>
-                <li th:if="${inspector.specialQualification.specialQualificationDetails != null and !inspector.specialQualification.specialQualificationDetails.isEmpty()}">
-                    Details: <span th:text="${inspector.specialQualification.specialQualificationDetails}"></span>
-                </li>
-            </ul>
+        </div>
 
-            <!-- Main Qualification -->
-            <p class="card-text"><i class="fas fa-tools"></i> Main Qualification:</p>
-            <ul>
-                <li th:if="${inspector.mainQualificationCategory.mechStatic}">Mechanical Static</li>
-                <li th:if="${inspector.mainQualificationCategory.mechRotating}">Mechanical Rotating</li>
-                <li th:if="${inspector.mainQualificationCategory.electrical}">Electrical</li>
-                <li th:if="${inspector.mainQualificationCategory.piping}">Piping</li>
-                <li th:if="${inspector.mainQualificationCategory.steelStructure}">Steel Structure</li>
-            </ul>
-            <p class="card-text"><i class="fas fa-info-circle"></i> Status: <span th:text="${inspector.inspectorStatus}">Status</span></p>
-            <p class="card-text"><i class="fas fa-comment"></i> Remarks: <span th:text="${inspector.remarks}">Remarks</span></p>
+        <!-- Special Qualification -->
+        <div class="section-title"><i class="fas fa-star"></i> Special Qualifications</div>
+        <div class="qualification-list">
+            <div class="qualification-item" th:if="${inspector.specialQualification.aramco}">
+                <i class="fas fa-check-circle"></i> ARAMCO
+            </div>
+            <div class="qualification-item" th:if="${inspector.specialQualification.sec}">
+                <i class="fas fa-check-circle"></i> SEC
+            </div>
+        </div>
+        <div class="info-item" th:if="${inspector.specialQualification.specialQualificationDetails != null and !inspector.specialQualification.specialQualificationDetails.isEmpty()}">
+            <i class="fas fa-info-circle"></i>
+            <div class="info-content">
+                <div class="info-label">Additional Qualification Details</div>
+                <div class="info-value" th:text="${inspector.specialQualification.specialQualificationDetails}">
+                    Additional qualification details here
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Qualification -->
+        <div class="section-title"><i class="fas fa-tools"></i> Main Qualifications</div>
+        <div class="qualification-list">
+            <div class="qualification-item" th:if="${inspector.mainQualificationCategory.mechStatic}">
+                <i class="fas fa-check-circle"></i> Mechanical Static
+            </div>
+            <div class="qualification-item" th:if="${inspector.mainQualificationCategory.mechRotating}">
+                <i class="fas fa-check-circle"></i> Mechanical Rotating
+            </div>
+            <div class="qualification-item" th:if="${inspector.mainQualificationCategory.electrical}">
+                <i class="fas fa-check-circle"></i> Electrical
+            </div>
+            <div class="qualification-item" th:if="${inspector.mainQualificationCategory.piping}">
+                <i class="fas fa-check-circle"></i> Piping
+            </div>
+            <div class="qualification-item" th:if="${inspector.mainQualificationCategory.steelStructure}">
+                <i class="fas fa-check-circle"></i> Steel Structure
+            </div>
+        </div>
+
+        <!-- Status & Remarks -->
+        <div class="section-title"><i class="fas fa-clipboard-check"></i> Status & Remarks</div>
+        <div class="d-flex align-items-center mb-3">
+            <div class="mr-3">
+                <strong>Current Status:</strong>
+            </div>
+            <span class="badge badge-primary" th:text="${inspector.inspectorStatus}">Active</span>
+        </div>
+
+        <div class="remarks-box">
+            <h6><i class="fas fa-comment"></i> Remarks</h6>
+            <p th:text="${inspector.remarks}"></p>
         </div>
     </div>
+    </div>
 
-    <div class="text-center">
-        <a href="/inspectors/list" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to List</a>
+    <div class="text-center mb-5 mt-4">
+        <a href="/inspectors/list" class="btn btn-back"><i class="fas fa-arrow-left"></i> Back to Inspector List</a>
     </div>
 </main>
-
+<!-- Footer -->
+<footer>
+    <p>&copy; 2025 International Inspection Services Pvt Ltd. All Rights Reserved.</p>
+</footer>
 <!-- Include Bootstrap JS and dependencies -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
