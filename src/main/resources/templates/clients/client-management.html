@@ -164,20 +164,7 @@
 </head>
 <body>
 <!-- Header -->
-<header>
-    <div class="header-content">
-        <img alt="IISPL Logo" class="logo" src="/images/logo.png">
-    </div>
-    <div style="flex: 1 1 70%; text-align: center; font-size: 1.5rem; font-weight: bold; color: white;">
-        <h1 class="company-name">Inspection Management Services</h1>
-    </div>
-    <button class="logout-btn">
-        <i class="fas fa-sign-out-alt"></i>
-        <a th:href="@{/logout}" th:onclick="return confirm('Are you sure you want to log out?');">
-            Logout
-        </a>
-    </button>
-</header>
+<header th:replace="fragments/header :: header"></header>
 
 <main class="container">
     <h1 class="text-center">Manage Clients</h1>
@@ -522,8 +509,6 @@
 
 </script>
 <!-- Footer -->
-<footer style="background: #2c3e50; color: white; text-align: center; padding: 15px 0; margin-top: auto; box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);">
-    <p>&copy; 2025 International Inspection Services Pvt Ltd. All Rights Reserved.</p>
-</footer>
+<footer th:replace="fragments/footer :: footer"></footer>
 </body>
 </html>
