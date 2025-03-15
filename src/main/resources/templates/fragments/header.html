@@ -1,16 +1,15 @@
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Internation Inspection Services Pvt Ltd</title>
-    <!-- Link the CSS -->
-    <link rel="stylesheet" th:href="@{/css/styles.css}">
-</head>
-<!--<body>-->
+<!-- Header -->
 <header>
-    <!--    <img th:scr="@{/images/logo.png}" alt="Logo">-->
-    <img src="/images/logo.png" width="150" height="70" alt="static logo">
-
+    <div class="header-content" style="flex: 1 1 20%; display: flex; align-items: center;">
+        <img src="/images/logo.png" alt="IISPL Logo" class="logo" onerror="this.style.display='none';">
+    </div>
+    <div style="flex: 1 1 70%; text-align: center; font-size: 1.5rem; font-weight: bold; color: white;">
+        <h1 class="company-name">Inspection Management Services</h1>
+    </div>
+    <button class="logout-btn" style="flex: 1 1 10%;">
+        <i class="fas fa-sign-out-alt"></i>
+        <a href="/logout" onclick="return confirm('Are you sure you want to log out?');">
+            Logout
+        </a>
+    </button>
 </header>
-</html>
