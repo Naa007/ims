@@ -1,5 +1,5 @@
 :root {
-    --primary-color: linear-gradient(135deg, rgba(44, 62, 80, 0.95), rgba(52, 73, 94, 0.95)); /* Changed to a softer blue */
+    --primary-color: #2c3d50; /* Changed to a softer blue */
     --secondary-color: #50e3c2; /* Teal */
     --accent-color: #f39c12; /* Orange */
     --light-bg: #f0f4f8; /* Light background */
@@ -18,6 +18,7 @@
     --button-green-border-color: #28a745; /* Green color button border */
     --button-red-bg: #dc3545; /* Red color button */
     --button-red-border-color: #dc3545; /* Red color button border */
+    --card-icon-bg: #e1f0fa; /* Card Icon bg */
 
 }
 
@@ -320,7 +321,7 @@ footer p {
 }
 
 .card-header {
-   background: linear-gradient(135deg, #3498db, #2980b9);
+   background: var(--primary-color);
    color: var(--white-color);
    padding: 1.5rem;
    font-weight: 600;
@@ -341,8 +342,7 @@ footer p {
 }
 
 .card-title i {
-   background-color: #3498db;
-   color: var(--white-color);
+   background-color: var(--card-icon-bg);
    padding: 10px;
    border-radius: 50%;
    margin-right: 15px;
@@ -381,8 +381,8 @@ footer p {
 }
 
 .info-item i {
-   background-color: #e1f0fa;
-   color: #3498db;
+   background-color: var(--card-icon-bg);
+   color: var(--primary-color);
    padding: 10px;
    border-radius: 10px;
    margin-right: 15px;
@@ -422,7 +422,6 @@ footer p {
 
 .section-title i {
    margin-right: 10px;
-   color: #3498db;
 }
 
 .table-responsive {
@@ -533,7 +532,7 @@ footer p {
 
 .remarks-box {
    background-color: var(--light-background);
-   border-left: 4px solid #3498db;
+   border-left: 4px solid var(--primary-color);
    padding: 15px;
    border-radius: 5px;
    margin-top: 20px;
