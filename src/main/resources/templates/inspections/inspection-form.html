@@ -13,7 +13,6 @@
             <h1 class="form-title">Add Inspection</h1>
             <p class="form-subtitle">Please fill out the information below to register a new inspection</p>
         </div>
-
         <form th:action="@{/inspection/save}" th:object="${inspection}" method="post" class="needs-validation" novalidate>
             <input type="hidden" th:field="*{id}" id="id" />
 
@@ -132,6 +131,7 @@
 
 
             </div>
+
             <div class="row g-3 mb-4">
 
                 <!-- First Column -->
@@ -390,7 +390,6 @@
                     </div>
                 </div>
 
-
                 <!-- Contract Review Prepared -->
                 <div class="col-md-6">
                     <label class="form-label">Contract Review Prepared</label>
@@ -404,7 +403,6 @@
                         No
                     </div>
                 </div>
-
 
                 <!-- Inspection Advise Note -->
                 <div class="col-md-6">
@@ -534,7 +532,6 @@
                     </div>
                 </div>
 
-
                 <!-- Job Folder Link -->
                 <div class="col-md-6">
                     <label for="jobFolderLink" class="form-label">Job Folder Link</label>
@@ -546,7 +543,7 @@
 
             </div>
 
-            
+            </div>
             <!-- Submit Button -->
             <div class="col-12">
                 <button type="submit" class="btn btn-success" th:text="${edit ? 'Edit Inspection' : 'Add Inspection'}">
@@ -555,7 +552,7 @@
             </div>
             
         </form>
-
+    </div>
 </div>
 </main>
 <!-- Footer -->
