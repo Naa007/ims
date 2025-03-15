@@ -9,7 +9,7 @@
 <main class="container">
 
     <div class="card-body">
-        <h5 class="card-title"><i class="fas fa-record"></i> <span
+        <h5 class="card-title"><i class="fas fa-envelope"></i> <span
                 th:text="'IISPL #' + ${inspection.inspectionNo}"></span></h5>
         
         <!-- notification details -->
@@ -41,7 +41,7 @@
                 <i class="fas fa-user"></i>
                 <div class="info-content">
                     <div class="info-label">Client Name</div>
-                    <div class="info-value" th:text="${inspection.client.clientName}"></div>
+                    <div class="info-value" th:text="${inspection.client.clientName+ ' - ' + inspection.client.country}"></div>
                 </div>
             </div>
 
@@ -139,7 +139,7 @@
                     <td th:text="${cv.cvCertificatesAvailable != null && cv.cvCertificatesAvailable ? 'Yes' : 'No'}"></td>
                     <td th:text="${cv.cvReviewByTechnicalCoordinator.empName}"></td>
                     <td th:text="${cv.pqrAvailable != null && cv.pqrAvailable ? 'Yes' : 'No'}"></td>
-                    <td th:text="${cv.cvSubmittedToClientDate}"</td>
+                    <td th:text="${cv.cvSubmittedToClientDate}"></td>
                     <td th:text="${cv.cvStatus ? 'Approved' : 'Not Approved'}"></td>
                 </tr>
                 </tbody>
