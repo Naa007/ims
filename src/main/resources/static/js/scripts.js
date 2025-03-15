@@ -93,6 +93,20 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
         });
     }
+
+     // Initialize Map with default or provided location
+    const locationDetails = document.getElementById('inspectionLocationDetails');
+    if (locationDetails) {
+        const locationDetailsValue = locationDetails.value;
+        initMap(locationDetailsValue ? locationDetailsValue : 'Hyderabad, India');
+    }
+
+    flatpickr("#inspectionDateAsPerNotification", {
+                    mode: "multiple",
+                    dateFormat: "d/m/Y"
+                });
+
+
 });
 
   // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> INSPECTOR <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -203,59 +217,133 @@ document.addEventListener("DOMContentLoaded", function () {
     function disableButton() {
 
     }
-     document.getElementById('send-otp-btn').addEventListener('click', function () {
-        const email = document.getElementById('email').value;
-
-        const button = document.getElementById('send-otp-btn');
-        button.disabled = true; // Disable the button
-        button.textContent = "Sending..."; // Feedback to the user
-
-        // Call backend API to send OTP
-        fetch('/auth/send-otp', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ email })
-        })
-        .then(response => response.text())
-        .then(responseMessage => {
-            document.getElementById('status').textContent = responseMessage;
-
-            if (responseMessage.includes("OTP sent")) {
-                // Show the verify OTP section
-                document.getElementById('otp-request-section').style.display = 'none';
-                document.getElementById('otp-verify-section').style.display = 'block';
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    });
-
-     document.getElementById('verify-otp-btn').addEventListener('click', function () {
-        const button = document.getElementById('verify-otp-btn');
-        button.disabled = true; // Disable the button
-        button.textContent = "Verifying..."; // Feedback to the user
-
-        const email = document.getElementById('email').value;
-        const otp = document.getElementById('otp').value;
-
-        // Call backend API to verify OTP
-        fetch('/auth/verify-otp', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ email, otpCode: otp })
-        })
-        .then(response => {
-            if (response.redirected) {
-                credentials: 'include'
-                window.location.href = response.url; // Handle backend redirects
-            } else {
-                return response.text().then(text => {
-                    // Display validation errors
-                    console.error("Error:", text);
-                });
-            }
-        })
-
-        .catch(error => console.error('Error:', error));
-    });
 
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> LOGIN <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+  // if CVStatus is approved then the inspector becomes approvedInspector
+   function approvedInspector(index, approved) {
+        if(!approved) {
+            document.getElementById("approvedInspectorName").value = "";
+        }else{
+            const proposedCVsTable = document.querySelector("#proposedCVsTable tbody");
+            const row = proposedCVsTable.querySelector(`tr:nth-child(${index + 1})`);
+            if (row) {
+                const selectedOption = row.querySelector("select").selectedOptions[0];
+                if (selectedOption) {
+                    document.getElementById("approvedInspectorName").value = "";
+                    document.getElementById("approvedInspectorName").value = selectedOption.textContent.trim()
+                } else {
+                    alert("No Inspector is selected.");
+                }
+            } else {
+                console.log("Specified row not found in the proposedCVsTable.");
+            }
+        }
+    }
+
+   function initMap(inspectionLocation) {
+
+       fetch('/api/inspectors?address=' + inspectionLocation )
+       .then(response => response.json())
+       .then(data => {
+           for (const [locationKey, inspectors] of Object.entries(data)) {
+               const userLocationArray = locationKey.split(',').map(Number); // Split and convert to numbers
+               const userLocation = new google.maps.LatLng(userLocationArray[0], userLocationArray[1]); // Create LatLng object
+
+              const map = new google.maps.Map(document.getElementById('map'), {
+                  zoom: 10,
+                  center: userLocation
+              });
+
+               // Add marker for user location
+               const userMarker = new google.maps.Marker({
+                   position: userLocation,
+                   map: map,
+                   title: "Inspection Location"
+               });
+
+               // Plot all inspectors for the current user location
+               inspectors.forEach(inspector => {
+                   const marker = new google.maps.Marker({
+                       position: {
+                           lat: inspector.location.lat,
+                           lng: inspector.location.lng
+                       },
+                       map: map,
+                       title: `${inspector.name}, Distance: ${inspector.distance}, Duration: ${inspector.duration}`,
+                       icon: {
+                           url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png" // Green marker icon
+                       }
+                   });
+               });
+           }
+               });
+
+   }
+
+   function showMapLoadingMessage() {
+               const mapLoadingMessage = document.getElementById('mapLoadingMessage');
+               mapLoadingMessage.style.display = 'block';
+
+               // Assuming 'initMap' will handle the map loading process
+               // Add a timeout or any custom logic to hide the message after map loading completes
+               setTimeout(() => {
+                   mapLoadingMessage.style.display = 'none';
+               }, 5000); // Adjust the time as per map loading logic
+           }
+
+   function addCVRow() {
+
+    const tableBody = document.querySelector("#proposedCVsTable tbody");
+    const previousRow = tableBody.querySelector("tr:last-child");
+    const index = tableBody.querySelectorAll("tr").length -1;
+
+    if (previousRow) {
+        const lastRadioInput = [...previousRow.querySelectorAll("input[type='radio']")].pop();
+        if (lastRadioInput && lastRadioInput.value === "false" && !lastRadioInput.checked) {
+            alert("Inspector is already approved.");
+            return;
+        }
+
+        const newRow = previousRow.cloneNode(true); // Clone the previous row
+
+        newRow.querySelectorAll("input, select").forEach(input => {
+
+            input.id = input.id.replace(index, index + 1);
+            input.name = input.name.replace(index, index + 1);
+
+            if (input.tagName === "SELECT") {
+                input.selectedIndex = 0; // Reset dropdowns
+            } else if (input.type === "radio") {
+                // Reset radio buttons
+                if (input.value === "true") {
+                    input.checked = false;
+                }
+                if (input.value === "false") {
+                    input.checked = true;
+                }
+            } else if (input.type === "datetime-local") {
+                input.value = ""; // Reset datetime-local input
+            }
+        });
+        tableBody.appendChild(newRow); // Append the cloned row as a new row
+    }
+
+  }
+
+   function deleteCVRow(button) {
+      const tableBody = document.querySelector("#proposedCVsTable tbody");
+      const rows = tableBody.querySelectorAll("tr");
+      const row = button.closest("tr");
+      if (row === rows[0]) {
+          alert("At least one Inspector should be assigned to the Inspection !");
+          return;
+      }
+      if (row) {
+        const lastRadioInput = [...row.querySelectorAll("input[type='radio']")].pop();
+        if (lastRadioInput && lastRadioInput.value === "false" && !lastRadioInput.checked) {
+           document.getElementById("approvedInspectorName").value = "";
+        }
+      }
+      row.remove();
+  }

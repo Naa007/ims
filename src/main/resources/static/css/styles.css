@@ -619,7 +619,15 @@ button:hover {
     background-color: #0056b3; /* Darker blue for hover effect */
 }
 
+#map {
+    border: 2px solid #000; /* Adds a black border with 2px thickness */
+    border-radius: 8px; /* Optional: Slightly rounds the corners of the border */
+}
 
+#inspectionDatesContainer .btn {
+    height: calc(1.5em + 0.75rem + 2px); /* Match the computed input field height */
+    line-height: normal; /* Center align button text */
+}
 
 
 
