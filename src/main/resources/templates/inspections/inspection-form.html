@@ -51,7 +51,7 @@
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
                        <input type="datetime-local" id="notificationReceivedDateTime" th:field="*{notificationReceivedDateTime}"
-                                   class="form-control"/>
+                                   class="form-control" required/>
                         </div>
                 </div>
 
@@ -99,7 +99,7 @@
                         <input id="inspectionDateAsPerNotification" name="inspectionDateAsPerNotification"
                            th:field="*{inspectionDateAsPerNotification}" class="form-control"
                            type="text" placeholder="Pick dates"
-                           th:value="${inspectionDateAsPerNotification}">
+                           th:value="${inspectionDateAsPerNotification}" required />
                     </div>
                 </div>
 
@@ -108,7 +108,7 @@
                     <label for="inspectionItem" class="form-label">Inspection Item</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-box"></i></span>
-                         <input type="text" id="inspectionItem" th:field="*{inspectionItem}" class="form-control"/>
+                         <input type="text" id="inspectionItem" th:field="*{inspectionItem}" class="form-control" required/>
                     </div>
                 </div>
 
@@ -144,7 +144,7 @@
                             <span class="input-group-text"><i class="fas fa-tasks"></i></span>
                             <textarea id="inspectionActivityWithStages"
                                       th:field="*{inspectionActivityWithStages}"
-                                      class="form-control" rows="3" placeholder="Enter Inspection Stages"></textarea>
+                                      class="form-control" rows="3" placeholder="Enter Inspection Stages" required></textarea>
                         </div>
                     </div>
 
@@ -155,7 +155,7 @@
                             <span class="input-group-text"><i class="fas fa-location-pin"></i></span>
                             <textarea id="inspectionLocationDetails" th:field="*{inspectionLocationDetails}"
                                       class="form-control" rows="3"
-                                      onchange="initMap(this.value); showMapLoadingMessage();"></textarea>
+                                      onchange="initMap(this.value); showMapLoadingMessage();" required></textarea>
                         </div>
                         <div id="mapLoadingMessage" class="mt-2 text-warning fw-bold" style="display: none;">
                             Wait for the map to load nearby inspectors...
