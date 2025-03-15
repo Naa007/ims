@@ -1,5 +1,5 @@
 :root {
-    --primary-color: #2c3d50; /* Changed to a softer blue */
+    --primary-color: #485d74; /* Changed to a softer blue */
     --secondary-color: #50e3c2; /* Teal */
     --accent-color: #f39c12; /* Orange */
     --light-bg: #f0f4f8; /* Light background */
@@ -8,6 +8,7 @@
     --input-border: #d1d8e0; /* Light border */
     --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     --header-bg: var(--primary-color); /* Same as primary color */
+    --footer-bg: var(--primary-color); /* Same as primary color */
     --company-name-bg: linear-gradient(135deg, #ffffff, #e0e0e0);
     --light-background: #f8f9fa; /* Light background to display in view mode */
     --subtitle-soft-text: #7f8c8d; /* Light text color for sub titles */
@@ -270,7 +271,7 @@ header::before {
 
   /* Footer Styles */
 footer {
-    background: var(--dark-text);
+    background: var(--footer-bg);
     color: var(--white-color);
     text-align: center;
     padding: 15px 0;
@@ -509,7 +510,7 @@ footer p {
 }
 
 .btn-back {
-   background: linear-gradient(135deg, #3498db, #2980b9);
+   background: var(--primary-color);
    border: none;
    padding: 12px 25px;
    border-radius: 50px;
