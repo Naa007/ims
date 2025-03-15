@@ -1,494 +1,195 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Add New Inspection</title>
-    
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHwaHTTVcK5bvy2Vg36H6r3gdpSoIYcjY"></script>
-    <script th:src="@{/js/scripts.js}"></script>
-
-    <!-- Add any required CSS frameworks like Bootstrap -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-
-    <style>
-        /* Global Styles */
-       body {
-           font-family: Arial, sans-serif;
-           margin: 0;
-           padding: 0;
-           background-color: #F8F9FA;
-           color: #343A40;
-           display: flex;
-           flex-direction: column;
-           min-height: 100vh;
-       }
-
-       /* Header Styles */
-       header {
-           background-color: #334e6b;
-           padding: 0.5rem;
-           text-align: center;
-           color: white;
-           font-size: 1.5rem;
-           font-weight: bold;
-       }
-
-       /* Footer Styles */
-       footer {
-           background-color: #334e6b;
-           color: white;
-           text-align: center;
-           padding: 1rem;
-           position: absolute;
-           bottom: 0;
-           width: 100%;
-       }
-
-       /* Container Styles */
-       .container {
-           flex: 1;
-<!--           display: flex;-->
-           flex-direction: column;
-           align-items: center;
-           justify-content: center;
-           padding: 0.5rem;
-       }
-        /* Form Section */
-        .form-section {
-            flex: 1;
-            padding: 2rem;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-        }
-
-
-        /* Add Gap Between Rows */
-        .row {
-            margin-bottom: 1.5rem; /* Adjust gap as needed */
-        }
-
-        label {
-            font-size: 1rem;
-            margin-bottom: 0.5rem;
-            font-weight: bold;
-        }
-
-        input {
-            padding: 0.8rem;
-            margin-bottom: 1rem;
-            font-size: 1rem;
-            border: 1px solid #CED4DA;
-            border-radius: 5px;
-        }
-
-        /* Button Styles */
-        button {
-            background-color: #334e6b; /* Primary blue color */
-            color: white;
-            font-size: 1rem;
-            padding: 0.8rem;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #0056b3; /* Darker blue for hover effect */
-        }
-
-        #map {
-            border: 2px solid #000; /* Adds a black border with 2px thickness */
-            border-radius: 8px; /* Optional: Slightly rounds the corners of the border */
-        }
-
-        #inspectionDatesContainer .btn {
-                        height: calc(1.5em + 0.75rem + 2px); /* Match the computed input field height */
-                        line-height: normal; /* Center align button text */
-                    }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-
-
-            .form-section {
-                padding: 1.5rem;
-            }
-
-            header {
-                padding: 1rem;
-                background-color: #334e6b;
-                color: white;
-                font-size: 1.5rem;
-                text-align: center;
-                font-weight: bold;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-            header img {
-                width: auto;
-                height: 60px;
-                margin-right: 1rem;
-            }
-
-            header .title {
-                flex: 1;
-                text-align: center;
-                font-size: 1.5rem;
-                font-weight: bold;
-                color: white;
-            }
-
-            /* Footer Styles */
-            footer {
-                background-color: #334e6b;
-                color: white;
-                text-align: center;
-                padding: 1rem;
-                width: 100%;
-                margin-top: auto;
-            }
-
-            /* Ensure body and html take full height of the viewport */
-            html, body {
-                height: 100%;
-                display: flex;
-                flex-direction: column;
-            }
-
-            /* Ensure the container grows and pushes footer to the bottom */
-            .container {
-                flex-grow: 1;
-                display: flex;
-                flex-direction: column;
-            }
-
-        }
-
-    </style>
-
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
-    <script th:inline="javascript">
-        // if CVStatus is approved then the inspector becomes approvedInspector
-        function approvedInspector(index, approved) {
-            if(!approved) {
-                document.getElementById("approvedInspectorName").value = "";
-            }else{
-                const proposedCVsTable = document.querySelector("#proposedCVsTable tbody");
-                const row = proposedCVsTable.querySelector(`tr:nth-child(${index + 1})`);
-                if (row) {
-                    const selectedOption = row.querySelector("select").selectedOptions[0];
-                    if (selectedOption) {
-                        document.getElementById("approvedInspectorName").value = "";
-                        document.getElementById("approvedInspectorName").value = selectedOption.textContent.trim()
-                    } else {
-                        alert("No Inspector is selected.");
-                    }
-                } else {
-                    console.log("Specified row not found in the proposedCVsTable.");
-                }
-            }
-        }
-
-       function initMap(inspectionLocation) {
-
-           fetch('/api/inspectors?address=' + inspectionLocation )
-           .then(response => response.json())
-           .then(data => {
-               for (const [locationKey, inspectors] of Object.entries(data)) {
-                   const userLocationArray = locationKey.split(',').map(Number); // Split and convert to numbers
-                   const userLocation = new google.maps.LatLng(userLocationArray[0], userLocationArray[1]); // Create LatLng object
-
-                  const map = new google.maps.Map(document.getElementById('map'), {
-                      zoom: 10,
-                      center: userLocation
-                  });
-
-                   // Add marker for user location
-                   const userMarker = new google.maps.Marker({
-                       position: userLocation,
-                       map: map,
-                       title: "Inspection Location"
-                   });
-
-                   // Plot all inspectors for the current user location
-                   inspectors.forEach(inspector => {
-                       const marker = new google.maps.Marker({
-                           position: {
-                               lat: inspector.location.lat,
-                               lng: inspector.location.lng
-                           },
-                           map: map,
-                           title: `${inspector.name}, Distance: ${inspector.distance}, Duration: ${inspector.duration}`,
-                           icon: {
-                               url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png" // Green marker icon
-                           }
-                       });
-                   });
-               }
-                   });
-
-       }
-
-       function showMapLoadingMessage() {
-                   const mapLoadingMessage = document.getElementById('mapLoadingMessage');
-                   mapLoadingMessage.style.display = 'block';
-
-                   // Assuming 'initMap' will handle the map loading process
-                   // Add a timeout or any custom logic to hide the message after map loading completes
-                   setTimeout(() => {
-                       mapLoadingMessage.style.display = 'none';
-                   }, 5000); // Adjust the time as per map loading logic
-               }
-
-      function addCVRow() {
-
-        const tableBody = document.querySelector("#proposedCVsTable tbody");
-        const previousRow = tableBody.querySelector("tr:last-child");
-        const index = tableBody.querySelectorAll("tr").length -1;
-        
-        if (previousRow) {
-            const lastRadioInput = [...previousRow.querySelectorAll("input[type='radio']")].pop();
-            if (lastRadioInput && lastRadioInput.value === "false" && !lastRadioInput.checked) {
-                alert("Inspector is already approved.");
-                return;
-            }
-
-            const newRow = previousRow.cloneNode(true); // Clone the previous row
-
-            newRow.querySelectorAll("input, select").forEach(input => {
-
-                input.id = input.id.replace(index, index + 1);
-                input.name = input.name.replace(index, index + 1);
-
-                if (input.tagName === "SELECT") {
-                    input.selectedIndex = 0; // Reset dropdowns
-                } else if (input.type === "radio") {
-                    // Reset radio buttons
-                    if (input.value === "true") {
-                        input.checked = false;
-                    }
-                    if (input.value === "false") {
-                        input.checked = true;
-                    }
-                } else if (input.type === "datetime-local") {
-                    input.value = ""; // Reset datetime-local input
-                }
-            });
-            tableBody.appendChild(newRow); // Append the cloned row as a new row
-        }
-
-      }
-
-      function deleteCVRow(button) {
-          const tableBody = document.querySelector("#proposedCVsTable tbody");
-          const rows = tableBody.querySelectorAll("tr");
-          const row = button.closest("tr");
-          if (row === rows[0]) {
-              alert("At least one Inspector should be assigned to the Inspection !");
-              return;
-          }
-          if (row) {
-            const lastRadioInput = [...row.querySelectorAll("input[type='radio']")].pop();
-            if (lastRadioInput && lastRadioInput.value === "false" && !lastRadioInput.checked) {
-               document.getElementById("approvedInspectorName").value = "";
-            }
-          }
-          row.remove();
-      }
-
-      document.addEventListener("DOMContentLoaded", function () {
-            // Dynamically Set Page Title Based on 'edit' Parameter
-            const href = new URL(window.location.href);
-            const isEdit = href.pathname.includes('edit');
-            document.title = isEdit ? 'Edit Inspection' : 'Add New Inspection';
-
-
-            // Initialize Map with default or provided location
-            const locationDetails = document.getElementById('inspectionLocationDetails').value;
-            initMap(locationDetails ? locationDetails : 'Hyderabad, India');
-        });
-
-      document.addEventListener("DOMContentLoaded", function () {
-            flatpickr("#inspectionDateAsPerNotification", {
-                mode: "multiple",
-                dateFormat: "d/m/Y"
-            });
-        });
-    </script>
-</head>
-<header style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background-color: #334e6b; border-bottom: 1px solid #ddd;">
-    <!-- Left Section: Logo -->
-    <div style="flex: 1 1 20%; display: flex; align-items: center;">
-        <img src="/images/logo.png" width="140" height="60" alt="static logo">
-    </div>
-
-    <!-- Middle Section: Title -->
-    <div style="flex: 1 1 60%; text-align: center; font-size: 1.5rem; font-weight: bold; color: white;">
-        Inspection Management Services
-    </div>
-
-    <!-- Right Section: Empty -->
-    <div style="flex: 1 1 20%;">
-
-        <button class="logout-btn" style="flex: 1 1 10%;">
-            <i class="fas fa-sign-out-alt"></i>
-            <a th:href="@{/logout}" th:onclick="return confirm('Are you sure you want to log out?');">
-                Logout
-            </a>
-
-        </button>
-    </div>
-</header>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<!-- Head -->
+<head th:replace="fragments/head :: head"><title>Add or Edit Inspection</title></head>
 <body>
-
-
-<div class="container mt-5">
-
-    <!-- Form to Add New Inspection -->
-    <div class="mt-5">
-        <form th:action="@{/inspection/save}" th:object="${inspection}" method="post" class="row g-3">
-
+<!-- Header -->
+<header th:replace="fragments/header :: header"></header>
+<!-- Main Content -->
+<main>
+<div class="page-container">
+    <div class="form-card">
+        <div class="form-header">
+            <h1 class="form-title">Add Inspection</h1>
+            <p class="form-subtitle">Please fill out the information below to register a new inspection</p>
+        </div>
+        <form th:action="@{/inspection/save}" th:object="${inspection}" method="post" class="needs-validation" novalidate>
             <input type="hidden" th:field="*{id}" id="id" />
 
-            <div class="row">
+            <!-- notification details -->
+            <h4 class="section-header">
+                <i class="fas fa-bell me-2"></i> Notification Details
+            </h4>
+
+            <div class="row g-3 mb-4">
 
                 <!-- Inspection No -->
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <label for="inspectionNo" class="form-label">IISPL No</label>
-                    <input type="text" id="inspectionNo" th:field="*{inspectionNo}" class="form-control" required
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-briefcase"></i></span>
+                        <input type="text" id="inspectionNo" th:field="*{inspectionNo}" class="form-control" placeholder="Enter IISPL No" required
                            th:disabled="${edit}"/>
-                    <!-- Hidden field to ensure the value is sent even when the input is disabled -->
-                    <input type="hidden" th:field="*{inspectionNo}" th:if="${edit}"/>
+                        <!-- Hidden field to ensure the value is sent even when the input is disabled -->
+                        <input type="hidden" th:field="*{inspectionNo}" th:if="${edit}"/>
+                    </div>
                 </div>
 
                 <!-- Notification No -->
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <label for="notificationNo" class="form-label">Notification No</label>
-                    <input type="text" id="notificationNo" th:field="*{notificationNo}" class="form-control" required/>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                        <input type="text" id="notificationNo" th:field="*{notificationNo}" class="form-control" required/>
+                    </div>
                 </div>
 
+
                 <!-- Notification Received Date and Time -->
-                <div class="col-md-4">
-                    <label for="notificationReceivedDateTime" class="form-label">Notification Received Date &
-                        Time</label>
-                    <input type="datetime-local" id="notificationReceivedDateTime"
-                           th:field="*{notificationReceivedDateTime}"
-                           class="form-control"/>
+                <div class="col-md-6">
+                    <label for="notificationReceivedDateTime" class="form-label">Notification Received Date</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                       <input type="datetime-local" id="notificationReceivedDateTime" th:field="*{notificationReceivedDateTime}"
+                                   class="form-control"/>
+                        </div>
                 </div>
+
+                <!-- Client Name -->
+                <div class="col-md-6">
+                    <label for="clientName" class="form-label">Client Name</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <select id="clientName" th:field="*{client.clientId}" class="form-control" required>
+                            <option value="">Select Client</option>
+                            <option th:each="client : ${inspection.clientsList}" th:value="${client.clientId}"
+                                    th:text="${client.clientName + ' - ' + client.country}"></option>
+                        </select>
+                        </div>
+                </div>
+
 
             </div>
 
+            <!-- inspection details -->
+            <h4 class="section-header">
+                <i class="fas fa-address-card"></i> Inspection Details
+            </h4>
 
-            <div class="row">
+            <div class="row g-3 mb-4">
 
-                <!-- Client Name -->
-                <div class="col-md-4">
-                    <label for="clientName" class="form-label">Client Name</label>
-                    <select id="clientName" th:field="*{client.clientId}" class="form-control" required>
-                        <option value="">Select Client</option>
-                        <option th:each="client : ${inspection.clientsList}" th:value="${client.clientId}"
-                                th:text="${client.clientName + ' - ' + client.country}"></option>
-                    </select>
+                <!--- Inspection Country -->
+                <div class="col-md-6">
+                    <label for="inspectionCountry" class="form-label">Inspection Country</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-globe"></i></span>
+                        <select id="inspectionCountry" th:field="*{inspectionCountry}" class="form-control" required>
+                            <option value="">Select Country</option>
+                            <option th:each="country : ${inspection.countriesList}" th:value="${country}"
+                                    th:text="${country}"></option>
+                        </select>
+                    </div>
                 </div>
 
-                <!-- Inspection Countries -->
-                <div class="col-md-4">
-                    <label for="inspectionCountry" class="form-label">Inspection Country</label>
-                    <select class="form-control" id="inspectionCountry" th:field="*{inspectionCountry}" required>
-                        <option value="">Select Country</option>
-                        <option th:each="country : ${inspection.countriesList}" th:value="${country}" 
-                                th:text="${country}"></option>
-                    </select>
-                </div>               
-                
                 <!-- Inspection Dates -->
-                <div class="col-md-4" id="inspectionDatesContainer">
-                    <label for="inspectionDateAsPerNotification">Inspection Dates</label>
-                    <input id="inspectionDateAsPerNotification" name="inspectionDateAsPerNotification"
+                <div class="col-md-6">
+                    <label for="inspectionDateAsPerNotification" class="form-label">Inspection Dates</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                        <input id="inspectionDateAsPerNotification" name="inspectionDateAsPerNotification"
                            th:field="*{inspectionDateAsPerNotification}" class="form-control"
                            type="text" placeholder="Pick dates"
                            th:value="${inspectionDateAsPerNotification}">
-                </div>
-            
-            </div>
-
-            <div class="row" style="height:470px">
-
-                <div class="col-md-4">
-
-                    <!-- Inspection Item -->
-                    <div>
-                        <label for="inspectionItem" class="form-label">Inspection Item</label>
-                        <input type="text" id="inspectionItem" th:field="*{inspectionItem}" class="form-control"/>
                     </div>
+                </div>
 
-                    <!-- Inspection Type -->
-                    <div>
-                        <label class="form-label">Inspection Type</label>
-                        <div>
+                <!-- Inspection Item -->
+                <div class="col-md-6">
+                    <label for="inspectionItem" class="form-label">Inspection Item</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-box"></i></span>
+                         <input type="text" id="inspectionItem" th:field="*{inspectionItem}" class="form-control"/>
+                    </div>
+                </div>
+
+                <!-- Inspection Type -->
+                <div class="col-md-6">
+                    <label class="form-label">Inspection Type</label>
+                    <div class="d-flex">
+                        <div class="form-check me-3">
                             <input type="radio" id="MECHANICAL"
                                    name="inspectionType" th:field="*{inspectionType}" value="MECHANICAL" required/>
-                            Mechanical
+                            <label for="MECHANICAL">Mechanical</label>
                         </div>
-                        <div>
+                        <div class="form-check">
                             <input type="radio" id="ELECTRICAL"
                                    name="inspectionType" th:field="*{inspectionType}" value="ELECTRICAL" required/>
-                            Electrical
+                            <label for="ELECTRICAL">Electrical</label>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Inspection Stages -->
-                    <div>
+
+            </div>
+
+            <div class="row g-3 mb-4">
+
+                <!-- First Column -->
+
+                <!-- Inspection Stages -->
+                <div class="col-md-6">
+                    <div class="mb-4">
                         <label for="inspectionActivityWithStages" class="form-label">Inspection Stages</label>
-                        <textarea id="inspectionActivityWithStages" th:field="*{inspectionActivityWithStages}"
-                                  class="form-control" rows="3"></textarea>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-tasks"></i></span>
+                            <textarea id="inspectionActivityWithStages"
+                                      th:field="*{inspectionActivityWithStages}"
+                                      class="form-control" rows="3" placeholder="Enter Inspection Stages"></textarea>
+                        </div>
                     </div>
 
                     <!-- Inspection Location Details -->
                     <div>
                         <label for="inspectionLocationDetails" class="form-label">Inspection Location Details</label>
-                        <textarea id="inspectionLocationDetails" th:field="*{inspectionLocationDetails}"
-                                  class="form-control" rows="3"
-                                  onchange="initMap(this.value); showMapLoadingMessage(); "></textarea>
-
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-location-pin"></i></span>
+                            <textarea id="inspectionLocationDetails" th:field="*{inspectionLocationDetails}"
+                                      class="form-control" rows="3"
+                                      onchange="initMap(this.value); showMapLoadingMessage();"></textarea>
+                        </div>
                         <div id="mapLoadingMessage" class="mt-2 text-warning fw-bold" style="display: none;">
                             Wait for the map to load nearby inspectors...
                         </div>
                     </div>
-
                 </div>
 
-                <!-- Inspectors Location Map -->
-
-                <div class="col-md-6" id="map"
-                     style="width: 65%; height: 100%; position: relative; overflow: hidden;"></div>
+                <!-- Second Column -->
+                <div class="col-md-6">
+                    <!-- Map -->
+                    <div id="map" style="width: 100%; height: 100%; position: relative; overflow: hidden;"></div>
+                </div>
 
             </div>
 
-            <div class="row">
+            <!-- inspector details -->
+            <h4 class="section-header">
+                <i class="fas fa-users"></i> Inspector Details
+            </h4>
+
+            <div class="row g-3 mb-4">
 
                 <!-- Proposed CVs Iteration -->
                 <div class="col-md-12 mt-4">
-                    <label class="form-label">Proposed CVs</label>
+                    <label class="form-label">Proposed Inspectors</label>
                     <table class="table table-bordered" id="proposedCVsTable">
                         <thead>
                         <tr>
                             <th>Inspector Name</th>
                             <th>CV Available</th>
-                            <th>Technical Coordinator Name</th>
+                            <th>Technical Coordinator</th>
                             <th>PQRAvailable</th>
-                            <th>CV Submitted To Client Date</th>
-                            <th>CV Approved</th>
+                            <th>CV Submitted Date</th>
+                            <th>CV Status</th>
                             <th>Actions</th>
                         </tr>
                         </thead>
@@ -604,49 +305,67 @@
 
             </div>
 
-            <div class="row">
+            <!-- inspection progress -->
+            <h4 class="section-header">
+                <i class="fas fa-cogs process-icon"></i> Inspection Progress
+            </h4>
+            
+            <div class="row g-3 mb-4">
 
                 <!-- Approved Inspector Name -->
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <label for="approvedInspectorName" class="form-label">Approved Inspector Name</label>
-                    <input type="text" id="approvedInspectorName" th:field="*{approvedInspectorName}"
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <input type="text" id="approvedInspectorName" th:field="*{approvedInspectorName}"
                            class="form-control" readonly/>
+                    </div>
                 </div>
 
                 <!-- Order Confirmation Date -->
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <label for="orderConfirmationDate" class="form-label">Date of Order Confirmation</label>
-                    <input type="date" id="orderConfirmationDate" th:field="*{orderConfirmationDate}"
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-calendar-check"></i></span>
+                        <input type="date" id="orderConfirmationDate" th:field="*{orderConfirmationDate}"
                            th:value="*{orderConfirmationDate != null ? orderConfirmationDate : ''}"
                            class="form-control" />
+                    </div>
                 </div>
 
                 <!--- Sector Scope -->
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <label for="sectorScope" class="form-label">Sector Scope</label>
-                    <input type="text" id="sectorScope" th:field="*{sectorScope}" class="form-control" />
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-industry"></i></span>
+                        <input type="text" id="sectorScope" th:field="*{sectorScope}" class="form-control" />
+                    </div>
                 </div>
-
-            </div>
-
-            <div class="row">
-
+                
                 <!--- End Client Name -->
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <label for="endClientName" class="form-label">End Client Name</label>
-                    <input type="text" id="endClientName" th:field="*{endClientName}" class="form-control" />
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user-tie"></i></span>
+                        <input type="text" id="endClientName" th:field="*{endClientName}" class="form-control" />
+                    </div>
                 </div>
 
                 <!-- Project Name -->
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <label for="projectName" class="form-label">Project Name</label>
-                    <input type="text" id="projectName" th:field="*{projectName}" class="form-control" />
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-project-diagram"></i></span>
+                        <input type="text" id="projectName" th:field="*{projectName}" class="form-control" />
+                    </div>
                 </div>
 
                 <!-- Reference Documents for Inspection Status -->
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <label class="form-label">Reference Documents</label>
-                    <div>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-file"></i></span>
+                        
                         <input type="radio" name="referenceDocumentsForInspectionStatus" value="true"
                                th:checked="${inspection.referenceDocumentsForInspectionStatus == true}" />
                         Available
@@ -655,29 +374,27 @@
                         Not Available
                     </div>
                 </div>
-
-            </div>
-
-            <div class="row">
-
+                
                 <!-- Documents Reviewed By Technical Coordinator -->
-                <div class="col-md-4">
-                    <label for="documentsReviewedByTechnicalCoordinator" class="form-label">Documents Reviewed By
-                        Technical Coordinator</label>
-                    <select id="documentsReviewedByTechnicalCoordinator" class="form-control"
-                            th:field="*{documentsReviewedByTechnicalCoordinator}" >
-                        <option value="">Select Technical Coordinator</option>
-                        <option th:each="coordinator : ${inspection.technicalCoordinatorsList}"
-                                th:value="${coordinator.empName}"
-                                th:text="${coordinator.empName}"></option>
-                    </select>
+                <div class="col-md-6">
+                    <label class="form-label">Documents Reviewed By Technical Coordinator</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user-check"></i></span>
+                        <select id="documentsReviewedByTechnicalCoordinator" class="form-control"
+                                th:field="*{documentsReviewedByTechnicalCoordinator}" >
+                            <option value="">Select Technical Coordinator</option>
+                            <option th:each="coordinator : ${inspection.technicalCoordinatorsList}"
+                                    th:value="${coordinator.empName}"
+                                    th:text="${coordinator.empName}"></option>
+                        </select>
+                    </div>
                 </div>
 
-
                 <!-- Contract Review Prepared -->
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <label class="form-label">Contract Review Prepared</label>
-                    <div>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
                         <input type="radio" name="contractReviewPrepared" value="true"
                                th:checked="${inspection.contractReviewPrepared == true}" />
                         Yes
@@ -687,11 +404,11 @@
                     </div>
                 </div>
 
-
                 <!-- Inspection Advise Note -->
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <label class="form-label">Inspection Advise Note</label>
-                    <div>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-sticky-note"></i></span>
                         <input type="radio" name="inspectionAdviseNote" value="true"
                                th:checked="${inspection.inspectionAdviseNote == true}" />
                         Yes
@@ -700,24 +417,21 @@
                         No
                     </div>
                 </div>
-
-
-            </div>
-
-
-            <div class="row">
-
-
+                
                 <!-- Instructions to Inspector Date -->
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <label for="instructionsToInspectorDate" class="form-label">Instructions to Inspector Date</label>
-                    <input type="date" id="instructionsToInspectorDate" th:field="*{instructionsToInspectorDate}" class="form-control"/>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-clipboard-list"></i></span>
+                        <input type="date" id="instructionsToInspectorDate" th:field="*{instructionsToInspectorDate}" class="form-control"/>
+                    </div>
                 </div>
-
+                
                 <!-- Any Inspection Issues -->
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <label class="form-label">Any Inspection Issues</label>
-                    <div>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-exclamation-triangle"></i></span>
                         <input type="radio" name="anyInspectionIssues" value="true"
                                th:checked="${inspection.anyInspectionIssues == true}" />
                         Yes
@@ -728,58 +442,66 @@
                 </div>
 
                 <!-- FR Sent To Client Date -->
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <label for="frSentToClientDate" class="form-label">FR Sent To Client Date</label>
-                    <input type="date" id="frSentToClientDate" th:field="*{frSentToClientDate}" class="form-control"/>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-file-signature"></i></span>
+                        <input type="date" id="frSentToClientDate" th:field="*{frSentToClientDate}" class="form-control"/>
+                    </div>
                 </div>
-
-            </div>
-
-
-            <div class="row">
-
+                
                 <!-- Inspection Reports Received Date -->
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <label for="inspectionReportsReceivedDate" class="form-label">Inspection Reports Received
                         Date</label>
-                    <input type="date" id="inspectionReportsReceivedDate" th:field="*{inspectionReportsReceivedDate}"
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-file-signature"></i></span>
+                        <input type="date" id="inspectionReportsReceivedDate" th:field="*{inspectionReportsReceivedDate}"
                            class="form-control" />
+                    </div>
                 </div>
 
                 <!-- Inspection Reviewed By -->
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <label for="inspectionReviewedBy" class="form-label">Inspection Reviewed By</label>
-                    <select id="inspectionReviewedBy" class="form-control" th:field="*{inspectionReviewedBy}" >
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user-check"></i></span>
+                        <select id="inspectionReviewedBy" class="form-control" th:field="*{inspectionReviewedBy}" >
                         <option value="">Select Reviewer</option>
                         <option th:each="coordinator : ${inspection.technicalCoordinatorsList}"
                                 th:value="${coordinator.empName}"
                                 th:text="${coordinator.empName}"></option>
                     </select>
+                    </div>
                 </div>
 
                 <!-- Inspection Support Documents Sent Date -->
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <label for="inspectionSupportDocumentsSentDate" class="form-label">Inspection Support Documents
                         Sent Date</label>
-                    <input type="date" id="inspectionSupportDocumentsSentDate"
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-file-signature"></i></span>
+                        <input type="date" id="inspectionSupportDocumentsSentDate"
                            th:field="*{inspectionSupportDocumentsSentDate}" class="form-control" />
+                    </div>
                 </div>
-
-            </div>
-
-            <div class="row">
-
+                
                 <!-- Inspection Report Number -->
-                <div class="col-md-4">
-                    <label for="inspectionReportNumber" class="form-label">Inspection Report Number</label>
-                    <input type="text" id="inspectionReportNumber"
+                <div class="col-md-6">
+                    <label for="inspectionReportNumber" class="form-label">
+                        Inspection Report Number</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-file-signature"></i></span>
+                        <input type="text" id="inspectionReportNumber"
                            th:field="*{inspectionReportNumber}" class="form-control" />
+                    </div>
                 </div>
 
                 <!-- NCR Raised -->
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <label class="form-label">NCR Raised</label>
-                    <div>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-file-signature"></i></span>
                         <input type="radio" name="ncrRaised" value="true" th:checked="${inspection.ncrRaised == true}" />
                         Yes
                         <input type="radio" name="ncrRaised" value="false" th:checked="${inspection.ncrRaised == false}" />
@@ -788,20 +510,19 @@
                 </div>
 
                 <!-- IRN Sent Date -->
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <label for="irnSentDate" class="form-label">IRN Sent Date</label>
-                    <input type="date" id="irnSentDate" th:field="*{irnSentDate}" class="form-control" />
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-file-signature"></i></span>
+                        <input type="date" id="irnSentDate" th:field="*{irnSentDate}" class="form-control" />
+                    </div>
                 </div>
 
-
-            </div>
-
-            <div class="row">
-
                 <!-- Impartiality and Confidentiality -->
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <label class="form-label">Impartiality and Confidentiality</label>
-                    <div>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-file-signature"></i></span>
                         <input type="radio" name="impartialityAndConfidentiality" value="true"
                                th:checked="${inspection.impartialityAndConfidentiality == true}" />
                         Yes
@@ -811,17 +532,18 @@
                     </div>
                 </div>
 
-
                 <!-- Job Folder Link -->
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <label for="jobFolderLink" class="form-label">Job Folder Link</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-file-signature"></i></span>
                     <input type="url" id="jobFolderLink" th:field="*{jobFolderLink}" class="form-control"
                            placeholder="Enter the URL" />
                 </div>
 
             </div>
 
-            
+            </div>
             <!-- Submit Button -->
             <div class="col-12">
                 <button type="submit" class="btn btn-success" th:text="${edit ? 'Edit Inspection' : 'Add Inspection'}">
@@ -832,12 +554,8 @@
         </form>
     </div>
 </div>
-
-<!-- Optional JavaScript Frameworks -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</main>
+<!-- Footer -->
+<footer th:replace="fragments/footer :: footer"></footer>
 </body>
-<!--<footer>-->
-<!--    <p class="mb-0" style="font-size: 1rem;">&copy; 2025 International Inspection Services Pvt Ltd. All Rights-->
-<!--        Reserved.</p>-->
-<!--</footer>-->
 </html>

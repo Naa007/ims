@@ -1,502 +1,349 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Inspection</title>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHwaHTTVcK5bvy2Vg36H6r3gdpSoIYcjY"></script>
-    <script th:src="@{/js/scripts.js}"></script>
-
-    <!-- Add any required CSS frameworks like Bootstrap -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-    <style>
-        /* Global Styles */
-       body {
-           font-family: Arial, sans-serif;
-           margin: 0;
-           padding: 0;
-           background-color: #F8F9FA;
-           color: #343A40;
-           display: flex;
-           flex-direction: column;
-           min-height: 100vh;
-       }
-
-       /* Header Styles */
-       header {
-           background-color: #334e6b;
-           padding: 0.5rem;
-           text-align: center;
-           color: white;
-           font-size: 1.5rem;
-           font-weight: bold;
-       }
-
-       /* Footer Styles */
-       footer {
-           background-color: #334e6b;
-           color: white;
-           text-align: center;
-           padding: 1rem;
-           position: absolute;
-           bottom: 0;
-           width: 100%;
-       }
-
-       /* Container Styles */
-       .container {
-           flex: 1;
-<!--           display: flex;-->
-           flex-direction: column;
-           align-items: center;
-           justify-content: center;
-           padding: 0.5rem;
-       }
-        /* Form Section */
-        .form-section {
-            flex: 1;
-            padding: 2rem;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-        }
-
-
-        /* Add Gap Between Rows */
-        .row {
-            margin-bottom: 1.5rem; /* Adjust gap as needed */
-        }
-
-        label {
-            font-size: 1rem;
-            margin-bottom: 0.5rem;
-            font-weight: bold;
-        }
-
-        input {
-            padding: 0.8rem;
-            margin-bottom: 1rem;
-            font-size: 1rem;
-            border: 1px solid #CED4DA;
-            border-radius: 5px;
-        }
-
-        /* Button Styles */
-        button {
-            background-color: #334e6b; /* Primary blue color */
-            color: white;
-            font-size: 1rem;
-            padding: 0.8rem;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #0056b3; /* Darker blue for hover effect */
-        }
-
-        #map {
-            border: 2px solid #000; /* Adds a black border with 2px thickness */
-            border-radius: 8px; /* Optional: Slightly rounds the corners of the border */
-        }
-
-        #inspectionDatesContainer .btn {
-                        height: calc(1.5em + 0.75rem + 2px); /* Match the computed input field height */
-                        line-height: normal; /* Center align button text */
-                    }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-
-
-            .form-section {
-                padding: 1.5rem;
-            }
-
-            header {
-                padding: 1rem;
-                background-color: #334e6b;
-                color: white;
-                font-size: 1.5rem;
-                text-align: center;
-                font-weight: bold;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-            header img {
-                width: auto;
-                height: 60px;
-                margin-right: 1rem;
-            }
-
-            header .title {
-                flex: 1;
-                text-align: center;
-                font-size: 1.5rem;
-                font-weight: bold;
-                color: white;
-            }
-
-            /* Footer Styles */
-            footer {
-                background-color: #334e6b;
-                color: white;
-                text-align: center;
-                padding: 1rem;
-                width: 100%;
-                margin-top: auto;
-            }
-
-            /* Ensure body and html take full height of the viewport */
-            html, body {
-                height: 100%;
-                display: flex;
-                flex-direction: column;
-            }
-
-            /* Ensure the container grows and pushes footer to the bottom */
-            .container {
-                flex-grow: 1;
-                display: flex;
-                flex-direction: column;
-            }
-
-        }
-
-    </style>
-
-</head>
-<header style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background-color: #334e6b; border-bottom: 1px solid #ddd;">
-    <!-- Left Section: Logo -->
-    <div style="flex: 1 1 20%; display: flex; align-items: center;">
-        <img src="/images/logo.png" width="140" height="60" alt="static logo">
-    </div>
-
-    <!-- Middle Section: Title -->
-    <div style="flex: 1 1 60%; text-align: center; font-size: 1.5rem; font-weight: bold; color: white;">
-        Inspection Management Services
-    </div>
-
-    <!-- Right Section: Empty -->
-    <div style="flex: 1 1 20%;">
-
-        <button class="logout-btn" style="flex: 1 1 10%;">
-            <i class="fas fa-sign-out-alt"></i>
-            <a th:href="@{/logout}" th:onclick="return confirm('Are you sure you want to log out?');">
-                Logout
-            </a>
-
-        </button>
-    </div>
-</header>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<!-- Head -->
+<head th:replace="fragments/head :: head"><title>View Inspection</title></head>
 <body>
+<!-- Header -->
+<header th:replace="fragments/header :: header"></header>
+<!-- Main Content -->
+<main class="container">
 
-    <div class="container mt-5">
+    <div class="card-body">
+        <h5 class="card-title"><i class="fas fa-envelope"></i> <span
+                th:text="'IISPL #' + ${inspection.inspectionNo}"></span></h5>
+        
+        <!-- notification details -->
+        <div class="section-title"><i class="fas fa-bell"></i> Notification Details</div>
 
-            <form th:object="${inspection}" class="row g-3">
+        <div class="info-section">
 
-                <div class="row">
-
-                    <!-- Inspection No -->
-                    <div class="col-md-4">
-                        <label class="form-label">IISPL No</label>
-                        <p th:text="${inspection.inspectionNo}" class="form-control-static"></p>
-                    </div>
-
-                    <!-- Notification No -->
-                    <div class="col-md-4">
-                        <label class="form-label">Notification No</label>
-                        <p th:text="${inspection.notificationNo}" class="form-control-static"></p>
-                    </div>
-
-                    <!-- Notification Received Date and Time -->
-                    <div class="col-md-4">
-                        <label class="form-label">Notification Received Date & Time</label>
-                        <p th:text="${inspection.notificationReceivedDateTime}"
-                           class="form-control-static"></p>
-                    </div>
-
+            <!-- Notification No -->
+            <div class="info-item">
+                <i class="fas fa-envelope"></i>
+                <div class="info-content">
+                    <div class="info-label">Notification No</div>
+                    <div class="info-value" th:text="${inspection.notificationNo}"></div>
                 </div>
+            </div>
 
-                <div class="row">
 
-                    <!-- Client Name -->
-                    <div class="col-md-4">
-                        <label class="form-label">Client Name</label>
-                        <p th:text="${inspection.client.clientName}" class="form-control-static"></p>
-                    </div>
-
-                    <!-- Inspection Country -->
-                    <div class="col-md-4">
-                        <label class="form-label">Inspection Country</label>
-                        <p th:text="${inspection.inspectionCountry}" class="form-control-static"></p>
-                    </div>
-
-                    <!-- Inspection Dates -->
-                    <div class="col-md-4">
-                        <label class="form-label">Inspection Dates</label>
-                        <ul>
-                            <li th:each="date : ${inspection.inspectionDateAsPerNotification}" th:text="${date}"></li>
-                        </ul>
-                    </div>
-
+            <!-- Notification Received Date and Time -->
+            <div class="info-item">
+                <i class="fas fa-clock"></i>
+                <div class="info-content">
+                    <div class="info-label">Notification Received Date & Time</div>
+                    <div class="info-value" th:text="${inspection.notificationReceivedDateTime}"></div>
                 </div>
+            </div>
 
-                <div class="row">
-
-                        <!-- Inspection Item -->
-                        <div class="col-md-4">
-                            <label class="form-label">Inspection Item</label>
-                            <p th:text="${inspection.inspectionItem}" class="form-control-static"></p>
-                        </div>
-
-                        <!-- Inspection Type -->
-                        <div class="col-md-4">
-                            <label class="form-label">Inspection Type</label>
-                            <ul>
-                                <li th:each="type : ${inspection.inspectionType}" th:text="${type}"></li>
-                            </ul>
-                        </div>
-
-
-                        <!-- Inspection Stages -->
-                        <div class="col-md-4">
-                            <label for="inspectionActivityWithStages" class="form-label">Inspection Stages</label>
-                            <p id="inspectionActivityWithStages" th:text="${inspection.inspectionActivityWithStages}"
-                               class="form-control-static"></p>
-                        </div>
-                        
-
-                        <!-- Inspection Location Details -->
-                        <div class="col-md-4">
-                            <label for="inspectionLocationDetails" class="form-label">Inspection Location
-                                Details</label>
-                            <p id="inspectionLocationDetails" th:text="${inspection.inspectionLocationDetails}"
-                               class="form-control-static"></p>
-                        </div>
-
+            <!-- Client Name -->
+            <div class="info-item">
+                <i class="fas fa-user"></i>
+                <div class="info-content">
+                    <div class="info-label">Client Name</div>
+                    <div class="info-value" th:text="${inspection.client.clientName+ ' - ' + inspection.client.country}"></div>
                 </div>
+            </div>
 
-                <div class="row">
-                    <!-- Proposed CVs Iteration -->
-                    <div class="col-md-12 mt-4">
-                        <label class="form-label">Proposed CVs</label>
-                        <table class="table table-bordered" id="proposedCVsTable">
-                            <thead>
-                            <tr>
-                                <th>Inspector Name</th>
-                                <th>CV Available</th>
-                                <th>Technical Coordinator Name</th>
-                                <th>PQR Available</th>
-                                <th>CV Submitted To Client Date</th>
-                                <th>CV Approved</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <!-- Existing CVs -->
-                            <tr th:each="cv : ${inspection.proposedCVs}">
-                                <td>
-                                    <p th:text="${cv.inspector.inspectorName}"></p>
-                                </td>
+        </div>
 
-                                <td>
-                                    <p th:text="${cv.cvCertificatesAvailable != null && cv.cvCertificatesAvailable ? 'Yes' : 'No'}"></p>
-                                </td>
+        <!-- inspection details -->
+        <div class="section-title"><i class="fas fa-address-card"></i> Inspection Details</div>
+        
+        <div class="info-section">
+            <!-- Inspection Country -->
+            <div class="info-item">
+                <i class="fas fa-globe"></i>
+                <div class="info-content">
+                    <div class="info-label">Inspection Country</div>
+                    <div class="info-value" th:text="${inspection.inspectionCountry}"></div>
+                </div>
+            </div>
+    
+            <!-- Inspection Dates -->
+            <div class="info-item">
+                <i class="fas fa-calendar-alt"></i>
+                <div class="info-content">
+                    <div class="info-label">Inspection Dates</div>
+                    <ul class="list-unstyled">
+                        <li th:each="date : ${inspection.inspectionDateAsPerNotification}" th:text="${date}"
+                            class="info-value"></li>
+                    </ul>
+                </div>
+            </div>
+    
+            <!-- Inspection Item -->
+            <div class="info-item">
+                <i class="fas fa-box"></i>
+                <div class="info-content">
+                    <div class="info-label">Inspection Item</div>
+                    <div class="info-value" th:text="${inspection.inspectionItem}"></div>
+                </div>
+            </div>
 
-                                <td>
-                                    <p th:text="${cv.cvReviewByTechnicalCoordinator.empName}"></p>
-                                </td>
+            <!-- Inspection Type -->
+            <div class="info-item">
+                <i class="fas fa-list-alt"></i>
+                <div class="info-content">
+                    <div class="info-label">Inspection Type</div>
+                    <ul class="list-unstyled">
+                        <li th:each="type : ${inspection.inspectionType}" th:text="${type}" class="info-value"></li>
+                    </ul>
+                </div>
+            </div>
 
-                                <td>
-                                    <p th:text="${cv.pqrAvailable != null && cv.pqrAvailable ? 'Yes' : 'No'}"></p>
-                                </td>
+            <!-- Inspection Stages -->
+            <div class="info-item">
+                <i class="fas fa-tasks"></i>
+                <div class="info-content">
+                    <div class="info-label">Inspection Stages</div>
+                    <p id="inspectionActivityWithStages" th:text="${inspection.inspectionActivityWithStages}"
+                       class="info-value"></p>
+                </div>
+            </div>
 
-                                <td>
-                                    <p th:text="${cv.cvSubmittedToClientDate}"></p>
-                                </td>
+            <!-- Inspection Location Details -->
+            <div class="info-item">
+                <i class="fas fa-map-marker"></i>
+                <div class="info-content">
+                    <div class="info-label">Inspection Location Details</div>
+                    <p id="inspectionLocationDetails" th:text="${inspection.inspectionLocationDetails}"
+                       class="info-value"></p>
+                </div>
+            </div>
 
-                                <td>
-                                    <p th:text="${cv.cvStatus ? 'Approved' : 'Not Approved'}"></p>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
+        </div>
+
+
+        <div class="section-title"><i class="fas fa-users"></i> Proposed Inspectors</div>
+        <div class="table-responsive">
+            <table class="table" id="proposedCVsTable">
+                <thead>
+                <tr>
+                    <th>Inspector Name</th>
+                    <th>CV Available</th>
+                    <th>Technical Coordinator</th>
+                    <th>PQR Available</th>
+                    <th>CV Submitted Date</th>
+                    <th>CV Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Existing CVs -->
+                <tr th:each="cv : ${inspection.proposedCVs}">
+                    <td>
+                        <i class="fas fa-user-tie text-success mr-2"></i>
+                        <span th:text="${cv.inspector.inspectorName}"></span>
+                    </td>
+
+                    <td th:text="${cv.cvCertificatesAvailable != null && cv.cvCertificatesAvailable ? 'Yes' : 'No'}"></td>
+                    <td th:text="${cv.cvReviewByTechnicalCoordinator.empName}"></td>
+                    <td th:text="${cv.pqrAvailable != null && cv.pqrAvailable ? 'Yes' : 'No'}"></td>
+                    <td th:text="${cv.cvSubmittedToClientDate}"></td>
+                    <td th:text="${cv.cvStatus ? 'Approved' : 'Not Approved'}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section-title"><i class="fas fa-cogs process-icon"></i> Inspection Process</div>
+        <div class="info-section">
+
+            <!-- Approved Inspector Name -->
+            <div class="info-item">
+                <i class="fas fa-user"></i>
+                <div class="info-content">
+                    <div class="info-label">Approved Inspector Name</div>
+                    <div class="info-value" th:text="${inspection.approvedInspectorName}"></div>
+                </div>
+            </div>
+
+            <!-- Order Confirmation Date -->
+            <div class="info-item">
+                <i class="fas fa-calendar-check"></i>
+                <div class="info-content">
+                    <div class="info-label">Date of Order Confirmation</div>
+                    <div class="info-value" th:text="${inspection.orderConfirmationDate}"></div>
+                </div>
+            </div>
+
+            <!-- Sector Scope -->
+            <div class="info-item">
+                <i class="fas fa-industry"></i>
+                <div class="info-content">
+                    <div class="info-label">Sector Scope</div>
+                    <div class="info-value" th:text="${inspection.sectorScope}"></div>
+                </div>
+            </div>
+
+            <!-- End Client Name -->
+            <div class="info-item">
+                <i class="fas fa-user-tie"></i>
+                <div class="info-content">
+                    <div class="info-label">End Client Name</div>
+                    <div class="info-value" th:text="${inspection.endClientName}"></div>
+                </div>
+            </div>
+
+            <!-- Project Name -->
+            <div class="info-item">
+                <i class="fas fa-project-diagram"></i>
+                <div class="info-content">
+                    <div class="info-label">Project Name</div>
+                    <div class="info-value" th:text="${inspection.projectName}"></div>
+                </div>
+            </div>
+
+            <!-- Reference Documents for Inspection Status -->
+            <div class="info-item">
+                <i class="fas fa-file"></i>
+                <div class="info-content">
+                    <div class="info-label">Reference Documents</div>
+                    <div class="info-value"
+                         th:text="${inspection.referenceDocumentsForInspectionStatus == true ? 'Available' : 'Not Available'}"></div>
+                </div>
+            </div>
+
+            <!-- Documents Reviewed By Technical Coordinator -->
+            <div class="info-item">
+                <i class="fas fa-user-check"></i>
+                <div class="info-content">
+                    <div class="info-label">Documents Reviewed By Technical Coordinator</div>
+                    <div class="info-value" th:text="${inspection.documentsReviewedByTechnicalCoordinator}"></div>
+                </div>
+            </div>
+
+            <!-- Contract Review Prepared -->
+            <div class="info-item">
+                <i class="fas fa-file-alt"></i>
+                <div class="info-content">
+                    <div class="info-label">Contract Review Prepared</div>
+                    <div class="info-value"
+                         th:text="${inspection.contractReviewPrepared != null && inspection.contractReviewPrepared ? 'Yes' : 'No'}"></div>
+                </div>
+            </div>
+
+            <!-- Inspection Advise Note -->
+            <div class="info-item">
+                <i class="fas fa-sticky-note"></i>
+                <div class="info-content">
+                    <div class="info-label">Inspection Advise Note</div>
+                    <div class="info-value"
+                         th:text="${inspection.inspectionAdviseNote != null && inspection.inspectionAdviseNote ? 'Yes' : 'No'}"></div>
+                </div>
+            </div>
+
+            <!-- Instructions to Inspector Date -->
+            <div class="info-item">
+                <i class="fas fa-clipboard-list"></i>
+                <div class="info-content">
+                    <div class="info-label">Instructions to Inspector Date</div>
+                    <div class="info-value" th:text="${inspection.instructionsToInspectorDate}"></div>
+                </div>
+            </div>
+
+            <!-- Any Inspection Issues -->
+            <div class="info-item">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div class="info-content">
+                    <div class="info-label">Any Inspection Issues</div>
+                    <div class="info-value"
+                         th:text="${inspection.anyInspectionIssues != null && inspection.anyInspectionIssues ? 'Yes' : 'No'}"></div>
+                </div>
+            </div>
+
+            <!-- FR Sent To Client Date -->
+            <div class="info-item">
+                <i class="fas fa-share-square"></i>
+                <div class="info-content">
+                    <div class="info-label">FR Sent To Client Date</div>
+                    <div class="info-value" th:text="${inspection.frSentToClientDate}"></div>
+                </div>
+            </div>
+
+            <!-- Inspection Reports Received Date -->
+            <div class="info-item">
+                <i class="fas fa-file-download"></i>
+                <div class="info-content">
+                    <div class="info-label">Inspection Reports Received Date</div>
+                    <div class="info-value" th:text="${inspection.inspectionReportsReceivedDate}"></div>
+                </div>
+            </div>
+
+            <!-- Inspection Reviewed By -->
+            <div class="info-item">
+                <i class="fas fa-user-edit"></i>
+                <div class="info-content">
+                    <div class="info-label">Inspection Reviewed By</div>
+                    <div class="info-value" th:text="${inspection.inspectionReviewedBy}"></div>
+                </div>
+            </div>
+
+            <!-- Inspection Support Documents Sent Date -->
+            <div class="info-item">
+                <i class="fas fa-paper-plane"></i>
+                <div class="info-content">
+                    <div class="info-label">Inspection Support Documents Sent Date</div>
+                    <div class="info-value" th:text="${inspection.inspectionSupportDocumentsSentDate}"></div>
+                </div>
+            </div>
+
+            <!-- Inspection Report Number -->
+            <div class="info-item">
+                <i class="fas fa-hashtag"></i>
+                <div class="info-content">
+                    <div class="info-label">Inspection Report Number</div>
+                    <div class="info-value" th:text="${inspection.inspectionReportNumber}"></div>
+                </div>
+            </div>
+
+            <!-- NCR Raised -->
+            <div class="info-item">
+                <i class="fas fa-exclamation-circle"></i>
+                <div class="info-content">
+                    <div class="info-label">NCR Raised</div>
+                    <div class="info-value"
+                         th:text="${inspection.ncrRaised != null && inspection.ncrRaised ? 'Yes' : 'No'}"></div>
+                </div>
+            </div>
+
+            <!-- IRN Sent Date -->
+            <div class="info-item">
+                <i class="fas fa-paperclip"></i>
+                <div class="info-content">
+                    <div class="info-label">IRN Sent Date</div>
+                    <div class="info-value" th:text="${inspection.irnSentDate}"></div>
+                </div>
+            </div>
+
+            <!-- Impartiality and Confidentiality -->
+            <div class="info-item">
+                <i class="fas fa-balance-scale"></i>
+                <div class="info-content">
+                    <div class="info-label">Impartiality and Confidentiality</div>
+                    <div class="info-value"
+                         th:text="${inspection.impartialityAndConfidentiality != null && inspection.impartialityAndConfidentiality ? 'Yes' : 'No'}"></div>
+                </div>
+            </div>
+
+            <!-- Job Folder Link -->
+            <div class="info-item">
+                <i class="fas fa-link"></i>
+                <div class="info-content">
+                    <div class="info-label">Job Folder Link</div>
+                    <div class="info-value">
+                        <a id="viewJobFolderLink" th:href="${inspection.jobFolderLink}" class="text-primary"
+                           target="_blank">View Job Folder</a>
                     </div>
                 </div>
+            </div>
 
+        </div>
 
-                <div class="row">
-                    <!-- Approved Inspector Name -->
-                    <div class="col-md-4">
-                        <label class="form-label">Approved Inspector Name</label>
-                        <p th:text="${inspection.approvedInspectorName}" class="form-control-static"></p>
-                    </div>
-
-                    <!-- Order Confirmation Date -->
-                    <div class="col-md-4">
-                        <label class="form-label">Date of Order Confirmation</label>
-                        <p th:text="${inspection.orderConfirmationDate}"
-                           class="form-control-static"></p>
-                    </div>
-
-                    <!-- Sector Scope -->
-                    <div class="col-md-4">
-                        <label class="form-label">Sector Scope</label>
-                        <p th:text="${inspection.sectorScope}" class="form-control-static"></p>
-                    </div>
-                </div>
-
-
-                <div class="row">
-
-                    <!-- End Client Name -->
-                    <div class="col-md-4">
-                        <label class="form-label">End Client Name</label>
-                        <p th:text="${inspection.endClientName}" class="form-control-static"></p>
-                    </div>
-
-                    <!-- Project Name -->
-                    <div class="col-md-4">
-                        <label class="form-label">Project Name</label>
-                        <p th:text="${inspection.projectName}" class="form-control-static"></p>
-                    </div>
-
-                    <!-- Reference Documents for Inspection Status -->
-                    <div class="col-md-4">
-                        <label class="form-label">Reference Documents</label>
-                        <p th:text="${inspection.referenceDocumentsForInspectionStatus == true ? 'Available' : 'Not Available'}"
-                           class="form-control-static"></p>
-                    </div>
-
-                </div>
-              
-                <div class="row mt-3">
-                    <!-- Documents Reviewed By Technical Coordinator -->
-                    <div class="col-md-4">
-                        <label class="form-label">Documents Reviewed By Technical Coordinator</label>
-                        <p th:text="${inspection.documentsReviewedByTechnicalCoordinator}" class="form-control-static"></p>
-                    </div>
-
-                    <!-- Contract Review Prepared -->
-                    <div class="col-md-4">
-                        <label class="form-label">Contract Review Prepared</label>
-
-                        <p th:text="${inspection.contractReviewPrepared != null && inspection.contractReviewPrepared ? 'Yes' : 'No'}"
-                           class="form-control-static"></p>
-                    </div>
-
-                    <!-- Inspection Advise Note -->
-                    <div class="col-md-4">
-                        <label class="form-label">Inspection Advise Note</label>
-
-                        <p th:text="${inspection.inspectionAdviseNote != null && inspection.inspectionAdviseNote ? 'Yes' : 'No'}"
-                           class="form-control-static"></p>
-                    </div>
-                </div>
-
-
-                <div class="row">
-                    <!-- Instructions to Inspector Date -->
-                    <div class="col-md-4">
-                        <label class="form-label">Instructions to Inspector Date</label>
-                        <p th:text="${inspection.instructionsToInspectorDate}"
-                           class="form-control-static"></p>
-                    </div>
-                    <!-- Any Inspection Issues -->
-                    <div class="col-md-4">
-                        <label class="form-label">Any Inspection Issues</label>
-                        
-                        <p th:text="${inspection.anyInspectionIssues != null && inspection.anyInspectionIssues ? 'Yes' : 'No'}"
-                           class="form-control-static"></p>
-                    </div>
-                    <!-- FR Sent To Client Date -->
-                    <div class="col-md-4">
-                        <label class="form-label">FR Sent To Client Date</label>
-                        <p th:text="${inspection.frSentToClientDate}" class="form-control-static"></p>
-                    </div>
-                </div>
-
-
-                <div class="row">
-                    <!-- Inspection Reports Received Date -->
-                    <div class="col-md-4">
-                        <label class="form-label">Inspection Reports Received Date</label>
-                        <p th:text="${inspection.inspectionReportsReceivedDate}"
-                           class="form-control-static"></p>
-                    </div>
-
-                    <!-- Inspection Reviewed By -->
-                    <div class="col-md-4">
-                        <label class="form-label">Inspection Reviewed By</label>
-                        <p th:text="${inspection.inspectionReviewedBy}"
-                           class="form-control-static"></p>
-                    </div>
-
-                    <!-- Inspection Support Documents Sent Date -->
-                    <div class="col-md-4">
-                        <label class="form-label">Inspection Support Documents Sent Date</label>
-                        <p th:text="${inspection.inspectionSupportDocumentsSentDate}"
-                           class="form-control-static"></p>
-                    </div>
-                </div>
-
-
-                <div class="row">
-                    <!-- Inspection Report Number -->
-                    <div class="col-md-4">
-                        <label class="form-label">Inspection Report Number</label>
-                        <p th:text="${inspection.inspectionReportNumber}" class="form-control-static"></p>
-                    </div>
-
-                    <!-- NCR Raised -->
-                    <div class="col-md-4">
-                        <label class="form-label">NCR Raised</label>
-
-                        <p th:text="${inspection.ncrRaised != null && inspection.ncrRaised ? 'Yes' : 'No'}" class="form-control-static"></p>
-                    </div>
-
-                    <!-- IRN Sent Date -->
-                    <div class="col-md-4">
-                        <label class="form-label">IRN Sent Date</label>
-                        <p th:text="${inspection.irnSentDate}" class="form-control-static"></p>
-                    </div>
-                </div>
-
-                <div class="row">
-
-                        <!-- Impartiality and Confidentiality -->
-                        <div class="col-md-4">
-                            <label class="form-label">Impartiality and Confidentiality</label>
-                            <div>
-                                <span th:text="${inspection.impartialityAndConfidentiality != null && inspection.impartialityAndConfidentiality ? 'Yes' : 'No'}"></span>
-                            </div>
-                        </div>
-
-                        <!-- Job Folder Link -->
-                        <div class="col-md-4">
-                            <label for="viewJobFolderLink" class="form-label">Job Folder Link</label>
-                            <div>
-                                <a id="viewJobFolderLink" th:href="${inspection.jobFolderLink}" target="_blank">View Job Folder</a>
-                            </div>
-                        </div>
-
-                </div>
-
-            </form>
     </div>
-
-
-<!-- Optional JavaScript Frameworks -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        
+</main>
+<!-- Footer -->
+<footer th:replace="fragments/footer :: footer"></footer>
 </body>
-<!--<footer>-->
-<!--    <p class="mb-0" style="font-size: 1rem;">&copy; 2025 International Inspection Services Pvt Ltd. All Rights-->
-<!--        Reserved.</p>-->
-<!--</footer>-->
 </html>
