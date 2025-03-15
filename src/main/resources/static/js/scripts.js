@@ -2,7 +2,10 @@
        console.log("Page loaded. JavaScript is working!");
     });
 
+  // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> INSPECTOR <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
     //  **********************************   Inspector - Form JS - Start   **********************************
+
     // Function to add a certificate row
     function addCertificate(tableBodyId) {
      const tableBody = document.getElementById(tableBodyId);
@@ -50,32 +53,54 @@
      //  **********************************   Inspector - Management JS - Start   **********************************
 
      function openInspectorForm() {
-             window.location.href = '/inspectors/form';
-         }
+         window.location.href = '/inspectors/form';
+     }
 
-         function redirectToEditForm(inspectorId) {
-             window.location.href = '/inspectors/edit/' + inspectorId;
-         }
+     function redirectToEditForm(inspectorId) {
+         window.location.href = '/inspectors/edit/' + inspectorId;
+     }
 
-         function redirectToViewForm(inspectorId) {
-             window.location.href = '/inspectors/view/' + inspectorId;
-         }
+     function redirectToViewForm(inspectorId) {
+         window.location.href = '/inspectors/view/' + inspectorId;
+     }
 
-         // Initialize DataTable with responsive extension
-         $(document).ready(function () {
-             var table = $('#inspectorTable').DataTable({
-                 "paging": true,
-                 "searching": true,
-                 "ordering": true,
-                 "info": true,
-                 "lengthMenu": [5, 10, 25, 50],
-                 "pageLength": 10,
-                 "language": {
-                     "search": "Search: ",
-                     "lengthMenu": "Show _MENU_ entries",
-                     "info": "Showing _START_ to _END_ of _TOTAL_ entries"
-                 }
-             });
+     // Initialize DataTable with responsive extension
+     $(document).ready(function () {
+         var table = $('#inspectorTable, #inspectionsTable').DataTable({
+             "paging": true,
+             "searching": true,
+             "ordering": true,
+             "info": true,
+             "lengthMenu": [5, 10, 25, 50],
+             "pageLength": 10,
+             "language": {
+                 "search": "Search: ",
+                 "lengthMenu": "Show _MENU_ entries",
+                 "info": "Showing _START_ to _END_ of _TOTAL_ entries"
+             }
          });
+     });
 
-     //  **********************************   Inspector - Form JS - End   **********************************
+     //  **********************************   Inspector - Management JS - End   **********************************
+
+ // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> INSPECTOR <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+ // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> INSPECTION <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+     //  **********************************   Inspection - Management JS - End   **********************************
+
+     function redirectToNewInspection() {
+         window.location.href = '/inspection/new';
+     }
+
+
+     function redirectToEditInspection(inspectionId) {
+         window.location.href = '/inspection/edit/' + inspectionId;
+     }
+
+
+     function redirectToViewInspection(inspectionId) {
+         window.location.href = '/inspection/view/' + inspectionId;
+     }
+ // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> INSPECTION <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
