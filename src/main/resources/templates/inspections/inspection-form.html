@@ -323,28 +323,31 @@
                         <input type="text" id="projectName" th:field="*{projectName}" class="form-control" />
                     </div>
                 </div>
+            </div>
 
-                <h4 class="section-header">
-                    <i class="fas fa-file-alt"></i> Documentation Process
-                </h4>
-                <div class="row g-3 mb-4">
-                    <!-- Reference Documents -->
-                    <div class="col-md-6">
-                        <label class="form-label">Reference Documents</label>
-                        <div class="input-group">
-                            <span class="input-group-text me-3"><i class="fas fa-file"></i></span>
-                            <div class="d-flex align-items-center">
-                                <div class="form-check me-3">
-                                    <input type="radio" id="referenceDocumentsYes" name="referenceDocumentsForInspectionStatus" value="true" th:checked="${inspection.referenceDocumentsForInspectionStatus == true}" class="form-check-input" />
-                                    <label for="referenceDocumentsYes" class="form-check-label">Available</label>
-                                </div>
-                                <div class="form-check">
-                                    <input type="radio" id="referenceDocumentsNo" name="referenceDocumentsForInspectionStatus" value="false" th:checked="${inspection.referenceDocumentsForInspectionStatus == false}" class="form-check-input" />
-                                    <label for="referenceDocumentsNo" class="form-check-label">Not Available</label>
-                                </div>
+            <h4 class="section-header">
+                <i class="fas fa-file-alt"></i> Documentation Process
+            </h4>
+
+            <div class="row g-3 mb-4">
+
+                <!-- Reference Documents -->
+                <div class="col-md-6">
+                    <label class="form-label">Reference Documents</label>
+                    <div class="input-group">
+                        <span class="input-group-text me-3"><i class="fas fa-file"></i></span>
+                        <div class="d-flex align-items-center">
+                            <div class="form-check me-3">
+                                <input type="radio" id="referenceDocumentsYes" name="referenceDocumentsForInspectionStatus" value="true" th:checked="${inspection.referenceDocumentsForInspectionStatus == true}" class="form-check-input" />
+                                <label for="referenceDocumentsYes" class="form-check-label">Available</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="radio" id="referenceDocumentsNo" name="referenceDocumentsForInspectionStatus" value="false" th:checked="${inspection.referenceDocumentsForInspectionStatus == false}" class="form-check-input" />
+                                <label for="referenceDocumentsNo" class="form-check-label">Not Available</label>
                             </div>
                         </div>
                     </div>
+                </div>
 
                 <!-- Documents Reviewed By Technical Coordinator -->
                 <div class="col-md-6">
@@ -381,27 +384,30 @@
 
                 <!-- Inspection Advise Note -->
                 <div class="col-md-6">
-                    <label class="form-label me-3">Inspection Advise Note</label>
-                    <div class="input-group">
-                        <span class="input-group-text me-3"><i class="fas fa-sticky-note"></i></span>
-                        <div class="d-flex align-items-center">
-                            <div class="form-check me-3">
-                                <input type="radio" id="adviseNoteYes" name="inspectionAdviseNote" value="true" th:checked="${inspection.inspectionAdviseNote == true}" class="form-check-input" />
-                                <label for="adviseNoteYes" class="form-check-label">Yes</label>
-                            </div>
-                            <div class="form-check">
-                                <input type="radio" id="adviseNoteNo" name="inspectionAdviseNote" value="false" th:checked="${inspection.inspectionAdviseNote == false}" class="form-check-input" />
-                                <label for="adviseNoteNo" class="form-check-label">No</label>
-                            </div>
+                <label class="form-label me-3">Inspection Advise Note</label>
+                <div class="input-group">
+                    <span class="input-group-text me-3"><i class="fas fa-sticky-note"></i></span>
+                    <div class="d-flex align-items-center">
+                        <div class="form-check me-3">
+                            <input type="radio" id="adviseNoteYes" name="inspectionAdviseNote" value="true" th:checked="${inspection.inspectionAdviseNote == true}" class="form-check-input" />
+                            <label for="adviseNoteYes" class="form-check-label">Yes</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" id="adviseNoteNo" name="inspectionAdviseNote" value="false" th:checked="${inspection.inspectionAdviseNote == false}" class="form-check-input" />
+                            <label for="adviseNoteNo" class="form-check-label">No</label>
                         </div>
                     </div>
                 </div>
+            </div>
+            </div>
 
-                <!-- Inspection Process -->
-                <h4 class="section-header">
-                    <i class="fas fa-cogs"></i> Inspection Process
-                </h4>
-                <div class="row g-3 mb-4">
+            <!-- Inspection Process -->
+            <h4 class="section-header">
+                <i class="fas fa-cogs"></i> Inspection Process
+            </h4>
+
+            <div class="row g-3 mb-4">
+
                 <!-- Instructions to Inspector Date -->
                 <div class="col-md-6">
                     <label for="instructionsToInspectorDate" class="form-label">Instructions to Inspector Date</label>
@@ -409,7 +415,6 @@
                         <span class="input-group-text"><i class="fas fa-clipboard-list"></i></span>
                         <input type="date" id="instructionsToInspectorDate" th:field="*{instructionsToInspectorDate}" class="form-control"/>
                     </div>
-                </div>
                 </div>
 
                 <!-- Any Inspection Issues -->
@@ -438,7 +443,7 @@
                         <input type="date" id="frSentToClientDate" th:field="*{frSentToClientDate}" class="form-control"/>
                     </div>
                 </div>
-                
+
                 <!-- Inspection Reports Received Date -->
                 <div class="col-md-6">
                     <label for="inspectionReportsReceivedDate" class="form-label">Inspection Reports Received
@@ -474,7 +479,7 @@
                            th:field="*{inspectionSupportDocumentsSentDate}" class="form-control" />
                     </div>
                 </div>
-                
+
                 <!-- Inspection Report Number -->
                 <div class="col-md-6">
                     <label for="inspectionReportNumber" class="form-label">
@@ -538,18 +543,18 @@
                         <span class="input-group-text"><i class="fas fa-file-signature"></i></span>
                     <input type="url" id="jobFolderLink" th:field="*{jobFolderLink}" class="form-control"
                            placeholder="Enter the URL" />
+                    </div>
                 </div>
 
-            </div>
+        </div>
 
-            </div>
             <!-- Submit Button -->
             <div class="col-12 d-flex justify-content-center">
                 <button type="submit" class="btn btn-primary" th:text="${edit ? 'Edit Inspection' : 'Add Inspection'}">
                     Add Inspection
                 </button>
             </div>
-            </div>
+
         </form>
     </div>
 </div>
