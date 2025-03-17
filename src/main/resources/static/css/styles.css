@@ -20,7 +20,6 @@
     --button-red-bg: #dc3545; /* Red color button */
     --button-red-border-color: #dc3545; /* Red color button border */
     --card-icon-bg: #e1f0fa; /* Card Icon bg */
-    --danger-color: #dc3545;
 
 }
 
@@ -673,81 +672,6 @@ button:hover {
     transform: translateY(-100%);
     transition: transform 0.3s ease;
 }
-.required-field::after {
-         content: "*";
-         color: var(--danger-color);
-         margin-left: 0.25rem;
-        }
-
- #proposedCVsTable {
-      width: 100% !important;
-      table-layout: fixed !important;
-    }
-
-    #proposedCVsTable th:nth-child(1) {
-      width: 18% !important;
-    }
-
-    #proposedCVsTable th:nth-child(2) {
-      width: 12% !important;
-    }
-
-    #proposedCVsTable th:nth-child(3) {
-      width: 18% !important;
-    }
-
-    #proposedCVsTable th:nth-child(4) {
-      width: 12% !important;
-    }
-
-    #proposedCVsTable th:nth-child(5) {
-      width: 15% !important;
-    }
-
-    #proposedCVsTable th:nth-child(6) {
-      width: 12% !important;
-    }
-
-    #proposedCVsTable th:nth-child(7) {
-      width: 8% !important;
-    }
-
-    #proposedCVsTable select.form-select {
-      width: 100% !important;
-      min-width: 150px !important;
-      max-width: none !important;
-    }
-
-    /* Fix radio button alignment */
-    #proposedCVsTable .form-check-inline {
-      display: inline-flex !important;
-      align-items: center !important;
-      margin-right: 10px !important;
-      margin-bottom: 0 !important;
-      position: relative !important;
-    }
-
-    #proposedCVsTable .form-check-input {
-      margin-top: 0 !important;
-      position: relative !important;
-      top: 0 !important;
-      float: none !important;
-    }
-
-    #proposedCVsTable .form-check-label {
-      position: relative !important;
-      top: 0 !important;
-      margin-bottom: 0 !important;
-      margin-left: 5px !important;
-      padding-top: 0 !important;
-      padding-bottom: 0 !important;
-      line-height: 1 !important;
-    }
-
-    /* Ensure the table is responsive */
-    .table-responsive {
-      overflow-x: auto !important;
-    }
 
 .tab:hover {
     transform: translateY(-5px);
@@ -781,5 +705,79 @@ button:hover {
     color: var(--primary-color);
 }
 
+.required-field::after {
+ content: "*";
+ color: var(--danger-color);
+ margin-left: 0.25rem;
+}
 
+#proposedCVsTable {
+  width: 100% !important;
+  table-layout: fixed !important;
+}
+
+#proposedCVsTable th:nth-child(1) {
+  width: 18% !important;
+}
+
+#proposedCVsTable th:nth-child(2) {
+  width: 12% !important;
+}
+
+#proposedCVsTable th:nth-child(3) {
+  width: 18% !important;
+}
+
+#proposedCVsTable th:nth-child(4) {
+  width: 12% !important;
+}
+
+#proposedCVsTable th:nth-child(5) {
+  width: 15% !important;
+}
+
+#proposedCVsTable th:nth-child(6) {
+  width: 12% !important;
+}
+
+#proposedCVsTable th:nth-child(7) {
+  width: 8% !important;
+}
+
+#proposedCVsTable select.form-select {
+  width: 100% !important;
+  min-width: 150px !important;
+  max-width: none !important;
+}
+
+/* Fix radio button alignment */
+#proposedCVsTable .form-check-inline {
+  display: inline-flex !important;
+  align-items: center !important;
+  margin-right: 10px !important;
+  margin-bottom: 0 !important;
+  position: relative !important;
+}
+
+#proposedCVsTable .form-check-input {
+  margin-top: 0 !important;
+  position: relative !important;
+  top: 0 !important;
+  float: none !important;
+}
+
+#proposedCVsTable .form-check-label {
+  position: relative !important;
+  top: 0 !important;
+  margin-bottom: 0 !important;
+  margin-left: 5px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  line-height: 1 !important;
+}
+
+/* Ensure the table is responsive */
+.table-responsive {
+  overflow-x: auto !important;
+}
 
