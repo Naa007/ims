@@ -26,7 +26,7 @@
                         <label for="email" class="form-label">Email</label>
                         <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
                     </div>
-                    <button type="button" id="send-otp-btn" >Send OTP</button>
+                    <button type="button" id="send-otp-btn" ><i class="fas fa-paper-plane me-2"></i> Send OTP</button>
                 </form>
             </div>
 
@@ -46,8 +46,6 @@
         </div>
 </main>
 <!-- Footer -->
-<footer style="position: fixed !important; bottom: 0 !important; width: 100% !important; background-color: var(--primary-color) !important; text-align: center !important; padding: 10px 0 !important; border-top: 1px solid #ccc !important;">
-    <p>&copy; 2025 International Inspection Services Pvt Ltd. All Rights Reserved.</p>
-</footer>
+<footer th:replace="fragments/footer :: footer"></footer>
 </body>
 </html>
