@@ -1,15 +1,17 @@
 <!-- Header -->
-<header>
-    <div class="header-content" style="flex: 1 1 10%; display: flex; align-items: center;">
+<header xmlns:th="http://www.w3.org/1999/xhtml">
+    <div class="header-content" style="flex: 1 1 15%; display: flex; align-items: center;">
         <img src="/images/logo.png" alt="IISPL Logo" class="logo" onerror="this.style.display='none';">
     </div>
-    <div style="flex: 1 1 80%; text-align: center; font-size: 1.5rem; font-weight: bold; color: white;">
+    <div style="flex: 1 1 70%; text-align: center; font-size: 1.5rem; font-weight: bold; color: white;">
         <h1 class="company-name">Inspection Management Services</h1>
     </div>
-    <button class="logout-btn" style="flex: 1 1 10%;">
-        <i class="fas fa-sign-out-alt"></i>
-        <a href="/logout" onclick="return confirm('Are you sure you want to log out?');">
-            Logout
+    <div style="flex: 1 1 15%; display: flex; align-items: center;">
+        <span th:if="${session.employeeName != null}" th:text="${session.employeeName}">Guest</span>
+        <a th:if="${session.employeeName != null}" href="/logout" class="logout-btn"
+           onclick="return confirm('Are you sure you want to log out?');">
+            <i class="fas fa-sign-out-alt"></i>
         </a>
-    </button>
+    </div>
+
 </header>

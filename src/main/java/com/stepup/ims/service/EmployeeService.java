@@ -62,4 +62,13 @@ public class EmployeeService {
                 .findFirst()
                 .orElse(null);
     }
+
+    public String getEmployeeNameByEmail(String email) {
+        return employeeRepository.findAll().stream()
+                .filter(employee -> email.equalsIgnoreCase(employee.getEmail()))
+                .map(com.stepup.ims.entity.Employee::getEmpName)
+                .findFirst()
+                .orElse(null);
+    }
+
 }

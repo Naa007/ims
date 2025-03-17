@@ -89,6 +89,9 @@ public class AuthController {
             securityContext.setAuthentication(authentication);
             session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
 
+            String employeeName = employeeService.getEmployeeNameByEmail(email);
+            session.setAttribute("employeeName", employeeName);
+
             String redirectUrl;
             switch (user.getRole().toUpperCase()) {
                 case ADMIN:
