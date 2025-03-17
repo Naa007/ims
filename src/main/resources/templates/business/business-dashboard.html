@@ -16,16 +16,18 @@
             <div class="tab" th:each="entry : ${businessStats}">
 
                 <!-- Header Part -->
-                <div class="tab-header"><i class="fas fa-chart-bar"
-                                           style="margin-right: 8px; vertical-align: middle;"></i>
+                <div class="tab-header">
+                    <i class="fas fa-chart-bar" style="margin-right: 8px; vertical-align: middle;"></i>
                     <span th:text="${entry.key}" style="vertical-align: middle;">Statistic Name</span>
                 </div>
                 
                 <hr style="border-top: none; margin: 10px 0;"/>
 
                 <!-- Details Part -->
-                <div class="tab-details"><span th:each="stat : ${entry.value}"
-                                               th:text="${stat.key + ': ' + stat.value}">Key: Value</span><br/>
+                <div class="tab-details">
+                    <span th:each="stat : ${entry.value}" th:text="${stat.key + ': ' + stat.value}">
+                        Key: Value <br/>
+                    </span>
                 </div>
 
             </div>
