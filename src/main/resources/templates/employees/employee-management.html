@@ -550,7 +550,7 @@
                         <p class="form-subtitle">Please Add the information below</p>
                     </div>
                 <!-- Add Employee Form -->
-                <form method="post" th:action="@{/employee/save-employee}" th:object="${employee}">
+                <form method="post" th:action="@{/employee/save-employee}" th:object="${employee}" class="needs-validation" novalidate>
                     <div class="row">
                         <!-- Employee Name -->
                         <div class="col-md-6 mb-3">
@@ -642,7 +642,7 @@
                         <p class="form-subtitle">Please update the information below</p>
                     </div>
                     <!-- Edit Employee Form -->
-                    <form id="editEmployeeForm" method="post">
+                    <form id="editEmployeeForm" method="post" class="needs-validation" novalidate>
                         <input id="editId" name="id" type="hidden">
                         <div class="row">
                             <!-- Employee Name -->
@@ -791,6 +791,8 @@
         document.getElementById("viewPhoneNumber").textContent = phoneNumber;
     }
 </script>
+<!-- Custom JS -->
+<script th:inline="javascript" th:src="@{/js/scripts.js}"></script>
 <!-- Footer -->
 <footer th:replace="fragments/footer :: footer"></footer>
 </body>
