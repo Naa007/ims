@@ -10,39 +10,48 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <!-- Include DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
     <!-- Custom CSS -->
     <style>
+        /* Root Variables for Consistent Design System */
+        :root {
+            --primary-color: #485d74; /* Soft blue */
+            --primary-dark: #2980b9; /* Darker blue for gradients */
+            --secondary-color: #50e3c2; /* Teal */
+            --accent-color: #f39c12; /* Orange */
+            --light-bg: #f0f4f8; /* Light background */
+            --dark-text: #2c3e50; /* Darker text */
+            --light-text: #ffffff; /* White text */
+            --input-border: #d1d8e0; /* Light border */
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --header-bg: linear-gradient(135deg, rgba(44, 62, 80, 0.95), rgba(52, 73, 94, 0.95));
+            --footer-bg: #2c3e50;
+            --button-gradient: var(---primary-color);
+            --button-hover: linear-gradient(135deg, #2980b9, #4a90e2);
+            --table-header-bg: var(---primary-color);
+        }
+
         /* General Styles */
         html, body {
             height: 100%; /* Ensure the body takes full height */
             margin: 0; /* Remove default margin */
+            font-family: 'Poppins', sans-serif !important;
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            line-height: 1.6;
         }
 
         body {
             display: flex;
             flex-direction: column; /* Stack header, main, and footer vertically */
-            background-color: #f8f9fa;
-            font-family: 'Arial', sans-serif;
         }
 
         main {
             flex: 1; /* Allow main to grow and fill available space */
-            padding: 70px 20px 20px; /* Increase padding-top to create more space below the header */
-        }
-
-        h1 {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #343a40;
-            margin: 40px 0 20px; /* Add margin-top to create space below the header */
-        }
-
-        .table {
-            font-size: 0.9rem; /* Smaller font size */
-        }
-
-        .table th, .table td {
-            vertical-align: middle; /* Center align text */
+            padding: 80px 20px 30px; /* Adjust the top padding to ensure content is below the header */
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
         }
 
         .btn-sm {
@@ -55,7 +64,7 @@
         }
 
         .modal-header {
-            background: linear-gradient(135deg, #007bff, #0056b3);
+            background: var(--primary-color);
             color: white;
             border-bottom: none;
             border-radius: 10px 10px 0 0;
@@ -70,23 +79,33 @@
             padding: 20px;
         }
 
-        /* Footer */
-        footer {
-            background: #2c3e50;
-            color: white;
-            text-align: center;
-            padding: 15px 0;
-            margin-top: auto;
-            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
+        /* Responsive Table */
+        .dataTables_wrapper .dataTables_filter input {
+            margin-bottom: 10px; /* Add spacing for search input */
         }
 
-        footer p {
-            margin: 0;
-            font-size: 14px;
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.5rem; /* Smaller heading on smaller screens */
+            }
+
+            .btn-sm {
+                font-size: 0.7rem; /* Smaller buttons on smaller screens */
+            }
+
+            .table {
+                font-size: 0.8rem; /* Smaller table font size */
+            }
+
+            .modal-title {
+                font-size: 1.2rem; /* Smaller modal title */
+            }
         }
-          /* Header */
+
+        /* Header Styles */
         header {
-            background: linear-gradient(135deg, rgba(44, 62, 80, 0.9), rgba(52, 73, 94, 0.9));
+            background: var(--header-bg);
             backdrop-filter: blur(10px);
             color: white;
             padding: 15px 20px;
@@ -160,105 +179,305 @@
         .logout-btn i {
             font-size: 18px;
         }
+
+        .logout-btn a {
+            color: white;
+            text-decoration: none;
+        }
+
+        /* Footer */
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            margin-top: auto;
+            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        @media (max-width: 576px) {
+            h1 {
+                font-size: 1.2rem; /* Even smaller heading on mobile */
+            }
+
+            .btn-sm {
+                padding: 3px 6px; /* Smaller button padding */
+            }
+
+            .table {
+                font-size: 0.7rem; /* Smaller table font size */
+            }
+
+            .modal-title {
+                font-size: 1rem; /* Smaller modal title */
+            }
+        }
+
+        /* Card & Form Styles */
+        .form-card, .data-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-header {
+            border-bottom: 2px solid var(--secondary-color);
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+        }
+
+        .form-title, h1 {
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Table Styles */
+        .table {
+            font-size: 0.9rem;
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+            padding: 0.75rem 1rem;
+        }
+
+        .table thead {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .table td {
+            border-top: 1px solid var(--input-border);
+        }
+
+        /* Button Styles */
+        .btn-primary, .btn-secondary {
+            background: var(--primary-color);
+            border: none;
+            color: white;
+            padding: 0.6rem 1.5rem;
+            font-weight: 500;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover, .btn-secondary:hover {
+            background: var(--button-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-warning {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            color: #212529;
+            transition: all 0.3s ease;
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+        }
+
+        .custom-modal {
+            max-width: 750px; /* Set your desired width */
+            width: 80%; /* Ensure it takes full width on smaller screens */
+        }
+        .custom-addModal{
+         max-width: 950px; /* Set your desired width */
+            width: 80%; /* Ensure it takes full width on smaller screens */
+        }
+        .custom-editModal {
+            max-width: 950px; /* Set your desired width */
+            width: 80%; /* Ensure it takes full width on smaller screens */
+        }
+
+        .info-section {
+            margin-bottom: 20px; /* Space below the info section */
+        }
+
+        .info-item {
+            display: flex; /* Flexbox for alignment */
+            align-items: center; /* Center items vertically */
+            padding: 10px; /* Padding for each item */
+            border-radius: 10px; /* Rounded corners */
+            transition: all 0.3s ease; /* Smooth transition */
+        }
+
+        .info-item i {
+            background-color: #e1f0fa; /* Light background for icons */
+            color: var(--primary-color); /* Icon color */
+            padding: 10px; /* Padding for icons */
+            border-radius: 10px; /* Rounded corners for icons */
+            margin-right: 15px; /* Space between icon and text */
+            width: 40px; /* Fixed width for icons */
+            height: 40px; /* Fixed height for icons */
+            display: flex; /* Flexbox for centering */
+            align-items: center; /* Center icon */
+            justify-content: center; /* Center icon */
+        }
+
+        .info-content {
+            flex: 1; /* Allow content to take available space */
+        }
+
+        .info-label {
+            font-size: 0.85rem; /* Smaller font size for labels */
+            color: #95a5a6; /* Light gray color for labels */
+            margin-bottom: 2px; /* Space below labels */
+        }
+
+        /* Ensure email wraps properly */
+        .info-value {
+            font-size: 1rem; /* Normal font size for values */
+            font-weight: 500; /* Medium weight for values */
+            color: #2c3e50; /* Dark color for values */
+            word-wrap: break-word; /* Allow long words to break */
+        }
+
+        /* Style for the section title */
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 30px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+
+        .card-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-title i {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px;
+            border-radius: 50%;
+            margin-right: 15px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-blue {
+            color: var(--primary-color); /* Blue color */
+        }
+
+        .custom-select {
+            font-family: 'Poppins', sans-serif !important; /* Ensure the same font family */
+            font-size: 1rem; /* Set the same font size */
+            color: #2c3e50; /* Set the text color */
+        }
     </style>
 </head>
 <body>
 <!-- Header -->
-<header>
-    <div class="header-content">
-        <img alt="IISPL Logo" class="logo" src="/images/logo.png">
-    </div>
-    <div style="flex: 1 1 70%; text-align: center; font-size: 1.5rem; font-weight: bold; color: white;">
-        <h1 class="company-name">Inspection Management Services</h1>
-    </div>
-    <button class="logout-btn">
-        <i class="fas fa-sign-out-alt"></i>
-        <a th:href="@{/logout}" th:onclick="return confirm('Are you sure you want to log out?');">
-            Logout
-        </a>
-    </button>
-</header>
+<header th:replace="fragments/header :: header"></header>
 
-<main class="container">
-    <h1 class="text-center">Manage Clients</h1>
+<main>
+    <div class="data-card">
+        <div class="form-header">
+            <h1 class="text-center">Manage Clients</h1>
+        </div>
+        <!-- Add Client Button -->
+        <div class="text-center mb-4">
+            <button class="btn btn-primary" data-toggle="modal" data-target="#addClientModal">
+                <i class="fas fa-plus"></i> Add Client
+            </button>
+        </div>
 
-    <!-- Hidden Employees Input -->
-    <input type="hidden" id="employees" name="employees" th:value="${employees}"/>
-    <!-- Add Client Button -->
-    <div class="text-center mb-4">
-        <button class="btn btn-primary" data-toggle="modal" data-target="#addClientModal">
-            <i class="fas fa-plus"></i> Add Client
-        </button>
-    </div>
-
-    <!-- Client List Table -->
-    <div class="client-list">
-        <table id="clientTable" class="table table-striped table-hover table-sm">
-            <thead>
-            <tr>
-                <th style="width: 10%;">Client ID</th>
-                <th style="width: 20%;">Client Name</th>
-                <th style="width: 15%;">Country</th>
-                <th style="width: 20%;">Address</th>
-                <th style="width: 15%;">Email</th>
-                <th style="width: 15%;">Phone</th>
-                <th style="width: 10%;">Reference Type</th>
-                <th style="width: 10%;">Confirmation Date</th>
-                <th style="width: 15%;">Coordinator</th> <!-- Coordinator Column -->
-                <th style="width: 5%;">Action</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="client : ${clients}">
-                <td th:text="${client.clientId}"></td>
-                <td th:text="${client.clientName}"></td>
-                <td th:text="${client.country}"></td>
-                <td th:text="${client.address}"></td>
-                <td th:text="${client.email}"></td>
-                <td th:text="${client.phone}"></td>
-                <td th:text="${client.reference}"></td>
-                <td th:text="${client.confirmationDate}"></td>
-                <td th:text="${client.employee != null ? client.employee.empName : 'N/A'}"></td> <!-- Display Coordinator Name or N/A -->
-                <td>
-                    <div class="btn-group">
-                        <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#editClientModal"
-                                th:data-id="${client.clientId}"
-                                th:data-clientname="${client.clientName}"
-                                th:data-country="${client.country}"
-                                th:data-address="${client.address}"
-                                th:data-email="${client.email}"
-                                th:data-phone="${client.phone}"
-                                th:data-reference="${client.reference}"
-                                th:data-confirmationdate="${client.confirmationDate}"
-                                th:data-coordinator="${client.employee != null ? client.employee.empId : 'N/A'}"
-                                onclick="loadClientData(this)">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#viewClientModal"
-                                th:data-id="${client.clientId}"
-                                th:data-clientname="${client.clientName}"
-                                th:data-country="${client.country}"
-                                th:data-address="${client.address}"
-                                th:data-email="${client.email}"
-                                th:data-phone="${client.phone}"
-                                th:data-reference="${client.reference}"
-                                th:data-confirmationdate="${client.confirmationDate}"
-                                th:data-coordinator="${client.employee != null ? client.employee.empName : 'N/A'}"
-                        onclick="viewClientData(this)">
-                        <i class="fas fa-eye"></i>
-                        </button>
-
-                    </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+        <!-- Client List Table -->
+        <div class="client-list">
+            <table id="clientTable" class="table table-striped table-hover table-sm" style="width:100%">
+                <thead>
+                <tr>
+                    <th>Client ID</th>
+                    <th>Client Name</th>
+                    <th>Country</th>
+                    <th>Address</th>
+                    <th>Email</th>
+                    <th>Confirmation Date</th>
+                    <th>Coordinator</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="client : ${clients}">
+                    <td th:text="${client.clientId}"></td>
+                    <td th:text="${client.clientName}"></td>
+                    <td th:text="${client.country}"></td>
+                    <td th:text="${client.address}"></td>
+                    <td th:text="${client.email}"></td>
+                    <td th:text="${client.confirmationDate}"></td>
+                    <td th:text="${client.employee != null ? client.employee.empName : 'N/A'}"></td>
+                    <td>
+                        <div class="btn-group">
+                            <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#editClientModal"
+                                    th:data-id="${client.clientId}"
+                                    th:data-clientname="${client.clientName}"
+                                    th:data-country="${client.country}"
+                                    th:data-address="${client.address}"
+                                    th:data-email="${client.email}"
+                                    th:data-phone="${client.phone}"
+                                    th:data-reference="${client.reference}"
+                                    th:data-confirmationdate="${client.confirmationDate}"
+                                    th:data-coordinator="${client.employee != null ? client.employee.empId : 'N/A'}"
+                                    onclick="loadClientData(this)">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#viewClientModal"
+                                    th:data-id="${client.clientId}"
+                                    th:data-clientname="${client.clientName}"
+                                    th:data-country="${client.country}"
+                                    th:data-address="${client.address}"
+                                    th:data-email="${client.email}"
+                                    th:data-phone="${client.phone}"
+                                    th:data-reference="${client.reference}"
+                                    th:data-confirmationdate="${client.confirmationDate}"
+                                    th:data-coordinator="${client.employee != null ? client.employee.empName : 'N/A'}"
+                                    onclick="viewClientData(this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </main>
 
 <!-- Add Client Modal -->
 <div class="modal fade" id="addClientModal" tabindex="-1" aria-labelledby="addClientModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered custom-addModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addClientModalLabel">Add Client</h5>
@@ -267,55 +486,96 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form th:action="@{/client/save}" method="post">
-                    <!-- Client Name Field -->
-                    <div class="form-group">
-                        <label for="clientName">Client Name</label>
-                        <input type="text" class="form-control" id="clientName" name="clientName" required>
+                <div class="form-card">
+                    <div class="form-header">
+                        <p class="form-subtitle">Please add the information below</p>
                     </div>
-                    <div class="form-group">
-                        <label for="country">Country</label>
-                        <select class="form-control" id="country" name="country" required>
-                            <option value="">Select Country</option>
-                            <option th:each="country : ${client.countriesList}" th:value="${country}" th:text="${country}"></option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="address">Address</label>
-                        <input type="text" class="form-control" id="address" name="address" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="phone">Phone</label>
-                        <input type="text" class="form-control" id="phone" name="phone" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Reference Type</label><br>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" id="referenceEmail" name="reference" value="EMAIL_CONFIRMATION" required>
-                            <label class="form-check-label" for="referenceEmail">Email Confirmation</label>
+                    <form th:action="@{/client/save}" method="post" class="needs-validation" novalidate>
+                        <div class="row">
+                            <!-- Client Name -->
+                            <div class="col-md-6 mb-3">
+                                <label for="clientName">Client Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-building icon-blue"></i></span>
+                                    <input type="text" class="form-control" id="clientName" name="clientName" required>
+                                </div>
+                            </div>
+                            <!-- Country -->
+                            <div class="col-md-6 mb-3">
+                                <label for="country">Country</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-globe icon-blue"></i></span>
+                                    <select class="form-control" id="country" name="country" required>
+                                        <option value="">Select Country</option>
+                                        <option th:each="country : ${client.countriesList}" th:value="${country}" th:text="${country}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <!-- Address -->
+                            <div class="col-md-6 mb-3">
+                                <label for="address">Address</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-map-marker-alt icon-blue"></i></span>
+                                    <input type="text" class="form-control" id="address" name="address" required>
+                                </div>
+                            </div>
+                            <!-- Email -->
+                            <div class="col-md-6 mb-3">
+                                <label for="email">Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-envelope icon-blue"></i></span>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+                            </div>
+                            <!-- Phone -->
+                            <div class="col-md-6 mb-3">
+                                <label for="phone">Phone</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-phone icon-blue"></i></span>
+                                    <input type="text" class="form-control" id="phone" name="phone" required>
+                                </div>
+                            </div>
+                            <!-- Reference Type -->
+                            <div class="col-md-6 mb-3">
+                                <label>Reference Type</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-file-alt icon-blue"></i></span>
+                                    <div class="form-check form-check-inline" style="margin-left: 10px;">
+                                        <input class="form-check-input" type="radio" id="referenceEmail" name="reference" value="EMAIL_CONFIRMATION" required>
+                                        <label class="form-check-label" for="referenceEmail">Email Confirmation</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" id="referencePhone" name="reference" value="PHONE_CONFIRMATION" required>
+                                        <label class="form-check-label" for="referencePhone">Phone Confirmation</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Confirmation Date -->
+                            <div class="col-md-6 mb-3">
+                                <label for="confirmationDate">Confirmation Date</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-calendar-check icon-blue"></i></span>
+                                    <input type="date" class="form-control" id="confirmationDate" name="confirmationDate" required>
+                                </div>
+                            </div>
+                            <!-- Coordinator -->
+                            <div class="col-md-6 mb-3">
+                                <label for="addEmployee">Coordinator</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user-tie icon-blue"></i></span>
+                                    <select class="form-control" id="addEmployee" name="employee.empId" required>
+                                        <option value="">Select Coordinator</option>
+                                        <option th:each="employee : ${employees}" th:value="${employee.empId}" th:text="${employee.empName}"></option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" id="referencePhone" name="reference" value="PHONE_CONFIRMATION" required>
-                            <label class="form-check-label" for="referencePhone">Phone Confirmation</label>
+                        <!-- Submit Button -->
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary">Submit</button>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="confirmationDate">Confirmation Date</label>
-                        <input type="date" class="form-control" id="confirmationDate" name="confirmationDate" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="addEmployee">Coordinator</label>
-                        <select class="form-control" id="addEmployee" name="employee.empId" required>
-                            <option value="">Select Coordinator</option>
-                            <option th:each="employee : ${employees}" th:value="${employee.empId}" th:text="${employee.empName}"></option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -323,7 +583,7 @@
 
 <!-- Edit Client Modal -->
 <div class="modal fade" id="editClientModal" tabindex="-1" aria-labelledby="editClientModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered custom-editModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editClientModalLabel">Edit Client</h5>
@@ -332,58 +592,97 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="editClientForm" th:action="@{/client/save}" method="post">
-                    <!-- Client ID Field (Hidden) -->
-                    <input type="hidden" id="editClientId" name="clientId">
-                    <!-- Rest of the form fields -->
-                    <div class="form-group">
-                        <label for="editClientName">Client Name</label>
-                        <input type="text" class="form-control" id="editClientName" name="clientName" required>
+                <div class="form-card">
+                    <div class="form-header">
+                        <p class="form-subtitle">Please update the information below</p>
                     </div>
-                    <div class="form-group">
-                        <label for="editCountry">Country</label>
-                        <select class="form-control" id="editCountry" name="country" required>
-                            <option value="">Select Country</option>
-                            <option th:each="country : ${client.countriesList}" th:value="${country}" th:text="${country}"></option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="editAddress">Address</label>
-                        <input type="text" class="form-control" id="editAddress" name="address" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editEmail">Email</label>
-                        <input type="email" class="form-control" id="editEmail" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editPhone">Phone</label>
-                        <input type="text" class="form-control" id="editPhone" name="phone" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Reference Type</label><br>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" id="editReferenceEmail" name="reference" value="EMAIL_CONFIRMATION">
-                            <label class="form-check-label" for="editReferenceEmail">Email Confirmation</label>
+                    <form id="editClientForm" th:action="@{/client/save}" method="post" class="needs-validation" novalidate>
+                        <input type="hidden" id="editClientId" name="clientId">
+                        <div class="row">
+                            <!-- Client Name -->
+                            <div class="col-md-6 mb-3">
+                                <label for="editClientName">Client Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-building icon-blue"></i></span>
+                                    <input type="text" class="form-control" id="editClientName" name="clientName" required>
+                                </div>
+                            </div>
+                            <!-- Country -->
+                            <div class="col-md-6 mb-3">
+                                <label for="editCountry">Country</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-globe icon-blue"></i></span>
+                                    <select class="form-control" id="editCountry" name="country" required>
+                                        <option value="">Select Country</option>
+                                        <option th:each="country : ${client.countriesList}" th:value="${country}" th:text="${country}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <!-- Address -->
+                            <div class="col-md-6 mb-3">
+                                <label for="editAddress">Address</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-map-marker-alt icon-blue"></i></span>
+                                    <input type="text" class="form-control" id="editAddress" name="address" required>
+                                </div>
+                            </div>
+                            <!-- Email -->
+                            <div class="col-md-6 mb-3">
+                                <label for="editEmail">Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-envelope icon-blue"></i></span>
+                                    <input type="email" class="form-control" id="editEmail" name="email" required>
+                                </div>
+                            </div>
+                            <!-- Phone -->
+                            <div class="col-md-6 mb-3">
+                                <label for="editPhone">Phone</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-phone icon-blue"></i></span>
+                                    <input type="text" class="form-control" id="editPhone" name="phone" required>
+                                </div>
+                            </div>
+                            <!-- Reference Type -->
+                            <div class="col-md-6 mb-3">
+                                <label>Reference Type</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-file-alt icon-blue"></i></span>
+                                    <div class="form-check form-check-inline" style="margin-left: 10px;">
+                                        <input class="form-check-input" type="radio" id="editReferenceEmail" name="reference" value="EMAIL_CONFIRMATION">
+                                        <label class="form-check-label" for="editReferenceEmail">Email Confirmation</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" id="editReferencePhone" name="reference" value="PHONE_CONFIRMATION">
+                                        <label class="form-check-label" for="editReferencePhone">Phone Confirmation</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Confirmation Date -->
+                            <div class="col-md-6 mb-3">
+                                <label for="editConfirmationDate">Confirmation Date</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-calendar-check icon-blue"></i></span>
+                                    <input type="date" class="form-control" id="editConfirmationDate" name="confirmationDate" required>
+                                </div>
+                            </div>
+                            <!-- Coordinator -->
+                            <div class="col-md-6 mb-3">
+                                <label for="editEmployee">Coordinator</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user-tie icon-blue"></i></span>
+                                    <select class="form-control" id="editEmployee" name="employee.empId" required>
+                                        <option value="">Select Coordinator</option>
+                                        <option th:each="employee : ${employees}" th:value="${employee.empId}" th:text="${employee.empName}"></option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" id="editReferencePhone" name="reference" value="PHONE_CONFIRMATION">
-                            <label class="form-check-label" for="editReferencePhone">Phone Confirmation</label>
+                        <!-- Submit Button -->
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="editConfirmationDate">Confirmation Date</label>
-                        <input type="date" class="form-control" id="editConfirmationDate" name="confirmationDate" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editEmployee">Coordinator</label>
-                        <select class="form-control" id="editEmployee" name="employee.empId" required>
-                            <option value="">Select Coordinator</option>
-                            <option th:each="employee : ${employees}" th:value="${employee.empId}"
-                                    th:text="${employee.empName}">></option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -391,7 +690,7 @@
 
 <!-- View Client Modal -->
 <div aria-hidden="true" aria-labelledby="viewClientModalLabel" class="modal fade" id="viewClientModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered custom-modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="viewClientModalLabel">Client Details</h5>
@@ -404,13 +703,75 @@
                     <div class="card-body">
                         <h5 class="card-title"><i class="fas fa-building"></i> <span id="viewClientName"></span></h5>
                         <h6 class="card-subtitle mb-2 text-muted">Client ID: <span id="viewClientId"></span></h6>
-                        <p class="card-text"><i class="fas fa-globe"></i> Country: <span id="viewCountry"></span></p>
-                        <p class="card-text"><i class="fas fa-map-marker-alt"></i> Address: <span id="viewAddress"></span></p>
-                        <p class="card-text"><i class="fas fa-envelope"></i> Email: <span id="viewEmail"></span></p>
-                        <p class="card-text"><i class="fas fa-phone"></i> Phone: <span id="viewPhone"></span></p>
-                        <p class="card-text"><i class="fas fa-file-alt"></i> Reference Type: <span id="viewReference"></span></p>
-                        <p class="card-text"><i class="fas fa-calendar-check"></i> Confirmation Date: <span id="viewConfirmationDate"></span></p>
-                        <p class="card-text"><i class="fas fa-user-tie"></i> Coordinator: <span id="viewCoordinator"></span></p>
+                        <!-- Personal Information -->
+                        <div class="section-title"><i class="fas fa-address-card"></i> Personal Information</div>
+                        <div class="info-section">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="info-item">
+                                        <i class="fas fa-globe"></i>
+                                        <div class="info-content">
+                                            <div class="info-label">Country</div>
+                                            <div class="info-value" id="viewCountry"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-item">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <div class="info-content">
+                                            <div class="info-label">Address</div>
+                                            <div class="info-value" id="viewAddress"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-item">
+                                        <i class="fas fa-envelope"></i>
+                                        <div class="info-content">
+                                            <div class="info-label">Email</div>
+                                            <div class="info-value" id="viewEmail"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-item">
+                                        <i class="fas fa-phone"></i>
+                                        <div class="info-content">
+                                            <div class="info-label">Phone</div>
+                                            <div class="info-value" id="viewPhone"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-item">
+                                        <i class="fas fa-file-alt"></i>
+                                        <div class="info-content">
+                                            <div class="info-label">Reference Type</div>
+                                            <div class="info-value" id="viewReference"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-item">
+                                        <i class="fas fa-calendar-check"></i>
+                                        <div class="info-content">
+                                            <div class="info-label">Confirmation Date</div>
+                                            <div class="info-value" id="viewConfirmationDate"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-item">
+                                        <i class="fas fa-user-tie"></i>
+                                        <div class="info-content">
+                                            <div class="info-label">Coordinator</div>
+                                            <div class="info-value" id="viewCoordinator"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -423,28 +784,25 @@
 
 <!-- Include Bootstrap JS and dependencies -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <!-- Include DataTables JS -->
 <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
 <!-- Custom JS -->
 <script>
-    // Initialize DataTable
+    // Initialize DataTable with responsive extension
     $(document).ready(function () {
-        var table = $('#clientTable').DataTable({
-            "paging": true,
-            "searching": true,
-            "ordering": true,
-            "info": true,
-            "lengthMenu": [5, 10, 25, 50],
-            "pageLength": 10
-        });
-
-        // Custom search function to filter by client name only
-        $('#clientTable_filter input').on('keyup change', function () {
-            var searchTerm = this.value;
-            table.column(1).search(searchTerm).draw(); // Search only in the first column (Client Name)
+        $('#clientTable').DataTable({
+            responsive: true,
+            paging: true,
+            searching: true,
+            ordering: true,
+            info: true,
+            lengthMenu: [5, 10, 25, 50],
+            pageLength: 10
         });
     });
 
@@ -460,17 +818,14 @@
         const confirmationDate = button.getAttribute("data-confirmationdate");
         const employeeId = button.getAttribute("data-employeeid");
         const coordinator = button.getAttribute("data-coordinator");
-        // Populate the Client ID field
-        document.getElementById("editClientId").value = id;
 
-        // Populate other fields
+        document.getElementById("editClientId").value = id;
         document.getElementById("editClientName").value = clientName;
         document.getElementById("editCountry").value = country;
         document.getElementById("editAddress").value = address;
         document.getElementById("editEmail").value = email;
         document.getElementById("editPhone").value = phone;
         document.getElementById("editConfirmationDate").value = confirmationDate;
-        document.getElementById("viewCoordinator").value = coordinator;
 
         // Set the reference radio buttons based on the client's reference type
         if (reference === "EMAIL_CONFIRMATION") {
@@ -496,34 +851,33 @@
         }
     }
 
- function viewClientData(button) {
-    // Get values from the button attributes
-    var clientId = button.getAttribute("data-id");
-    var clientName = button.getAttribute("data-clientname");
-    var country = button.getAttribute("data-country");
-    var address = button.getAttribute("data-address");
-    var email = button.getAttribute("data-email");
-    var phone = button.getAttribute("data-phone");
-    var reference = button.getAttribute("data-reference");
-    var confirmationDate = button.getAttribute("data-confirmationdate");
-    var coordinator = button.getAttribute("data-coordinator");
+    // Function to view client data in the view modal
+    function viewClientData(button) {
+        const clientId = button.getAttribute("data-id");
+        const clientName = button.getAttribute("data-clientname");
+        const country = button.getAttribute("data-country");
+        const address = button.getAttribute("data-address");
+        const email = button.getAttribute("data-email");
+        const phone = button.getAttribute("data-phone");
+        const reference = button.getAttribute("data-reference");
+        const confirmationDate = button.getAttribute("data-confirmationdate");
+        const coordinator = button.getAttribute("data-coordinator");
 
-    // Set values in modal fields
-    document.getElementById("viewClientId").textContent = clientId ? clientId : "N/A";
-    document.getElementById("viewClientName").textContent = clientName ? clientName : "N/A";
-    document.getElementById("viewCountry").textContent = country ? country : "N/A";
-    document.getElementById("viewAddress").textContent = address ? address : "N/A";
-    document.getElementById("viewEmail").textContent = email ? email : "N/A";
-    document.getElementById("viewPhone").textContent = phone ? phone : "N/A";
-    document.getElementById("viewReference").textContent = reference ? reference : "N/A";
-    document.getElementById("viewConfirmationDate").textContent = confirmationDate ? confirmationDate : "N/A";
-    document.getElementById("viewCoordinator").innerText = coordinator ? coordinator : "N/A";
-}
+        document.getElementById("viewClientId").textContent = clientId ? clientId : "N/A";
+        document.getElementById("viewClientName").textContent = clientName ? clientName : "N/A";
+        document.getElementById("viewCountry").textContent = country ? country : "N/A";
+        document.getElementById("viewAddress").textContent = address ? address : "N/A";
+        document.getElementById("viewEmail").textContent = email ? email : "N/A";
+        document.getElementById("viewPhone").textContent = phone ? phone : "N/A";
+        document.getElementById("viewReference").textContent = reference ? reference : "N/A";
+        document.getElementById("viewConfirmationDate").textContent = confirmationDate ? confirmationDate : "N/A";
+        document.getElementById("viewCoordinator").innerText = coordinator ? coordinator : "N/A";
+    }
 
 </script>
+<!-- Custom JS -->
+<script th:inline="javascript" th:src="@{/js/scripts.js}"></script>
 <!-- Footer -->
-<footer style="background: #2c3e50; color: white; text-align: center; padding: 15px 0; margin-top: auto; box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);">
-    <p>&copy; 2025 International Inspection Services Pvt Ltd. All Rights Reserved.</p>
-</footer>
+<footer th:replace="fragments/footer :: footer"></footer>
 </body>
 </html>

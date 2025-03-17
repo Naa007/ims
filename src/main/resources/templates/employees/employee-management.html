@@ -15,7 +15,7 @@
     <style>
         /* Root Variables for Consistent Design System */
         :root {
-            --primary-color: #4a90e2; /* Soft blue */
+            --primary-color: #485d74;; /* Soft blue */
             --primary-dark: #2980b9; /* Darker blue for gradients */
             --secondary-color: #50e3c2; /* Teal */
             --accent-color: #f39c12; /* Orange */
@@ -26,16 +26,16 @@
             --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             --header-bg: linear-gradient(135deg, rgba(44, 62, 80, 0.95), rgba(52, 73, 94, 0.95));
             --footer-bg: #2c3e50;
-            --button-gradient: linear-gradient(135deg, #4a90e2, #2980b9);
+            --button-gradient: var(---primary-color);
             --button-hover: linear-gradient(135deg, #2980b9, #4a90e2);
-            --table-header-bg: linear-gradient(135deg, #4a90e2, #2980b9);
+            --table-header-bg: var(---primary-color);
         }
 
         /* General Styles */
         html, body {
             height: 100%; /* Ensure the body takes full height */
             margin: 0; /* Remove default margin */
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Poppins', sans-serif !important;
             background-color: var(--light-bg);
             color: var(--dark-text);
             line-height: 1.6;
@@ -43,6 +43,7 @@
 
         body {
             display: flex;
+             font-family: 'Poppins', sans-serif !important;
             flex-direction: column; /* Stack header, main, and footer vertically */
         }
 
@@ -64,7 +65,7 @@
         }
 
         .modal-header {
-            background: linear-gradient(135deg, #007bff, #0056b3);
+            background: var(--primary-color);
             color: white;
             border-bottom: none;
             border-radius: 10px 10px 0 0;
@@ -252,7 +253,7 @@
         }
 
         .table thead {
-            background: var(--table-header-bg);
+            background: var(--primary-color);
             color: white;
         }
 
@@ -260,8 +261,8 @@
             border-top: 1px solid var(--input-border);
         }
          /* Button Styles */
-        .btn-primary {
-            background: var(--button-gradient);
+        .btn-primary,.btn-secondary {
+            background: var(--primary-color);
             border: none;
             color: white;
             padding: 0.6rem 1.5rem;
@@ -270,7 +271,7 @@
             transition: all 0.3s ease;
         }
 
-        .btn-primary:hover {
+        .btn-primary:hover,.btn-secondary:hover {
             background: var(--button-hover);
             transform: translateY(-2px);
         }
@@ -285,24 +286,106 @@
         .btn-warning:hover {
             transform: translateY(-2px);
         }
+ .custom-modal {
+    max-width: 750px; /* Set your desired width */
+    width: 80%; /* Ensure it takes full width on smaller screens */
+}
+ .custom-editModal {
+    max-width: 750px; /* Set your desired width */
+    width: 80%; /* Ensure it takes full width on smaller screens */
+}
+         .info-section {
+    margin-bottom: 20px; /* Space below the info section */
+}
+
+.info-item {
+    display: flex; /* Flexbox for alignment */
+    align-items: center; /* Center items vertically */
+    padding: 10px; /* Padding for each item */
+    border-radius: 10px; /* Rounded corners */
+    transition: all 0.3s ease; /* Smooth transition */
+}
+
+.info-item i {
+    background-color: #e1f0fa; /* Light background for icons */
+    color: var(--primary-color); /* Icon color */
+    padding: 10px; /* Padding for icons */
+    border-radius: 10px; /* Rounded corners for icons */
+    margin-right: 15px; /* Space between icon and text */
+    width: 40px; /* Fixed width for icons */
+    height: 40px; /* Fixed height for icons */
+    display: flex; /* Flexbox for centering */
+    align-items: center; /* Center icon */
+    justify-content: center; /* Center icon */
+}
+
+.info-content {
+    flex: 1; /* Allow content to take available space */
+}
+
+.info-label {
+    font-size: 0.85rem; /* Smaller font size for labels */
+    color: #95a5a6; /* Light gray color for labels */
+    margin-bottom: 2px; /* Space below labels */
+}
+
+/* Ensure email wraps properly */
+.info-value {
+    font-size: 1rem; /* Normal font size for values */
+    font-weight: 500; /* Medium weight for values */
+    color: #2c3e50; /* Dark color for values */
+    word-wrap: break-word; /* Allow long words to break */
+}
+        /* Style for the section title */
+.section-title {
+           font-size: 1.3rem;
+           font-weight: 600;
+           color: #2c3e50;
+           margin: 30px 0 20px;
+           padding-bottom: 10px;
+           border-bottom: 2px solid #3498db;
+           display: flex;
+           align-items: center;
+       }
+
+       .section-title i {
+           margin-right: 10px;
+           color: var(--primary-color);
+       }
+         .card-title {
+           font-size: 1.75rem;
+           font-weight: 700;
+           color: #2c3e50;
+           margin-bottom: 1.5rem;
+           display: flex;
+           align-items: center;
+       }
+
+       .card-title i {
+           background-color: var(--primary-color);
+           color: white;
+           padding: 10px;
+           border-radius: 50%;
+           margin-right: 15px;
+           width: 40px;
+           height: 40px;
+           display: flex;
+           align-items: center;
+           justify-content: center;
+       }
+.icon-blue {
+    color: var(--primary-color); /* Blue color */
+}
+        .custom-select {
+    font-family: 'Poppins', sans-serif !important; /* Ensure the same font family */
+    font-size: 1rem; /* Set the same font size */
+    color: #2c3e50; /* Set the text color */
+}
     </style>
 </head>
 <body>
 <!-- Header -->
-<header>
-    <div class="header-content" style="flex: 1 1 20%; display: flex; align-items: center;">
-        <img src="/images/logo.png" alt="IISPL Logo" class="logo">
-    </div>
-    <div style="flex: 1 1 70%; text-align: center; font-size: 1.5rem; font-weight: bold; color: white;">
-        <h1 class="company-name">Inspection Management Services</h1>
-    </div>
-    <button class="logout-btn" style="flex: 1 1 10%;">
-        <i class="fas fa-sign-out-alt"></i>
-        <a th:href="@{/logout}" th:onclick="return confirm('Are you sure you want to log out?');">
-            Logout
-        </a>
-    </button>
-</header>
+<header th:replace="fragments/header :: header"></header>
 
 
 <main>
@@ -377,7 +460,7 @@
 <!-- View Employee Modal -->
 <div aria-hidden="true" aria-labelledby="viewEmployeeModalLabel" class="modal fade" id="viewEmployeeModal"
      tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered custom-modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="viewEmployeeModalLabel">Employee Details</h5>
@@ -388,7 +471,7 @@
             <div class="modal-body">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title"><i class="fas fa-user"></i> <span id="viewEmpName"></span></h5>
+                        <h5 class="card-title" style="margin-right: 10px;"><i class="fas fa-user"></i> <span id="viewEmpName"></span></h5>
 
                         <!-- Personal Information -->
                         <div class="section-title"><i class="fas fa-address-card"></i> Personal Information</div>
@@ -453,7 +536,7 @@
 
 <!-- Add Employee Modal -->
 <div aria-hidden="true" aria-labelledby="addEmployeeModalLabel" class="modal fade" id="addEmployeeModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered custom-editModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addEmployeeModalLabel">Add Employee</h5>
@@ -462,56 +545,90 @@
                 </button>
             </div>
             <div class="modal-body">
+                <div class="form-card">
+                    <div class="form-header">
+                        <p class="form-subtitle">Please Add the information below</p>
+                    </div>
                 <!-- Add Employee Form -->
-                <form method="post" th:action="@{/employee/save-employee}" th:object="${employee}">
-                    <div class="form-group">
-                        <label for="empName">Employee Name</label>
-                        <input class="form-control" id="empName" required th:field="*{empName}" type="text">
-                    </div>
-                    <div class="form-group">
-                        <label for="empId">Employee ID</label>
-                        <input class="form-control" id="empId" required th:field="*{empId}" type="text">
-                    </div>
-                    <div class="form-group">
-                        <label for="role">Role</label>
-                        <select class="form-control" id="role" required th:field="*{role}">
-                            <option value="">Select Role</option>
-                            <option value="COORDINATOR">COORDINATOR</option>
-                            <option value="INSPECTOR">INSPECTOR</option>
-                                <option value="TECHNICAL_COORDINATOR">TECHNICAL COORDINATOR</option>
-                            <option value="ADMIN">ADMIN</option>
-                            <option value="BUSINESS">BUSINESS</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Active</label><br>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" id="activeYes" th:field="*{active}" type="radio" value="Yes" required>
-                            <label class="form-check-label" for="activeYes">Yes</label>
+                <form method="post" th:action="@{/employee/save-employee}" th:object="${employee}" class="needs-validation" novalidate>
+                    <div class="row">
+                        <!-- Employee Name -->
+                        <div class="col-md-6 mb-3">
+                            <label for="empName">Employee Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-user icon-blue"></i></span>
+                                <input class="form-control" id="empName" required th:field="*{empName}" type="text">
+                            </div>
                         </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" id="activeNo" th:field="*{active}" type="radio" value="No" required>
-                            <label class="form-check-label" for="activeNo">No</label>
+                        <!-- Employee ID -->
+                        <div class="col-md-6 mb-3">
+                            <label for="empId">Employee ID</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-id-badge icon-blue"></i></span>
+                                <input class="form-control" id="empId" required th:field="*{empId}" type="text">
+                            </div>
+                        </div>
+                        <!-- Role -->
+                        <div class="col-md-6 mb-3">
+                            <label for="role">Role</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-briefcase icon-blue"></i></span>
+                                <select class="form-select custom-select" id="role" required th:field="*{role}">
+                                    <option value="">Select Role</option>
+                                    <option value="COORDINATOR">Coordinator</option>
+                                    <option value="INSPECTOR">Inspector</option>
+                                    <option value="TECHNICAL_COORDINATOR">Technical Coordinator</option>
+                                    <option value="ADMIN">Admin</option>
+                                    <option value="BUSINESS">Business</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- Active Status -->
+                        <div class="col-md-6 mb-3">
+                            <label>Active</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-check-circle icon-blue"></i></span>
+                                <div class="form-check form-check-inline"  style="margin-left: 10px;">
+                                    <input class="form-check-input" id="activeYes" th:field="*{active}" type="radio" value="Yes" required>
+                                    <label class="form-check-label" for="activeYes">Yes</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" id="activeNo" th:field="*{active}" type="radio" value="No" required>
+                                    <label class="form-check-label" for="activeNo">No</label>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Email -->
+                        <div class="col-md-6 mb-3">
+                            <label for="email">Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-envelope icon-blue"></i></span>
+                                <input class="form-control" id="email" required th:field="*{email}" type="email">
+                            </div>
+                        </div>
+                        <!-- Phone Number -->
+                        <div class="col-md-6 mb-3">
+                            <label for="phoneNumber">Phone Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-phone icon-blue"></i></span>
+                                <input class="form-control" id="phoneNumber" required th:field="*{phoneNumber}" type="text">
+                            </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input class="form-control" id="email" required th:field="*{email}" type="email">
+                    <!-- Submit Button -->
+                    <div class="text-center mt-4">
+                        <button class="btn btn-primary" type="submit">Submit</button>
                     </div>
-                    <div class="form-group">
-                        <label for="phoneNumber">Phone Number</label>
-                        <input class="form-control" id="phoneNumber" required th:field="*{phoneNumber}" type="text">
-                    </div>
-                    <button class="btn btn-primary" type="submit">Submit</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
+</div>
 
 <!-- Edit Employee Modal -->
 <div aria-hidden="true" aria-labelledby="editEmployeeModalLabel" class="modal fade" id="editEmployeeModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered custom-editModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editEmployeeModalLabel">Edit Employee</h5>
@@ -520,49 +637,85 @@
                 </button>
             </div>
             <div class="modal-body">
-                <!-- Edit Employee Form -->
-                <form id="editEmployeeForm" method="post">
-                    <input id="editId" name="id" type="hidden">
-                    <div class="form-group">
-                        <label for="editEmpName">Employee Name</label>
-                        <input class="form-control" id="editEmpName" name="empName" required type="text">
+                <div class="form-card">
+                    <div class="form-header">
+                        <p class="form-subtitle">Please update the information below</p>
                     </div>
-                    <div class="form-group">
-                        <label for="editEmpId">Employee ID</label>
-                        <input class="form-control" id="editEmpId" name="empId" readonly required type="text">
-                    </div>
-                    <div class="form-group">
-                        <label for="editRole">Role</label>
-                        <select class="form-control" id="editRole" name="role" required>
-                            <option value="">Select Role</option>
-                            <option value="COORDINATOR">COORDINATOR</option>
-                            <option value="INSPECTOR">INSPECTOR</option>
-                            <option value="TECHNICAL_COORDINATOR">TECHNICAL COORDINATOR</option>
-                            <option value="ADMIN">ADMIN</option>
-                            <option value="BUSINESS">BUSINESS</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Active</label><br>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" id="editActiveYes" name="active" type="radio" value="Yes">
-                            <label class="form-check-label" for="editActiveYes">Yes</label>
+                    <!-- Edit Employee Form -->
+                    <form id="editEmployeeForm" method="post" class="needs-validation" novalidate>
+                        <input id="editId" name="id" type="hidden">
+                        <div class="row">
+                            <!-- Employee Name -->
+                            <div class="col-md-6 mb-3">
+                                <label for="editEmpName">Employee Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user icon-blue"></i></span>
+                                    <input class="form-control" id="editEmpName" name="empName" required type="text">
+                                </div>
+                            </div>
+                            <!-- Employee ID -->
+                            <div class="col-md-6 mb-3">
+                                <label for="editEmpId">Employee ID</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-id-badge icon-blue"></i></span>
+                                    <input type="text" id="editEmpId" name="empId" class="form-control" readonly required />
+                                </div>
+                            </div>
+                            <!-- Role -->
+                            <div class="col-md-6 mb-3">
+                                <label for="editRole">Role</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-briefcase icon-blue"></i></span>
+                                    <select id="editRole" name="role" class="custom-select" required>
+                                        <option value="">Select Role</option>
+                                        <option value="COORDINATOR">COORDINATOR</option>
+                                        <option value="INSPECTOR">INSPECTOR</option>
+                                        <option value="TECHNICAL_COORDINATOR">TECHNICAL COORDINATOR</option>
+                                        <option value="ADMIN">ADMIN</option>
+                                        <option value="BUSINESS">BUSINESS</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <!-- Active Status -->
+                            <div class="col-md-6 mb-3">
+                                <label>Active</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"> <i class="fas fa-info-circle me-2 icon-blue"></i></span>
+                                    <div class="form-check form-check-inline" style="margin-left: 10px;">
+                                        <input class="form-check-input" id="editActiveYes" name="active" type="radio" value="Yes" required>
+                                        <label class="form-check-label" for="editActiveYes">Yes</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" id="editActiveNo" name="active" type="radio" value="No" required>
+                                        <label class="form-check-label" for="editActiveNo">No</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Email -->
+                            <div class="col-md-6 mb-3">
+                                <label for="editEmail">Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-envelope icon-blue"></i></span>
+                                    <input type="email" id="editEmail" name="email" class="form-control" required />
+                                </div>
+                            </div>
+                            <!-- Phone Number -->
+                            <div class="col-md-6 mb-3">
+                                <label for="editPhoneNumber">Phone Number</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-phone icon-blue"></i></span>
+                                    <input type="text" id="editPhoneNumber" name="phoneNumber" class="form-control" required />
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" id="editActiveNo" name="active" type="radio" value="No">
-                            <label class="form-check-label" for="editActiveNo">No</label>
+                        <!-- Submit Button -->
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save me-2"></i> Save Changes
+                            </button>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="editEmail">Email</label>
-                        <input class="form-control" id="editEmail" name="email" required type="email">
-                    </div>
-                    <div class="form-group">
-                        <label for="editPhoneNumber">Phone Number</label>
-                        <input class="form-control" id="editPhoneNumber" name="phoneNumber" required type="text">
-                    </div>
-                    <button class="btn btn-primary" type="submit">Save Changes</button>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -638,8 +791,9 @@
         document.getElementById("viewPhoneNumber").textContent = phoneNumber;
     }
 </script>
-<footer>
-    <p>&copy; 2025 International Inspection Services Pvt Ltd. All Rights Reserved.</p>
-</footer>
+<!-- Custom JS -->
+<script th:inline="javascript" th:src="@{/js/scripts.js}"></script>
+<!-- Footer -->
+<footer th:replace="fragments/footer :: footer"></footer>
 </body>
 </html>
