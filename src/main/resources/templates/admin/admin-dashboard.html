@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/head :: head"><title>Admin Dashboard - IISPL Console</title></head>
+<!-- Head -->
+<head th:replace="fragments/head :: head"><title>Admin Dashboard</title></head>
 <body>
 <!-- Header -->
 <header th:replace="fragments/header :: header"></header>
@@ -40,16 +41,10 @@
             </p>
         </div>
     </div>
+
 </main>
 
 <!-- Footer -->
 <footer th:replace="fragments/footer :: footer"></footer>
-
-<!-- Bootstrap JS Bundle with Popper -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- Custom JS -->
-<script th:src="@{/js/scripts.js}"></script>
 </body>
 </html>
