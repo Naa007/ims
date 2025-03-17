@@ -22,6 +22,7 @@
     --card-icon-bg: #e1f0fa; /* Card Icon bg */
 
 }
+
 /* Reset body and html to use full height */
 html, body {
     height: 100%;
@@ -637,13 +638,9 @@ button:hover {
 }
 
 .dashboard-container {
-flex: 1;
-display: flex;
-flex-direction: column;
-justify-content: space-between;
-margin: 0 auto;
-padding: 2rem;
-max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    max-width: 1200px;
 }
 
 /* Dashboard Tabs */
@@ -791,6 +788,7 @@ max-width: 1200px;
 .table-responsive {
   overflow-x: auto !important;
 }
+
 /* Main Content */
 .main-content {
     background: white;
