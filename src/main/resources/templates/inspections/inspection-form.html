@@ -206,18 +206,12 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center align-items-center">
-                                        <div class="form-check me-3">
-                                            <input type="radio" th:name="proposedCVs[__${iterStat.index}__].cvCertificatesAvailable"
-                                                   value="true" th:checked="${cv.cvCertificatesAvailable == true}"
-                                                   class="form-check-input" id="cvYes-${iterStat.index}">
-                                            Yes
-                                        </div>
-                                        <div class="form-check">
-                                            <input type="radio" th:name="proposedCVs[__${iterStat.index}__].cvCertificatesAvailable"
-                                                   value="false" th:checked="${cv.cvCertificatesAvailable == false}"
-                                                   class="form-check-input" id="cvNo-${iterStat.index}">
-                                            No
-                                        </div>
+                                        <select class="form-select form-select-sm"
+                                                th:name="proposedCVs[__${iterStat.index}__].cvCertificatesAvailable">
+                                            <option value="" disabled selected>Select</option> <!-- Placeholder -->
+                                            <option value="true" th:selected="${cv.cvCertificatesAvailable == true}">Yes</option>
+                                            <option value="false" th:selected="${cv.cvCertificatesAvailable == false}">No</option>
+                                        </select>
                                     </div>
 
                                 </td>
@@ -229,29 +223,27 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center align-items-center">
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" th:name="proposedCVs[__${iterStat.index}__].pqrAvailable" value="true" th:checked="${cv.pqrAvailable == true}" class="form-check-input" id="pqrAvailYes-${iterStat.index}"/>
-                                            Yes
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" th:name="proposedCVs[__${iterStat.index}__].pqrAvailable" value="false" th:checked="${cv.pqrAvailable == false}" class="form-check-input" id="pqrAvailNo-${iterStat.index}"/>
-                                            No
-                                        </div>
+                                        <select class="form-select form-select-sm" th:name="proposedCVs[__${iterStat.index}__].pqrAvailable">
+                                            <option value="" disabled selected>Select</option> <!-- Placeholder -->
+                                            <option value="true" th:selected="${cv.pqrAvailable == true}">Yes</option>
+                                            <option value="false" th:selected="${cv.pqrAvailable == false}">No</option>
+                                        </select>
                                     </div>
                                 </td>
                                 <td>
+                                    <div class="d-flex justify-content-center align-items-center">
                                     <input type="datetime-local" class="form-control form-control-sm" th:field="*{proposedCVs[__${iterStat.index}__].cvSubmittedToClientDate}" th:value="*{proposedCVs[__${iterStat.index}__].cvSubmittedToClientDate != null ? proposedCVs[__${iterStat.index}__].cvSubmittedToClientDate : ''}"/>
+                                    </div>
                                 </td>
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center align-items-center">
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" th:name="proposedCVs[__${iterStat.index}__].cvStatus" value="true" th:onclick="'approvedInspector('+ ${iterStat.index} +', true)'" th:checked="${cv.cvStatus == true}" class="form-check-input" id="cvStatusYes-${iterStat.index}"/>
-                                            Yes
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input type="radio" th:name="proposedCVs[__${iterStat.index}__].cvStatus" value="false" th:onclick="'approvedInspector('+ ${iterStat.index} +', false)'" th:checked="${cv.cvStatus == false}" class="form-check-input" id="cvStatusNo-${iterStat.index}"/>
-                                            No
-                                        </div>
+                                        <select class="form-select form-select-sm"
+                                                th:name="proposedCVs[__${iterStat.index}__].cvStatus"
+                                                th:onchange="'approvedInspector(' + ${iterStat.index} + ', this.value === \'true\')'">
+                                            <option value="" disabled selected>Select</option> <!-- Placeholder -->
+                                            <option value="true" th:selected="${cv.cvStatus == true}">Yes</option>
+                                            <option value="false" th:selected="${cv.cvStatus == false}">No</option>
+                                        </select>
                                     </div>
                                 </td>
                                 <td class="text-center">

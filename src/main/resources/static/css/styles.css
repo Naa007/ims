@@ -605,7 +605,6 @@ label {
 
 input {
     padding: 0.8rem;
-    margin-bottom: 1rem;
     font-size: 1rem;
     border: 1px solid #CED4DA;
     border-radius: 5px;
@@ -750,12 +749,6 @@ button:hover {
 
 #proposedCVsTable th:nth-child(7) {
   width: 8% !important;
-}
-
-#proposedCVsTable select.form-select {
-  width: 100% !important;
-  min-width: 150px !important;
-  max-width: none !important;
 }
 
 /* Fix radio button alignment */
