@@ -244,7 +244,7 @@ document.addEventListener("DOMContentLoaded", function () {
        fetch('/api/inspectors?address=' + inspectionLocation )
        .then(response => response.json())
        .then(data => {
-           for (const [locationKey, inspectors] of Object.entries(data)) {
+           for (const [locationKey, inspectorsMap] of Object.entries(data)) {
                const userLocationArray = locationKey.split(',').map(Number); // Split and convert to numbers
                const userLocation = new google.maps.LatLng(userLocationArray[0], userLocationArray[1]); // Create LatLng object
 
@@ -260,22 +260,42 @@ document.addEventListener("DOMContentLoaded", function () {
                    title: "Inspection Location"
                });
 
-               // Plot all inspectors for the current user location
-               inspectors.forEach(inspector => {
-                   const marker = new google.maps.Marker({
-                       position: {
-                           lat: inspector.location.lat,
-                           lng: inspector.location.lng
-                       },
-                       map: map,
-                       title: `${inspector.name}, Distance: ${inspector.distance}, Duration: ${inspector.duration}`,
-                       icon: {
-                           url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png" // Green marker icon
-                       }
-                   });
-               });
+                
+                // Iterate over the map of inspector types and their distances
+                for (const [inspectorType, inspectors] of Object.entries(inspectorsMap)) {
+                    const iconUrl = (type) => {
+                        switch (type) {
+                            case 'PARTNER_INSPECTOR':
+                                return "http://maps.google.com/mapfiles/ms/icons/green-dot.png"; // Green icon for Partner
+                            case 'FREELANCER':
+                                return "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png"; // Yellow icon for Freelancer
+                            case 'INHOUSE_INSPECTOR':
+                                return "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"; // Blue icon for Inhouse
+                            case 'TECHNICAL_COORDINATOR':
+                                return "http://maps.google.com/mapfiles/ms/icons/purple-dot.png"; // Purple icon for Technical Coordinator
+                            default:
+                                return "http://maps.google.com/mapfiles/ms/icons/green-dot.png"; // Default icon (red)
+                        }
+                    };
+
+                    inspectors.forEach(inspector => {
+                        const inspectorMarker = new google.maps.Marker({
+                            position: {
+                                lat: inspector.location.lat,
+                                lng: inspector.location.lng
+                            },
+                            map: map,
+                            title: `${inspector.name}, Distance: ${inspector.distance}, Duration: ${inspector.duration}`,
+                            icon: {
+                                url: iconUrl(inspectorType) // Set marker color based on inspectorType
+                            }
+                        });
+                    });
+                }
+
+
            }
-               });
+       });
 
    }
 

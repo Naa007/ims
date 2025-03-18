@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class InspectorService {
@@ -64,11 +66,16 @@ public class InspectorService {
     }
 
 
-    public List<Pair<String, LatLng>> getActiveInspectorsLatLang() {
-        return inspectorRepository.findAllByInspectorStatus(com.stepup.ims.entity.Inspector.InspectorStatusType.ACTIVE).stream()
+    public Map<String, List<Pair<String, LatLng>>> getActiveInspectorsLatLang() {
+        return  inspectorRepository.findAllByInspectorStatus(com.stepup.ims.entity.Inspector.InspectorStatusType.ACTIVE).stream()
                 .map(inspectorModelMapper::toModel)
                 .filter(inspector -> inspector.getAddressCoordinates() != null)
-                .map(inspector -> Pair.of(inspector.getInspectorName(), inspector.getAddressCoordinates()))
-                .toList();
+                .collect(Collectors.groupingBy(
+                        inspector -> inspector.getInspectorType().toString(),
+                        Collectors.mapping(
+                                inspector -> Pair.of(inspector.getInspectorName(), inspector.getAddressCoordinates()),
+                                Collectors.toList()
+                        )
+                ));
     }
 }

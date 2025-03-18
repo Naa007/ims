@@ -30,7 +30,7 @@ public class MapController {
     private UserService userService;
 
     @GetMapping("/inspectors")
-    public Map<String, List<GoogleMapsService.InspectorDistance>> getInspectorsByAddress(Model model, @RequestParam String address) throws InterruptedException, ApiException, IOException {
+    public Map<String, Map<String, List<GoogleMapsService.InspectorDistance>>> getInspectorsByAddress(Model model, @RequestParam String address) throws InterruptedException, ApiException, IOException {
         // 1. Geocode the user's input address
         LatLng inspectionLocation = googleMapsService.geocodeAddress(address);
 
