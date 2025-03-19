@@ -317,8 +317,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const index = tableBody.querySelectorAll("tr").length -1;
 
     if (previousRow) {
-        const lastRadioInput = [...previousRow.querySelectorAll("input[type='radio']")].pop();
-        if (lastRadioInput && lastRadioInput.value === "false" && !lastRadioInput.checked) {
+        const lastSelectInput = [...previousRow.querySelectorAll("select")].pop();
+        if (lastSelectInput && lastSelectInput.value === "true") {
             alert("Inspector is already approved.");
             return;
         }
@@ -332,14 +332,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (input.tagName === "SELECT") {
                 input.selectedIndex = 0; // Reset dropdowns
-            } else if (input.type === "radio") {
-                // Reset radio buttons
-                if (input.value === "true") {
-                    input.checked = false;
-                }
-                if (input.value === "false") {
-                    input.checked = true;
-                }
             } else if (input.type === "datetime-local") {
                 input.value = ""; // Reset datetime-local input
             }
@@ -358,8 +350,8 @@ document.addEventListener("DOMContentLoaded", function () {
           return;
       }
       if (row) {
-        const lastRadioInput = [...row.querySelectorAll("input[type='radio']")].pop();
-        if (lastRadioInput && lastRadioInput.value === "false" && !lastRadioInput.checked) {
+        const lastSelectInput = [...row.querySelectorAll("select")].pop();
+        if (lastSelectInput && lastSelectInput.value === "true") {
            document.getElementById("approvedInspectorName").value = "";
         }
       }
