@@ -1,4 +1,4 @@
-package exception;
+package com.stepup.ims.exception;
 
 public class BusinessStatsException extends RuntimeException {
 
