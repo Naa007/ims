@@ -431,7 +431,7 @@
                 <div class="col-md-6">
                     <label for="frSentToClientDate" class="form-label">FR Sent To Client Date</label>
                     <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-file-signature"></i></span>
+                        <span class="input-group-text"><i class="fas fa-share-square"></i></span>
                         <input type="date" id="frSentToClientDate" th:field="*{frSentToClientDate}" class="form-control"/>
                     </div>
                 </div>
@@ -441,7 +441,7 @@
                     <label for="inspectionReportsReceivedDate" class="form-label">Inspection Reports Received
                         Date</label>
                     <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-file-signature"></i></span>
+                        <span class="input-group-text"><i class="fas fa-file-download"></i></span>
                         <input type="date" id="inspectionReportsReceivedDate" th:field="*{inspectionReportsReceivedDate}"
                            class="form-control" />
                     </div>
@@ -451,7 +451,7 @@
                 <div class="col-md-6">
                     <label for="inspectionReviewedBy" class="form-label">Inspection Reviewed By</label>
                     <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-user-check"></i></span>
+                        <span class="input-group-text"><i class="fas fa-user-edit"></i></span>
                         <select id="inspectionReviewedBy" class="form-select" th:field="*{inspectionReviewedBy}" >
                         <option value="">Select Reviewer</option>
                         <option th:each="coordinator : ${inspection.technicalCoordinatorsList}"
@@ -466,7 +466,7 @@
                     <label for="inspectionSupportDocumentsSentDate" class="form-label">Inspection Support Documents
                         Sent Date</label>
                     <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-file-signature"></i></span>
+                        <span class="input-group-text"><i class="fas fa-paper-plane"></i></span>
                         <input type="date" id="inspectionSupportDocumentsSentDate"
                            th:field="*{inspectionSupportDocumentsSentDate}" class="form-control" />
                     </div>
@@ -477,7 +477,7 @@
                     <label for="inspectionReportNumber" class="form-label">
                         Inspection Report Number</label>
                     <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-file-signature"></i></span>
+                        <span class="input-group-text"><i class="fas fa-hashtag"></i></span>
                         <input type="text" id="inspectionReportNumber"
                            th:field="*{inspectionReportNumber}" class="form-control" />
                     </div>
@@ -487,7 +487,7 @@
                 <div class="col-md-6">
                     <label class="form-label">NCR Raised</label>
                     <div class="input-group">
-                        <span class="input-group-text me-3"><i class="fas fa-file-signature"></i></span>
+                        <span class="input-group-text me-3"><i class="fas fa-exclamation-circle"></i></span>
                         <div class="d-flex align-items-center">
                             <div class="form-check me-3">
                                 <input type="radio" id="ncrRaisedYes" name="ncrRaised" value="true" th:checked="${inspection.ncrRaised == true}" class="form-check-input" />
@@ -505,7 +505,7 @@
                 <div class="col-md-6">
                     <label for="irnSentDate" class="form-label">IRN Sent Date</label>
                     <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-file-signature"></i></span>
+                        <span class="input-group-text"><i class="fas fa-paperclip"></i></span>
                         <input type="date" id="irnSentDate" th:field="*{irnSentDate}" class="form-control" />
                     </div>
                 </div>
@@ -514,7 +514,7 @@
                 <div class="col-md-6">
                     <label class="form-label">Impartiality and Confidentiality</label>
                     <div class="input-group">
-                        <span class="input-group-text me-3"><i class="fas fa-file-signature"></i></span>
+                        <span class="input-group-text me-3"><i class="fas fa-balance-scale"></i></span>
                         <div class="d-flex align-items-center">
                             <div class="form-check me-3">
                                 <input type="radio" id="impartialityYes" name="impartialityAndConfidentiality" value="true" th:checked="${inspection.impartialityAndConfidentiality == true}" class="form-check-input" />
@@ -532,7 +532,7 @@
                 <div class="col-md-6">
                     <label for="jobFolderLink" class="form-label">Job Folder Link</label>
                     <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-file-signature"></i></span>
+                        <span class="input-group-text"><i class="fas fa-link"></i></span>
                     <input type="url" id="jobFolderLink" th:field="*{jobFolderLink}" class="form-control"
                            placeholder="Enter the URL" />
                     </div>
