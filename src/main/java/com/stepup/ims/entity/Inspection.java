@@ -1,5 +1,6 @@
 package com.stepup.ims.entity;
 
+import com.stepup.ims.audit.Auditable;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -11,7 +12,7 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "inspection")
-public class Inspection {
+public class Inspection extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

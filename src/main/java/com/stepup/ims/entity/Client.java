@@ -1,5 +1,6 @@
 package com.stepup.ims.entity;
 
+import com.stepup.ims.audit.Auditable;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -8,7 +9,7 @@ import java.time.LocalDate;
 @Data
 @Entity
 @Table(name = "client")
-public class Client {
+public class Client extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

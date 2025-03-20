@@ -1,6 +1,7 @@
 package com.stepup.ims.entity;
 
 import com.google.maps.model.LatLng;
+import com.stepup.ims.audit.Auditable;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -11,7 +12,7 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "Inspector")
-public class Inspector {
+public class Inspector extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

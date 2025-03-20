@@ -1,5 +1,6 @@
 package com.stepup.ims.entity;
 
+import com.stepup.ims.audit.Auditable;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -7,7 +8,7 @@ import lombok.Getter;
 @Entity
 @Data
 @Table(name = "pqr")
-public class PQR {
+public class PQR extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
