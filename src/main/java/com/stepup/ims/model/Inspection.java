@@ -84,6 +84,8 @@ public class Inspection {
 
     private String jobFolderLink;
 
+    private InspectionStatusType inspectionStatus;
+
     @JsonIgnore
     private List<String> countriesList;
 
@@ -99,6 +101,28 @@ public class Inspection {
 
     public enum InspectionType {
         MECHANICAL, ELECTRICAL
+    }
+
+    public enum InspectionStatusType {
+        NEW("New"),
+        INSPECTOR_ASSIGNED("Inspector Assigned"),
+        INSPECTOR_REVIEW( "Inspector Review"),
+        INSPECTOR_APPROVED( "Inspector Approved"),
+        REFERENCE_DOC_RECEIVED( "Reference Documents Received"),
+        REFERENCE_DOC_REVIEW("Reference Documents Review"),
+        INSPECTION_REPORTS_REVIEW( "Inspection Reports Review"),
+        INSPECTION_REPORTS_SENT_TO_CLIENT( "Inspection Reports Sent to Client"),
+        CLOSED ("Closed");
+
+        private final String description;
+
+        InspectionStatusType(String description) {
+            this.description = description;
+        }
+
+        public String getDescription() {
+            return description;
+        }
     }
 
     public List<String> getCountriesList() {

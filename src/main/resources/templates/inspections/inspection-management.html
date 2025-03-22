@@ -28,6 +28,7 @@
                     <th>Client Name - Country</th>
                     <th>Inspection Date</th>
                     <th>Inspection Item</th>
+                    <th>Inspection Status</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
@@ -38,6 +39,7 @@
                     <td th:text="${inspection.client.clientName + ' - ' + inspection.client.country}"></td>
                     <td th:text="${inspection.inspectionDateAsPerNotification}"></td>
                     <td th:text="${inspection.inspectionItem}"></td>
+                    <td th:text="${inspection.inspectionStatus.description}"></td>
                     <td>
                         <button class="btn btn-warning btn-sm"
                                 th:onclick="|redirectToEditInspection(${inspection.id})|"><i class="fas fa-edit"></i>

@@ -125,8 +125,23 @@ public class Inspection extends Auditable {
     @Column(name = "job_folder_link")
     private String jobFolderLink;
 
+    @Column(name = "inspection_status", nullable = false)
+    private InspectionStatusType inspectionStatus;
+
 
     public enum InspectionType {
         MECHANICAL, ELECTRICAL
+    }
+
+    public enum InspectionStatusType {
+        NEW,
+        INSPECTOR_ASSIGNED,
+        INSPECTOR_REVIEW,
+        INSPECTOR_APPROVED,
+        REFERENCE_DOC_RECEIVED,
+        REFERENCE_DOC_REVIEW,
+        INSPECTION_REPORTS_REVIEW,
+        INSPECTION_REPORTS_SENT_TO_CLIENT,
+        CLOSED;
     }
 }

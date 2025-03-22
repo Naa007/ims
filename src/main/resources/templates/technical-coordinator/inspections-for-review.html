@@ -12,32 +12,27 @@
             <h1 class="text-center">Reviewed Inspections</h1>
         </div>
 
-<!--        &lt;!&ndash; Add Inspection Button &ndash;&gt;-->
-<!--        <div class="text-center mb-4">-->
-<!--            <button class="btn btn-primary" th:onclick="redirectToNewInspection()">-->
-<!--                <i class="fas fa-plus"></i> Add Inspection-->
-<!--            </button>-->
-<!--        </div>-->
-
         <!-- Inspection table -->
         <div class="table-responsive">
             <table id="inspectionsTable" class="table table-striped table-hover">
                 <thead>
                 <tr>
-                    <th>Notification NO</th>
+                    <th>IISPL NO</th>
                     <th>Client Name - Country</th>
                     <th>Inspection Date</th>
                     <th>Inspection Item</th>
+                    <th>Inspection Status</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
                 <tbody>
                 <!-- Assuming inspections data comes from backend -->
                 <tr th:each="inspection : ${inspections}">
-                    <td th:text="${inspection.notificationNo}"></td>
+                    <td th:text="${inspection.inspectionNo}"></td>
                     <td th:text="${inspection.client.clientName + ' - ' + inspection.client.country}"></td>
                     <td th:text="${inspection.inspectionDateAsPerNotification}"></td>
                     <td th:text="${inspection.inspectionItem}"></td>
+                    <td th:text="${inspection.inspectionStatus.description}"></td>
                     <td>
                         <button class="btn btn-warning btn-sm"
                                 th:onclick="|redirectToEditInspection(${inspection.id})|"><i class="fas fa-edit"></i>
