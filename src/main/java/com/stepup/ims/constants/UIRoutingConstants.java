@@ -25,6 +25,10 @@ public class UIRoutingConstants {
     public static final String RETURN_TO_INSPECTION_MANAGEMENT = "inspections/inspection-management";
     public static final String REDIRECT_INSPECTION_MANAGEMENT = "redirect:/inspection/inspection-management";
 
+    // Technical Coordinate Review Management
+    public static final String RETURN_TO_TECHNICAL_COORDINATOR_REVIEWED = "technical-coordinator/inspections-reviewed";
+
+
     // Role Based Management
     public static final String ADMIN_DASHBOARD_URL = "/admin/dashboard";
     public static final String COORDINATOR_DASHBOARD_URL = "/coordinator/dashboard";

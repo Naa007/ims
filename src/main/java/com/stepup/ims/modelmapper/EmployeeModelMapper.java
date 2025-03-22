@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class EmployeeModelMapper {
@@ -40,4 +41,10 @@ public class EmployeeModelMapper {
         }
         return employees.stream().map(this::toEntity).toList();
     }
+
+    public Optional<Employee> toOptionalModel(Optional<com.stepup.ims.entity.Employee> employeeEntityOptional) {
+        return employeeEntityOptional.map(this::toModel);
+    }
+
+
 }

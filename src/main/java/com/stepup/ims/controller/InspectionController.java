@@ -102,7 +102,7 @@ public class InspectionController {
 
     @GetMapping("/inspection-management")
     public String getAllInspections(Model model) {
-        List<Inspection> inspections = inspectionService.getAllInspections();
+        List<Inspection> inspections = inspectionService.getAllInspectionsByCreatedBy();
         model.addAttribute(INSPECTIONS, inspections);
         return RETURN_TO_INSPECTION_MANAGEMENT;
     }
