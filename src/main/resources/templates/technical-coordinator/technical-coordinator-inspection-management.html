@@ -35,10 +35,10 @@
                     <td th:text="${inspection.inspectionStatus.description}"></td>
                     <td>
                         <button class="btn btn-warning btn-sm"
-                                th:onclick="|redirectToEditInspection(${inspection.id})|"><i class="fas fa-edit"></i>
+                                th:onclick="|redirectToTechnicalCoordinatorEditInspection(${inspection.id})|"><i class="fas fa-edit"></i>
                         </button>
                         <button class="btn btn-primary btn-sm"
-                                th:onclick="|redirectToViewInspection(${inspection.id})|"> <i class="fas fa-eye"></i>
+                                th:onclick="|redirectToTechnicalCoordinatorViewInspection(${inspection.id})|"> <i class="fas fa-eye"></i>
                         </button>
                     </td>
                 </tr>

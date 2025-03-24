@@ -208,7 +208,24 @@ document.addEventListener("DOMContentLoaded", function () {
      function redirectToViewInspection(inspectionId) {
          window.location.href = '/inspection/view/' + inspectionId;
      }
+
  // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> INSPECTION <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>TECHNICAL COORDINATOR INSPECTION <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+     //  ********************* Technical Coordinator Inspection - Management JS - Start   **********************************
+
+     function redirectToTechnicalCoordinatorEditInspection(inspectionId) {
+         window.location.href = 'inspection/edit/' + inspectionId;
+     }
+
+
+     function redirectToTechnicalCoordinatorViewInspection(inspectionId) {
+         window.location.href = 'inspection/view/' + inspectionId;
+     }
+
+ // >>>>>>>>>>>>>>>>>>>>>>>>>>>> TECHNICAL COORDINATOR INSPECTION <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
 
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> LOGIN <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
