@@ -6,44 +6,207 @@
 <!-- Header -->
 <header th:replace="fragments/header :: header"></header>
 
-<main class="container">
-<!-- Dashboard Layout -->
-
-    <div class="dashboard-container">    <!-- Dashboard Tabs -->
-
-        <div class="dashboard-tabs">        <!-- Dynamic Business Stats -->
-
-            <div class="tab" th:each="entry : ${businessStats}">
-
-                <!-- Header Part -->
-                <div class="tab-header"><i class="fas fa-chart-bar"
-                                           style="margin-right: 8px; vertical-align: middle;"></i>
-                    <span th:text="${entry.key}" style="vertical-align: middle;">Statistic Name</span>
-                </div>
-                
-                <hr style="border-top: none; margin: 10px 0;"/>
-
-                <!-- Details Part -->
-                <div class="tab-details"><span th:each="stat : ${entry.value}"
-                                               th:text="${stat.key + ': ' + stat.value}">Key: Value</span><br/>
-                </div>
-
+<main class="bd-container">
+    <div class="bd-dashboard-container">
+        <div class="bd-dashboard-header">
+            <div class="bd-dashboard-title">Business Performance Dashboard</div>
+            <div class="bd-date-filter">
+                <span th:text="${#temporals.format(#temporals.createNow(), 'MMMM dd, yyyy')}">March 20, 2025</span>
             </div>
-
         </div>
 
-    </div>
+        <!-- Stats Grid -->
+        <div class="bd-stats-grid">
+            <!-- Inspection Stats Card -->
+            <div class="bd-stat-card" th:if="${inspectionStats != null}">
+                <div class="bd-stat-header" data-target="inspection-stats">
+                    <div class="bd-stat-icon bd-inspection-icon">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+                    <div class="bd-stat-title">Inspections</div>
+                    <i class="fas fa-chevron-down bd-dropdown-icon"></i>
+                </div>
+                <div class="bd-stat-summary">
+                    <div class="bd-summary-label">Total Inspections</div>
+                    <div class="bd-summary-value" th:text="${inspectionStats['Total Inspections']}">0</div>
+                </div>
+                <div id="inspection-stats" class="bd-stat-content">
+                    <div class="bd-stat-item" th:each="stat : ${inspectionStats}" th:if="${!stat.key.equals('Total Inspections')}">
+                        <div class="bd-stat-label" th:text="${stat.key}">Completed Inspections</div>
+                        <div class="bd-stat-value" th:text="${stat.value}">0</div>
+                    </div>
+                </div>
+            </div>
+            <!-- Employee Stats Card -->
+            <div class="bd-stat-card" th:if="${employeeStats!= null}">
+                <div class="bd-stat-header" data-target="employee-stats">
+                    <div class="bd-stat-icon bd-employee-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="bd-stat-title">Employees</div>
+                    <i class="fas fa-chevron-down bd-dropdown-icon"></i>
+                </div>
+                <div class="bd-stat-summary">
+                    <div class="bd-summary-label">Total Employees</div>
+                    <div class="bd-summary-value" th:text="${employeeStats['Total Employees']}">0</div>
+                </div>
+                <div id="employee-stats" class="bd-stat-content">
+                    <div class="bd-stat-item" th:each="stat : ${employeeStats}" th:if="${!stat.key.equals('Total Employees')}">
+                        <div class="bd-stat-label" th:text="${stat.key}">Active Employees</div>
+                        <div class="bd-stat-value" th:text="${stat.value}">0</div>
+                    </div>
+                </div>
+            </div>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <h2>You are in BUSINESS DASHBOARD</h2>
-        <p>
-            Use the tabs to generate the reports and many more. Stay organized and efficient with our comprehensive management tools.
-        </p>
-    </div>
+            <!-- Client Stats Card -->
+            <div class="bd-stat-card" th:if="${clientStats != null}">
+                <div class="bd-stat-header" data-target="client-stats">
+                    <div class="bd-stat-icon bd-client-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <div class="bd-stat-title">Clients</div>
+                    <i class="fas fa-chevron-down bd-dropdown-icon"></i>
+                </div>
+                <div class="bd-stat-summary">
+                    <div class="bd-summary-label">Total Clients</div>
+                    <div class="bd-summary-value" th:text="${clientStats['Total Clients']}">0</div>
+                </div>
+                <div id="client-stats" class="bd-stat-content">
+                    <div class="bd-stat-item" th:each="stat : ${clientStats}" th:if="${!stat.key.equals('Total Clients')}">
+                        <div class="bd-stat-label" th:text="${stat.key}">Active Clients</div>
+                        <div class="bd-stat-value" th:text="${stat.value}">0</div>
+                    </div>
+                </div>
+            </div>
 
+            <!-- Inspector Stats Card -->
+            <div class="bd-stat-card" th:if="${inspectorStats != null}">
+                <div class="bd-stat-header" data-target="inspector-stats">
+                    <div class="bd-stat-icon bd-inspector-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="bd-stat-title">Inspectors</div>
+                    <i class="fas fa-chevron-down bd-dropdown-icon"></i>
+                </div>
+                <div class="bd-stat-summary">
+                    <div class="bd-summary-label">Total Inspectors</div>
+                    <div class="bd-summary-value" th:text="${inspectorStats['Total Inspectors']}">0</div>
+                </div>
+                <div id="inspector-stats" class="bd-stat-content">
+                    <div class="bd-stat-item" th:each="stat : ${inspectorStats}" th:if="${!stat.key.equals('Total Inspectors')}">
+                        <div class="bd-stat-label" th:text="${stat.key}">Inhouse Inspectors</div>
+                        <div class="bd-stat-value" th:text="${stat.value}">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Inspection Status Chart -->
+        <div class="bd-chart-card">
+            <div class="bd-chart-header-container">
+                <div class="bd-chart-header">Inspection Status</div>
+                <div class="bd-chart-period-selector">
+                    <select id="chartPeriodSelect" class="bd-period-select" onchange="handleChartPeriodChange()">
+                        <option value="week">Last 7 Days</option>
+                        <option value="month">Last 30 Days</option>
+                        <option value="threeMonths">Last 3 Months</option>
+                        <option value="custom">Custom Range...</option>
+                    </select>
+
+                    <div id="chartCustomRangeContainer" class="bd-custom-range" style="display: none;">
+                        <div class="bd-date-input-group">
+                            <label for="chartStartDate">From:</label>
+                            <input type="date" id="chartStartDate" name="chartStartDate">
+                        </div>
+                        <div class="bd-date-input-group">
+                            <label for="chartEndDate">To:</label>
+                            <input type="date" id="chartEndDate" name="chartEndDate">
+                        </div>
+                        <button type="button" class="bd-filter-btn" onclick="applyChartCustomRange()">Apply</button>
+                    </div>
+                </div>
+            </div>
+            <canvas id="inspectionStatusChart" width="400" height="200"></canvas>
+        </div>
+
+        <!-- Info Card -->
+        <div class="bd-info-card">
+            <h2>Business Dashboard Overview</h2>
+            <p>
+                Welcome to your business dashboard. Here you can monitor key metrics, generate reports, and gain valuable insights into your operations. Use the tabs to access different reporting tools and management features. Stay organized and make data-driven decisions with our comprehensive management system.
+            </p>
+        </div>
+    </div>
 </main>
+
 <!-- Footer -->
 <footer th:replace="fragments/footer :: footer"></footer>
+
+<!-- Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle stats content
+        const statHeaders = document.querySelectorAll('.bd-stat-header');
+
+        statHeaders.forEach(header => {
+            header.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const content = document.getElementById(targetId);
+                const icon = this.querySelector('.bd-dropdown-icon');
+
+                // Toggle expanded class
+                content.classList.toggle('expanded');
+                icon.classList.toggle('active');
+            });
+        });
+
+        // Inspection status bar chart
+        const inspectionStats = /*[[${inspectionStats}]]*/ {
+            'Total Inspections': 128,
+            'Completed Inspections': 75,
+            'Ongoing Inspections': 38,
+            'Pending Inspections': 15
+        };
+
+        if (document.getElementById('inspectionStatusChart')) {
+            const inspectionCtx = document.getElementById('inspectionStatusChart').getContext('2d');
+            new Chart(inspectionCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Completed', 'Ongoing', 'Pending'],
+                    datasets: [{
+                        label: 'Inspections',
+                        data: [
+                            inspectionStats ? (inspectionStats['Completed Inspections'] || 0) : 0,
+                            inspectionStats ? (inspectionStats['Ongoing Inspections'] || 0) : 0,
+                            inspectionStats ? (inspectionStats['Pending Inspections'] || 0) : 0
+                        ],
+                        backgroundColor: ['#28c76f', '#00cfe8', '#ff9f43'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+    });
+    /*]]>*/
+</script>
 </body>
 </html>

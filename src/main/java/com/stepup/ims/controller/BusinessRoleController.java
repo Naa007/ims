@@ -20,7 +20,10 @@ public class BusinessRoleController {
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
-        model.addAttribute("businessStats", reportsService.getBusinessStats());
+        model.addAttribute("employeeStats", reportsService.getEmployeeStatistics());
+        model.addAttribute("clientStats", reportsService.getClientStatistics());
+        model.addAttribute("inspectorStats", reportsService.getInspectorStatistics());
+        model.addAttribute("inspectionStats", reportsService.getInspectionStatistics());
         return RETURN_TO_BUSINESS_DASHBOARD;
     }
 }

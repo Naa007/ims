@@ -106,9 +106,9 @@ public class ReportsService {
                 blockedInspectors++;
             }
 
-            if ("IN_HOUSE".equalsIgnoreCase(String.valueOf(inspector.getInspectorType()))) {
+            if ("INHOUSE_INSPECTOR".equalsIgnoreCase(String.valueOf(inspector.getInspectorType()))) {
                 inHouseInspectors++;
-            } else if ("PARTNER".equalsIgnoreCase(String.valueOf(inspector.getInspectorType()))) {
+            } else if ("PARTNER_INSPECTOR".equalsIgnoreCase(String.valueOf(inspector.getInspectorType()))) {
                 partnerInspectors++;
             } else if ("FREELANCER".equalsIgnoreCase(String.valueOf(inspector.getInspectorType()))) {
                 freelancerInspectors++;
