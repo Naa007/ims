@@ -8,6 +8,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.Map;
+
 import static com.stepup.ims.constants.UIRoutingConstants.RETURN_TO_BUSINESS_DASHBOARD;
 
 @Controller
@@ -20,10 +22,12 @@ public class BusinessRoleController {
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
-        model.addAttribute("employeeStats", reportsService.getEmployeeStatistics());
-        model.addAttribute("clientStats", reportsService.getClientStatistics());
-        model.addAttribute("inspectorStats", reportsService.getInspectorStatistics());
-        model.addAttribute("inspectionStats", reportsService.getInspectionStatistics());
+        Map<String, Object> businessStats = reportsService.getBusinessStats();
+        // Add the statistics to the model
+        model.addAttribute("employeeStats", businessStats.get("Employee Stats"));
+        model.addAttribute("clientStats", businessStats.get("Client Stats"));
+        model.addAttribute("inspectorStats", businessStats.get("Inspector Stats"));
+        model.addAttribute("inspectionStats", businessStats.get("Inspection Stats"));
         return RETURN_TO_BUSINESS_DASHBOARD;
     }
 }
