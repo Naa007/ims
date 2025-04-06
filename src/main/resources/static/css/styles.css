@@ -825,7 +825,7 @@ button:hover {
     max-width: 800px;
     margin: 0 auto;
 }
-/*:root {
+:root {
     --primary-color: #485d74;
     --secondary-color: #50e3c2;
     --accent-color: #f39c12;
@@ -1161,7 +1161,7 @@ canvas {
         padding: 1.5rem 1rem;
     }
 }
-*//* Chart Filter Styles *//*
+
 .bd-chart-header-container {
     display: flex;
     justify-content: space-between;
@@ -1226,5 +1226,5 @@ canvas {
 
 .bd-filter-btn:hover {
     opacity: 0.8;
-}*/
+}
 

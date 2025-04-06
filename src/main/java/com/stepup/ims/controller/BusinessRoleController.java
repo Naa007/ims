@@ -1,6 +1,6 @@
 package com.stepup.ims.controller;
 
-import com.stepup.ims.service.ReportsService;
+import com.stepup.ims.service.StatsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -18,11 +18,11 @@ import static com.stepup.ims.constants.UIRoutingConstants.RETURN_TO_BUSINESS_DAS
 public class BusinessRoleController {
 
     @Autowired
-    ReportsService reportsService;
+    StatsService statsService;
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
-        Map<String, Object> businessStats = reportsService.getBusinessStats();
+        Map<String, Object> businessStats = statsService.getBusinessStats();
         // Add the statistics to the model
         model.addAttribute("employeeStats", businessStats.get("Employee Stats"));
         model.addAttribute("clientStats", businessStats.get("Client Stats"));

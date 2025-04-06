@@ -9,12 +9,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Service
-public class ReportsService {
+public class StatsService {
 
     private final StatsRepository statsRepository;
 
     @Autowired
-    public ReportsService(StatsRepository statsRepository) {
+    public StatsService(StatsRepository statsRepository) {
         this.statsRepository = statsRepository;
     }
 
