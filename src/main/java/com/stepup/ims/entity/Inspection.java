@@ -1,5 +1,6 @@
 package com.stepup.ims.entity;
 
+import com.stepup.ims.audit.Auditable;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -11,7 +12,7 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "inspection")
-public class Inspection {
+public class Inspection extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -124,8 +125,29 @@ public class Inspection {
     @Column(name = "job_folder_link")
     private String jobFolderLink;
 
+    @Column(name = "inspection_status", nullable = false)
+    private InspectionStatusType inspectionStatus;
+
 
     public enum InspectionType {
         MECHANICAL, ELECTRICAL
+    }
+
+    public enum InspectionStatusType {
+        NEW,
+        INSPECTOR_ASSIGNED,
+        INSPECTOR_REVIEW_AWAITING,
+        INSPECTOR_REVIEW_COMPLETED,
+        INSPECTOR_APPROVED,
+        REFERENCE_DOC_RECEIVED,
+        REFERENCE_DOC_REVIEW_AWAITING,
+        REFERENCE_DOC_REVIEW_COMPLETED,
+        INSPECTION_REPORTS_RECEIVED,
+        INSPECTION_REPORTS_REVIEW_AWAITING,
+        INSPECTION_REPORTS_REVIEW_COMPLETED,
+        INSPECTION_REPORTS_SENT_TO_CLIENT,
+        INSPECTION_AWARDED,
+        INSPECTION_REJECTED,
+        CLOSED;
     }
 }

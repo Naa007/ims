@@ -257,7 +257,7 @@
                     </div>
 
                     <!-- Add CV Button -->
-                    <button type="button" class="btn btn-primary btn-sm" onclick="addCVRow()">Add CV</button>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="addCVRow()">Add Inspector</button>
                 </div>
             </div>
 
@@ -537,6 +537,22 @@
                            placeholder="Enter the URL" />
                     </div>
                 </div>
+                
+
+                <!-- Inspection Status -->
+                <div class="col-md-6">
+                    <label for="inspectionStatus" class="form-label required-field">Inspection Status</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-info-circle"></i></span>
+                        <select id="inspectionStatus" class="form-select" th:field="*{inspectionStatus}" required>
+                            <option value="">Select Status</option>
+                            <option th:each="inspectionStatusType : ${T(com.stepup.ims.model.Inspection.InspectionStatusType).values()}"
+                                    th:value="${inspectionStatusType}"
+                                    th:text="${inspectionStatusType.description}"></option>
+                        </select>
+                    </div>
+                </div>
+                                
 
         </div>
 

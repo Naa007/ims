@@ -12,6 +12,9 @@ public class ApplicationConstants {
     public static final String COORDINATOR = "COORDINATOR";
     public static final String TECHNICAL_COORDINATOR = "TECHNICAL_COORDINATOR";
     public static final String INSPECTOR = "INSPECTOR";
+    
+    /* Roles in Smallcase */
+    public static final String INSPECTOR_LOWERCASE = "inspector";
 
     /* Scopes in IMS */
     public static final String ROLE_ADMIN = "ROLE_ADMIN";

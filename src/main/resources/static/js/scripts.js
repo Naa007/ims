@@ -1,6 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
     console.log("All events hooks here !!!");
 
+    /** ================= OTP Section ================= **/
+
     const sendOtpBtn = document.getElementById('send-otp-btn');
     const verifyOtpBtn = document.getElementById('verify-otp-btn');
 
@@ -94,12 +96,15 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-     // Initialize Map with default or provided location
+    /** ================= Map Initialization Section ================= **/
+
     const locationDetails = document.getElementById('inspectionLocationDetails');
     if (locationDetails) {
         const locationDetailsValue = locationDetails.value;
         initMap(locationDetailsValue ? locationDetailsValue : 'Hyderabad, India');
     }
+
+    /** ================= Date Picker Initialization ================= **/
 
     flatpickr("#inspectionDateAsPerNotification", {
                     mode: "multiple",
@@ -109,117 +114,96 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 
-  // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> INSPECTOR <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+/** ================= Universal Form Validation ============== **/
 
-    //  **********************************   Inspector - Form JS - Start   **********************************
+document.addEventListener('DOMContentLoaded', function () {
+    'use strict'
 
-    // Function to add a certificate row
-    function addCertificate(tableBodyId) {
-     const tableBody = document.getElementById(tableBodyId);
-     const rowCount = tableBody.children.length;
-     const newRow = document.createElement("tr");
-     newRow.innerHTML = `
-         <td><input type="text" name="certificates[${rowCount}].name" class="form-control" placeholder="Certificate Name"/></td>
-         <td><input type="date" name="certificates[${rowCount}].dateIssued" class="form-control"/></td>
-         <td><input type="date" name="certificates[${rowCount}].expiryDate" class="form-control"/></td>
-         <td><input type="text" name="certificates[${rowCount}].issuer" class="form-control" placeholder="Issuer"/></td>
-         <td><button type="button" class="btn btn-danger" onclick="removeCertificateRow(this)"><i class="fas fa-trash"></i></button></td>
-     `;
-     tableBody.appendChild(newRow);
-    }
+    // Fetch all forms we want to apply validation to
+    var forms = document.querySelectorAll('.needs-validation');
 
-     // Function to remove a certificate row
-     function removeCertificateRow(button) {
-         const row = button.closest("tr");
-         row.remove();
-     }
+    // Loop over them and prevent submission
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        'use strict'
-
-        // Fetch all forms we want to apply validation to
-        var forms = document.querySelectorAll('.needs-validation');
-
-        // Loop over them and prevent submission
-        Array.prototype.slice.call(forms).forEach(function (form) {
-            form.addEventListener('submit', function (event) {
-                if (!form.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-
-                form.classList.add('was-validated');
-            }, false);
-        });
+            form.classList.add('was-validated');
+        }, false);
     });
+});
 
-     //  **********************************   Inspector - Form JS - End   **********************************
+/** ================= Universal Data Table ================ **/
 
-     //  **********************************   Inspector - Management JS - Start   **********************************
-
-     function openInspectorForm() {
-         window.location.href = '/inspectors/form';
-     }
-
-     function redirectToEditForm(inspectorId) {
-         window.location.href = '/inspectors/edit/' + inspectorId;
-     }
-
-     function redirectToViewForm(inspectorId) {
-         window.location.href = '/inspectors/view/' + inspectorId;
-     }
-
-     // Initialize DataTable with responsive extension
-     $(document).ready(function () {
-         var table = $('#inspectorTable, #inspectionsTable').DataTable({
-             "paging": true,
-             "searching": true,
-             "ordering": true,
-             "info": true,
-             "lengthMenu": [5, 10, 25, 50],
-             "pageLength": 10,
-             "language": {
-                 "search": "Search: ",
-                 "lengthMenu": "Show _MENU_ entries",
-                 "info": "Showing _START_ to _END_ of _TOTAL_ entries"
-             }
-         });
+$(document).ready(function () {
+     var table = $('#inspectorTable, #inspectionsTable').DataTable({
+         "paging": true,
+         "searching": true,
+         "ordering": true,
+         "info": true,
+         "lengthMenu": [5, 10, 25, 50],
+         "pageLength": 10,
+         "language": {
+             "search": "Search: ",
+             "lengthMenu": "Show _MENU_ entries",
+             "info": "Showing _START_ to _END_ of _TOTAL_ entries"
+         }
      });
+ });
 
-     //  **********************************   Inspector - Management JS - End   **********************************
+/** ================= Inspector ================= **/
 
- // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> INSPECTOR <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+// Function to add a certificate row
+function addCertificate(tableBodyId) {
+ const tableBody = document.getElementById(tableBodyId);
+ const rowCount = tableBody.children.length;
+ const newRow = document.createElement("tr");
+ newRow.innerHTML = `
+     <td><input type="text" name="certificates[${rowCount}].name" class="form-control" placeholder="Certificate Name"/></td>
+     <td><input type="date" name="certificates[${rowCount}].dateIssued" class="form-control"/></td>
+     <td><input type="date" name="certificates[${rowCount}].expiryDate" class="form-control"/></td>
+     <td><input type="text" name="certificates[${rowCount}].issuer" class="form-control" placeholder="Issuer"/></td>
+     <td><button type="button" class="btn btn-danger" onclick="removeCertificateRow(this)"><i class="fas fa-trash"></i></button></td>
+ `;
+ tableBody.appendChild(newRow);
+}
 
+// Function to remove a certificate row
+function removeCertificateRow(button) {
+ const row = button.closest("tr");
+ row.remove();
+}
 
- // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> INSPECTION <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+function openInspectorForm() {
+ window.location.href = '/inspectors/form';
+}
 
-     //  **********************************   Inspection - Management JS - End   **********************************
+function redirectToEditForm(inspectorId) {
+ window.location.href = '/inspectors/edit/' + inspectorId;
+}
 
-     function redirectToNewInspection() {
-         window.location.href = '/inspection/new';
-     }
+function redirectToViewForm(inspectorId) {
+ window.location.href = '/inspectors/view/' + inspectorId;
+}
 
+/** ================= Inspection ================= **/
 
-     function redirectToEditInspection(inspectionId) {
-         window.location.href = '/inspection/edit/' + inspectionId;
-     }
+function redirectToNewInspection() {
+ window.location.href = '/inspection/new';
+}
 
+function redirectToEditInspection(inspectionId) {
+ window.location.href = '/inspection/edit/' + inspectionId;
+}
 
-     function redirectToViewInspection(inspectionId) {
-         window.location.href = '/inspection/view/' + inspectionId;
-     }
- // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> INSPECTION <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+function redirectToViewInspection(inspectionId) {
+ window.location.href = '/inspection/view/' + inspectionId;
+}
 
-// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> LOGIN <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-    function disableButton() {
-
-    }
-
-// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> LOGIN <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-  // if CVStatus is approved then the inspector becomes approvedInspector
-   function approvedInspector(index, approved) {
+// if CVStatus is approved then the inspector becomes approvedInspector
+function approvedInspector(index, approved) {
         if(!approved) {
             document.getElementById("approvedInspectorName").value = "";
         }else{
@@ -239,12 +223,60 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-   function initMap(inspectionLocation) {
+function addCVRow() {
+
+    const tableBody = document.querySelector("#proposedCVsTable tbody");
+    const previousRow = tableBody.querySelector("tr:last-child");
+    const index = tableBody.querySelectorAll("tr").length -1;
+
+    if (previousRow) {
+        const lastSelectInput = [...previousRow.querySelectorAll("select")].pop();
+        if (lastSelectInput && lastSelectInput.value === "true") {
+            alert("Inspector is already approved.");
+            return;
+        }
+
+        const newRow = previousRow.cloneNode(true); // Clone the previous row
+
+        newRow.querySelectorAll("input, select").forEach(input => {
+
+            input.id = input.id.replace(index, index + 1);
+            input.name = input.name.replace(index, index + 1);
+
+            if (input.tagName === "SELECT") {
+                input.selectedIndex = 0; // Reset dropdowns
+            } else if (input.type === "datetime-local") {
+                input.value = ""; // Reset datetime-local input
+            }
+        });
+        tableBody.appendChild(newRow); // Append the cloned row as a new row
+    }
+
+  }
+
+function deleteCVRow(button) {
+      const tableBody = document.querySelector("#proposedCVsTable tbody");
+      const rows = tableBody.querySelectorAll("tr");
+      const row = button.closest("tr");
+      if (row === rows[0]) {
+          alert("At least one Inspector should be assigned to the Inspection !");
+          return;
+      }
+      if (row) {
+        const lastSelectInput = [...row.querySelectorAll("select")].pop();
+        if (lastSelectInput && lastSelectInput.value === "true") {
+           document.getElementById("approvedInspectorName").value = "";
+        }
+      }
+      row.remove();
+  }
+
+function initMap(inspectionLocation) {
 
        fetch('/api/inspectors?address=' + inspectionLocation )
        .then(response => response.json())
        .then(data => {
-           for (const [locationKey, inspectors] of Object.entries(data)) {
+           for (const [locationKey, inspectorsMap] of Object.entries(data)) {
                const userLocationArray = locationKey.split(',').map(Number); // Split and convert to numbers
                const userLocation = new google.maps.LatLng(userLocationArray[0], userLocationArray[1]); // Create LatLng object
 
@@ -260,26 +292,46 @@ document.addEventListener("DOMContentLoaded", function () {
                    title: "Inspection Location"
                });
 
-               // Plot all inspectors for the current user location
-               inspectors.forEach(inspector => {
-                   const marker = new google.maps.Marker({
-                       position: {
-                           lat: inspector.location.lat,
-                           lng: inspector.location.lng
-                       },
-                       map: map,
-                       title: `${inspector.name}, Distance: ${inspector.distance}, Duration: ${inspector.duration}`,
-                       icon: {
-                           url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png" // Green marker icon
-                       }
-                   });
-               });
+
+                // Iterate over the map of inspector types and their distances
+                for (const [inspectorType, inspectors] of Object.entries(inspectorsMap)) {
+                    const iconUrl = (type) => {
+                        switch (type) {
+                            case 'PARTNER_INSPECTOR':
+                                return "http://maps.google.com/mapfiles/ms/icons/green-dot.png"; // Green icon for Partner
+                            case 'FREELANCER':
+                                return "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png"; // Yellow icon for Freelancer
+                            case 'INHOUSE_INSPECTOR':
+                                return "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"; // Blue icon for Inhouse
+                            case 'TECHNICAL_COORDINATOR':
+                                return "http://maps.google.com/mapfiles/ms/icons/purple-dot.png"; // Purple icon for Technical Coordinator
+                            default:
+                                return "http://maps.google.com/mapfiles/ms/icons/green-dot.png"; // Default icon (red)
+                        }
+                    };
+
+                    inspectors.forEach(inspector => {
+                        const inspectorMarker = new google.maps.Marker({
+                            position: {
+                                lat: inspector.location.lat,
+                                lng: inspector.location.lng
+                            },
+                            map: map,
+                            title: `${inspector.name}, Distance: ${inspector.distance}, Duration: ${inspector.duration}`,
+                            icon: {
+                                url: iconUrl(inspectorType) // Set marker color based on inspectorType
+                            }
+                        });
+                    });
+                }
+
+
            }
-               });
+       });
 
    }
 
-   function showMapLoadingMessage() {
+function showMapLoadingMessage() {
                const mapLoadingMessage = document.getElementById('mapLoadingMessage');
                mapLoadingMessage.style.display = 'block';
 
@@ -290,58 +342,30 @@ document.addEventListener("DOMContentLoaded", function () {
                }, 5000); // Adjust the time as per map loading logic
            }
 
-   function addCVRow() {
+/** ================== Technical Coordinator =========== **/
 
-    const tableBody = document.querySelector("#proposedCVsTable tbody");
-    const previousRow = tableBody.querySelector("tr:last-child");
-    const index = tableBody.querySelectorAll("tr").length -1;
+function redirectToTechnicalCoordinatorEditInspection(inspectionId) {
+ window.location.href = 'inspection/edit/' + inspectionId;
+}
 
-    if (previousRow) {
-        const lastRadioInput = [...previousRow.querySelectorAll("input[type='radio']")].pop();
-        if (lastRadioInput && lastRadioInput.value === "false" && !lastRadioInput.checked) {
-            alert("Inspector is already approved.");
-            return;
-        }
+function redirectToTechnicalCoordinatorViewInspection(inspectionId) {
+ window.location.href = 'inspection/view/' + inspectionId;
+}
 
-        const newRow = previousRow.cloneNode(true); // Clone the previous row
+/** ================== PQR =================== **/
 
-        newRow.querySelectorAll("input, select").forEach(input => {
+function editPQRForm(inspectorId) {
+ const url = `/pqr/edit/` + inspectorId;
+ window.open(url, '_blank', 'width=900,height=800');
+}
 
-            input.id = input.id.replace(index, index + 1);
-            input.name = input.name.replace(index, index + 1);
+function viewPQRForm(inspectorId) {
+ const url = `/pqr/view/` + inspectorId;
+ window.open(url, '_blank', 'width=900,height=800');
+}
+/** ================== Login ================= **/
 
-            if (input.tagName === "SELECT") {
-                input.selectedIndex = 0; // Reset dropdowns
-            } else if (input.type === "radio") {
-                // Reset radio buttons
-                if (input.value === "true") {
-                    input.checked = false;
-                }
-                if (input.value === "false") {
-                    input.checked = true;
-                }
-            } else if (input.type === "datetime-local") {
-                input.value = ""; // Reset datetime-local input
-            }
-        });
-        tableBody.appendChild(newRow); // Append the cloned row as a new row
-    }
+function disableButton() {
+}
 
-  }
 
-   function deleteCVRow(button) {
-      const tableBody = document.querySelector("#proposedCVsTable tbody");
-      const rows = tableBody.querySelectorAll("tr");
-      const row = button.closest("tr");
-      if (row === rows[0]) {
-          alert("At least one Inspector should be assigned to the Inspection !");
-          return;
-      }
-      if (row) {
-        const lastRadioInput = [...row.querySelectorAll("input[type='radio']")].pop();
-        if (lastRadioInput && lastRadioInput.value === "false" && !lastRadioInput.checked) {
-           document.getElementById("approvedInspectorName").value = "";
-        }
-      }
-      row.remove();
-  }

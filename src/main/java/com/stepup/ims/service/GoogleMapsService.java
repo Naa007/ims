@@ -8,13 +8,19 @@ import com.google.maps.model.DistanceMatrix;
 import com.google.maps.model.GeocodingResult;
 import com.google.maps.model.LatLng;
 import com.google.maps.model.TravelMode;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class GoogleMapsService {
@@ -35,49 +41,42 @@ public class GoogleMapsService {
     }
 
     // Calculate distances between a user location and a list of inspector locations
-    public List<InspectorDistance> getInspectorDistances(LatLng inspectionLocation, List<Pair<String, LatLng>> inspectorLocations) throws InterruptedException, ApiException, IOException {
-        List<InspectorDistance> distances = new ArrayList<>();
+    public Map<String, List<InspectorDistance>> getInspectorDistances(LatLng inspectionLocation, Map<String, List<Pair<String, LatLng>>> inspectorLocations) throws InterruptedException, ApiException, IOException {
+        Map<String, List<InspectorDistance>> distances = new HashMap<>();
 
-        LatLng[] destinations = inspectorLocations.stream()
-                .map(Pair::getRight) // Extract the LatLng values from the Pair
-                .toArray(LatLng[]::new);
+        Map<String, LatLng[]> destinationsMap = inspectorLocations.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().stream()
+                        .map(Pair::getRight)
+                        .toArray(LatLng[]::new)));
 
-        DistanceMatrix result = DistanceMatrixApi.newRequest(geoApiContext).origins(inspectionLocation).destinations(destinations).mode(TravelMode.DRIVING).await();
+        DistanceMatrix result = DistanceMatrixApi.newRequest(geoApiContext).origins(inspectionLocation)
+                .destinations(destinationsMap.values().stream().flatMap(Stream::of).toArray(LatLng[]::new))
+                .mode(TravelMode.DRIVING).await();
 
-        for (int i = 0; i < destinations.length; i++) {
-            distances.add(new InspectorDistance(inspectorLocations.get(i).getLeft(), destinations[i], result.rows[0].elements[i].distance.humanReadable, result.rows[0].elements[i].duration.humanReadable));
+        int index = 0;
+        for (Map.Entry<String, List<Pair<String, LatLng>>> entry : inspectorLocations.entrySet()) {
+            List<InspectorDistance> inspectorDistances = new ArrayList<>();
+            for (Map.Entry<String, LatLng> destination : entry.getValue()) {
+                inspectorDistances.add(new InspectorDistance(
+                        destination.getKey(),
+                        destination.getValue(),
+                        result.rows[0].elements[index].distance.humanReadable,
+                        result.rows[0].elements[index].duration.humanReadable));
+                index++;
+            }
+            distances.put(entry.getKey(), inspectorDistances);
         }
 
         return distances;
     }
 
+    @Data
+    @AllArgsConstructor
     public static class InspectorDistance {
         private String name;
         private LatLng location;
         private String distance;
         private String duration;
 
-        public InspectorDistance(String name, LatLng location, String distance, String duration) {
-            this.name = name;
-            this.location = location;
-            this.distance = distance;
-            this.duration = duration;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public LatLng getLocation() {
-            return location;
-        }
-
-        public String getDistance() {
-            return distance;
-        }
-
-        public String getDuration() {
-            return duration;
-        }
     }
 }

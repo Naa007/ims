@@ -19,11 +19,21 @@ public class UIRoutingConstants {
     public static final String REDIRECT_TO_INSPECTOR_FORM = "inspectors/inspector-form";
     public static final String REDIRECT_TO_INSPECTOR_VIEW = "inspectors/inspector-view";
 
+    // PQR Managemet
+    public static final String RETURN_TO_PQR_FORM = "pqr/pqr-form";
+    public static final String RETURN_TO_PQR_VIEW = "pqr/pqr-view";
+
     // Inspection Management
     public static final String RETURN_TO_INSPECTION_FORM = "inspections/inspection-form";
     public static final String RETURN_TO_INSPECTION_VIEW = "inspections/inspection-view";
     public static final String RETURN_TO_INSPECTION_MANAGEMENT = "inspections/inspection-management";
     public static final String REDIRECT_INSPECTION_MANAGEMENT = "redirect:/inspection/inspection-management";
+
+    // Technical Coordinate Review Management
+    public static final String RETURN_TO_TECHNICAL_COORDINATOR_INSPECTION_FORM = "technical-coordinator/technical-coordinator-inspection-form";
+    public static final String RETURN_TO_TECHNICAL_COORDINATOR_INSPECTION_MANAGEMENT = "technical-coordinator/technical-coordinator-inspection-management";
+    public static final String RETURN_TO_TECHNICAL_COORDINATOR_INSPECTION_VIEW = "technical-coordinator/technical-coordinator-inspection-view";
+    public static final String REDIRECT_TO_TECHNICAL_COORDINATOR_INSPECTION_MANAGEMENT = "redirect:/technical-coordinator/inspection-management";
 
     // Role Based Management
     public static final String ADMIN_DASHBOARD_URL = "/admin/dashboard";

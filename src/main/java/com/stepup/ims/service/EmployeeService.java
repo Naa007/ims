@@ -63,6 +63,14 @@ public class EmployeeService {
                 .orElse(null);
     }
 
+    public Employee getEmployeeByEmail(String email) {
+        return employeeModelMapper.toModel(employeeRepository.findByEmail(email));
+    }
+
+    public String getEmployeeIdByEmail(String email) {
+        return employeeRepository.findEmpIdByEmail(email);
+    }
+
     public String getEmployeeNameByEmail(String email) {
         return employeeRepository.findAll().stream()
                 .filter(employee -> email.equalsIgnoreCase(employee.getEmail()))
