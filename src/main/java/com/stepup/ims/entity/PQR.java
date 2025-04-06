@@ -21,7 +21,7 @@ public class PQR extends Auditable {
     private Education education;
 
     @Column(name = "english_skills", nullable = true)
-    private EnglishSkills english;
+    private EnglishSkills englishSkills;
 
     @Column(name = "professional_qualifications", nullable = true)
     private ProfessionalQualifications professionalQualifications;

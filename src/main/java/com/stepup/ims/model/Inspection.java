@@ -106,12 +106,18 @@ public class Inspection {
     public enum InspectionStatusType {
         NEW("New"),
         INSPECTOR_ASSIGNED("Inspector Assigned"),
-        INSPECTOR_REVIEW( "Inspector Review"),
+        INSPECTOR_REVIEW_AWAITING( "Inspector Review Awaiting"),
+        INSPECTOR_REVIEW_COMPLETED( "Inspector Review Completed"),
         INSPECTOR_APPROVED( "Inspector Approved"),
         REFERENCE_DOC_RECEIVED( "Reference Documents Received"),
-        REFERENCE_DOC_REVIEW("Reference Documents Review"),
-        INSPECTION_REPORTS_REVIEW( "Inspection Reports Review"),
+        REFERENCE_DOC_REVIEW_AWAITING("Reference Documents Review Awaiting"),
+        REFERENCE_DOC_REVIEW_COMPLETED( "Reference Documents Review Completed"),
+        INSPECTION_REPORTS_RECEIVED( "Inspection Reports Received"),
+        INSPECTION_REPORTS_REVIEW_AWAITING( "Inspection Reports Review Awaiting"),
+        INSPECTION_REPORTS_REVIEW_COMPLETED( "Inspection Reports Review Completed"),
         INSPECTION_REPORTS_SENT_TO_CLIENT( "Inspection Reports Sent to Client"),
+        INSPECTION_AWARDED( "Inspection Awarded"),
+        INSPECTION_REJECTED( "Inspection Rejected"),
         CLOSED ("Closed");
 
         private final String description;
