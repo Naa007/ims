@@ -38,6 +38,9 @@ public class PQR extends Auditable {
     @Column(name = "remarks", nullable = true, length = 1000)
     private String remarks;
 
+    @Column(name = "inspector_id", nullable = true)
+    private Long inspectorId;
+
 
     @Getter
     public enum Skills {

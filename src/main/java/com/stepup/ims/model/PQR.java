@@ -16,6 +16,7 @@ public class PQR {
     private int score;
     private OtherProfessionalSkills otherProfessionalSkills;
     private String remarks;
+    private Long inspectorId;
 
 
 
