@@ -356,13 +356,34 @@ function redirectToTechnicalCoordinatorViewInspection(inspectionId) {
 
 function editPQRForm(inspectorId) {
  const url = `/pqr/edit/` + inspectorId;
- window.open(url, '_blank', 'width=900,height=800');
+ const width = screen.width * 0.9;
+ const height = screen.height * 0.9;
+ const left = (screen.width - width) / 2;
+ const top = (screen.height - height) / 2;
+ window.open(url, '_blank', `width=${width},height=${height},left=${left},top=${top}`);
 }
 
-function viewPQRForm(inspectorId) {
- const url = `/pqr/view/` + inspectorId;
- window.open(url, '_blank', 'width=900,height=800');
-}
+document.addEventListener('DOMContentLoaded', function () {
+    const successMessage = document.querySelector('#successMessage');
+    if (successMessage && successMessage.textContent.trim() !== '') {
+        const form = document.querySelector('div.page-container');
+        if (form) {
+            form.style.filter = 'blur(5px)';
+        }
+
+        const successMessageElement = document.createElement('div');
+        successMessageElement.className = 'alert alert-success';
+        successMessageElement.textContent = successMessage.textContent.trim();
+        const mainElement = document.querySelector('main');
+        if (mainElement) {
+            mainElement.prepend(successMessageElement);
+        }
+
+        setTimeout(() => {
+            window.close();
+        }, 3000);
+    }
+});
 /** ================== Login ================= **/
 
 function disableButton() {

@@ -42,12 +42,12 @@ public class PQRService {
                 .orElseThrow(() -> new IllegalArgumentException("Inspector not found with id: " + inspectorId));
     }
 
-    public void updateInspectorPQR(Long inspectorId, PQR updatedPQR) {
+    public Inspector updateInspectorPQR(Long inspectorId, PQR updatedPQR) {
         Optional<com.stepup.ims.entity.Inspector> inspectorOptional = inspectorRepository.findById(inspectorId);
         com.stepup.ims.entity.Inspector inspectorEntity = inspectorOptional.orElseThrow(() ->
                 new IllegalArgumentException("Inspector not found with id: " + inspectorId));
         inspectorEntity.setPqr(pqrModelMapper.toEntity(updatedPQR));
-        inspectorRepository.save(inspectorEntity);
+        return inspectorModelMapper.toModel(inspectorRepository.save(inspectorEntity));
     }
 
 }
