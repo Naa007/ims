@@ -348,10 +348,6 @@ function redirectToTechnicalCoordinatorEditInspection(inspectionId) {
  window.location.href = 'inspection/edit/' + inspectionId;
 }
 
-function redirectToTechnicalCoordinatorViewInspection(inspectionId) {
- window.location.href = 'inspection/view/' + inspectionId;
-}
-
 /** ================== PQR =================== **/
 
 function editPQRForm(inspectorId) {
@@ -384,6 +380,13 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 3000);
     }
 });
+
+/** ================== Inspector =========== **/
+
+function redirectToInspectorViewInspection(inspectionId) {
+ window.location.href = 'inspection/view/' + inspectionId;
+}
+
 /** ================== Login ================= **/
 
 function disableButton() {

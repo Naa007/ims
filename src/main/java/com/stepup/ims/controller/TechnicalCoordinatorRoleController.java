@@ -32,13 +32,6 @@ public class TechnicalCoordinatorRoleController {
         return RETURN_TO_TECHNICAL_COORDINATOR_INSPECTION_FORM;
     }
 
-    @GetMapping("inspection/view/{inspectionId}")
-    public String viewInspection(@PathVariable String inspectionId, Model model) {
-        Inspection inspection = inspectionService.getInspectionById(Long.valueOf(inspectionId)).orElseThrow(() -> new IllegalArgumentException("Inspection not found for ID:" + inspectionId));
-        model.addAttribute("inspection", inspection);
-        return RETURN_TO_TECHNICAL_COORDINATOR_INSPECTION_VIEW;
-    }
-
     @PostMapping(value = "inspection/save")
     public String updateInspection(@ModelAttribute Inspection inspection) {
         inspectionService.saveInspection(inspection);

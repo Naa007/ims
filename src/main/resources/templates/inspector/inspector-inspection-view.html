@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<!-- Head -->
+<head th:replace="fragments/head :: head"><title>Review Inspection</title></head>
+<body>
+<!-- Header -->
+<header th:replace="fragments/header :: header"></header>
+<!-- Main Content -->
+<main>
+
+    <div class="page-container">
+
+        <div class="form-card">
+
+            <div class="form-header">
+                <h1 class="form-title">Review Inspection - IISPL # <span th:text="${inspection.inspectionNo}"></span></h1>
+                <p class="form-subtitle">Current Inspection Status - <span th:text="${inspection.inspectionStatus.description}"></span></p>
+            </div>
+
+            <!-- notification details -->
+            <h4 class="section-header">
+                <i class="fas fa-bell me-2"></i> Notification Details
+            </h4>
+
+            <div class="info-section">
+
+                <!-- Notification No -->
+                <div class="info-item">
+                    <i class="fas fa-envelope"></i>
+                    <div class="info-content">
+                        <div class="info-label">Notification No</div>
+                        <div class="info-value" th:text="${inspection.notificationNo}"></div>
+                    </div>
+                </div>
+
+                <!-- Notification Received Date and Time -->
+                <div class="info-item">
+                    <i class="fas fa-clock"></i>
+                    <div class="info-content">
+                        <div class="info-label">Notification Received Date & Time</div>
+                        <div class="info-value" th:text="${inspection.notificationReceivedDateTime}"></div>
+                    </div>
+                </div>
+
+                <!-- Client Name -->
+                <div class="info-item">
+                    <i class="fas fa-user"></i>
+                    <div class="info-content">
+                        <div class="info-label">Client Name</div>
+                        <div class="info-value" th:text="${inspection.client.clientName+ ' - ' + inspection.client.country}"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- inspection details -->
+            <h4 class="section-header">
+                <i class="fas fa-address-card"></i> Inspection Details
+            </h4>
+
+            <div class="info-section">
+
+                <!-- Inspection Country -->
+                <div class="info-item">
+                    <i class="fas fa-globe"></i>
+                    <div class="info-content">
+                        <div class="info-label">Inspection Country</div>
+                        <div class="info-value" th:text="${inspection.inspectionCountry}"></div>
+                    </div>
+                </div>
+
+                <!-- Inspection Dates -->
+                <div class="info-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <div class="info-content">
+                        <div class="info-label">Inspection Dates</div>
+                        <ul class="list-unstyled">
+                            <li th:each="date : ${inspection.inspectionDateAsPerNotification}" th:text="${date}"
+                                class="info-value"></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Inspection Item -->
+                <div class="info-item">
+                    <i class="fas fa-box"></i>
+                    <div class="info-content">
+                        <div class="info-label">Inspection Item</div>
+                        <div class="info-value" th:text="${inspection.inspectionItem}"></div>
+                    </div>
+                </div>
+
+                <!-- Inspection Type -->
+                <div class="info-item">
+                    <i class="fas fa-list-alt"></i>
+                    <div class="info-content">
+                        <div class="info-label">Inspection Type</div>
+                        <ul class="list-unstyled">
+                            <li th:each="type : ${inspection.inspectionType}" th:text="${type}" class="info-value"></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Inspection Stages -->
+                <div class="info-item">
+                    <i class="fas fa-tasks"></i>
+                    <div class="info-content">
+                        <div class="info-label">Inspection Stages</div>
+                        <p id="inspectionActivityWithStages" th:text="${inspection.inspectionActivityWithStages}"
+                           class="info-value"></p>
+                    </div>
+                </div>
+
+                <!-- Inspection Location Details -->
+                <div class="info-item">
+                    <i class="fas fa-map-marker"></i>
+                    <div class="info-content">
+                        <div class="info-label">Inspection Location Details</div>
+                        <p id="inspectionLocationDetails" th:text="${inspection.inspectionLocationDetails}"
+                           class="info-value"></p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- inspector details -->
+            <h4 class="section-header">
+                <i class="fas fa-users"></i> Inspector Details
+            </h4>
+
+                <div class="table-responsive">
+                    <table class="table" id="proposedCVsTable">
+                        <thead>
+                        <tr>
+                            <th>Inspector Name</th>
+                            <th>CV Available</th>
+                            <th>Technical Coordinator</th>
+                            <th>PQR Available</th>
+                            <th>CV Submitted Date</th>
+                            <th>CV Status</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!-- Existing CVs -->
+                        <tr th:each="cv : ${inspection.proposedCVs}">
+                            <td>
+                                <i class="fas fa-user-tie text-success mr-2"></i>
+                                <span th:text="${cv.inspector.inspectorName}"></span>
+                            </td>
+
+                            <td th:text="${cv.cvCertificatesAvailable != null && cv.cvCertificatesAvailable ? 'Yes' : 'No'}"></td>
+                            <td th:text="${cv.cvReviewByTechnicalCoordinator.empName}"></td>
+                            <td th:text="${cv.pqrAvailable != null && cv.pqrAvailable ? 'Yes' : 'No'}"></td>
+                            <td th:text="${cv.cvSubmittedToClientDate}"></td>
+                            <td th:text="${cv.cvStatus ? 'Approved' : 'Not Approved'}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+        </div>
+    </div>
+
+</main>
+<!-- Footer -->
+<footer th:replace="fragments/footer :: footer"></footer>
+</body>
+</html>

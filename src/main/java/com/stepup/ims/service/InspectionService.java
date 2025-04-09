@@ -70,4 +70,12 @@ public class InspectionService {
                 inspectionRepository.findByProposedCVs_CvReviewBytechnicalCoordinator_EmpIdOrDocumentsReviewedByTechnicalCoordinatorOrInspectionReviewedBy(
                        currentUser, currentUser, currentUser ));
     }
+
+    /**
+     * Get all inspections assigned to the current user.
+     */
+    public List<Inspection> getInspectionsOfInspectorByLoggedUser() {
+        return inspectionModelMapper.toModelList(
+                inspectionRepository.findByProposedCVs_Inspector_Email(SecurityContextHolder.getContext().getAuthentication().getName()));
+    }
 }
