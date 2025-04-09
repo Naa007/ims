@@ -64,9 +64,10 @@ public class InspectionService {
      * Get all inspections reviewed by the current user.
      */
     public List<Inspection> getInspectionsReviewedByLoggedUser() {
+        String currentUser = employeeService.getEmployeeIdByEmail(
+                SecurityContextHolder.getContext().getAuthentication().getName());
         return inspectionModelMapper.toModelList(
-                inspectionRepository.findByProposedCVs_CvReviewBytechnicalCoordinator_empId(
-                        employeeService.getEmployeeIdByEmail(
-                                SecurityContextHolder.getContext().getAuthentication().getName())));
+                inspectionRepository.findByProposedCVs_CvReviewBytechnicalCoordinator_EmpIdOrDocumentsReviewedByTechnicalCoordinatorOrInspectionReviewedBy(
+                       currentUser, currentUser, currentUser ));
     }
 }
