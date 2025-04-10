@@ -3,212 +3,244 @@
 <!-- Head -->
 <head th:replace="fragments/head :: head"><title>Inspector PQR Add/Edit</title></head>
 <body>
-<!-- Header -->
-<header th:replace="fragments/header :: header"></header>
+
 
 <!-- Main Content -->
 <main>
-    <div class="page-container">
-
+    <div class="form-card">
         <div id="successMessage" class="alert alert-success" style="display: none;" th:text="${successMessage}">
         </div>
-        <div class="form-card">
-            <div class="form-header">
-                <h1 class="form-title">Add Inspector PQR</h1>
-                <p class="form-subtitle">Please fill out the PQR information of the inspector</p>
+        <div class="form-header">
+            <h1 class="form-title">Add Inspector PQR</h1>
+            <p class="form-subtitle">Please fill out the PQR information of the inspector</p>
+        </div>
+
+        <!-- Inspector Details -->
+        <h4 class="section-header">
+            <i class="fas fa-user-circle me-2"></i> Inspector Details
+        </h4>
+
+        <div class="info-section">
+
+            <div class="info-item">
+                <i class="fas fa-user"></i>
+                <div class="info-content">
+                    <div class="info-label">Inspector Name</div>
+                    <div class="info-value" th:text="${inspector.inspectorName}">johndoe@example.com</div>
+                </div>
             </div>
 
-            <!-- Inspector Details -->
+            <div class="info-item">
+                <i class="fas fa-envelope"></i>
+                <div class="info-content">
+                    <div class="info-label">Email Address</div>
+                    <div class="info-value" th:text="${inspector.email}">johndoe@example.com</div>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <i class="fas fa-id-card"></i>
+                <div class="info-content">
+                    <div class="info-label">Inspector Type</div>
+                    <div class="info-value" th:text="${inspector.inspectorType.description}">Senior Inspector</div>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <i class="fas fa-university"></i>
+                <div class="info-content">
+                    <div class="info-label">Education Details</div>
+                    <div class="info-value" th:text="${inspector.educationDetails}">Bachelor of Engineering,
+                        Mechanical
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <i class="fas fa-book"></i>
+                <div class="info-content">
+                    <div class="info-label">Disciplines</div>
+                    <div class="info-value" th:text="${inspector.disciplines}">Mechanical, Structural</div>
+                </div>
+            </div>
+        </div>
+
+        <form th:action="@{/pqr/update}" th:object="${pqr}" method="post"
+              class="needs-validation"
+              novalidate>
+
+            <input type="hidden" th:field="*{inspectorId}" id="inspectorId"/>
+            <!-- pqr id -->
+            <input type="hidden" th:field="*{id}" id="id"/>
+
+            <!-- Skills -->
             <h4 class="section-header">
-                <i class="fas fa-user-circle me-2"></i> Inspector Details
+                <i class="fas fa-tools me-2"></i> Skills
             </h4>
 
-            <div class="info-section">
-
-                <div class="info-item">
-                    <i class="fas fa-user"></i>
-                    <div class="info-content">
-                        <div class="info-label">Inspector Name</div>
-                        <div class="info-value" th:text="${inspector.inspectorName}">johndoe@example.com</div>
+            <!-- Primary Skills -->
+            <div class="row">
+                <div class="info-item d-flex flex-column">
+                <div class="d-flex align-items-start mb-2">
+                    <i class="fas fa-tools me-2"></i>
+                    <span>Skills</span>
+                </div>
+                <div class="info-content mt-2">
+                    <div class="row row-cols-5 g-3">
+                        <div class="col"
+                             th:each="skill, iterStat : ${T(com.stepup.ims.model.PQR.Skills).values()}">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" th:field="*{skills}"
+                                       th:value="${skill}"
+                                       th:checked="${skills != null and skills.contains(skill)}"
+                                       id="${'skill_' + iterStat.index}"/>
+                                <label class="form-check-label fw-normal d-inline-block"
+                                       style="font-size: smaller; white-space: nowrap;"
+                                       th:for="${'skill_' + iterStat.index}"
+                                       th:text="${skill.getName()}"></label>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <div class="info-item">
-                    <i class="fas fa-envelope"></i>
-                    <div class="info-content">
-                        <div class="info-label">Email Address</div>
-                        <div class="info-value" th:text="${inspector.email}">johndoe@example.com</div>
-                    </div>
                 </div>
+            </div>
 
-                <div class="info-item">
-                    <i class="fas fa-id-card"></i>
-                    <div class="info-content">
-                        <div class="info-label">Inspector Type</div>
-                        <div class="info-value" th:text="${inspector.inspectorType.description}">Senior Inspector</div>
+            <br/>            <!-- Education, Experience and English -->
+            <div class="row text-start">
+                <div class="col-md-4 info-item d-flex flex-column text-start">
+                    <div class="d-flex align-items-start mb-2">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Education</span>
                     </div>
-                </div>
-
-                <div class="info-item">
-                    <i class="fas fa-university"></i>
-                    <div class="info-content">
-                        <div class="info-label">Education Details</div>
-                        <div class="info-value" th:text="${inspector.educationDetails}">Bachelor of Engineering,
-                            Mechanical
+                    <div class="info-content mt-2">
+                        <div th:each="educationItem, iterStat : ${T(com.stepup.ims.model.PQR.Education).values()}">
+                            <input type="radio" th:field="*{education}" th:value="${educationItem}"
+                                   th:checked="${education != null and education.equals(educationItem)}"
+                                   id="${'education_' + iterStat.index}" required/>
+                            <span th:text="${educationItem.getQualification()}" style="font-size: smaller;"></span>
                         </div>
                     </div>
                 </div>
 
-                <div class="info-item">
-                    <i class="fas fa-book"></i>
-                    <div class="info-content">
-                        <div class="info-label">Disciplines</div>
-                        <div class="info-value" th:text="${inspector.disciplines}">Mechanical, Structural</div>
+                <div class="col-md-4 info-item d-flex flex-column text-start">
+                    <div class="d-flex align-items-start mb-2">
+                        <i class="fas fa-briefcase"></i>
+                        <span>Experience</span>
+                    </div>
+                    <div class="info-content mt-2">
+                        <div th:each="exp, iterStat : ${T(com.stepup.ims.model.PQR.Experience).values()}">
+                            <input type="radio" th:field="*{experience}" th:value="${exp}"
+                                   th:checked="${experience != null and experience.contains(exp)}"
+                                   id="${'experience_' + iterStat.index}" required/>
+                            <span th:text="${exp.getName()}" style="font-size: smaller;"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 info-item d-flex flex-column">
+                    <div class="d-flex align-items-start mb-2">
+                        <i class="fas fa-comments"></i>
+                        <span>Communication</span>
+                    </div>
+                    <div class="info-content mt-2">
+                        <div th:each="englishSkill, iterStat : ${T(com.stepup.ims.model.PQR.EnglishSkills).values()}">
+                            <input type="radio" th:field="*{englishSkills}" th:value="${englishSkill}"
+                                   th:checked="${englishSkills != null and englishSkills.contains(englishSkill)}"
+                                   id="${'englishSkill_' + iterStat.index}" required/>
+                            <span th:text="${englishSkill.getName()}" style="font-size: smaller;"></span>
+                        </div>
                     </div>
                 </div>
             </div>
+            <br/>
 
+      
 
-            <form th:action="@{/pqr/update}" th:object="${pqr}" method="post"
-                  class="needs-validation"
-                  novalidate>
-
-                <input type="hidden" th:field="*{inspectorId}" id="inspectorId"/>
-                <!-- pqr id -->
-                <input type="hidden" th:field="*{id}" id="id"/>
-
-                <!-- Skills -->
-                <h4 class="section-header">
-                    <i class="fas fa-tools me-2"></i> Skills
-                </h4>
-
-                <!-- Primary Skills -->
-                <div class="info-item">
-                    <i class="fas fa-tools me-2"></i>
-                    <span>Skills</span>
-                    <div class="info-content mt-2">
-                        <select class="form-select" multiple="multiple" th:field="*{skills}" required>
-                            <option th:each="skill : ${T(com.stepup.ims.model.PQR.Skills).values()}"
-                                    th:value="${skill}"
-                                    th:selected="${skills != null and skills.contains(skill)}"
-                                    th:text="${skill.getName()}"></option>
-                        </select>
-                    </div>
-                </div>
-
-
-                <!-- Education -->
-                <div class="info-item">
-                    <i class="fas fa-graduation-cap"></i>
-                    <span>Education</span>
-                    <div class="info-content mt-2">
-                        <select class="form-select" multiple th:field="*{education}" required>
-                            <option th:each="educationItem : ${T(com.stepup.ims.model.PQR.Education).values()}"
-                                    th:value="${educationItem}"
-                                    th:selected="${education != null and education.contains(educationItem)}"
-                                    th:text="${educationItem.getQualification()}">
-                            </option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- English -->
-                <div class="info-item">
-                    <i class="fas fa-comments"></i>
-                    <span>Communication</span>
-                    <div class="info-content mt-2">
-                        <select class="form-select" multiple="multiple" th:field="*{englishSkills}" required>
-                            <option th:each="englishSkill : ${T(com.stepup.ims.model.PQR.EnglishSkills).values()}"
-                                    th:value="${englishSkill}"
-                                    th:selected="${englishSkills != null and englishSkills.contains(englishSkill)}"
-                                    th:text="${englishSkill.getName()}"></option>
-                        </select>
-                    </div>
-                </div>
+            <!-- Professional Qualifications and Other Professional Skills -->
+            <div class="row">
 
                 <!-- Professional Qualifications -->
-                <div class="info-item">
-                    <i class="fas fa-briefcase"></i>
-                    <span>Professional Qualifications</span>
-                    <div class="info-content mt-2">
-                        <select class="form-select" multiple th:field="*{professionalQualifications}" required>
-                            <option th:each="qualification : ${T(com.stepup.ims.model.PQR.ProfessionalQualifications).values()}"
-                                    th:value="${qualification}"
-                                    th:selected="${professionalQualifications != null and professionalQualifications.contains(qualification)}"
-                                    th:text="${qualification.getName()}">
-                            </option>
-                        </select>
+                <div class="col-md-6 info-item d-flex flex-column">
+                    <div class="d-flex align-items-start mb-2">
+                        <i class="fas fa-briefcase"></i>
+                        <span class="ms-2">Professional Qualifications</span>
                     </div>
-                </div>
-
-                <!-- Experience -->
-                <div class="info-item">
-                    <i class="fas fa-briefcase"></i>
-                    <span>Experience</span>
                     <div class="info-content mt-2">
-                        <select class="form-select" multiple th:field="*{experience}" required>
-                            <option th:each="exp : ${T(com.stepup.ims.model.PQR.Experience).values()}"
-                                    th:value="${exp}"
-                                    th:selected="${experience != null and experience.contains(exp)}"
-                                    th:text="${exp.getName()}"></option>
-                        </select>
+                        <div th:each="qualification, iterStat : ${T(com.stepup.ims.model.PQR.ProfessionalQualifications).values()}">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox"
+                                       th:field="*{professionalQualifications}"
+                                       th:value="${qualification}"
+                                       th:checked="${professionalQualifications != null and professionalQualifications.contains(qualification)}"
+                                       id="${'professionalQualification_' + iterStat.index}"/>
+                                <label class="form-check-label fw-normal d-inline-block"
+                                       style="font-size: smaller; white-space: nowrap;"
+                                       th:for="${'professionalQualification_' + iterStat.index}"
+                                       th:text="${qualification.getName()}"></label>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Other Professional Skills -->
-                <div class="info-item">
-                    <i class="fas fa-briefcase"></i>
-                    <span>Other Professional Skills</span>
-                    <div class="info-content mt-2">
-                        <select class="form-select" multiple size="6" th:field="*{otherProfessionalSkills}" required>
-                            <option th:each="otherSkill : ${T(com.stepup.ims.model.PQR.OtherProfessionalSkills).values()}"
-                                    th:value="${otherSkill}"
-                                    th:selected="${otherProfessionalSkills != null and otherProfessionalSkills.contains(otherSkill)}"
-                                    th:text="${otherSkill.getName()}">
-                            </option>
-                        </select>
+                <div class="col-md-6 info-item d-flex flex-column">
+                    <div class="d-flex align-items-start mb-2">
+                        <i class="fas fa-briefcase"></i>
+                        <span class="ms-2">Other Professional Skills</span>
                     </div>
-                </div>
-
-                <!-- Score -->
-                <h4 class="section-header">
-                    <i class="fas fa-star me-2"></i> Score & Remarks
-                </h4>
-
-                <div class="info-section">
-
-                    <!-- Score -->
-                    <div class="info-item">
-                        <i class="fas fa-star"></i><span>Score</span>
-                        <div class="info-content mt-2">
-                            <input type="number" id="score" th:field="*{score}" step="0.01" min="0"
-                                   class="form-control" required/>
-                            <div class="invalid-feedback">
-                                Please enter a valid score.
+                    <div class="info-content mt-2">
+                       <div th:each="otherSkill, iterStat : ${T(com.stepup.ims.model.PQR.OtherProfessionalSkills).values()}">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox"
+                                       th:field="*{otherProfessionalSkills}"
+                                       th:value="${otherSkill}"
+                                       th:checked="${otherProfessionalSkills != null and otherProfessionalSkills.contains(otherSkill)}"
+                                       id="${'otherSkill_' + iterStat.index}"/>
+                                <span th:text="${otherSkill.getName()}" style="font-size: smaller;"></span>
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    <!-- Remarks -->
-                    <div class="info-item">
-                        <i class="fas fa-comment-alt"></i><span>Remarks</span>
-                        <div class="info-content mt-2">
-                            <textarea id="remarks" th:field="*{remarks}" class="form-control" rows="4"
-                                      required></textarea>
-                        </div>
+            <br/>
+
+           
+
+            <!-- Score -->
+            <h4 class="section-header">
+                <i class="fas fa-star me-2"></i> Score & Remarks
+            </h4>
+            <div class="row g-3 mb-4">
+
+                <!-- Score -->
+                <div class="col-md-6">
+                    <label for="score" class="form-label">Score</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-star"></i></span>
+                        <input type="text" id="score" th:field="*{score}" class="form-control" required/>
                     </div>
                 </div>
 
-                <div class="text-end mt-3">
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                <!-- Remarks -->
+                <div class="col-md-6">
+                    <label for="remarks" class="form-label">Remarks</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-comments"></i></span>
+                        <textarea id="remarks" th:field="*{remarks}" class="form-control" rows="4" required></textarea>
+                    </div>
                 </div>
 
-            </form>
-        </div>
+            </div>
+
+            <div class="text-end mt-3">
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="button" class="btn btn-primary" onclick="window.close()">Close</button>
+            </div>
+
+        </form>
     </div>
 </main>
 
-<!-- Footer -->
-<footer th:replace="fragments/footer :: footer"></footer>
 </body>
 </html>

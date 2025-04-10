@@ -346,6 +346,10 @@ function showMapLoadingMessage() {
 
 function redirectToTechnicalCoordinatorEditInspection(inspectionId) {
  window.location.href = 'inspection/edit/' + inspectionId;
+ window.history.pushState(null, "", window.location.href);
+ window.onpopstate = function () {
+     window.history.pushState(null, "", window.location.href);
+ };
 }
 
 /** ================== PQR =================== **/
