@@ -21,7 +21,6 @@ public class UIRoutingConstants {
 
     // PQR Managemet
     public static final String RETURN_TO_PQR_FORM = "pqr/pqr-form";
-    public static final String RETURN_TO_PQR_VIEW = "pqr/pqr-view";
 
     // Inspection Management
     public static final String RETURN_TO_INSPECTION_FORM = "inspections/inspection-form";
