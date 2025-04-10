@@ -81,31 +81,33 @@
             <!-- Primary Skills -->
             <div class="row">
                 <div class="info-item d-flex flex-column">
-                <div class="d-flex align-items-start mb-2">
-                    <i class="fas fa-tools me-2"></i>
-                    <span>Skills</span>
-                </div>
-                <div class="info-content mt-2">
-                    <div class="row row-cols-5 g-3">
-                        <div class="col"
-                             th:each="skill, iterStat : ${T(com.stepup.ims.model.PQR.Skills).values()}">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" th:field="*{skills}"
-                                       th:value="${skill}"
-                                       th:checked="${skills != null and skills.contains(skill)}"
+                    <div class="d-flex align-items-start mb-2">
+                        <i class="fas fa-tools me-2"></i>
+                        <span>Skills</span>
+                    </div>
+                    <div class="info-content mt-2">
+                        <div class="row row-cols-5 g-3">
+                            <div class="col"
+                                 th:each="skill, iterStat : ${T(com.stepup.ims.model.PQR.Skills).values()}">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" th:field="*{skills}"
+                                           th:value="${skill}"
+                                           th:checked="${skills != null and skills.contains(skill)}"
                                        id="${'skill_' + iterStat.index}"/>
-                                <label class="form-check-label fw-normal d-inline-block"
-                                       style="font-size: smaller; white-space: nowrap;"
-                                       th:for="${'skill_' + iterStat.index}"
-                                       th:text="${skill.getName()}"></label>
+                                    <label class="form-check-label fw-normal d-inline-block"
+                                           style="font-size: smaller; white-space: nowrap;"
+                                           th:for="${'skill_' + iterStat.index}"
+                                           th:text="${skill.getName()}"></label>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                </div>
             </div>
 
-            <br/>            <!-- Education, Experience and English -->
+            <br/>            
+            
+            <!-- Education, Experience and English -->
             <div class="row text-start">
                 <div class="col-md-4 info-item d-flex flex-column text-start">
                     <div class="d-flex align-items-start mb-2">
@@ -116,7 +118,7 @@
                         <div th:each="educationItem, iterStat : ${T(com.stepup.ims.model.PQR.Education).values()}">
                             <input type="radio" th:field="*{education}" th:value="${educationItem}"
                                    th:checked="${education != null and education.equals(educationItem)}"
-                                   id="${'education_' + iterStat.index}" required/>
+                                   id="${'education_' + iterStat.index}" name="education" required/>
                             <span th:text="${educationItem.getQualification()}" style="font-size: smaller;"></span>
                         </div>
                     </div>
@@ -131,7 +133,7 @@
                         <div th:each="exp, iterStat : ${T(com.stepup.ims.model.PQR.Experience).values()}">
                             <input type="radio" th:field="*{experience}" th:value="${exp}"
                                    th:checked="${experience != null and experience.contains(exp)}"
-                                   id="${'experience_' + iterStat.index}" required/>
+                                   id="${'experience_' + iterStat.index}"  name="experience" required/>
                             <span th:text="${exp.getName()}" style="font-size: smaller;"></span>
                         </div>
                     </div>
@@ -146,7 +148,7 @@
                         <div th:each="englishSkill, iterStat : ${T(com.stepup.ims.model.PQR.EnglishSkills).values()}">
                             <input type="radio" th:field="*{englishSkills}" th:value="${englishSkill}"
                                    th:checked="${englishSkills != null and englishSkills.contains(englishSkill)}"
-                                   id="${'englishSkill_' + iterStat.index}" required/>
+                                   id="${'englishSkill_' + iterStat.index}" name="englishSkills" required/>
                             <span th:text="${englishSkill.getName()}" style="font-size: smaller;"></span>
                         </div>
                     </div>
@@ -172,7 +174,7 @@
                                        th:field="*{professionalQualifications}"
                                        th:value="${qualification}"
                                        th:checked="${professionalQualifications != null and professionalQualifications.contains(qualification)}"
-                                       id="${'professionalQualification_' + iterStat.index}"/>
+                                       id="${'professionalQualification_' + iterStat.index}" name="professionalQualifications" />
                                 <label class="form-check-label fw-normal d-inline-block"
                                        style="font-size: smaller; white-space: nowrap;"
                                        th:for="${'professionalQualification_' + iterStat.index}"
@@ -195,7 +197,7 @@
                                        th:field="*{otherProfessionalSkills}"
                                        th:value="${otherSkill}"
                                        th:checked="${otherProfessionalSkills != null and otherProfessionalSkills.contains(otherSkill)}"
-                                       id="${'otherSkill_' + iterStat.index}"/>
+                                       id="${'otherSkill_' + iterStat.index}" name="otherProfessionalSkills" />
                                 <span th:text="${otherSkill.getName()}" style="font-size: smaller;"></span>
                             </div>
                         </div>

@@ -26,7 +26,7 @@ public class PQRController {
     }
 
     @PostMapping("/update")
-    public String updateInspectoPRQ(@ModelAttribute PQR pqr, Model model) {
+    public String updateInspectorPRQ(@ModelAttribute PQR pqr, Model model) {
         Inspector inspector = pqrService.updateInspectorPQR(pqr.getInspectorId(), pqr);
         model.addAttribute("inspector", inspector);
         model.addAttribute("pqr", inspector.getPqr());

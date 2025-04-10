@@ -4,17 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 
+import java.util.List;
+
 @Data
 public class PQR {
 
     private Long id;
-    private Skills skills;
+    private List<Skills> skills;
     private Education education;
     private EnglishSkills englishSkills;
-    private ProfessionalQualifications professionalQualifications;
+    private List<ProfessionalQualifications> professionalQualifications;
     private Experience experience;
     private int score;
-    private OtherProfessionalSkills otherProfessionalSkills;
+    private List<OtherProfessionalSkills> otherProfessionalSkills;
     private String remarks;
     private Long inspectorId;
 
