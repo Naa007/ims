@@ -385,6 +385,37 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
+// Function to calculate and update the total score
+function calculateScore() {
+    let totalScore = 0;
+    const fields = ["education", "experience", "englishSkills", "professionalQualifications"];
+
+    // Iterate through the predefined fields
+    fields.forEach((fieldName) => {
+      // Get the selected radio buttons or checkboxes for the field
+      const selectedOptions = document.querySelectorAll(`input[name="${fieldName}"]:checked`);
+
+      selectedOptions.forEach((selectedOption) => {
+        // Extract data-rating and data-factor values
+        const rating = parseFloat(selectedOption.getAttribute("data-rating") || 0);
+        const factor = parseFloat(selectedOption.getAttribute("data-factor") || 0);
+
+        // Calculate the score for this option
+        const optionScore = rating * factor;
+
+        // Add the option score to the cumulative total score
+        totalScore += optionScore;
+      });
+    });
+
+    // Update the corresponding score field on the form
+    const scoreField = document.getElementById("score");
+    if (scoreField) {
+      scoreField.value = totalScore; // Assign the calculated value dynamically
+    }
+}
+
+
 /** ================== Inspector =========== **/
 
 function redirectToInspectorViewInspection(inspectionId) {

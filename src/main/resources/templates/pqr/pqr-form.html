@@ -118,7 +118,10 @@
                         <div th:each="educationItem, iterStat : ${T(com.stepup.ims.model.PQR.Education).values()}">
                             <input type="radio" th:field="*{education}" th:value="${educationItem}"
                                    th:checked="${education != null and education.equals(educationItem)}"
-                                   id="${'education_' + iterStat.index}" name="education" required/>
+                                   id="${'education_' + iterStat.index}" name="education" required
+                                   th:data-rating="${educationItem.getRating()}"
+                                   th:data-factor="${educationItem.getFactor()}"
+                                   onchange="calculateScore()"/>
                             <span th:text="${educationItem.getQualification()}" style="font-size: smaller;"></span>
                         </div>
                     </div>
@@ -133,7 +136,10 @@
                         <div th:each="exp, iterStat : ${T(com.stepup.ims.model.PQR.Experience).values()}">
                             <input type="radio" th:field="*{experience}" th:value="${exp}"
                                    th:checked="${experience != null and experience.contains(exp)}"
-                                   id="${'experience_' + iterStat.index}"  name="experience" required/>
+                                   id="${'experience_' + iterStat.index}"  name="experience" required
+                                   th:data-rating="${exp.getRating()}"
+                                   th:data-factor="${exp.getFactor()}"
+                                   onchange="calculateScore()"/>
                             <span th:text="${exp.getName()}" style="font-size: smaller;"></span>
                         </div>
                     </div>
@@ -146,17 +152,24 @@
                     </div>
                     <div class="info-content mt-2">
                         <div th:each="englishSkill, iterStat : ${T(com.stepup.ims.model.PQR.EnglishSkills).values()}">
-                            <input type="radio" th:field="*{englishSkills}" th:value="${englishSkill}"
-                                   th:checked="${englishSkills != null and englishSkills.contains(englishSkill)}"
-                                   id="${'englishSkill_' + iterStat.index}" name="englishSkills" required/>
-                            <span th:text="${englishSkill.getName()}" style="font-size: smaller;"></span>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox"
+                                       th:field="*{englishSkills}" th:value="${englishSkill}"
+                                       th:checked="${englishSkills != null and englishSkills.contains(englishSkill)}"
+                                       id="${'englishSkill_' + iterStat.index}" name="englishSkills"
+                                       th:data-rating="${englishSkill.getRating()}"
+                                       th:data-factor="${englishSkill.getFactor()}"
+                                       onchange="calculateScore()"/>
+                                <label class="form-check-label fw-normal d-inline-block"
+                                       style="font-size: smaller; white-space: nowrap;"
+                                       th:for="${'englishSkill_' + iterStat.index}"
+                                       th:text="${englishSkill.getName()}"></label>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             <br/>
-
-      
 
             <!-- Professional Qualifications and Other Professional Skills -->
             <div class="row">
@@ -174,7 +187,11 @@
                                        th:field="*{professionalQualifications}"
                                        th:value="${qualification}"
                                        th:checked="${professionalQualifications != null and professionalQualifications.contains(qualification)}"
-                                       id="${'professionalQualification_' + iterStat.index}" name="professionalQualifications" />
+                                       id="${'professionalQualification_' + iterStat.index}"
+                                       name="professionalQualifications"
+                                       th:data-rating="${qualification.getRating()}"
+                                       th:data-factor="${qualification.getFactor()}"
+                                       onchange="calculateScore()"/>
                                 <label class="form-check-label fw-normal d-inline-block"
                                        style="font-size: smaller; white-space: nowrap;"
                                        th:for="${'professionalQualification_' + iterStat.index}"
@@ -220,7 +237,7 @@
                     <label for="score" class="form-label">Score</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-star"></i></span>
-                        <input type="text" id="score" th:field="*{score}" class="form-control" required/>
+                        <input type="text" id="score" th:field="*{score}" class="form-control" required readonly/>
                     </div>
                 </div>
 
