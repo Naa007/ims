@@ -35,17 +35,28 @@
                 <tbody>
                 <!-- Assuming inspections data comes from backend -->
                 <tr th:each="inspection : ${inspections}">
-                    <td th:text="${inspection.notificationNo}"></td>
-                    <td th:text="${inspection.client.clientName + ' - ' + inspection.client.country}"></td>
-                    <td th:text="${inspection.inspectionDateAsPerNotification}"></td>
-                    <td th:text="${inspection.inspectionItem}"></td>
-                    <td th:text="${inspection.inspectionStatus.description}"></td>
-                    <td>
+                    <td th:text="${inspection.notificationNo}" class="text-sm"></td>
+                    <td th:text="${inspection.client.clientName + ' - ' + inspection.client.country}"
+                        class="text-sm"></td>
+                    <td class="text-sm">
+                        <ul class="list-unstyled d-inline">
+                            <i th:if="${inspection.inspectionDateAsPerNotification.size() > 2}"
+                               class="fas fa-info-circle d-inline text-muted ml-1"
+                               th:attr="title=${inspection.inspectionDateAsPerNotification}"></i>
+                            <li th:each="date, iterStat : ${inspection.inspectionDateAsPerNotification}"
+                                th:text="${iterStat.index < 2 ? date : ''}"
+                                th:classappend="${iterStat.index > 1 ? 'd-none' : ''}"></li>
+
+                        </ul>
+                    </td>
+                    <td th:text="${inspection.inspectionItem}" class="text-sm"></td>
+                    <td th:text="${inspection.inspectionStatus.description}" class="text-sm"></td>
+                    <td class="text-sm">
                         <button class="btn btn-warning btn-sm"
                                 th:onclick="|redirectToEditInspection(${inspection.id})|"><i class="fas fa-edit"></i>
                         </button>
                         <button class="btn btn-primary btn-sm"
-                                th:onclick="|redirectToViewInspection(${inspection.id})|"> <i class="fas fa-eye"></i>
+                                th:onclick="|redirectToViewInspection(${inspection.id})|"><i class="fas fa-eye"></i>
                         </button>
                     </td>
                 </tr>

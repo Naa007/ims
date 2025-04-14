@@ -106,11 +106,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     /** ================= Date Picker Initialization ================= **/
 
-    flatpickr("#inspectionDateAsPerNotification", {
-                    mode: "multiple",
-                    dateFormat: "d/m/Y"
-                });
-
+   flatpickr("#inspectionDateAsPerNotification", {
+        mode: "multiple",
+        dateFormat: "d/m/Y",
+        defaultDate: document.getElementById("inspectionDateAsPerNotification").value.split(",") // Prepopulate default dates
+    });
 
 });
 

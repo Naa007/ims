@@ -97,9 +97,10 @@
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
                         <input id="inspectionDateAsPerNotification" name="inspectionDateAsPerNotification"
-                           th:field="*{inspectionDateAsPerNotification}" class="form-control"
-                           type="text" placeholder="Pick dates"
-                           th:value="${inspectionDateAsPerNotification}" required />
+                               th:field="*{inspectionDateAsPerNotification}" class="form-control"
+                               type="text" placeholder="Pick dates"
+                               th:attr="value=${inspection.inspectionDateAsPerNotification != null ? inspection.inspectionDateAsPerNotification : ''}"
+                               multiple data-toggle="datepicker" required/>
                     </div>
                 </div>
 
