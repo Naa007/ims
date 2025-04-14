@@ -28,6 +28,8 @@ public class BusinessRoleController {
         model.addAttribute("clientStats", businessStats.get("Client Stats"));
         model.addAttribute("inspectorStats", businessStats.get("Inspector Stats"));
         model.addAttribute("inspectionStats", businessStats.get("Inspection Stats"));
+        model.addAttribute("inspectionStatusStats", businessStats.get("Inspection Status Stats"));
+
         return RETURN_TO_BUSINESS_DASHBOARD;
     }
 }

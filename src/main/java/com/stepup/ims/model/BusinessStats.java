@@ -30,4 +30,21 @@ public class BusinessStats {
     private final Long completedInspections;
     private final Long ongoingInspections;
     private final Long pendingInspections;
+
+    // Inspection status counts
+    private final Long newInspections;
+    private final Long inspectorAssigned;
+    private final Long inspectorReviewAwaiting;
+    private final Long inspectorReviewCompleted;
+    private final Long inspectorApproved;
+    private final Long referenceDocReceived;
+    private final Long referenceDocReviewAwaiting;
+    private final Long referenceDocReviewCompleted;
+    private final Long inspectionReportsReceived;
+    private final Long inspectionReportsReviewAwaiting;
+    private final Long inspectionReportsReviewCompleted;
+    private final Long inspectionReportsSentToClient;
+    private final Long inspectionAwarded;
+    private final Long inspectionRejected;
+    private final Long closedInspections;
 }

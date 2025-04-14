@@ -31,9 +31,25 @@
                     <div class="bd-summary-value" th:text="${inspectionStats['Total Inspections']}">0</div>
                 </div>
                 <div id="inspection-stats" class="bd-stat-content">
-                    <div class="bd-stat-item" th:each="stat : ${inspectionStats}" th:if="${!stat.key.equals('Total Inspections')}">
-                        <div class="bd-stat-label" th:text="${stat.key}">Completed Inspections</div>
-                        <div class="bd-stat-value" th:text="${stat.value}">0</div>
+                    <div class="bd-stat-item">
+                        <div class="bd-stat-label">New</div>
+                        <div class="bd-stat-value" th:text="${inspectionStats['New']}">0</div>
+                    </div>
+                    <div class="bd-stat-item">
+                        <div class="bd-stat-label">Ongoing</div>
+                        <div class="bd-stat-value" th:text="${inspectionStats['Ongoing']}">0</div>
+                    </div>
+                    <div class="bd-stat-item">
+                        <div class="bd-stat-label">Awarded</div>
+                        <div class="bd-stat-value" th:text="${inspectionStats['Awarded']}">0</div>
+                    </div>
+                    <div class="bd-stat-item">
+                        <div class="bd-stat-label">Rejected</div>
+                        <div class="bd-stat-value" th:text="${inspectionStats['Rejected']}">0</div>
+                    </div>
+                    <div class="bd-stat-item">
+                        <div class="bd-stat-label">Closed</div>
+                        <div class="bd-stat-value" th:text="${inspectionStats['Closed']}">0</div>
                     </div>
                 </div>
             </div>
@@ -105,7 +121,7 @@
         <!-- Inspection Status Chart -->
         <div class="bd-chart-card">
             <div class="bd-chart-header-container">
-                <div class="bd-chart-header">Inspection Status</div>
+                <div class="bd-chart-header">Detailed Inspection Status</div>
                 <div class="bd-chart-period-selector">
                     <select id="chartPeriodSelect" class="bd-period-select" onchange="handleChartPeriodChange()">
                         <option value="week">Last 7 Days</option>
@@ -127,7 +143,9 @@
                     </div>
                 </div>
             </div>
-            <canvas id="inspectionStatusChart" width="400" height="200"></canvas>
+            <div class="chart-container" style="position: relative; height:500px;">
+                <canvas id="detailedInspectionStatusChart"></canvas>
+            </div>
         </div>
 
         <!-- Info Card -->
@@ -164,48 +182,69 @@
             });
         });
 
-        // Inspection status bar chart
-        const inspectionStats = /*[[${inspectionStats}]]*/ {
-            'Total Inspections': 128,
-            'Completed Inspections': 75,
-            'Ongoing Inspections': 38,
-            'Pending Inspections': 15
-        };
+       // Get the actual data from Thymeleaf model
+    const inspectionStatusStats = /*[[${inspectionStatusStats}]]*/ null;
 
-        if (document.getElementById('inspectionStatusChart')) {
-            const inspectionCtx = document.getElementById('inspectionStatusChart').getContext('2d');
-            new Chart(inspectionCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Completed', 'Ongoing', 'Pending'],
-                    datasets: [{
-                        label: 'Inspections',
-                        data: [
-                            inspectionStats ? (inspectionStats['Completed Inspections'] || 0) : 0,
-                            inspectionStats ? (inspectionStats['Ongoing Inspections'] || 0) : 0,
-                            inspectionStats ? (inspectionStats['Pending Inspections'] || 0) : 0
-                        ],
-                        backgroundColor: ['#28c76f', '#00cfe8', '#ff9f43'],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true
+    if (document.getElementById('detailedInspectionStatusChart')) {
+        const ctx = document.getElementById('detailedInspectionStatusChart').getContext('2d');
+
+        // Prepare data for the chart
+        const labels = inspectionStatusStats ? Object.keys(inspectionStatusStats) : [];
+        const data = inspectionStatusStats ? Object.values(inspectionStatusStats) : [];
+
+        // Color palette for the bars (15 distinct colors)
+        const backgroundColors = [
+            '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b',
+            '#5a5c69', '#858796', '#3a3b45', '#f8f9fc', '#e83e8c',
+            '#fd7e14', '#20c997', '#6f42c1', '#d63384', '#0dcaf0'
+        ];
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Number of Inspections',
+                    data: data,
+                    backgroundColor: backgroundColors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        },
+                        grid: {
+                            display: true
                         }
                     },
-                    plugins: {
-                        legend: {
+                    x: {
+                        grid: {
                             display: false
                         }
                     }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y.toLocaleString(); // Fixed to use y value
+                            }
+                        }
+                    }
                 }
-            });
-        }
-    });
+            }
+        });
+    }
+});
     /*]]>*/
 </script>
 </body>
