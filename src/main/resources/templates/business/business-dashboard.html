@@ -130,6 +130,133 @@
             <canvas id="inspectionStatusChart" width="400" height="200"></canvas>
         </div>
 
+
+        <br/>
+
+        <!-- Coordinator Select Box -->
+        <div class="bd-select-box">
+            <label for="coordinatorSelect">Select Coordinator:</label>
+            <select id="coordinatorSelect" class="bd-select">
+                <option value="" disabled selected>Select a coordinator</option>
+                <option th:each="coordinator : ${coordinatorsList}"
+                        th:value="${coordinator.email}"
+                        th:text="${coordinator.empName}">
+                </option>
+            </select>
+        </div>
+
+        <br/>        <!-- Technical Coordinator Select Box -->
+        <div class="bd-select-box">
+            <label for="technicalCoordinatorSelect">Select Technical Coordinator:</label>
+            <select id="technicalCoordinatorSelect" class="bd-select">
+                <option value="" disabled selected>Select a technical coordinator</option>
+                <option th:each="technicalCoordinator : ${technicalCoordinatorsList}"
+                        th:value="${technicalCoordinator.empId}"
+                        th:text="${technicalCoordinator.empName}">
+                </option>
+            </select>
+        </div>
+
+        <br/>
+
+        <!-- Inspectors Select Box -->
+        <div class="bd-select-box">
+            <label for="inspectorSelect">Select Inspector:</label>
+            <select id="inspectorSelect" class="bd-select">
+                <option value="" disabled selected>Select an inspector</option>
+                <option th:each="inspector : ${inspectorsList}"
+                        th:value="${inspector.email}"
+                        th:text="${inspector.inspectorName}"></option>
+            </select>
+        </div>
+
+        <script th:inline="javascript"> /*<![CDATA[*/
+            function handleCoordinatorChange(selectElement) {
+                const selectedCoordinatorEmail = selectElement.value;
+                const period = "YEAR"; // Example of obtaining a period value
+                fetch(`coordinator-stats/${encodeURIComponent(selectedCoordinatorEmail)}/${encodeURIComponent(period)}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Coordinator selected:', data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+
+            function handleTechnicalCoordinatorChange(selectElement) {
+                const selectedTechnicalCoordinator = selectElement.value;
+                const period = "YEAR"; // Example of obtaining a period value
+                fetch(`technical-coordinator-stats/${encodeURIComponent(selectedTechnicalCoordinator)}/${encodeURIComponent(period)}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Technical Coordinator selected:', data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+
+            function handleInspectorChange(selectElement) {
+                const selectedInspector = selectElement.value;
+                const period = "YEAR"; // Example of obtaining a period value
+                fetch(`inspector-stats/${encodeURIComponent(selectedInspector)}/${encodeURIComponent(period)}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Inspector selected:', data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+
+            document.getElementById('coordinatorSelect').addEventListener('change', function() {
+                handleCoordinatorChange(this);
+            });
+
+            document.getElementById('technicalCoordinatorSelect').addEventListener('change', function() {
+                handleTechnicalCoordinatorChange(this);
+            });
+
+            document.getElementById('inspectorSelect').addEventListener('change', function() {
+                handleInspectorChange(this);
+            });
+            /*]]>*/</script>
+        <br/>
+
         <!-- Info Card -->
         <div class="bd-info-card">
             <h2>Business Dashboard Overview</h2>
