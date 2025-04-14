@@ -346,23 +346,82 @@ function showMapLoadingMessage() {
 
 function redirectToTechnicalCoordinatorEditInspection(inspectionId) {
  window.location.href = 'inspection/edit/' + inspectionId;
-}
-
-function redirectToTechnicalCoordinatorViewInspection(inspectionId) {
- window.location.href = 'inspection/view/' + inspectionId;
+ window.history.pushState(null, "", window.location.href);
+ window.onpopstate = function () {
+     window.history.pushState(null, "", window.location.href);
+ };
 }
 
 /** ================== PQR =================== **/
 
 function editPQRForm(inspectorId) {
  const url = `/pqr/edit/` + inspectorId;
- window.open(url, '_blank', 'width=900,height=800');
+ const width = screen.width * 0.9;
+ const height = screen.height * 0.9;
+ const left = (screen.width - width) / 2;
+ const top = (screen.height - height) / 2;
+ window.open(url, '_blank', `width=${width},height=${height},left=${left},top=${top}`);
 }
 
-function viewPQRForm(inspectorId) {
- const url = `/pqr/view/` + inspectorId;
- window.open(url, '_blank', 'width=900,height=800');
+document.addEventListener('DOMContentLoaded', function () {
+    const successMessage = document.querySelector('#successMessage');
+    if (successMessage && successMessage.textContent.trim() !== '') {
+        const form = document.querySelector('div.page-container');
+        if (form) {
+            form.style.filter = 'blur(5px)';
+        }
+
+        const successMessageElement = document.createElement('div');
+        successMessageElement.className = 'alert alert-success';
+        successMessageElement.textContent = successMessage.textContent.trim();
+        const mainElement = document.querySelector('main');
+        if (mainElement) {
+            mainElement.prepend(successMessageElement);
+        }
+
+        setTimeout(() => {
+            window.close();
+        }, 3000);
+    }
+});
+
+// Function to calculate and update the total score
+function calculateScore() {
+    let totalScore = 0;
+    const fields = ["education", "experience", "englishSkills", "professionalQualifications"];
+
+    // Iterate through the predefined fields
+    fields.forEach((fieldName) => {
+      // Get the selected radio buttons or checkboxes for the field
+      const selectedOptions = document.querySelectorAll(`input[name="${fieldName}"]:checked`);
+
+      selectedOptions.forEach((selectedOption) => {
+        // Extract data-rating and data-factor values
+        const rating = parseFloat(selectedOption.getAttribute("data-rating") || 0);
+        const factor = parseFloat(selectedOption.getAttribute("data-factor") || 0);
+
+        // Calculate the score for this option
+        const optionScore = rating * factor;
+
+        // Add the option score to the cumulative total score
+        totalScore += optionScore;
+      });
+    });
+
+    // Update the corresponding score field on the form
+    const scoreField = document.getElementById("score");
+    if (scoreField) {
+      scoreField.value = totalScore; // Assign the calculated value dynamically
+    }
 }
+
+
+/** ================== Inspector =========== **/
+
+function redirectToInspectorViewInspection(inspectionId) {
+ window.location.href = 'inspection/view/' + inspectionId;
+}
+
 /** ================== Login ================= **/
 
 function disableButton() {

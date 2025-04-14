@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
 
+import java.util.List;
+
 @Entity
 @Data
 @Table(name = "pqr")
@@ -14,8 +16,10 @@ public class PQR extends Auditable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ElementCollection
+    @CollectionTable(name = "pqr_skills", joinColumns = @JoinColumn(name = "pqr_id"))
     @Column(name = "skills", nullable = true)
-    private Skills skills;
+    private List<Skills> skills;
 
     @Column(name = "education", nullable = true)
     private Education education;
@@ -23,8 +27,10 @@ public class PQR extends Auditable {
     @Column(name = "english_skills", nullable = true)
     private EnglishSkills englishSkills;
 
+    @ElementCollection
+    @CollectionTable(name = "pqr_professional_qualifications", joinColumns = @JoinColumn(name = "pqr_id"))
     @Column(name = "professional_qualifications", nullable = true)
-    private ProfessionalQualifications professionalQualifications;
+    private List<ProfessionalQualifications> professionalQualifications;
 
     @Column(name = "experience", nullable = true)
     private Experience experience;
@@ -32,11 +38,16 @@ public class PQR extends Auditable {
     @Column(name = "score", nullable = true)
     private int score;
 
-    @Column(name = "other_professional_skills", nullable = true)
-    private OtherProfessionalSkills otherProfessionalSkills;
+    @ElementCollection
+    @CollectionTable(name = "pqr_other_professional_skills", joinColumns = @JoinColumn(name = "pqr_id"))
+    @Column(name = "other_professional_skill", nullable = true)
+    private List<OtherProfessionalSkills> otherProfessionalSkills;
 
     @Column(name = "remarks", nullable = true, length = 1000)
     private String remarks;
+
+    @Column(name = "inspector_id", nullable = true)
+    private Long inspectorId;
 
 
     @Getter

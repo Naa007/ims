@@ -11,6 +11,9 @@ public interface InspectionRepository extends JpaRepository<Inspection, Long> {
 
     List<Inspection> findByCreatedBy(String createdBy);
 
-    List<Inspection> findByProposedCVs_CvReviewBytechnicalCoordinator_empId(String cvReviewBytechnicalCoordinatorId);
+    List<Inspection> findByProposedCVs_CvReviewBytechnicalCoordinator_EmpIdOrDocumentsReviewedByTechnicalCoordinatorOrInspectionReviewedBy(String cvReviewBytechnicalCoordinatorId, String documentsReviewedByTechnicalCoordinator, String inspectionReviewedBy);
+
+    List<Inspection> findByProposedCVs_Inspector_Email(String email);
 
 }
+

@@ -350,7 +350,7 @@
                                 th:field="*{documentsReviewedByTechnicalCoordinator}" style="min-width: 200px;" >
                             <option value="">Select Technical Coordinator</option>
                             <option th:each="coordinator : ${inspection.technicalCoordinatorsList}"
-                                    th:value="${coordinator.empName}"
+                                    th:value="${coordinator.empId}"
                                     th:text="${coordinator.empName}"></option>
                         </select>
                     </div>
@@ -455,7 +455,7 @@
                         <select id="inspectionReviewedBy" class="form-select" th:field="*{inspectionReviewedBy}" >
                         <option value="">Select Reviewer</option>
                         <option th:each="coordinator : ${inspection.technicalCoordinatorsList}"
-                                th:value="${coordinator.empName}"
+                                th:value="${coordinator.empId}"
                                 th:text="${coordinator.empName}"></option>
                     </select>
                     </div>

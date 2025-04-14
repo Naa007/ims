@@ -7,14 +7,15 @@
 <header th:replace="fragments/header :: header"></header>
 <!-- Main Content -->
 <main>
+
     <div class="page-container">
+
         <div class="form-card">
+
             <div class="form-header">
                 <h1 class="form-title">Review Inspection - IISPL # <span th:text="${inspection.inspectionNo}"></span></h1>
                 <p class="form-subtitle">Current Inspection Status - <span th:text="${inspection.inspectionStatus.description}"></span></p>
             </div>
-            <form th:object="${inspection}" method="post" class="needs-validation">
-                <input type="hidden" th:field="*{id}" id="id" />
 
             <!-- notification details -->
             <h4 class="section-header">
@@ -127,78 +128,39 @@
                 <i class="fas fa-users"></i> Inspector Details
             </h4>
 
-            <div class="table-responsive">
-
-                <table class="table table-bordered table-striped" id="proposedCVsTable">
-                    <thead>
-                        <tr class="text-center">
+                <div class="table-responsive">
+                    <table class="table" id="proposedCVsTable">
+                        <thead>
+                        <tr>
                             <th>Inspector Name</th>
                             <th>CV Available</th>
                             <th>Technical Coordinator</th>
                             <th>PQR Available</th>
-                            <th>ADD or Review PQR</th>
+                            <th>CV Submitted Date</th>
+                            <th>CV Status</th>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="cv, iterStat : ${inspection.proposedCVs}">
-                        <input type="hidden" th:field="*{proposedCVs[__${iterStat.index}__].id}" th:value="${cv.id}"/>
-                        <td>
-                            <select class="form-select form-select-sm"
-                                    th:field="*{proposedCVs[__${iterStat.index}__].inspector.inspectorId}"
-                                    disabled>
-                                <option th:value="${cv.inspector.inspectorId}"
-                                        th:text="${cv.inspector.inspectorName}"></option>
-                            </select>
-                        </td>
-                        <td class="text-center">
-                            <div class="d-flex justify-content-center align-items-center">
-                                <select class="form-select form-select-sm"
-                                        th:name="proposedCVs[__${iterStat.index}__].cvCertificatesAvailable"
-                                        disabled>
-                                    <option value="true" th:selected="${cv.cvCertificatesAvailable == true}">
-                                        Yes
-                                    </option>
-                                    <option value="false" th:selected="${cv.cvCertificatesAvailable == false}">
-                                        No
-                                    </option>
-                                </select>
-                            </div>
+                        </thead>
+                        <tbody>
+                        <!-- Existing CVs -->
+                        <tr th:each="cv : ${inspection.proposedCVs}">
+                            <td>
+                                <i class="fas fa-user-tie text-success mr-2"></i>
+                                <span th:text="${cv.inspector.inspectorName}"></span>
+                            </td>
 
-                        </td>
-                        <td>
-                            <select class="form-select form-select-sm"
-                                    th:field="*{proposedCVs[__${iterStat.index}__].cvReviewByTechnicalCoordinator.empId}"
-                                    disabled>
-                                <option th:value="${cv.cvReviewByTechnicalCoordinator.empId}"
-                                        th:text="${cv.cvReviewByTechnicalCoordinator.empName}"></option>
-                            </select>
-                        </td>
-                        <td class="text-center">
-                            <div class="d-flex justify-content-center align-items-center">
-                                <select class="form-select form-select-sm" th:name="proposedCVs[__${iterStat.index}__].pqrAvailable"
-                                        disabled>
-                                    <option value="" disabled selected>Select</option>
-                                    <option value="true" th:selected="${cv.pqrAvailable == true}">Yes</option>
-                                    <option value="false" th:selected="${cv.pqrAvailable == false}">No</option>
-                                </select>
-                            </div>
-                        </td>
-                    <td>
-                        <div class="d-flex justify-content-end">
-                            <button type="button" class="btn btn-sm btn-primary me-2"
-                                    onclick="editPQRForm(this.closest('tr').querySelector('td select').value)">
-                                <i class="fas fa-edit"></i> Manage PQR
-                            </button>
-                        </div>
-                     </td>
-                    </tr>
-                    </tbody>
-                </table>
+                            <td th:text="${cv.cvCertificatesAvailable != null && cv.cvCertificatesAvailable ? 'Yes' : 'No'}"></td>
+                            <td th:text="${cv.cvReviewByTechnicalCoordinator.empName}"></td>
+                            <td th:text="${cv.pqrAvailable != null && cv.pqrAvailable ? 'Yes' : 'No'}"></td>
+                            <td th:text="${cv.cvSubmittedToClientDate}"></td>
+                            <td th:text="${cv.cvStatus ? 'Approved' : 'Not Approved'}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
 
-            </div>
-            </form>
         </div>
     </div>
+
 </main>
 <!-- Footer -->
 <footer th:replace="fragments/footer :: footer"></footer>
