@@ -60,8 +60,8 @@ public class GoogleMapsService {
                 inspectorDistances.add(new InspectorDistance(
                         destination.getKey(),
                         destination.getValue(),
-                        result.rows[0].elements[index].distance.humanReadable,
-                        result.rows[0].elements[index].duration.humanReadable));
+                        result.rows[0].elements[index].distance != null ? result.rows[0].elements[index].distance.humanReadable : "N/A",
+                        result.rows[0].elements[index].duration != null ? result.rows[0].elements[index].duration.humanReadable : "N/A"));
                 index++;
             }
             distances.put(entry.getKey(), inspectorDistances);
