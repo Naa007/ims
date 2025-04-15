@@ -57,7 +57,9 @@ public class AuthController {
         // Send OTP via email
         try {
             String otp = otpService.generateOTP(email);
-            emailService.sendEmail(email, "Your IMS login OTP", "Dear Employee,\n\nYour One-Time Password (OTP) for IMS login is: " + otp + "\n\nPlease note that this OTP will expire in 5 minutes. Do not share this OTP with anyone.\n\nThank you,\nTeam IMS");
+            String employeeName = employeeService.getEmployeeByEmail(email).getEmpName();
+            String body = "Dear " + (employeeName != null ? employeeName.trim() : "Employee") + ",\n\nYour One-Time Password (OTP) for IMS login is: " + otp + "\n\nPlease note that this OTP will expire in 5 minutes. Do not share this OTP with anyone.\n\nThank you,\nTeam IMS";
+            emailService.sendEmail(email, "Your IMS login OTP", body);
         } catch (RuntimeException re) {
             return re.getMessage();
         } catch (Exception e) {
