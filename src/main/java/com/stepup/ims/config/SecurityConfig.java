@@ -41,7 +41,9 @@ public class SecurityConfig {
                         .defaultSuccessUrl("/admin/dashboard", true)
                         .permitAll())
                 .sessionManagement(sessionManagement -> sessionManagement
-                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
+                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+                        .maximumSessions(1) // Allow a single active session per user
+                        .maxSessionsPreventsLogin(false))
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> response
                                 .sendRedirect("/error")))
