@@ -5,7 +5,6 @@ import com.stepup.ims.model.PQR;
 import com.stepup.ims.modelmapper.InspectorModelMapper;
 import com.stepup.ims.modelmapper.PQRModelMapper;
 import com.stepup.ims.repository.InspectorRepository;
-import com.stepup.ims.repository.PQRRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +13,6 @@ import java.util.Optional;
 @Service
 public class PQRService {
 
-    @Autowired
-    private PQRRepository pqrRepository;
-    
     @Autowired
     private InspectorRepository inspectorRepository;
 
