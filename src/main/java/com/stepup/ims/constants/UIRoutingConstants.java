@@ -58,6 +58,11 @@ public class UIRoutingConstants {
 
     // Default Error
     public static final String RETURN_TO_DEFAULT_ERROR = "/error/default";
+    public static final String ERROR_PATH = "/error";
+    public static final String ERROR_MESSAGE = "errorMessage";
+    public static final String ERROR_TITLE = "errorTitle";
+
+
 
     private UIRoutingConstants() {
     }

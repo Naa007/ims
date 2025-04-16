@@ -14,13 +14,12 @@ public class CustomErrorPageConfiguration {
 
     @Bean
     public WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> webServerCustomizer() {
-        return factory -> {
-            factory.addErrorPages(
-                    new ErrorPage(HttpStatus.UNAUTHORIZED, "/error/401"), // Map 401 errors
-                    new ErrorPage(HttpStatus.NOT_FOUND, RETURN_TO_DEFAULT_ERROR), // Map 404 errors
-                    new ErrorPage(HttpStatus.INTERNAL_SERVER_ERROR, RETURN_TO_DEFAULT_ERROR), // Map 500 errors
-                    new ErrorPage(RETURN_TO_DEFAULT_ERROR) // Map all other errors
-            );
-        };
+        return factory ->
+                factory.addErrorPages(
+                        new ErrorPage(HttpStatus.UNAUTHORIZED, RETURN_TO_DEFAULT_ERROR), // Map 401 errors
+                        new ErrorPage(HttpStatus.NOT_FOUND, RETURN_TO_DEFAULT_ERROR), // Map 404 errors
+                        new ErrorPage(HttpStatus.INTERNAL_SERVER_ERROR, RETURN_TO_DEFAULT_ERROR), // Map 500 errors
+                        new ErrorPage(RETURN_TO_DEFAULT_ERROR) // Map all other errors
+                );
     }
 }

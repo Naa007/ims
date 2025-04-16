@@ -1,11 +1,27 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Error</title>
-</head>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<!-- Head -->
+<head th:replace="fragments/head :: head"><title>ERROR</title></head>
 <body>
-<h1 th:text="${errorTitle}">An Error Occurred</h1>
-<p th:text="${errorMessage}">Something went wrong.</p>
-<a th:href="@{/}">Return to Home</a>
+<!-- Header -->
+<header th:replace="fragments/header :: header"></header>
+<!-- Main Content -->
+<main>
+<br/>
+    <div class="error-message"
+         style="text-align: center; font-family: Arial, sans-serif; color: #333; margin: 50px auto; max-width: 600px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); background-color: #f9f9f9;">
+        <h1 th:text="${errorTitle}" class="error-title" style="font-size: 24px; color: #e63946; margin-bottom: 15px;">An
+            Error Occurred</h1>
+        <p th:text="${errorMessage}" class="error-description"
+           style="font-size: 16px; color: #555; line-height: 1.5; margin-bottom: 20px;">Something went wrong.</p>
+        <p style="font-size: 14px; color: #444;">
+            If the issue persists, please contact the administrator or <a th:href="@{/}"
+                                                                          style="color: #1d3557; text-decoration: underline;">log
+            in</a> again.
+        </p>
+    </div>
+</main>
+<!-- Footer -->
+<footer th:replace="fragments/footer :: footer"></footer>
 </body>
 </html>
