@@ -19,8 +19,12 @@ public class UIRoutingConstants {
     public static final String REDIRECT_TO_INSPECTOR_FORM = "inspectors/inspector-form";
     public static final String REDIRECT_TO_INSPECTOR_VIEW = "inspectors/inspector-view";
 
-    // PQR Managemet
+    // PQR Management
     public static final String RETURN_TO_PQR_FORM = "pqr/pqr-form";
+
+    // Contract Review Management
+    public static final String RETURN_TO_CONTRACT_REVIEW_FORM = "contract-review/contract-review-form";
+
 
     // Inspection Management
     public static final String RETURN_TO_INSPECTION_FORM = "inspections/inspection-form";

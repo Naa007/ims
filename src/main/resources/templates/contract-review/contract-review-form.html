@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<!-- Head -->
+<head th:replace="fragments/head :: head"><title>Inspection Contract Review Add/Edit</title></head>
+<body>
+
+
+<!-- Main Content -->
+<main>
+    <div class="form-card">
+        <div id="successMessage" class="alert alert-success" style="display: none;" th:text="${successMessage}">
+        </div>
+        <div class="form-header">
+            <h1 class="form-title">Add Inspection Contract Review</h1>
+            <p class="form-subtitle">Please fill out the Contract Review information of the inspection</p>
+        </div>
+
+
+        <form th:action="@{/contractReview/update}" th:object="${contractReview}" method="post"
+              class="needs-validation"
+              novalidate>
+
+            <!-- inspection id -->
+            <input type="hidden" th:field="*{inspectionId}" id="inspectionId"/>
+            <!-- contract review id -->
+            <input type="hidden" th:field="*{id}" id="id"/>
+
+            <!-- Client/Project Documents -->
+            <h4 class="section-header">
+                <i class="fas fa-briefcase me-2"></i> Client/Project Documents
+            </h4>
+
+            <div>
+                <!-- Contract Documents -->
+                <div>
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>Document Description</th>
+                            <th>Status</th>
+                            <th>Special Remarks</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="contractDocument, iterStat : ${contractReview.contractDocumentList}">
+                            <input type="hidden" th:field="*{contractDocumentList[__${iterStat.index}__].id}"
+                            <!-- Document Description -->
+                            <td>
+                                <input type="text"
+                                       th:field="*{contractDocumentList[__${iterStat.index}__].documentDescription}"
+                                       readonly/>
+                            </td>
+
+                            <!-- Status -->
+                            <td>
+                                <div>
+                                    <div th:each="statusType : ${T(com.stepup.ims.model.ContractDocument.DocumentStatusTypes).values()}">
+                                        <label> <input type="radio"
+                                                       th:field="*{contractDocumentList[__${iterStat.index}__].status}"
+                                                       th:value="${statusType}"
+                                                       th:checked="*{contractDocumentList[__${iterStat.index}__].status} == ${statusType}"/>
+                                            <span style="font-weight: normal;" th:text="${statusType.getName()}"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- Special Remarks -->
+                            <td>
+                                <textarea th:field="*{contractDocumentList[__${iterStat.index}__].specialRemarks}"
+                                          class="form-control"></textarea>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div><br/>
+            
+            <!-- Submission List -->
+            <h4 class="section-header">
+                <i class="fas fa-file-alt me-2"></i> Submission List
+            </h4>
+         
+            <div>
+                <!-- submissionList  -->
+                <div class="form-group">
+                    <label for="submissionList">Submission List</label>
+                    <textarea th:field="*{submissionList}" id="submissionList" class="form-control"
+                              placeholder="Enter Submission List"></textarea>
+                </div>
+            </div>
+
+
+            <!-- Conclusion -->
+            <h4 class="section-header">
+                <i class="fas fa-check-circle me-2"></i> Conclusion
+            </h4>
+
+            <div>
+                <div class="form-group">
+                    <label for="conclusion">Conclusion</label>
+                    <textarea th:field="*{conclusion}" id="conclusion" class="form-control"
+                              placeholder="Enter your conclusion here"></textarea>
+                </div>
+            </div>
+
+            <div class="text-end mt-3">
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="button" class="btn btn-primary" onclick="window.close()">Close</button>
+            </div>
+        </form>
+    </div>
+</main>
+
+</body>
+</html>

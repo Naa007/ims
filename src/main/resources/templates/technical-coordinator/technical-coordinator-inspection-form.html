@@ -16,121 +16,121 @@
             <form th:object="${inspection}" method="post" class="needs-validation">
                 <input type="hidden" th:field="*{id}" id="id" />
 
-            <!-- notification details -->
-            <h4 class="section-header">
-                <i class="fas fa-bell me-2"></i> Notification Details
-            </h4>
-
-            <div class="info-section">
-
-                <!-- Notification No -->
-                <div class="info-item">
-                    <i class="fas fa-envelope"></i>
-                    <div class="info-content">
-                        <div class="info-label">Notification No</div>
-                        <div class="info-value" th:text="${inspection.notificationNo}"></div>
+                <!-- notification details -->
+                <h4 class="section-header">
+                    <i class="fas fa-bell me-2"></i> Notification Details
+                </h4>
+    
+                <div class="info-section">
+    
+                    <!-- Notification No -->
+                    <div class="info-item">
+                        <i class="fas fa-envelope"></i>
+                        <div class="info-content">
+                            <div class="info-label">Notification No</div>
+                            <div class="info-value" th:text="${inspection.notificationNo}"></div>
+                        </div>
                     </div>
-                </div>
-
-                <!-- Notification Received Date and Time -->
-                <div class="info-item">
-                    <i class="fas fa-clock"></i>
-                    <div class="info-content">
-                        <div class="info-label">Notification Received Date & Time</div>
-                        <div class="info-value" th:text="${inspection.notificationReceivedDateTime}"></div>
+    
+                    <!-- Notification Received Date and Time -->
+                    <div class="info-item">
+                        <i class="fas fa-clock"></i>
+                        <div class="info-content">
+                            <div class="info-label">Notification Received Date & Time</div>
+                            <div class="info-value" th:text="${inspection.notificationReceivedDateTime}"></div>
+                        </div>
                     </div>
-                </div>
-
-                <!-- Client Name -->
-                <div class="info-item">
-                    <i class="fas fa-user"></i>
-                    <div class="info-content">
-                        <div class="info-label">Client Name</div>
-                        <div class="info-value" th:text="${inspection.client.clientName+ ' - ' + inspection.client.country}"></div>
+    
+                    <!-- Client Name -->
+                    <div class="info-item">
+                        <i class="fas fa-user"></i>
+                        <div class="info-content">
+                            <div class="info-label">Client Name</div>
+                            <div class="info-value" th:text="${inspection.client.clientName+ ' - ' + inspection.client.country}"></div>
+                        </div>
                     </div>
+    
                 </div>
-
-            </div>
-
-            <!-- inspection details -->
-            <h4 class="section-header">
-                <i class="fas fa-address-card"></i> Inspection Details
-            </h4>
-
-            <div class="info-section">
-
-                <!-- Inspection Country -->
-                <div class="info-item">
-                    <i class="fas fa-globe"></i>
-                    <div class="info-content">
-                        <div class="info-label">Inspection Country</div>
-                        <div class="info-value" th:text="${inspection.inspectionCountry}"></div>
+    
+                <!-- inspection details -->
+                <h4 class="section-header">
+                    <i class="fas fa-address-card"></i> Inspection Details
+                </h4>
+    
+                <div class="info-section">
+    
+                    <!-- Inspection Country -->
+                    <div class="info-item">
+                        <i class="fas fa-globe"></i>
+                        <div class="info-content">
+                            <div class="info-label">Inspection Country</div>
+                            <div class="info-value" th:text="${inspection.inspectionCountry}"></div>
+                        </div>
                     </div>
-                </div>
-
-                <!-- Inspection Dates -->
-                <div class="info-item">
-                    <i class="fas fa-calendar-alt"></i>
-                    <div class="info-content">
-                        <div class="info-label">Inspection Dates</div>
-                        <ul class="list-unstyled">
-                            <li th:each="date : ${inspection.inspectionDateAsPerNotification}" th:text="${date}"
-                                class="info-value"></li>
-                        </ul>
+    
+                    <!-- Inspection Dates -->
+                    <div class="info-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <div class="info-content">
+                            <div class="info-label">Inspection Dates</div>
+                            <ul class="list-unstyled">
+                                <li th:each="date : ${inspection.inspectionDateAsPerNotification}" th:text="${date}"
+                                    class="info-value"></li>
+                            </ul>
+                        </div>
                     </div>
-                </div>
-
-                <!-- Inspection Item -->
-                <div class="info-item">
-                    <i class="fas fa-box"></i>
-                    <div class="info-content">
-                        <div class="info-label">Inspection Item</div>
-                        <div class="info-value" th:text="${inspection.inspectionItem}"></div>
+    
+                    <!-- Inspection Item -->
+                    <div class="info-item">
+                        <i class="fas fa-box"></i>
+                        <div class="info-content">
+                            <div class="info-label">Inspection Item</div>
+                            <div class="info-value" th:text="${inspection.inspectionItem}"></div>
+                        </div>
                     </div>
-                </div>
-
-                <!-- Inspection Type -->
-                <div class="info-item">
-                    <i class="fas fa-list-alt"></i>
-                    <div class="info-content">
-                        <div class="info-label">Inspection Type</div>
-                        <ul class="list-unstyled">
-                            <li th:each="type : ${inspection.inspectionType}" th:text="${type}" class="info-value"></li>
-                        </ul>
+    
+                    <!-- Inspection Type -->
+                    <div class="info-item">
+                        <i class="fas fa-list-alt"></i>
+                        <div class="info-content">
+                            <div class="info-label">Inspection Type</div>
+                            <ul class="list-unstyled">
+                                <li th:each="type : ${inspection.inspectionType}" th:text="${type}" class="info-value"></li>
+                            </ul>
+                        </div>
                     </div>
-                </div>
-
-                <!-- Inspection Stages -->
-                <div class="info-item">
-                    <i class="fas fa-tasks"></i>
-                    <div class="info-content">
-                        <div class="info-label">Inspection Stages</div>
-                        <p id="inspectionActivityWithStages" th:text="${inspection.inspectionActivityWithStages}"
-                           class="info-value"></p>
+    
+                    <!-- Inspection Stages -->
+                    <div class="info-item">
+                        <i class="fas fa-tasks"></i>
+                        <div class="info-content">
+                            <div class="info-label">Inspection Stages</div>
+                            <p id="inspectionActivityWithStages" th:text="${inspection.inspectionActivityWithStages}"
+                               class="info-value"></p>
+                        </div>
                     </div>
-                </div>
-
-                <!-- Inspection Location Details -->
-                <div class="info-item">
-                    <i class="fas fa-map-marker"></i>
-                    <div class="info-content">
-                        <div class="info-label">Inspection Location Details</div>
-                        <p id="inspectionLocationDetails" th:text="${inspection.inspectionLocationDetails}"
-                           class="info-value"></p>
+    
+                    <!-- Inspection Location Details -->
+                    <div class="info-item">
+                        <i class="fas fa-map-marker"></i>
+                        <div class="info-content">
+                            <div class="info-label">Inspection Location Details</div>
+                            <p id="inspectionLocationDetails" th:text="${inspection.inspectionLocationDetails}"
+                               class="info-value"></p>
+                        </div>
                     </div>
+    
                 </div>
-
-            </div>
-
-            <!-- inspector details -->
-            <h4 class="section-header">
-                <i class="fas fa-users"></i> Inspector Details
-            </h4>
-
-            <div class="table-responsive">
-
-                <table class="table table-bordered table-striped" id="proposedCVsTable">
-                    <thead>
+    
+                <!-- inspector details -->
+                <h4 class="section-header" th:if="${inspection.inspectionStatus.ordinal > 1}">
+                    <i class="fas fa-users"></i> Inspector Details
+                </h4>
+    
+                <div class="table-responsive" th:if="${inspection.inspectionStatus.ordinal > 1}">
+    
+                    <table class="table table-bordered table-striped" id="proposedCVsTable">
+                        <thead>
                         <tr class="text-center">
                             <th>Inspector Name</th>
                             <th>CV Available</th>
@@ -138,64 +138,158 @@
                             <th>PQR Available</th>
                             <th>ADD or Review PQR</th>
                         </tr>
-                    </thead>
-                    <tbody>
+                        </thead>
+                        <tbody>
                         <tr th:each="cv, iterStat : ${inspection.proposedCVs}">
-                        <input type="hidden" th:field="*{proposedCVs[__${iterStat.index}__].id}" th:value="${cv.id}"/>
-                        <td>
-                            <select class="form-select form-select-sm"
-                                    th:field="*{proposedCVs[__${iterStat.index}__].inspector.inspectorId}"
-                                    disabled>
-                                <option th:value="${cv.inspector.inspectorId}"
-                                        th:text="${cv.inspector.inspectorName}"></option>
-                            </select>
-                        </td>
-                        <td class="text-center">
-                            <div class="d-flex justify-content-center align-items-center">
+                            <input type="hidden" th:field="*{proposedCVs[__${iterStat.index}__].id}"
+                                   th:value="${cv.id}"/>
+                            <td>
                                 <select class="form-select form-select-sm"
-                                        th:name="proposedCVs[__${iterStat.index}__].cvCertificatesAvailable"
+                                        th:field="*{proposedCVs[__${iterStat.index}__].inspector.inspectorId}"
                                         disabled>
-                                    <option value="true" th:selected="${cv.cvCertificatesAvailable == true}">
-                                        Yes
-                                    </option>
-                                    <option value="false" th:selected="${cv.cvCertificatesAvailable == false}">
-                                        No
-                                    </option>
+                                    <option th:value="${cv.inspector.inspectorId}"
+                                            th:text="${cv.inspector.inspectorName}"></option>
                                 </select>
-                            </div>
-
-                        </td>
-                        <td>
-                            <select class="form-select form-select-sm"
-                                    th:field="*{proposedCVs[__${iterStat.index}__].cvReviewByTechnicalCoordinator.empId}"
-                                    disabled>
-                                <option th:value="${cv.cvReviewByTechnicalCoordinator.empId}"
-                                        th:text="${cv.cvReviewByTechnicalCoordinator.empName}"></option>
-                            </select>
-                        </td>
-                        <td class="text-center">
-                            <div class="d-flex justify-content-center align-items-center">
-                                <select class="form-select form-select-sm" th:name="proposedCVs[__${iterStat.index}__].pqrAvailable"
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <select class="form-select form-select-sm"
+                                            th:name="proposedCVs[__${iterStat.index}__].cvCertificatesAvailable"
+                                            disabled>
+                                        <option value="true" th:selected="${cv.cvCertificatesAvailable == true}">
+                                            Yes
+                                        </option>
+                                        <option value="false" th:selected="${cv.cvCertificatesAvailable == false}">
+                                            No
+                                        </option>
+                                    </select>
+                                </div>
+    
+                            </td>
+                            <td>
+                                <select class="form-select form-select-sm"
+                                        th:field="*{proposedCVs[__${iterStat.index}__].cvReviewByTechnicalCoordinator.empId}"
                                         disabled>
-                                    <option value="" disabled selected>Select</option>
-                                    <option value="true" th:selected="${cv.pqrAvailable == true}">Yes</option>
-                                    <option value="false" th:selected="${cv.pqrAvailable == false}">No</option>
+                                    <option th:value="${cv.cvReviewByTechnicalCoordinator.empId}"
+                                            th:text="${cv.cvReviewByTechnicalCoordinator.empName}"></option>
                                 </select>
-                            </div>
-                        </td>
-                    <td>
-                        <div class="d-flex justify-content-end">
-                            <button type="button" class="btn btn-sm btn-primary me-2"
-                                    onclick="editPQRForm(this.closest('tr').querySelector('td select').value)">
-                                <i class="fas fa-edit"></i> Manage PQR
-                            </button>
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <select class="form-select form-select-sm"
+                                            th:name="proposedCVs[__${iterStat.index}__].pqrAvailable"
+                                            disabled>
+                                        <option value="" disabled selected>Select</option>
+                                        <option value="true" th:selected="${cv.pqrAvailable == true}">Yes</option>
+                                        <option value="false" th:selected="${cv.pqrAvailable == false}">No</option>
+                                    </select>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-sm btn-primary me-2"
+                                            onclick="editPQRForm(this.closest('tr').querySelector('td select').value)">
+                                        <i class="fas fa-edit"></i> Manage PQR
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+    
+                </div>
+    
+                <!-- Inspection process -->
+                <h4 class="section-header" th:if="${inspection.inspectionStatus.ordinal > 5}">
+                    <i class="fas fa-cogs process-icon"></i> Inspection Process
+                </h4>
+                
+                <div class="info-section" th:if="${inspection.inspectionStatus.ordinal > 5}">
+                    <!-- Approved Inspector Name -->
+                    <div class="info-item">
+                        <i class="fas fa-user"></i>
+                        <div class="info-content">
+                            <div class="info-label">Approved Inspector Name</div>
+                            <div class="info-value" th:text="${inspection.approvedInspectorName}"></div>
                         </div>
-                     </td>
-                    </tr>
-                    </tbody>
-                </table>
+                    </div>
 
-            </div>
+                    <!-- Order Confirmation Date -->
+                    <div class="info-item">
+                        <i class="fas fa-calendar-check"></i>
+                        <div class="info-content">
+                            <div class="info-label">Date of Order Confirmation</div>
+                            <div class="info-value" th:text="${inspection.orderConfirmationDate}"></div>
+                        </div>
+                    </div>
+
+                    <!-- Sector Scope -->
+                    <div class="info-item">
+                        <i class="fas fa-industry"></i>
+                        <div class="info-content">
+                            <div class="info-label">Scope Sector</div>
+                            <div class="info-value" th:text="${inspection.sectorScope}"></div>
+                        </div>
+                    </div>
+
+                    <!-- End Client Name -->
+                    <div class="info-item">
+                        <i class="fas fa-user-tie"></i>
+                        <div class="info-content">
+                            <div class="info-label">End Client Name</div>
+                            <div class="info-value" th:text="${inspection.endClientName}"></div>
+                        </div>
+                    </div>
+
+                    <!-- Project Name -->
+                    <div class="info-item">
+                        <i class="fas fa-project-diagram"></i>
+                        <div class="info-content">
+                            <div class="info-label">Project Name</div>
+                            <div class="info-value" th:text="${inspection.projectName}"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Documentation process -->
+                <h4 class="section-header" th:if="${inspection.inspectionStatus.ordinal > 5}">
+                    <i class="fas fa-cogs process-icon"></i> Inspection Process
+                </h4>
+
+                <div class="info-section" th:if="${inspection.inspectionStatus.ordinal > 5}">
+                    <!-- Reference Documents for Inspection Status -->
+                    <div class="info-item">
+                        <i class="fas fa-file"></i>
+                        <div class="info-content">
+                            <div class="info-label">Reference Documents</div>
+                            <div class="info-value"
+                                 th:text="${inspection.referenceDocumentsForInspectionStatus == true ? 'Available' : 'Not Available'}"></div>
+                        </div>
+                    </div>
+
+                    <!-- Documents Reviewed By Technical Coordinator -->
+                    <div class="info-item">
+                        <i class="fas fa-user-check"></i>
+                        <div class="info-content">
+                            <div class="info-label">Documents Reviewed By Technical Coordinator</div>
+                            <div class="info-value" th:text="${inspection.documentsReviewedByTechnicalCoordinator}"></div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-column align-items-end">
+                        <button type="button" class="btn btn-sm btn-primary w-100"
+                                th:onclick="|prepareContractReview(${inspection.id})|">
+                            <i class="fas fa-edit"></i> Prepare Contract
+                        </button>
+
+                        <button type="button" class="btn btn-sm btn-primary w-100"
+                                th:onclick="|prepareAdviseNote(${inspection.id})|">
+                            <i class="fas fa-edit"></i> Prepare Advise
+                        </button>
+                    </div>
+                </div>
+
+                
             </form>
         </div>
     </div>

@@ -98,7 +98,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     /** ================= Map Initialization Section ================= **/
 
-    const locationDetails = document.getElementById('inspectionLocationDetails');
+    const locationDetails = document.getElementById('inspectionLocationDetailsId');
     if (locationDetails) {
         const locationDetailsValue = locationDetails.value;
         initMap(locationDetailsValue ? locationDetailsValue : 'Hyderabad, India');
@@ -106,11 +106,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     /** ================= Date Picker Initialization ================= **/
 
-   flatpickr("#inspectionDateAsPerNotification", {
-        mode: "multiple",
-        dateFormat: "d/m/Y",
-        defaultDate: document.getElementById("inspectionDateAsPerNotification").value.split(",") // Prepopulate default dates
-    });
+    if (document.getElementById('inspectionDateAsPerNotification')) {
+        flatpickr("#inspectionDateAsPerNotification", {
+            mode: "multiple",
+            dateFormat: "d/m/Y",
+            defaultDate: document.getElementById("inspectionDateAsPerNotification").value.split(",") // Prepopulate default dates
+        });
+    }
 
 });
 
@@ -352,7 +354,18 @@ function redirectToTechnicalCoordinatorEditInspection(inspectionId) {
  };
 }
 
-/** ================== PQR =================== **/
+/** =================== Contract Review ================= **/
+
+function prepareContractReview(inspectionId) {
+  const url = `/contractReview/edit/` + inspectionId;
+  const width = screen.width * 0.9;
+  const height = screen.height * 0.9;
+  const left = (screen.width - width) / 2;
+  const top = (screen.height - height) / 2;
+  window.open(url, '_blank', `width=${width},height=${height},left=${left},top=${top}`);
+ }
+
+/** ====================== PQR ========================== **/
 
 function editPQRForm(inspectorId) {
  const url = `/pqr/edit/` + inspectorId;

@@ -33,7 +33,6 @@
                 </tr>
                 </thead>
                 <tbody>
-                <!-- Assuming inspections data comes from backend -->
                 <tr th:each="inspection : ${inspections}">
                     <td th:text="${inspection.notificationNo}" class="text-sm"></td>
                     <td th:text="${inspection.client.clientName + ' - ' + inspection.client.country}"

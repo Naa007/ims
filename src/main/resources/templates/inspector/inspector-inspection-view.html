@@ -74,10 +74,15 @@
                     <i class="fas fa-calendar-alt"></i>
                     <div class="info-content">
                         <div class="info-label">Inspection Dates</div>
-                        <ul class="list-unstyled">
-                            <li th:each="date : ${inspection.inspectionDateAsPerNotification}" th:text="${date}"
-                                class="info-value"></li>
+                        <ul class="list-unstyled d-inline">
+                            <li th:each="date, iterStat : ${inspection.inspectionDateAsPerNotification}"
+                                th:text="${iterStat.index < 2 ? date : ''}"
+                                th:classappend="${iterStat.index > 1 ? 'd-none' : ''}"></li>
+
                         </ul>
+                        <i th:if="${inspection.inspectionDateAsPerNotification.size() > 2}"
+                           class="fas fa-info-circle d-inline text-muted ml-1"
+                           th:attr="title=${inspection.inspectionDateAsPerNotification}"></i>
                     </div>
                 </div>
 

@@ -30,7 +30,17 @@
                 <tr th:each="inspection : ${inspections}">
                     <td th:text="${inspection.inspectionNo}"></td>
                     <td th:text="${inspection.client.clientName + ' - ' + inspection.client.country}"></td>
-                    <td th:text="${inspection.inspectionDateAsPerNotification}"></td>
+                    <td>
+                        <ul class="list-unstyled d-inline">
+                            <i th:if="${inspection.inspectionDateAsPerNotification.size() > 2}"
+                               class="fas fa-info-circle d-inline text-muted ml-1"
+                               th:attr="title=${inspection.inspectionDateAsPerNotification}"></i>
+                            <li th:each="date, iterStat : ${inspection.inspectionDateAsPerNotification}"
+                                th:text="${iterStat.index < 2 ? date : ''}"
+                                th:classappend="${iterStat.index > 1 ? 'd-none' : ''}"></li>
+
+                        </ul>
+                    </td>
                     <td th:text="${inspection.inspectionItem}"></td>
                     <td th:text="${inspection.inspectionStatus.description}"></td>
                     <td>

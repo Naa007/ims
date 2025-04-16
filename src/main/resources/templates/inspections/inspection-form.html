@@ -151,10 +151,10 @@
 
                     <!-- Inspection Location Details -->
                     <div>
-                        <label for="inspectionLocationDetails" class="form-label required-field">Inspection Location Details</label>
+                        <label for="inspectionLocationDetailsId" class="form-label required-field">Inspection Location Details</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-location-pin"></i></span>
-                            <textarea id="inspectionLocationDetails" th:field="*{inspectionLocationDetails}"
+                            <textarea id="inspectionLocationDetailsId" th:field="*{inspectionLocationDetails}"
                                       class="form-control" rows="3"
                                       onchange="initMap(this.value); showMapLoadingMessage();" required></textarea>
                         </div>
@@ -242,8 +242,8 @@
                                                 th:name="proposedCVs[__${iterStat.index}__].cvStatus"
                                                 th:onchange="'approvedInspector(' + ${iterStat.index} + ', this.value === \'true\')'">
                                             <option value="" disabled selected>Select</option> <!-- Placeholder -->
-                                            <option value="true" th:selected="${cv.cvStatus == true}">Yes</option>
-                                            <option value="false" th:selected="${cv.cvStatus == false}">No</option>
+                                            <option value="true" th:selected="${cv.cvStatus == true}">Approved</option>
+                                            <option value="false" th:selected="${cv.cvStatus == false}">Not Approved</option>
                                         </select>
                                     </div>
                                 </td>
@@ -292,7 +292,7 @@
 
                 <!--- Sector Scope -->
                 <div class="col-md-6">
-                    <label for="sectorScope" class="form-label">Sector Scope</label>
+                    <label for="sectorScope" class="form-label">Scope Sector</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-industry"></i></span>
                         <input type="text" id="sectorScope" th:field="*{sectorScope}" class="form-control" />

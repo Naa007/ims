@@ -1,6 +1,7 @@
 package com.stepup.ims.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.stepup.ims.entity.ContractReview;
 import com.stepup.ims.utils.DataUtils;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -83,6 +84,8 @@ public class Inspection {
     private boolean impartialityAndConfidentiality;
 
     private String jobFolderLink;
+
+    private ContractReview contractReview;
 
     private InspectionStatusType inspectionStatus;
 
