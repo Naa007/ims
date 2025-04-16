@@ -33,7 +33,7 @@ public class SecurityConfig {
                         .requestMatchers(COORDINATOR_ACCESS).hasAnyRole(COORDINATOR)
                         .requestMatchers(TECHNICAL_COORDINATOR_ACCESS).hasAnyRole(TECHNICAL_COORDINATOR)
                         .requestMatchers(INSPECTOR_ACCESS).hasAnyRole(INSPECTOR)
-                        .requestMatchers(EMPLOYEE_ACCESS).hasAnyRole(ADMIN, BUSINESS, COORDINATOR, TECHNICAL_COORDINATOR, INSPECTOR)
+                        .requestMatchers(EMPLOYEE_ACCESS).hasAnyRole(ADMIN)
                         .anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(form -> form
