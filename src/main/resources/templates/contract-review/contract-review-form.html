@@ -4,7 +4,6 @@
 <head th:replace="fragments/head :: head"><title>Inspection Contract Review Add/Edit</title></head>
 <body>
 
-
 <!-- Main Content -->
 <main>
     <div class="form-card">
@@ -43,7 +42,8 @@
                         </thead>
                         <tbody>
                         <tr th:each="contractDocument, iterStat : ${contractReview.contractDocumentList}">
-                            <input type="hidden" th:field="*{contractDocumentList[__${iterStat.index}__].id}"
+                            <input type="hidden" th:field="*{contractDocumentList[__${iterStat.index}__].id}">
+
                             <!-- Document Description -->
                             <td>
                                 <input type="text"

@@ -25,6 +25,8 @@ public class UIRoutingConstants {
     // Contract Review Management
     public static final String RETURN_TO_CONTRACT_REVIEW_FORM = "contract-review/contract-review-form";
 
+    // Inspection Advise
+    public static final String RETURN_TO_INSPECTION_ADVISE_FORM = "inspection-advise/inspection-advise-form";
 
     // Inspection Management
     public static final String RETURN_TO_INSPECTION_FORM = "inspections/inspection-form";

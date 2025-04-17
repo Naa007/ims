@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<!-- Head -->
+<head th:replace="fragments/head :: head"><title>Inspection Advice Note Add/Edit</title></head>
+<body>
+
+<!-- Main Content -->
+<main>
+    <div class="form-card">
+        <div id="successMessage" class="alert alert-success" style="display: none;" th:text="${successMessage}">
+        </div>
+        <div class="form-header">
+            <h1 class="form-title">Add/Edit Inspection Advice Note</h1>
+            <p class="form-subtitle">Please fill out the Advice Note of the inspection</p>
+        </div>
+
+
+        <form th:action="@{/inspectionAdvise/update}" th:object="${inspectionAdvise}" method="post"
+              class="needs-validation"
+              novalidate>
+
+            <!-- inspection id -->
+            <input type="hidden" th:field="*{inspectionId}" id="inspectionId"/>
+            <!-- inspection advise id -->
+            <input type="hidden" th:field="*{id}" id="id"/>
+
+            <!-- Scope of Inspection -->
+            <h4 class="section-header">
+                <i class="fas fa-sitemap me-2"></i> Scope of Inspection
+            </h4>
+
+            <div>
+                <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>Scopes</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="scopeOfInspection, iterStat : ${inspectionAdvise.scopeOfInspectionList}">
+                            <input type="hidden" th:field="*{scopeOfInspectionList[__${iterStat.index}__].id}"/>
+                            <!-- scopes -->
+                            <td>
+                                <span th:text="*{scopeOfInspectionList[__${iterStat.index}__].scopeOfInspection.name}"></span>
+                                <input type="hidden"
+                                       th:field="*{scopeOfInspectionList[__${iterStat.index}__].scopeOfInspection}"/>
+                            </td>
+
+                            <!-- Status -->
+                            <td>
+                                <div>
+                                    <div th:each="statusType : ${T(com.stepup.ims.model.ScopeOfInspection.DocumentStatusTypes).values()}">
+                                        <label> <input type="radio"
+                                                       th:field="*{scopeOfInspectionList[__${iterStat.index}__].status}"
+                                                       th:value="${statusType}"
+                                                       th:checked="*{scopeOfInspectionList[__${iterStat.index}__].status} == ${statusType}"/>
+                                            <span style="font-weight: normal;" th:text="${statusType.getName()}"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </td>
+
+                        </tr>
+                        </tbody>
+                    </table>
+            </div><br/>
+            
+            <!-- Scope of Inspection -->
+            <h4 class="section-header">
+                <i class="fas fa-sitemap me-2"></i> Client Instructions to Inspector
+            </h4>
+
+            <div>
+                <!-- Requirement & Reporting Format -->
+                <div>
+                    <!-- Requirement  -->
+                    <div class="form-group">
+                        <label for="requirement">Requirement</label>
+                        <textarea th:field="*{requirement}" id="requirement" class="form-control"
+                                  placeholder="Enter Requirement"></textarea>
+                    </div>
+                    <!-- Reporting Format  -->
+                    <div class="form-group">
+                        <div class="form-group">
+                            <label for="reportingFormat">Reporting Format</label>
+                            <div id="reportingFormat">
+                                <div th:each="reportFormat : ${T(com.stepup.ims.model.InspectionAdvise.ReportingFormats).values()}">
+                                    <label style="font-weight: normal;">
+                                        <input type="radio" th:field="*{reportingFormat}" th:value="${reportFormat}"/>
+                                        <span th:text="${reportFormat}"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Client Instruction To Inspector-->
+                <div>
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>Instructions</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="clientInstruction, iterStat : ${inspectionAdvise.clientInstructionToInspectorList}">
+                            <input type="hidden"
+                                   th:field="*{clientInstructionToInspectorList[__${iterStat.index}__].id}"/>
+                            <!-- Instructions -->
+                            <td>
+                                <span th:text="*{clientInstructionToInspectorList[__${iterStat.index}__].clientInstruction.name}"></span>
+                                <input type="hidden"
+                                       th:field="*{clientInstructionToInspectorList[__${iterStat.index}__].clientInstruction}"/>
+                            </td>
+
+                            <!-- Status -->
+                            <td>
+                                <div>
+                                    <div th:each="statusType : ${T(com.stepup.ims.model.ClientInstructionToInspector.DocumentStatusTypes).values()}">
+                                        <label>
+                                            <input type="radio"
+                                                   th:field="*{clientInstructionToInspectorList[__${iterStat.index}__].status}"
+                                                   th:value="${statusType}"
+                                                   th:checked="*{clientInstructionToInspectorList[__${iterStat.index}__].status} == ${statusType}"/>
+                                            <span style="font-weight: normal;" th:text="${statusType.getName()}"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div><br/>
+            
+            <!-- Instructions From Technical Team -->
+            <h4 class="section-header">
+                <i class="fas fa-check-circle me-2"></i> Instructions from Technical Team
+            </h4>
+
+            <div>
+                <div class="form-group">
+                    <label for="instructionsFromTechnicalTeam">Instructions</label>
+                    <textarea th:field="*{instructionsFromTechnicalTeam}" id="instructionsFromTechnicalTeam"
+                              class="form-control"
+                              placeholder="Enter instructions from the technical team"></textarea>
+                </div>
+            </div><br/>
+
+            <!-- Ackowledge From Inspector -->
+            <h4 class="section-header">
+                <i class="fas fa-check-circle me-2"></i> Acknowledge From Inspector
+            </h4>
+
+            <div>
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Scopes</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="acknowledgement, iterStat : ${inspectionAdvise.acknowledgeFromInspectorList}">
+                        <input type="hidden" th:field="*{acknowledgeFromInspectorList[__${iterStat.index}__].id}"/>
+                        <!-- scopes -->
+                        <td>
+                            <span th:text="*{acknowledgeFromInspectorList[__${iterStat.index}__].acknowledgement.name}"></span>
+                            <input type="hidden"
+                                   th:field="*{acknowledgeFromInspectorList[__${iterStat.index}__].acknowledgement}"/>
+                        </td>
+
+                        <!-- Status -->
+                        <td>
+                            <div>
+                                <div th:each="statusType : ${T(com.stepup.ims.model.AcknowledgeFromInspector.DocumentStatusTypes).values()}">
+                                    <label> <input type="radio"
+                                                   th:field="*{acknowledgeFromInspectorList[__${iterStat.index}__].status}"
+                                                   th:value="${statusType}"
+                                                   th:checked="*{acknowledgeFromInspectorList[__${iterStat.index}__].status} == ${statusType}"/>
+                                        <span style="font-weight: normal;" th:text="${statusType.getName()}"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </td>
+
+                    </tr>
+                    </tbody>
+                </table>
+            </div><br/>
+            
+            <div class="text-end mt-3">
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="button" class="btn btn-primary" onclick="window.close()">Close</button>
+            </div>
+        </form>
+    </div>
+</main>
+
+</body>
+</html>

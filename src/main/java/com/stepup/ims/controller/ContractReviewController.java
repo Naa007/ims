@@ -17,9 +17,9 @@ public class ContractReviewController {
     @Autowired
     ContractReviewService contractReviewService;
 
-    @GetMapping("/edit/{inspectorId}")
-    public String editContractReviewForm(Model model, @PathVariable Long inspectorId) {
-        Inspection inspection = contractReviewService.getContractReviewByInspectionId(inspectorId);
+    @GetMapping("/edit/{inspectionId}")
+    public String editContractReviewForm(Model model, @PathVariable Long inspectionId) {
+        Inspection inspection = contractReviewService.getContractReviewByInspectionId(inspectionId);
         model.addAttribute("inspection", inspection);
         model.addAttribute("contractReview", inspection.getContractReview());
         return RETURN_TO_CONTRACT_REVIEW_FORM;

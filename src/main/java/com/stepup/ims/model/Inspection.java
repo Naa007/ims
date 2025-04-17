@@ -87,6 +87,8 @@ public class Inspection {
 
     private ContractReview contractReview;
 
+    private InspectionAdvise inspectionAdvise;
+
     private InspectionStatusType inspectionStatus;
 
     @JsonIgnore

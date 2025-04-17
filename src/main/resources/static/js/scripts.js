@@ -365,6 +365,16 @@ function prepareContractReview(inspectionId) {
   window.open(url, '_blank', `width=${width},height=${height},left=${left},top=${top}`);
  }
 
+/** =================== Inspection Advise ================= **/
+
+function prepareInspectionAdvise(inspectionId) {
+  const url = `/inspectionAdvise/edit/` + inspectionId;
+  const width = screen.width * 0.9;
+  const height = screen.height * 0.9;
+  const left = (screen.width - width) / 2;
+  const top = (screen.height - height) / 2;
+  window.open(url, '_blank', `width=${width},height=${height},left=${left},top=${top}`);
+ }
 /** ====================== PQR ========================== **/
 
 function editPQRForm(inspectorId) {

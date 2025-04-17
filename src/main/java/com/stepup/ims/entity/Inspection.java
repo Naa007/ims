@@ -129,6 +129,10 @@ public class Inspection extends Auditable {
     @JoinColumn(name = "contract_review_id")
     private ContractReview contractReview;
 
+    @OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval = true)
+    @JoinColumn(name = "inspection_advise_id")
+    private InspectionAdvise inspectionAdvise;
+
     @Column(name = "inspection_status", nullable = false)
     private InspectionStatusType inspectionStatus;
 
