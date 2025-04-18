@@ -5,8 +5,7 @@ import com.stepup.ims.service.EmployeeService;
 import com.stepup.ims.service.InspectorService;
 import com.stepup.ims.service.StatsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -76,6 +75,28 @@ public class BusinessRoleController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+    }
+
+    @GetMapping("/coordinator-report/{email}/{period}/pdf")
+    public ResponseEntity<byte[]> exportCoordinatorPdf(@PathVariable String email, @PathVariable String period) {
+        byte[] report = statsService.generateCoordinatorReport(email, period, "pdf");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(ContentDisposition.attachment().filename("coordinator-report.pdf").build());
+
+        return new ResponseEntity<>(report, headers, HttpStatus.OK);
+    }
+
+    @GetMapping("/coordinator-report/{email}/{period}/excel")
+    public ResponseEntity<byte[]> exportCoordinatorExcel(@PathVariable String email, @PathVariable String period) {
+        byte[] report = statsService.generateCoordinatorReport(email, period, "excel");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+        headers.setContentDisposition(ContentDisposition.attachment().filename("coordinator-report.xlsx").build());
+
+        return new ResponseEntity<>(report, headers, HttpStatus.OK);
     }
 
 }

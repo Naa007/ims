@@ -1,17 +1,31 @@
 package com.stepup.ims.service;
 
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.properties.UnitValue;
 import com.stepup.ims.entity.Inspection;
 import com.stepup.ims.model.BusinessStats;
 import com.stepup.ims.model.InpsectionStatsByRole;
 import com.stepup.ims.repository.InspectionRepository;
 import com.stepup.ims.repository.StatsRepository;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class StatsService {
@@ -158,5 +172,91 @@ public class StatsService {
 
 
         return new InpsectionStatsByRole(totalInspections, newInspections, completedInspections, ongoingInspections, rejectedInspections, InpsectionStatsByRole.PeriodType.valueOf(period.toUpperCase()));
+    }
+    public byte[] generateCoordinatorReport(String email, String period, String format) {
+        Map<String, Integer> stats = getStatsByEmailAndPeriod(email, period);
+
+        if ("pdf".equalsIgnoreCase(format)) {
+            return generateCoordinatorPdf(email, period, stats);
+        } else {
+            return generateCoordinatorExcel(email, period, stats);
+        }
+    }
+    private Map<String, Integer> getStatsByEmailAndPeriod(String createdBy, String period) {
+        List<Inspection> allInspections = inspectionRepository.findByCreatedBy(createdBy);
+
+        LocalDate now = LocalDate.now();
+        LocalDate startDate;
+        switch (period.toLowerCase()) {
+            case "week": startDate = now.minusDays(7); break;
+            case "month": startDate = now.minusDays(30); break;
+            case "quarter": startDate = now.minusMonths(3); break;
+            case "year": startDate = now.withDayOfYear(1); break;
+            default: startDate = now.minusDays(30); break;
+        }
+
+        return allInspections.stream()
+                .filter(i -> i.getOrderConfirmationDate() != null &&
+                        !i.getOrderConfirmationDate().isBefore(startDate))
+                .collect(Collectors.groupingBy(
+                        i -> i.getInspectionStatus().name(),
+                        Collectors.summingInt(i -> 1)
+                ));
+    }
+
+    private byte[] generateCoordinatorPdf(String email, String period, Map<String, Integer> stats) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        PdfWriter writer = new PdfWriter(out);
+        PdfDocument pdf = new PdfDocument(writer);
+        Document document = new Document(pdf);
+
+        document.add(new Paragraph("Coordinator Performance Report").setBold().setFontSize(18));
+        document.add(new Paragraph("Coordinator email: " + email));
+        document.add(new Paragraph("Period: " + period));
+        document.add(new Paragraph("\n"));
+
+        Table table = new Table(UnitValue.createPercentArray(2)).useAllAvailableWidth();
+        table.addHeaderCell("Inspection Status");
+        table.addHeaderCell("Count");
+
+        stats.forEach((status, count) -> {
+            table.addCell(status);
+            table.addCell(count.toString());
+        });
+
+        document.add(table);
+        document.close();
+        return out.toByteArray();
+    }
+
+    private byte[] generateCoordinatorExcel(String email, String period, Map<String, Integer> stats) {
+        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            Sheet sheet = workbook.createSheet("Coordinator Report");
+
+            Row header = sheet.createRow(0);
+            header.createCell(0).setCellValue("Coordinator Report");
+
+            sheet.createRow(1).createCell(0).setCellValue("Coordinator email: " + email);
+            sheet.createRow(2).createCell(0).setCellValue("Period: " + period);
+
+            Row titleRow = sheet.createRow(4);
+            titleRow.createCell(0).setCellValue("Inspection Status");
+            titleRow.createCell(1).setCellValue("Count");
+
+            int rowIdx = 5;
+            for (Map.Entry<String, Integer> entry : stats.entrySet()) {
+                Row row = sheet.createRow(rowIdx++);
+                row.createCell(0).setCellValue(entry.getKey());
+                row.createCell(1).setCellValue(entry.getValue());
+            }
+
+            sheet.autoSizeColumn(0);
+            sheet.autoSizeColumn(1);
+            workbook.write(out);
+            return out.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to generate Excel", e);
+        }
     }
 }
