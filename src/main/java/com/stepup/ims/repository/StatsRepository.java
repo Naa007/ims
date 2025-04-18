@@ -41,7 +41,23 @@ public class StatsRepository {
                 "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.inspection_reports_received_date IS NULL " +
                 "AND EXISTS (SELECT 1 FROM proposed_cvs pc WHERE pc.inspection_id = ins.inspection_id AND pc.cv_status = 1)) AS ongoingInspections, " +
                 "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.inspection_reports_received_date IS NULL " +
-                "AND NOT EXISTS (SELECT 1 FROM proposed_cvs pc WHERE pc.inspection_id = ins.inspection_id AND pc.cv_status = 1)) AS pendingInspections " +
+                "AND NOT EXISTS (SELECT 1 FROM proposed_cvs pc WHERE pc.inspection_id = ins.inspection_id AND pc.cv_status = 1)) AS pendingInspections, " +
+                // Inspection status counts
+                "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.inspection_status = '0') AS newInspections, " +
+                "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.inspection_status = '1') AS inspectorAssigned, " +
+                "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.inspection_status = '2') AS inspectorReviewAwaiting, " +
+                "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.inspection_status = '3') AS inspectorReviewCompleted, " +
+                "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.inspection_status = '4') AS inspectorApproved, " +
+                "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.inspection_status = '5') AS referenceDocReceived, " +
+                "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.inspection_status = '6') AS referenceDocReviewAwaiting, " +
+                "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.inspection_status = '7') AS referenceDocReviewCompleted, " +
+                "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.inspection_status = '8') AS inspectionReportsReceived, " +
+                "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.inspection_status = '9') AS inspectionReportsReviewAwaiting, " +
+                "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.inspection_status = '10') AS inspectionReportsReviewCompleted, " +
+                "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.inspection_status = '11') AS inspectionReportsSentToClient, " +
+                "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.inspection_status = '12') AS inspectionAwarded, " +
+                "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.inspection_status = '13') AS inspectionRejected, " +
+                "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.inspection_status = '14') AS closedInspections " +
                 "FROM DUAL";
 
         Query query = entityManager.createNativeQuery(sqlQuery, BusinessStats.class);
