@@ -58,14 +58,6 @@ public class UIRoutingConstants {
     public static final String RETURN_TO_TECHNICAL_COORDINATOR_DASHBOARD = "technical-coordinator/technical-coordinator-dashboard";
     public static final String RETURN_TO_INSPECTOR_DASHBOARD = "inspector/inspector-dashboard";
 
-    // Default Error
-    public static final String RETURN_TO_DEFAULT_ERROR = "/error/default";
-    public static final String ERROR_PATH = "/error";
-    public static final String ERROR_MESSAGE = "errorMessage";
-    public static final String ERROR_TITLE = "errorTitle";
-
-
-
     private UIRoutingConstants() {
     }
 }

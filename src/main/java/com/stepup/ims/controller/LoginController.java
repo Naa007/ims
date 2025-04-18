@@ -1,5 +1,6 @@
 package com.stepup.ims.controller;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -7,12 +8,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class LoginController {
 
     @GetMapping("/")
-    public String loginPage() {
-        return "redirect:/auth/login";
+    public String loginPage(HttpSession session) {
+       return invalidateSession(session);
     }
 
     @GetMapping("/logout")
-    public String logoutPage() {
+    public String logoutPage(HttpSession session) {
+        return invalidateSession(session);
+    }
+
+    private String invalidateSession(HttpSession session) {
+        session.invalidate();
         return "redirect:/auth/login";
     }
 }
