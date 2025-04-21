@@ -1,19 +1,25 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <!-- Head -->
-<head th:replace="fragments/head :: head"><title>Enterprise Analytics Dashboard</title></head>
+<head th:replace="fragments/head :: head"><title>IISPL Performance Analytics</title></head>
 <body>
 <!-- Header -->
 <header th:replace="fragments/header :: header"></header>
 
 <main class="bd-container">
     <div class="bd-dashboard-container">
-        <div class="bd-dashboard-header">
-            <div class="bd-dashboard-title">Enterprise Performance Analytics</div>
-            <div class="bd-date-filter">
-                <span th:text="${#temporals.format(#temporals.createNow(), 'MMMM dd, yyyy')}">April 14, 2025</span>
+
+        <!-- Enterprises Performance Analytics Section -->
+        <h4 class="section-header">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; justify-content: flex-start;">
+                    <i class="fas fa-chart-line me-2"></i>Enterprise Performance Analytics
+                </div>
+                <div class="bd-date-filter date">
+                    <span th:text="${#temporals.format(#temporals.createNow(), 'MMMM dd, yyyy')}">April 14, 2025</span>
+                </div>
             </div>
-        </div>
+        </h4>
 
         <!-- Stats Grid -->
         <div class="bd-stats-grid">
@@ -121,12 +127,14 @@
         </div>
 
         <!-- Individual Performance Charts Section -->
-        <div class="bd-chart-section">
-            <div class="bd-section-header">
-                <h2>Individual Performance Metrics</h2>
-                <p>View detailed analytics by personnel role and time period</p>
+        <h4 class="section-header">
+            <div style="display: flex; align-items: center; justify-content: flex-start;">
+                <i class="fas fa-chart-line me-2"></i>Individual Performance Matrices
             </div>
+        </h4>
 
+        <div class="bd-chart-section">
+            
             <!-- Tab Navigation for Individual Charts -->
             <div class="bd-tab-navigation">
                 <button class="bd-tab-button active" data-target="coordinator-chart-panel">Coordinators</button>
@@ -136,15 +144,17 @@
 
             <!-- Chart Panels -->
             <div class="bd-chart-panels">
+
                 <!-- Coordinator Panel -->
                 <div class="bd-chart-panel active" id="coordinator-chart-panel">
                     <div class="bd-chart-card">
                         <div class="bd-chart-controls-container">
-                            <div class="bd-chart-header">Coordinator Performance Analytics</div>
-
+                          
                             <div class="bd-filters-container">
+
                                 <!-- Primary Selector -->
                                 <div class="bd-filter-group bd-primary-filter">
+                                  
                                     <label for="coordinatorSelect">Select Coordinator:</label>
                                     <select class="bd-select bd-primary-select" id="coordinatorSelect"
                                             onchange="handleCoordinatorChange(this)">
@@ -167,6 +177,24 @@
                                         <option value="year">Year to Date</option>
                                         <option value="custom">Custom Range</option>
                                     </select>
+
+                                </div>
+
+                                <!-- Custom Date Range Container -->
+                                <div id="coordinatorCustomRangeContainer" style="display: none;">
+                                    <div class="bd-custom-range-content">
+                                        <div class="bd-date-input-group">
+                                            <label for="coordinatorStartDate">From:</label>
+                                            <input id="coordinatorStartDate" name="coordinatorStartDate" type="date">
+                                        </div>
+                                        <div class="bd-date-input-group">
+                                            <label for="coordinatorEndDate">To:</label>
+                                            <input id="coordinatorEndDate" name="coordinatorEndDate" type="date">
+                                        </div>
+                                        <button class="bd-filter-btn" onclick="applyCoordinatorCustomRange()" type="button">
+                                            Apply
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <!-- Export Options -->
@@ -178,49 +206,14 @@
                                         <i class="fas fa-file-excel"></i> Excel
                                     </button>
                                 </div>
-                            </div>
-                        </div>
 
-                        <!-- Custom Date Range Container -->
-                        <div class="bd-custom-range" id="coordinatorCustomRangeContainer" style="display: none;">
-                            <div class="bd-custom-range-content">
-                                <div class="bd-date-input-group">
-                                    <label for="coordinatorStartDate">From:</label>
-                                    <input id="coordinatorStartDate" name="coordinatorStartDate" type="date">
-                                </div>
-                                <div class="bd-date-input-group">
-                                    <label for="coordinatorEndDate">To:</label>
-                                    <input id="coordinatorEndDate" name="coordinatorEndDate" type="date">
-                                </div>
-                                <button class="bd-filter-btn" onclick="applyCoordinatorCustomRange()" type="button">
-                                    Apply
-                                </button>
                             </div>
+
                         </div>
 
                         <!-- Chart Container -->
                         <div class="bd-chart-container" style="position: relative; height:500px;">
                             <canvas id="coordinatorPerformanceChart"></canvas>
-                        </div>
-
-                        <!-- Data Summary Table -->
-                        <div class="bd-data-summary">
-                            <h3>Performance Summary</h3>
-                            <div class="bd-data-table-container">
-                                <table class="bd-data-table" id="coordinatorSummaryTable">
-                                    <thead>
-                                    <tr>
-                                        <th>Status</th>
-                                        <th>Count</th>
-                                        <th>% of Total</th>
-                                        <th>Trend</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <!-- This will be populated by JavaScript -->
-                                    </tbody>
-                                </table>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -229,8 +222,6 @@
                 <div class="bd-chart-panel" id="technical-chart-panel">
                     <div class="bd-chart-card">
                         <div class="bd-chart-controls-container">
-                            <div class="bd-chart-header">Technical Coordinator Analytics</div>
-
                             <div class="bd-filters-container">
                                 <!-- Primary Selector -->
                                 <div class="bd-filter-group bd-primary-filter">
@@ -258,6 +249,23 @@
                                     </select>
                                 </div>
 
+                                <!-- Custom Date Range Container -->
+                                <div id="technicalCustomRangeContainer" style="display: none;">
+                                    <div class="bd-custom-range-content">
+                                        <div class="bd-date-input-group">
+                                            <label for="technicalStartDate">From:</label>
+                                            <input id="technicalStartDate" name="technicalStartDate" type="date">
+                                        </div>
+                                        <div class="bd-date-input-group">
+                                            <label for="technicalEndDate">To:</label>
+                                            <input id="technicalEndDate" name="technicalEndDate" type="date">
+                                        </div>
+                                        <button class="bd-filter-btn" onclick="applyTechnicalCustomRange()" type="button">
+                                            Apply
+                                        </button>
+                                    </div>
+                                </div>
+
                                 <!-- Export Options -->
                                 <div class="bd-filter-group bd-export-group">
                                     <button class="bd-export-btn" onclick="exportTechnicalData('pdf')">
@@ -270,45 +278,9 @@
                             </div>
                         </div>
 
-                        <!-- Custom Date Range Container -->
-                        <div class="bd-custom-range" id="technicalCustomRangeContainer" style="display: none;">
-                            <div class="bd-custom-range-content">
-                                <div class="bd-date-input-group">
-                                    <label for="technicalStartDate">From:</label>
-                                    <input id="technicalStartDate" name="technicalStartDate" type="date">
-                                </div>
-                                <div class="bd-date-input-group">
-                                    <label for="technicalEndDate">To:</label>
-                                    <input id="technicalEndDate" name="technicalEndDate" type="date">
-                                </div>
-                                <button class="bd-filter-btn" onclick="applyTechnicalCustomRange()" type="button">
-                                    Apply
-                                </button>
-                            </div>
-                        </div>
-
                         <!-- Chart Container -->
                         <div class="bd-chart-container" style="position: relative; height:500px;">
                             <canvas id="technicalCoordinatorChart"></canvas>
-                        </div>
-
-                        <!-- Data Summary Table -->
-                        <div class="bd-data-summary">
-                            <h3>Performance Summary</h3>
-                            <div class="bd-data-table-container">
-                                <table class="bd-data-table" id="technicalSummaryTable">
-                                    <thead>
-                                    <tr>
-                                        <th>Status</th>
-                                        <th>Count</th>
-                                        <th>% of Total</th>
-                                        <th>Trend</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -317,8 +289,6 @@
                 <div class="bd-chart-panel" id="inspector-chart-panel">
                     <div class="bd-chart-card">
                         <div class="bd-chart-controls-container">
-                            <div class="bd-chart-header">Inspector Performance Analytics</div>
-
                             <div class="bd-filters-container">
                                 <!-- Primary Selector -->
                                 <div class="bd-filter-group bd-primary-filter">
@@ -345,6 +315,24 @@
                                         <option value="custom">Custom Range</option>
                                     </select>
                                 </div>
+
+                                <!-- Custom Date Range Container -->
+                                <div id="inspectorCustomRangeContainer" style="display: none;">
+                                    <div class="bd-custom-range-content">
+                                        <div class="bd-date-input-group">
+                                            <label for="inspectorStartDate">From:</label>
+                                            <input id="inspectorStartDate" name="inspectorStartDate" type="date">
+                                        </div>
+                                        <div class="bd-date-input-group">
+                                            <label for="inspectorEndDate">To:</label>
+                                            <input id="inspectorEndDate" name="inspectorEndDate" type="date">
+                                        </div>
+                                        <button class="bd-filter-btn" onclick="applyInspectorCustomRange()" type="button">
+                                            Apply
+                                        </button>
+                                    </div>
+                                </div>
+
                                 <!-- Export Options -->
                                 <div class="bd-filter-group bd-export-group">
                                     <button class="bd-export-btn" onclick="exportInspectorData('pdf')">
@@ -356,61 +344,29 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Custom Date Range Container -->
-                        <div class="bd-custom-range" id="inspectorCustomRangeContainer" style="display: none;">
-                            <div class="bd-custom-range-content">
-                                <div class="bd-date-input-group">
-                                    <label for="inspectorStartDate">From:</label>
-                                    <input id="inspectorStartDate" name="inspectorStartDate" type="date">
-                                </div>
-                                <div class="bd-date-input-group">
-                                    <label for="inspectorEndDate">To:</label>
-                                    <input id="inspectorEndDate" name="inspectorEndDate" type="date">
-                                </div>
-                                <button class="bd-filter-btn" onclick="applyInspectorCustomRange()" type="button">
-                                    Apply
-                                </button>
-                            </div>
-                        </div>
+
+
                         <!-- Chart Container -->
                         <div class="bd-chart-container" style="position: relative; height:500px;">
                             <canvas id="inspectorPerformanceChart"></canvas>
                         </div>
-
-                        <!-- Data Summary Table -->
-                        <div class="bd-data-summary">
-                            <h3>Performance Summary</h3>
-                            <div class="bd-data-table-container">
-                                <table class="bd-data-table" id="inspectorSummaryTable">
-                                    <thead>
-                                    <tr>
-                                        <th>Status</th>
-                                        <th>Count</th>
-                                        <th>% of Total</th>
-                                        <th>Trend</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <!-- This will be populated by JavaScript -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
+
         </div>
 
         <!-- Performance Trends Section -->
         <div class="bd-trends-section">
-            <div class="bd-section-header">
-                <h2>Performance Trends</h2>
-                <p>View historical trends and comparative analytics</p>
-            </div>
+
+            <h4 class="section-header">
+                <div style="display: flex; align-items: center; justify-content: flex-start;">
+                    <i class="fas fa-chart-line me-2"></i>Individual Performance Trends
+                </div>
+            </h4>
 
             <div class="bd-trends-container">
                 <div class="bd-trend-card">
-                    <div class="bd-chart-header">Individual vs Team Performance</div>
                     <div class="bd-chart-container" style="position: relative; height:400px;">
                         <canvas id="comparisonChart"></canvas>
                     </div>
@@ -419,10 +375,11 @@
         </div>
     </div>
 </main>
+
 <!-- Footer -->
 <footer th:replace="fragments/footer :: footer"></footer>
 <!-- Chart.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+
 <script th:inline="javascript">
     /*<![CDATA[*/
     document.addEventListener('DOMContentLoaded', function() {
@@ -1017,45 +974,45 @@ totalDisplayEl.innerHTML = `
     </div>
 `;
 
-        const chart = Chart.getChart(chartId);
-        if (!chart) {
-            console.error(`Chart not found with ID: ${chartId}`);
-            return;
-        }
+<!--        const chart = Chart.getChart(chartId);-->
+<!--        if (!chart) {-->
+<!--            console.error(`Chart not found with ID: ${chartId}`);-->
+<!--            return;-->
+<!--        }-->
 
-        // Chart data for the status breakdown
-        const labels = ['New', 'Ongoing', 'Awarded', 'Rejected'];
-        const values = [
-            data.newInspections || 0,
-            data.ongoingInspections || 0,
-            data.completedInspections || 0,
-            data.rejectedInspections || 0
-        ];
+<!--        // Chart data for the status breakdown-->
+<!--        const labels = ['New', 'Ongoing', 'Awarded', 'Rejected'];-->
+<!--        const values = [-->
+<!--            data.newInspections || 0,-->
+<!--            data.ongoingInspections || 0,-->
+<!--            data.completedInspections || 0,-->
+<!--            data.rejectedInspections || 0-->
+<!--        ];-->
 
-        // Create chartData
-        const chartData = {
-            labels: labels,
-            datasets: [{
-                label: 'Inspection Status',
-                data: values,
-                backgroundColor: [
-                    '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'
-                ]
-            }]
-        };
+<!--        // Create chartData-->
+<!--        const chartData = {-->
+<!--            labels: labels,-->
+<!--            datasets: [{-->
+<!--                label: 'Inspection Status',-->
+<!--                data: values,-->
+<!--                backgroundColor: [-->
+<!--                    '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'-->
+<!--                ]-->
+<!--            }]-->
+<!--        };-->
 
-        const isAllZero = values.every(val => val === 0);
-        if (isAllZero) {
-            showNotification('No data available for selected filters', 'warning');
-            displayNoDataMessage(chartId);
-        } else {
-            removeNoDataMessage(chartId);
-            chart.data = chartData;
-            chart.update();
-        }
+<!--        const isAllZero = values.every(val => val === 0);-->
+<!--        if (isAllZero) {-->
+<!--            showNotification('No data available for selected filters', 'warning');-->
+<!--            displayNoDataMessage(chartId);-->
+<!--        } else {-->
+<!--            removeNoDataMessage(chartId);-->
+<!--            chart.data = chartData;-->
+<!--            chart.update();-->
+<!--        }-->
 
         // Update summary table with percentages based on the total
-        updateSummaryTable(tableId, chartData, data.totalInspections);
+     //   updateSummaryTable(tableId, chartData, data.totalInspections);
     }
 
     // Function to display "No Data Available" message in the chart
@@ -1842,9 +1799,9 @@ totalDisplayEl.innerHTML = `
         transition: all 0.2s ease;
     }
 
-    .bd-tab-button:hover {
-        color: #4e73df;
-    }
+<!--    .bd-tab-button:hover {-->
+<!--        color: #4e73df;-->
+<!--    }-->
 
     .bd-tab-button.active {
         color: #4e73df;
@@ -1907,7 +1864,7 @@ totalDisplayEl.innerHTML = `
     }
 
     .bd-primary-filter {
-        flex: 1;
+        flex: 0.4;
         min-width: 220px;
     }
 
