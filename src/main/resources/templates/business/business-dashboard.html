@@ -134,27 +134,62 @@
         </h4>
 
         <div class="bd-chart-section">
-            
+
             <!-- Tab Navigation for Individual Charts -->
             <div class="bd-tab-navigation">
-                <button class="bd-tab-button active" data-target="coordinator-chart-panel">Coordinators</button>
+                <button class="bd-tab-button active" data-target="all-chart-panel">All</button>
+                <button class="bd-tab-button" data-target="coordinator-chart-panel">Coordinators</button>
                 <button class="bd-tab-button" data-target="technical-chart-panel">Technical Coordinators</button>
                 <button class="bd-tab-button" data-target="inspector-chart-panel">Inspectors</button>
             </div>
 
             <!-- Chart Panels -->
             <div class="bd-chart-panels">
-
+                <!-- All Panel -->
+                <div class="bd-chart-panel active" id="all-chart-panel">
+                    <div class="bd-chart-card">
+                        <div class="bd-performance-metrics-container" id="allPerformanceContainer">
+                            <div class="bd-metrics-display">
+                                <div class="bd-metrics-header">
+                                    <h3>All Inspections</h3>
+                                    <span class="bd-period-label">Current Status</span>
+                                </div>
+                                <div class="bd-metrics-total">
+                                    <span class="bd-total-number" th:text="${inspectionStats['Total Inspections']}">0</span>
+                                    <span class="bd-total-label">Total Inspections</span>
+                                </div>
+                                <div class="bd-metrics-breakdown">
+                                    <div class="bd-metric-item">
+                                        <span class="bd-metric-value" th:text="${inspectionStats['New']}">0</span>
+                                        <span class="bd-metric-label">New</span>
+                                    </div>
+                                    <div class="bd-metric-item">
+                                        <span class="bd-metric-value" th:text="${inspectionStats['Ongoing']}">0</span>
+                                        <span class="bd-metric-label">Ongoing</span>
+                                    </div>
+                                    <div class="bd-metric-item">
+                                        <span class="bd-metric-value" th:text="${inspectionStats['Awarded']}">0</span>
+                                        <span class="bd-metric-label">Awarded</span>
+                                    </div>
+                                    <div class="bd-metric-item">
+                                        <span class="bd-metric-value" th:text="${inspectionStats['Rejected']}">0</span>
+                                        <span class="bd-metric-label">Rejected</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <!-- Coordinator Panel -->
-                <div class="bd-chart-panel active" id="coordinator-chart-panel">
+                <div class="bd-chart-panel" id="coordinator-chart-panel">
                     <div class="bd-chart-card">
                         <div class="bd-chart-controls-container">
-                          
+
                             <div class="bd-filters-container">
 
                                 <!-- Primary Selector -->
                                 <div class="bd-filter-group bd-primary-filter">
-                                  
+
                                     <label for="coordinatorSelect">Select Coordinator:</label>
                                     <select class="bd-select bd-primary-select" id="coordinatorSelect"
                                             onchange="handleCoordinatorChange(this)">
@@ -211,9 +246,14 @@
 
                         </div>
 
-                        <!-- Chart Container -->
-                        <div class="bd-chart-container" style="position: relative; height:500px;">
-                            <canvas id="coordinatorPerformanceChart"></canvas>
+                        <!-- Performance Metrics Container -->
+                        <div class="bd-performance-metrics-container" id="coordinatorPerformanceContainer">
+                            <div class="bd-empty-state">
+                                <div class="bd-empty-state-icon">
+                                    <i class="fas fa-chart-bar"></i>
+                                </div>
+                                <div class="bd-empty-state-text">Select a coordinator and time period to view data</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -278,9 +318,14 @@
                             </div>
                         </div>
 
-                        <!-- Chart Container -->
-                        <div class="bd-chart-container" style="position: relative; height:500px;">
-                            <canvas id="technicalCoordinatorChart"></canvas>
+                        <!-- Performance Metrics Container -->
+                        <div class="bd-performance-metrics-container" id="technicalCoordinatorContainer">
+                            <div class="bd-empty-state">
+                                <div class="bd-empty-state-icon">
+                                    <i class="fas fa-chart-bar"></i>
+                                </div>
+                                <div class="bd-empty-state-text">Select a technical coordinator and time period to view data</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -345,10 +390,14 @@
                             </div>
                         </div>
 
-
-                        <!-- Chart Container -->
-                        <div class="bd-chart-container" style="position: relative; height:500px;">
-                            <canvas id="inspectorPerformanceChart"></canvas>
+                        <!-- Performance Metrics Container -->
+                        <div class="bd-performance-metrics-container" id="inspectorPerformanceContainer">
+                            <div class="bd-empty-state">
+                                <div class="bd-empty-state-icon">
+                                    <i class="fas fa-chart-bar"></i>
+                                </div>
+                                <div class="bd-empty-state-text">Select an inspector and time period to view data</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -367,9 +416,16 @@
 
             <div class="bd-trends-container">
                 <div class="bd-trend-card">
-                    <div class="bd-chart-container" style="position: relative; height:400px;">
+                    <div class="bd-chart-container" id="comparisonChartContainer" style="position: relative; height:400px;">
+                        <div class="bd-loading-overlay" id="comparisonChartLoader" style="display: none;">
+                            <div class="bd-loading-spinner">
+                                <i class="fas fa-circle-notch fa-spin"></i>
+                            </div>
+                            <div class="bd-loading-text">Loading data...</div>
+                        </div>
                         <canvas id="comparisonChart"></canvas>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -378,10 +434,13 @@
 
 <!-- Footer -->
 <footer th:replace="fragments/footer :: footer"></footer>
-<!-- Chart.js -->
 
 <script th:inline="javascript">
     /*<![CDATA[*/
+ let lastCoordinatorData = null;
+let lastTechnicalData = null;
+let lastInspectorData = null;
+
     document.addEventListener('DOMContentLoaded', function() {
         // Initialize toggle for stat cards
         initializeStatCardToggles();
@@ -389,11 +448,12 @@
         // Initialize tab navigation
         initializeTabNavigation();
 
-        // Initialize charts with default data
-        initializeCharts();
+        // Initialize comparison chart
+        initializeComparisonChart();
 
         // Set current date for date inputs
         initializeDateInputs();
+        updateComparisonChart();
     });
 
     function initializeStatCardToggles() {
@@ -411,23 +471,25 @@
         });
     }
 
-    function initializeTabNavigation() {
-        const tabButtons = document.querySelectorAll('.bd-tab-button');
+   function initializeTabNavigation() {
+    const tabButtons = document.querySelectorAll('.bd-tab-button');
 
-        tabButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                // Remove active class from all buttons and panels
-                document.querySelectorAll('.bd-tab-button').forEach(btn => btn.classList.remove('active'));
-                document.querySelectorAll('.bd-chart-panel').forEach(panel => panel.classList.remove('active'));
-                // Add active class to clicked button
-                this.classList.add('active');
-                // Show the corresponding panel
-                const targetPanelId = this.getAttribute('data-target');
-                document.getElementById(targetPanelId).classList.add('active');
-            });
+    tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons and panels
+            document.querySelectorAll('.bd-tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.bd-chart-panel').forEach(panel => panel.classList.remove('active'));
+
+            // Add active class to clicked button
+            this.classList.add('active');
+
+            // Show the corresponding panel
+            const targetPanelId = this.getAttribute('data-target');
+            document.getElementById(targetPanelId).classList.add('active');
+
         });
-    }
-
+    });
+}
     function initializeDateInputs() {
         // Set default dates to 30 days ago and today
         const today = new Date();
@@ -450,34 +512,21 @@
         endDateInputs.forEach(input => input.value = formatDate(today));
     }
 
-    function initializeCharts() {
-        // Initialize empty charts with no data
-        createEmptyChart('coordinatorPerformanceChart');
-        createEmptyChart('technicalCoordinatorChart');
-        createEmptyChart('inspectorPerformanceChart');
-        // Use our new function for the comparison chart
-        initializeComparisonChart();
-        // Initialize empty summary tables
-        displayEmptyState('coordinatorPerformanceChart', 'Select a coordinator and time period to view data');
-        displayEmptyState('technicalCoordinatorChart', 'Select a technical coordinator and time period to view data');
-        displayEmptyState('inspectorPerformanceChart', 'Select an inspector and time period to view data');
-        // Create empty tables
-        initializeEmptySummaryTable('coordinatorSummaryTable');
-        initializeEmptySummaryTable('technicalSummaryTable');
-        initializeEmptySummaryTable('inspectorSummaryTable');
-    }
-
-    function createEmptyChart(chartId) {
-        const ctx = document.getElementById(chartId).getContext('2d');
+    function initializeComparisonChart() {
+        const ctx = document.getElementById('comparisonChart').getContext('2d');
         return new Chart(ctx, {
-            type: 'bar',
+            type: 'line',
             data: {
-                labels: [],
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
                 datasets: [{
-                    label: 'No data selected',
-                    data: [],
-                    backgroundColor: [],
-                    borderWidth: 1
+                    label: 'Select users above to compare performance',
+                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    borderColor: '#858796',
+                    backgroundColor: 'rgba(133, 135, 150, 0.1)',
+                    borderWidth: 1,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    fill: true
                 }]
             },
             options: {
@@ -486,8 +535,9 @@
                 scales: {
                     y: {
                         beginAtZero: true,
-                        ticks: {
-                            precision: 0
+                        title: {
+                            display: true,
+                            text: 'Inspections Completed'
                         },
                         grid: {
                             display: true,
@@ -503,113 +553,38 @@
                 },
                 plugins: {
                     legend: {
-                        display: false
+                        position: 'top',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 20,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        titleColor: '#5a5c69',
+                        bodyColor: '#5a5c69',
+                        borderColor: '#e3e6f0',
+                        borderWidth: 1,
+                        cornerRadius: 4,
+                        displayColors: true,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += context.parsed.y + ' inspections';
+                                }
+                                return label;
+                            }
+                        }
                     }
                 }
             }
-        });
-    }
-
-    function displayEmptyState(chartId, message) {
-        const chartCanvas = document.getElementById(chartId);
-        const container = chartCanvas.parentElement;
-
-        // Create message container if it doesn't exist
-        let emptyState = container.querySelector('.bd-empty-state');
-        if (!emptyState) {
-            emptyState = document.createElement('div');
-            emptyState.className = 'bd-empty-state';
-            container.appendChild(emptyState);
-        }
-
-        emptyState.innerHTML = `
-            <div class="bd-empty-state-icon">
-                <i class="fas fa-chart-bar"></i>
-            </div>
-            <div class="bd-empty-state-text">${message}</div>
-        `;
-
-        // Style the empty state
-        emptyState.style.position = 'absolute';
-        emptyState.style.top = '50%';
-        emptyState.style.left = '50%';
-        emptyState.style.transform = 'translate(-50%, -50%)';
-        emptyState.style.textAlign = 'center';
-        emptyState.style.color = '#858796';
-        emptyState.style.fontSize = '1.2rem';
-        emptyState.style.width = '100%';
-        emptyState.style.zIndex = '10';
-
-        // Style the chart canvas to be lighter
-        chartCanvas.style.opacity = '0.3';
-    }
-
-    function removeEmptyState(chartId) {
-        const chartCanvas = document.getElementById(chartId);
-        const container = chartCanvas.parentElement;
-        const emptyState = container.querySelector('.bd-empty-state');
-
-        if (emptyState) {
-            container.removeChild(emptyState);
-        }
-
-        // Restore chart opacity
-        chartCanvas.style.opacity = '1';
-    }
-
-    function initializeEmptySummaryTable(tableId) {
-        const table = document.getElementById(tableId);
-        const tbody = table.querySelector('tbody');
-        tbody.innerHTML = '';
-
-        // Add a single row with a message
-        const row = document.createElement('tr');
-        const cell = document.createElement('td');
-        cell.colSpan = 4;
-        cell.textContent = 'No data available. Make selections above to view performance metrics.';
-        cell.style.textAlign = 'center';
-        cell.style.padding = '20px';
-        cell.style.color = '#858796';
-
-        row.appendChild(cell);
-        tbody.appendChild(row);
-    }
-
-    function updateSummaryTable(tableId, chartData, totalInspections) {
-        const table = document.getElementById(tableId);
-        const tbody = table.querySelector('tbody');
-        tbody.innerHTML = '';
-
-        // Use provided total or calculate if not provided
-        const total = totalInspections || chartData.datasets[0].data.reduce((sum, value) => sum + value, 0);
-
-        // Create rows for each data point
-        chartData.labels.forEach((label, index) => {
-            const value = chartData.datasets[0].data[index];
-            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0';
-
-            // Generate trend indicator (sample logic - would be replaced with actual trend data)
-            let trendIcon, trendClass;
-            if (index % 3 === 0) {
-                trendIcon = 'fa-arrow-up';
-                trendClass = 'bd-trend-up';
-            } else if (index % 3 === 1) {
-                trendIcon = 'fa-arrow-down';
-                trendClass = 'bd-trend-down';
-            } else {
-                trendIcon = 'fa-arrows-alt-h';
-                trendClass = 'bd-trend-neutral';
-            }
-
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${label}</td>
-                <td>${value.toLocaleString()}</td>
-                <td>${percentage}%</td>
-                <td class="${trendClass}"><i class="fas ${trendIcon}"></i></td>
-            `;
-
-            tbody.appendChild(row);
         });
     }
 
@@ -748,13 +723,10 @@
         if (!selectedCoordinatorEmail) return;
 
         // Remove empty state and show loading
-        removeEmptyState('coordinatorPerformanceChart');
-        showLoadingIndicator('coordinatorPerformanceChart');
+        removeEmptyState('coordinatorPerformanceContainer');
+        showLoadingIndicator('coordinatorPerformanceContainer');
 
         fetchCoordinatorMetricData(selectedCoordinatorEmail, period);
-
-        // Update comparison chart if needed
-        updateComparisonChart();
     }
 
     function handleTechnicalCoordinatorChange(selectElement) {
@@ -764,13 +736,11 @@
         if (!selectedTechnicalCoordinator) return;
 
         // Remove empty state and show loading
-        removeEmptyState('technicalCoordinatorChart');
-        showLoadingIndicator('technicalCoordinatorChart');
+        removeEmptyState('technicalCoordinatorContainer');
+        showLoadingIndicator('technicalCoordinatorContainer');
 
         fetchTechnicalMetricData(selectedTechnicalCoordinator, period);
 
-        // Update comparison chart if needed
-        updateComparisonChart();
     }
 
     function handleInspectorChange(selectElement) {
@@ -780,18 +750,15 @@
         if (!selectedInspector) return;
 
         // Remove empty state and show loading
-        removeEmptyState('inspectorPerformanceChart');
-        showLoadingIndicator('inspectorPerformanceChart');
+        removeEmptyState('inspectorPerformanceContainer');
+        showLoadingIndicator('inspectorPerformanceContainer');
 
         fetchInspectorMetricData(selectedInspector, period);
-
-        // Update comparison chart if needed
-        updateComparisonChart();
     }
 
     // Update the fetch functions to match your API endpoints
     function fetchCoordinatorMetricData(coordinatorEmail, period) {
-        showLoadingIndicator('coordinatorPerformanceChart');
+        showLoadingIndicator('coordinatorPerformanceContainer');
 
         fetch(`/business/coordinator-stats/${encodeURIComponent(coordinatorEmail)}/${encodeURIComponent(period)}`, {
             method: 'GET',
@@ -807,27 +774,35 @@
             return response.json();
         })
         .then(data => {
-            hideLoadingIndicator('coordinatorPerformanceChart');
-            updateRoleChartDisplay('coordinator', data);
-             if (hasMeaningfulInspectionData(data)) {
-            // Add highlight animation
+    hideLoadingIndicator('coordinatorPerformanceContainer');
+    updateRoleMetricsDisplay('coordinator', data);
+
+    const isNew = JSON.stringify(data) !== JSON.stringify(lastCoordinatorData);
+
+    if (isNew) {
+        lastCoordinatorData = data;
+
+        if (hasMeaningfulInspectionData(data)) {
             const totalDisplay = document.getElementById('coordinatorTotalDisplay');
             if (totalDisplay) {
                 totalDisplay.classList.add('bd-total-highlight');
                 setTimeout(() => totalDisplay.classList.remove('bd-total-highlight'), 1500);
             }
             showNotification('Coordinator data updated successfully', 'success');
-            }
-        })
-        .catch(error => {
-            hideLoadingIndicator('coordinatorPerformanceChart');
+            updateComparisonChart();
+        } else {
+            showNotification('No data available for selected coordinator', 'warning');
+        }
+    }
+}).catch(error => {
+            hideLoadingIndicator('coordinatorPerformanceContainer');
             console.error('Error:', error);
             showNotification('Failed to fetch coordinator data. Please try again.', 'error');
         });
     }
 
     function fetchTechnicalMetricData(techCoordinatorId, period) {
-        showLoadingIndicator('technicalCoordinatorChart');
+        showLoadingIndicator('technicalCoordinatorContainer');
 
         fetch(`/business/technical-coordinator-stats/${encodeURIComponent(techCoordinatorId)}/${encodeURIComponent(period)}`, {
             method: 'GET',
@@ -842,28 +817,36 @@
             }
             return response.json();
         })
-        .then(data => {
-            hideLoadingIndicator('technicalCoordinatorChart');
-            updateRoleChartDisplay('technical', data);
-             if (hasMeaningfulInspectionData(data)) {
-                // Add highlight animation
+      .then(data => {
+    hideLoadingIndicator('technicalCoordinatorContainer');
+    updateRoleMetricsDisplay('technical', data);
+
+    const isNew = JSON.stringify(data) !== JSON.stringify(lastTechnicalData);
+
+    if (isNew) {
+        lastTechnicalData = data;
+
+        if (hasMeaningfulInspectionData(data)) {
             const totalDisplay = document.getElementById('techCoordinatorTotalDisplay');
             if (totalDisplay) {
                 totalDisplay.classList.add('bd-total-highlight');
                 setTimeout(() => totalDisplay.classList.remove('bd-total-highlight'), 1500);
             }
             showNotification('Technical coordinator data updated successfully', 'success');
-            }
-        })
-        .catch(error => {
-            hideLoadingIndicator('technicalCoordinatorChart');
+            updateComparisonChart();
+        } else {
+            showNotification('No data available for selected technical coordinator', 'warning');
+        }
+    }
+}).catch(error => {
+            hideLoadingIndicator('technicalCoordinatorContainer');
             console.error('Error:', error);
             showNotification('Failed to fetch technical coordinator data. Please try again.', 'error');
         });
     }
 
     function fetchInspectorMetricData(inspectorEmail, period) {
-        showLoadingIndicator('inspectorPerformanceChart');
+        showLoadingIndicator('inspectorPerformanceContainer');
 
         fetch(`/business/inspector-stats/${encodeURIComponent(inspectorEmail)}/${encodeURIComponent(period)}`, {
             method: 'GET',
@@ -878,21 +861,29 @@
             }
             return response.json();
         })
-        .then(data => {
-            hideLoadingIndicator('inspectorPerformanceChart');
-            updateRoleChartDisplay('inspector', data);
-             if (hasMeaningfulInspectionData(data)) {
-               // Add highlight animation
+.then(data => {
+    hideLoadingIndicator('inspectorPerformanceContainer');
+    updateRoleMetricsDisplay('inspector', data);
+
+    const isNew = JSON.stringify(data) !== JSON.stringify(lastInspectorData);
+
+    if (isNew) {
+        lastInspectorData = data;
+
+        if (hasMeaningfulInspectionData(data)) {
             const totalDisplay = document.getElementById('inspectorTotalDisplay');
             if (totalDisplay) {
                 totalDisplay.classList.add('bd-total-highlight');
                 setTimeout(() => totalDisplay.classList.remove('bd-total-highlight'), 1500);
             }
             showNotification('Inspector data updated successfully', 'success');
-            }
-        })
-        .catch(error => {
-            hideLoadingIndicator('inspectorPerformanceChart');
+             updateComparisonChart();
+        } else {
+            showNotification('No data available for selected inspector', 'warning');
+        }
+    }
+}).catch(error => {
+            hideLoadingIndicator('inspectorPerformanceContainer');
             console.error('Error:', error);
             showNotification('Failed to fetch inspector data. Please try again.', 'error');
         });
@@ -906,15 +897,15 @@
                data.rejectedInspections > 0;
     }
 
-    function updateRoleChartDisplay(roleType, data) {
-        // Chart ID determination remains the same
-        let chartId;
+    function updateRoleMetricsDisplay(roleType, data) {
+        let containerId;
         if (roleType === 'technical') {
-            chartId = 'technicalCoordinatorChart';
+            containerId = 'technicalCoordinatorContainer';
         } else {
-		            chartId = `${roleType}PerformanceChart`;
+            containerId = `${roleType}PerformanceContainer`;
         }
-        const tableId = `${roleType}SummaryTable`;
+
+        const container = document.getElementById(containerId);
 
         // Get the selected name from the dropdown
         let selectedName = "";
@@ -929,148 +920,42 @@
             selectedName = select.options[select.selectedIndex].text;
         }
 
-        // Create or update total inspections display
-        const panelId = `${roleType === 'technical' ? 'technical' : roleType}-chart-panel`;
-        let totalDisplayEl = document.getElementById(`${roleType}TotalDisplay`);
-
-        if (!totalDisplayEl) {
-            const chartContainer = document.getElementById(chartId).parentElement;
-            totalDisplayEl = document.createElement('div');
-            totalDisplayEl.id = `${roleType}TotalDisplay`;
-            totalDisplayEl.className = 'bd-total-inspections-display';
-            chartContainer.insertBefore(totalDisplayEl, chartContainer.firstChild);
-        }
-
         // Format period text
         const periodText = formatPeriodText(data.period);
 
-      // Update the total display
-totalDisplayEl.innerHTML = `
-    <div class="bd-total-header">
-        <h3>${selectedName}</h3>
-        <span class="bd-period-label">${periodText}</span>
-    </div>
-    <div class="bd-total-value">
-        <span class="bd-total-number">${data.totalInspections}</span>
-        <span class="bd-total-label">Total Inspections</span>
-    </div>
-    <div class="bd-metrics-breakdown">
-        <div class="bd-metric-item">
-            <span class="bd-metric-value">${data.newInspections || 0}</span>
-            <span class="bd-metric-label">New</span>
-        </div>
-        <div class="bd-metric-item">
-            <span class="bd-metric-value">${data.ongoingInspections || 0}</span>
-            <span class="bd-metric-label">Ongoing</span>
-        </div>
-        <div class="bd-metric-item">
-            <span class="bd-metric-value">${data.completedInspections || 0}</span>
-            <span class="bd-metric-label">Awarded</span>
-        </div>
-        <div class="bd-metric-item">
-            <span class="bd-metric-value">${data.rejectedInspections || 0}</span>
-            <span class="bd-metric-label">Rejected</span>
-        </div>
-    </div>
-`;
-
-<!--        const chart = Chart.getChart(chartId);-->
-<!--        if (!chart) {-->
-<!--            console.error(`Chart not found with ID: ${chartId}`);-->
-<!--            return;-->
-<!--        }-->
-
-<!--        // Chart data for the status breakdown-->
-<!--        const labels = ['New', 'Ongoing', 'Awarded', 'Rejected'];-->
-<!--        const values = [-->
-<!--            data.newInspections || 0,-->
-<!--            data.ongoingInspections || 0,-->
-<!--            data.completedInspections || 0,-->
-<!--            data.rejectedInspections || 0-->
-<!--        ];-->
-
-<!--        // Create chartData-->
-<!--        const chartData = {-->
-<!--            labels: labels,-->
-<!--            datasets: [{-->
-<!--                label: 'Inspection Status',-->
-<!--                data: values,-->
-<!--                backgroundColor: [-->
-<!--                    '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'-->
-<!--                ]-->
-<!--            }]-->
-<!--        };-->
-
-<!--        const isAllZero = values.every(val => val === 0);-->
-<!--        if (isAllZero) {-->
-<!--            showNotification('No data available for selected filters', 'warning');-->
-<!--            displayNoDataMessage(chartId);-->
-<!--        } else {-->
-<!--            removeNoDataMessage(chartId);-->
-<!--            chart.data = chartData;-->
-<!--            chart.update();-->
-<!--        }-->
-
-        // Update summary table with percentages based on the total
-     //   updateSummaryTable(tableId, chartData, data.totalInspections);
-    }
-
-    // Function to display "No Data Available" message in the chart
-    function displayNoDataMessage(chartId) {
-        const chart = Chart.getChart(chartId);
-        if (!chart) return;
-
-        const chartCanvas = document.getElementById(chartId);
-
-        // Remove any existing message
-        removeNoDataMessage(chartId);
-
-        // Create message container
-        const noDataContainer = document.createElement('div');
-        noDataContainer.className = 'bd-no-data-message';
-        noDataContainer.innerHTML = `
-            <div class="bd-no-data-icon">
-                <i class="fas fa-chart-bar"></i>
-            </div>
-            <div class="bd-no-data-text">
-                No data available for selected filters
+        // Create the metrics display HTML
+        const metricsHTML = `
+            <div class="bd-metrics-display">
+                <div class="bd-metrics-header">
+                    <h3>${selectedName}</h3>
+                    <span class="bd-period-label">${periodText}</span>
+                </div>
+                <div class="bd-metrics-total">
+                    <span class="bd-total-number">${data.totalInspections}</span>
+                    <span class="bd-total-label">Total Inspections</span>
+                </div>
+                <div class="bd-metrics-breakdown">
+                    <div class="bd-metric-item">
+                        <span class="bd-metric-value">${data.newInspections || 0}</span>
+                        <span class="bd-metric-label">New</span>
+                    </div>
+                    <div class="bd-metric-item">
+                        <span class="bd-metric-value">${data.ongoingInspections || 0}</span>
+                        <span class="bd-metric-label">Ongoing</span>
+                    </div>
+                    <div class="bd-metric-item">
+                        <span class="bd-metric-value">${data.completedInspections || 0}</span>
+                        <span class="bd-metric-label">Awarded</span>
+                    </div>
+                    <div class="bd-metric-item">
+                        <span class="bd-metric-value">${data.rejectedInspections || 0}</span>
+                        <span class="bd-metric-label">Rejected</span>
+                    </div>
+                </div>
             </div>
         `;
 
-        // Position the message over the chart
-        noDataContainer.style.position = 'absolute';
-        noDataContainer.style.top = '50%';
-        noDataContainer.style.left = '50%';
-        noDataContainer.style.transform = 'translate(-50%, -50%)';
-        noDataContainer.style.textAlign = 'center';
-        noDataContainer.style.color = '#858796';
-        noDataContainer.style.fontSize = '1.2rem';
-        noDataContainer.style.width = '100%';
-        noDataContainer.style.zIndex = '10';
-
-        // Make chart lighter to indicate no data
-        chartCanvas.style.opacity = '0.5';
-
-        // Add to parent container
-        chartCanvas.parentElement.appendChild(noDataContainer);
-
-        // Still update chart with empty data to maintain structure
-        chart.data.datasets[0].data = [0, 0, 0, 0];
-        chart.update();
-    }
-
-    // Function to remove "No Data Available" message
-    function removeNoDataMessage(chartId) {
-        const chartCanvas = document.getElementById(chartId);
-        const container = chartCanvas.parentElement;
-        const existingMessage = container.querySelector('.bd-no-data-message');
-
-        if (existingMessage) {
-            container.removeChild(existingMessage);
-        }
-
-        // Restore chart opacity
-        chartCanvas.style.opacity = '1';
+        container.innerHTML = metricsHTML;
     }
 
     // Helper function to format period text
@@ -1124,428 +1009,328 @@ totalDisplayEl.innerHTML = `
             });
     }
 
-    function exportTechnicalData(format) {
-        const selectedTechCoordinator = document.getElementById('technicalCoordinatorSelect').value;
+  function exportTechnicalData(format) {
+    const selectedTechCoordinator = document.getElementById('technicalCoordinatorSelect').value;
+    const techCoordinatorName = document.getElementById('technicalCoordinatorSelect').selectedOptions[0]?.text || 'report';
 
-        if (!selectedTechCoordinator) {
-            showNotification('Please select a technical coordinator before exporting data', 'warning');
-            return;
-        }
+    const period = document.getElementById('technicalPeriodSelect').value;
 
-        const coordinatorName = document.getElementById('technicalCoordinatorSelect').options[document.getElementById('technicalCoordinatorSelect').selectedIndex].text;
-
-        const period = document.getElementById('technicalPeriodSelect').value;
-
-        showNotification(`Exporting ${format.toUpperCase()} report for ${coordinatorName}...`, 'info');
-
-        // Simulate export process
-        setTimeout(() => {
-            showNotification(`${format.toUpperCase()} report for ${coordinatorName} has been generated successfully`, 'success');
-        }, 1500);
+    if (!selectedTechCoordinator) {
+        showNotification('Please select a technical coordinator before exporting.', 'warning');
+        return;
     }
 
-    function exportInspectorData(format) {
-        const selectedInspector = document.getElementById('inspectorSelect').value;
+    const endpoint = `/business/technical-coordinator-report/${selectedTechCoordinator}/${period}/${format}`;
+    const filename = `${techCoordinatorName.replace(/\s+/g, '_')}_report.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
 
-        if (!selectedInspector) {
-            showNotification('Please select an inspector before exporting data', 'warning');
-            return;
-        }
+    fetch(endpoint)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Error: ${response.status}`);
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(link.href);
 
-        const inspectorName = document.getElementById('inspectorSelect').options[document.getElementById('inspectorSelect').selectedIndex].text;
+            showNotification(`${format.toUpperCase()} downloaded successfully.`, 'success');
+        })
+        .catch(error => {
+            console.error('Download failed:', error);
+            showNotification(`Failed to export ${format.toUpperCase()} report.`, 'error');
+        });
+}
 
-        const period = document.getElementById('inspectorPeriodSelect').value;
+function exportInspectorData(format) {
+    const selectedInspector = document.getElementById('inspectorSelect').value;
+    const inspectorName = document.getElementById('inspectorSelect').selectedOptions[0]?.text || 'report';
 
-        showNotification(`Exporting ${format.toUpperCase()} report for ${inspectorName}...`, 'info');
+    const period = document.getElementById('inspectorPeriodSelect').value;
 
-        // Simulate export process
-        setTimeout(() => {
-            showNotification(`${format.toUpperCase()} report for ${inspectorName} has been generated successfully`, 'success');
-        }, 1500);
+    if (!selectedInspector) {
+        showNotification('Please select an inspector before exporting.', 'warning');
+        return;
     }
 
-    // Utility functions
-    function showLoadingIndicator(chartId) {
-        const chartContainer = document.getElementById(chartId).parentElement;
+    const endpoint = `/business/inspector-report/${selectedInspector}/${period}/${format}`;
+    const filename = `${inspectorName.replace(/\s+/g, '_')}_report.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
 
-        // Create loading overlay if it doesn't exist
-        if (!chartContainer.querySelector('.bd-loading-overlay')) {
-            const loadingOverlay = document.createElement('div');
-            loadingOverlay.className = 'bd-loading-overlay';
-            loadingOverlay.innerHTML = `
-                <div class="bd-loading-spinner">
-                    <i class="fas fa-circle-notch fa-spin"></i>
-                </div>
-                <div class="bd-loading-text">Loading data...</div>
-            `;
+    fetch(endpoint)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Error: ${response.status}`);
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(link.href);
 
-            chartContainer.style.position = 'relative';
-            chartContainer.appendChild(loadingOverlay);
-        } else {
-            chartContainer.querySelector('.bd-loading-overlay').style.display = 'flex';
-        }
-    }
+            showNotification(`${format.toUpperCase()} downloaded successfully.`, 'success');
+        })
+        .catch(error => {
+            console.error('Download failed:', error);
+            showNotification(`Failed to export ${format.toUpperCase()} report.`, 'error');
+        });
+}
 
-    function hideLoadingIndicator(chartId) {
-        const chartContainer = document.getElementById(chartId).parentElement;
-        const loadingOverlay = chartContainer.querySelector('.bd-loading-overlay');
+// Utility functions
+function showLoadingIndicator(containerId) {
+    const container = document.getElementById(containerId);
 
-        if (loadingOverlay) {
-            loadingOverlay.style.display = 'none';
-        }
-    }
-
-    function showNotification(message, type = 'info') {
-        // Check if notification container exists, if not create it
-        let notificationContainer = document.getElementById('bd-notification-container');
-        if (!notificationContainer) {
-            notificationContainer = document.createElement('div');
-            notificationContainer.id = 'bd-notification-container';
-            document.body.appendChild(notificationContainer);
-        }
-
-        // Create notification element
-        const notification = document.createElement('div');
-        notification.className = `bd-notification bd-notification-${type}`;
-
-        // Set icon based on type
-        let icon;
-        switch (type) {
-            case 'success':
-                icon = 'fa-check-circle';
-                break;
-            case 'error':
-                icon = 'fa-times-circle';
-                break;
-            case 'warning':
-                icon = 'fa-exclamation-triangle';
-                break;
-            default:
-                icon = 'fa-info-circle';
-        }
-
-        notification.innerHTML = `
-            <div class="bd-notification-icon">
-                <i class="fas ${icon}"></i>
+    // Create loading overlay if it doesn't exist
+    if (!container.querySelector('.bd-loading-overlay')) {
+        const loadingOverlay = document.createElement('div');
+        loadingOverlay.className = 'bd-loading-overlay';
+        loadingOverlay.innerHTML = `
+            <div class="bd-loading-spinner">
+                <i class="fas fa-circle-notch fa-spin"></i>
             </div>
-            <div class="bd-notification-content">
-                ${message}
-            </div>
-            <div class="bd-notification-close">
-                <i class="fas fa-times"></i>
-            </div>
+            <div class="bd-loading-text">Loading data...</div>
         `;
 
-        // Add to container
-        notificationContainer.appendChild(notification);
+        container.style.position = 'relative';
+        container.appendChild(loadingOverlay);
+    } else {
+        container.querySelector('.bd-loading-overlay').style.display = 'flex';
+    }
+}
 
-        // Add event listener to close button
-        notification.querySelector('.bd-notification-close').addEventListener('click', function() {
+function hideLoadingIndicator(containerId) {
+    const container = document.getElementById(containerId);
+    const loadingOverlay = container.querySelector('.bd-loading-overlay');
+
+    if (loadingOverlay) {
+        loadingOverlay.style.display = 'none';
+    }
+}
+
+function removeEmptyState(containerId) {
+    const container = document.getElementById(containerId);
+    const emptyState = container.querySelector('.bd-empty-state');
+
+    if (emptyState) {
+        container.removeChild(emptyState);
+    }
+}
+
+function showNotification(message, type = 'info') {
+    // Check if notification container exists, if not create it
+    let notificationContainer = document.getElementById('bd-notification-container');
+    if (!notificationContainer) {
+        notificationContainer = document.createElement('div');
+        notificationContainer.id = 'bd-notification-container';
+        document.body.appendChild(notificationContainer);
+    }
+
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `bd-notification bd-notification-${type}`;
+
+    // Set icon based on type
+    let icon;
+    switch (type) {
+        case 'success':
+            icon = 'fa-check-circle';
+            break;
+        case 'error':
+            icon = 'fa-times-circle';
+            break;
+        case 'warning':
+            icon = 'fa-exclamation-triangle';
+            break;
+        default:
+            icon = 'fa-info-circle';
+    }
+
+    notification.innerHTML = `
+        <div class="bd-notification-icon">
+            <i class="fas ${icon}"></i>
+        </div>
+        <div class="bd-notification-content">
+            ${message}
+        </div>
+        <div class="bd-notification-close">
+            <i class="fas fa-times"></i>
+        </div>
+    `;
+
+    // Add to container
+    notificationContainer.appendChild(notification);
+
+    // Add event listener to close button
+    notification.querySelector('.bd-notification-close').addEventListener('click', function() {
+        notification.classList.add('bd-notification-hiding');
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    });
+
+    // Auto-remove after delay
+    setTimeout(() => {
+        if (notification.parentNode) {
             notification.classList.add('bd-notification-hiding');
             setTimeout(() => {
                 if (notification.parentNode) {
                     notification.parentNode.removeChild(notification);
                 }
             }, 300);
-        });
-
-        // Auto-remove after delay
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.classList.add('bd-notification-hiding');
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
-                    }
-                }, 300);
-            }
-        }, 5000);
-    }
-
-    function generateChartColors(count) {
-        const colorPalette = [
-            '#4e73df', // Primary blue
-            '#1cc88a', // Success green
-            '#36b9cc', // Info teal
-            '#f6c23e', // Warning yellow
-            '#e74a3b', // Danger red
-            '#6f42c1', // Purple
-            '#fd7e14', // Orange
-            '#20c9a6', // Cyan
-            '#858796', // Gray
-            '#5a5c69'  // Dark Gray
-        ];
-        let colors = [];
-        // If we need more colors than in our palette, generate them
-        if (count <= colorPalette.length) {
-            colors = colorPalette.slice(0, count);
-        } else {
-            for (let i = 0; i < count; i++) {
-                if (i < colorPalette.length) {
-                    colors.push(colorPalette[i]);
-                } else {
-                    // Generate random colors for additional items
-                    const hue = i * (360 / count);
-                    colors.push(`hsl(${hue}, 70%, 60%)`);
-                }
-            }
         }
+    }, 5000);
+}
+function showComparisonLoader() {
+    const loader = document.getElementById('comparisonChartLoader');
+    if (loader) loader.style.display = 'flex';
+}
 
-        return colors;
-    }
+function hideComparisonLoader() {
+    const loader = document.getElementById('comparisonChartLoader');
+    if (loader) loader.style.display = 'none';
+}
+function updateComparisonChart() {
+    const chart = Chart.getChart('comparisonChart');
+    if (!chart) return;
 
-    function updateComparisonChart() {
-        const comparisonChart = Chart.getChart('comparisonChart');
-        if (!comparisonChart) {
-            console.error('Comparison chart not found');
-            return;
-        }
-        // Get selected individuals
-        const selectedCoordinator = document.getElementById('coordinatorSelect').value;
-        const selectedTechnical = document.getElementById('technicalCoordinatorSelect').value;
-        const selectedInspector = document.getElementById('inspectorSelect').value;
+    const coordinator = document.getElementById('coordinatorSelect')?.value;
+    const technical = document.getElementById('technicalCoordinatorSelect')?.value;
+    const inspector = document.getElementById('inspectorSelect')?.value;
 
-        // Get selected individual names
-        let coordinatorName = "";
-        let technicalName = "";
-        let inspectorName = "";
+    // Only pass selected values if actually chosen (non-placeholder)
+    const selectedCoordinator = coordinator !== "" ? coordinator : null;
+    const selectedTechnical = technical !== "" ? technical : null;
+    const selectedInspector = inspector !== "" ? inspector : null;
 
-        if (selectedCoordinator) {
-            const select = document.getElementById('coordinatorSelect');
-            coordinatorName = select.options[select.selectedIndex].text;
-        }
-        if (selectedTechnical) {
-            const select = document.getElementById('technicalCoordinatorSelect');
-            technicalName = select.options[select.selectedIndex].text;
-        }
-        if (selectedInspector) {
-            const select = document.getElementById('inspectorSelect');
-            inspectorName = select.options[select.selectedIndex].text;
-        }
+    const url = `/business/trend-data?coordinator=${encodeURIComponent(selectedCoordinator || "")}&technical=${encodeURIComponent(selectedTechnical || "")}&inspector=${encodeURIComponent(selectedInspector || "")}`;
 
-        if (!selectedCoordinator && !selectedTechnical && !selectedInspector) {
-            // No selections made - display empty state
-            comparisonChart.data.labels = ['No data available'];
-            comparisonChart.data.datasets = [{
-                label: 'Make selections above to compare performance',
-                data: [0],
-                borderColor: '#858796',
-                backgroundColor: 'rgba(133, 135, 150, 0.2)',
-                borderWidth: 2,
-                pointRadius: 0
-            }];
-            comparisonChart.update();
-            return;
-        }
+    showComparisonLoader();
 
-        // Set up data structure
-        const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        const datasets = [];
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            hideComparisonLoader();
 
-        // Generate sample data for comparison (in real implementation, fetch from API)
-        if (selectedCoordinator) {
-            datasets.push({
-                label: `${coordinatorName} (Coordinator)`,
-                data: generateRandomData(12, 10, 50),
-                borderColor: '#4e73df',
-                backgroundColor: 'rgba(78, 115, 223, 0.05)',
-                borderWidth: 2,
-                tension: 0.3,
-                pointRadius: 3,
-                pointBackgroundColor: '#4e73df',
-                pointBorderColor: '#fff',
-                pointHoverRadius: 5,
-                pointHoverBackgroundColor: '#4e73df',
-                pointHoverBorderColor: '#fff',
-                fill: false
-            });
-        }
-
-        if (selectedTechnical) {
-            datasets.push({
-                label: `${technicalName} (Technical)`,
-                data: generateRandomData(12, 10, 40),
-                borderColor: '#1cc88a',
-                backgroundColor: 'rgba(28, 200, 138, 0.05)',
-                borderWidth: 2,
-                tension: 0.3,
-                pointRadius: 3,
-                pointBackgroundColor: '#1cc88a',
-                pointBorderColor: '#fff',
-                pointHoverRadius: 5,
-                pointHoverBackgroundColor: '#1cc88a',
-                pointHoverBorderColor: '#fff',
-                fill: false
-            });
-        }
-
-        if (selectedInspector) {
-            datasets.push({
-                label: `${inspectorName} (Inspector)`,
-                data: generateRandomData(12, 10, 45),
-                borderColor: '#36b9cc',
-                backgroundColor: 'rgba(54, 185, 204, 0.05)',
-                borderWidth: 2,
-                tension: 0.3,
-                pointRadius: 3,
-                pointBackgroundColor: '#36b9cc',
-                pointBorderColor: '#fff',
-                pointHoverRadius: 5,
-                pointHoverBackgroundColor: '#36b9cc',
-                pointHoverBorderColor: '#fff',
-                fill: false
-            });
-        }
-
-        // Add team average for comparison
-        datasets.push({
-            label: 'Team Average',
-            data: generateRandomData(12, 15, 30),
-            borderColor: '#858796',
-            backgroundColor: 'rgba(133, 135, 150, 0.05)',
-            borderWidth: 2,
-            borderDash: [5, 5],
-            tension: 0.3,
-            pointRadius: 2,
-            pointBackgroundColor: '#858796',
-            pointBorderColor: '#fff',
-            pointHoverRadius: 4,
-            pointHoverBackgroundColor: '#858796',
-            pointHoverBorderColor: '#fff',
-            fill: false
-        });
-
-        // Update chart
-        comparisonChart.data.labels = labels;
-        comparisonChart.data.datasets = datasets;
-        comparisonChart.update();
-
-        // Add title or annotation if needed
-        comparisonChart.options.plugins.title = {
-            display: true,
-            text: 'Individual vs. Team Performance Comparison',
-            font: {
-                size: 16,
-                weight: 'bold'
-            },
-            padding: {
-                top: 10,
-                bottom: 20
-            }
-        };
-
-        comparisonChart.update();
-    }
-
-    // Helper function to generate random data for demonstration
-    function generateRandomData(count, min, max) {
-        const data = [];
-        for (let i = 0; i < count; i++) {
-            data.push(Math.floor(Math.random() * (max - min + 1)) + min);
-        }
-        return data;
-    }
-
-    // Initialize the comparison chart with empty data
-    function initializeComparisonChart() {
-        const ctx = document.getElementById('comparisonChart').getContext('2d');
-        return new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                datasets: [{
-                    label: 'Select users above to compare performance',
-                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                    borderColor: '#858796',
-                    backgroundColor: 'rgba(133, 135, 150, 0.1)',
-                    borderWidth: 1,
-                    borderDash: [5, 5],
-                    pointRadius: 0,
+            if (!data || !data.datasets || data.datasets.length === 0) {
+                chart.data.labels = [];
+                chart.data.datasets = [{
+                    label: 'No Data Available',
+                    data: [],
+                    borderColor: '#e74a3b',
+                    backgroundColor: 'rgba(231, 74, 59, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
                     fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Inspections Completed'
-                        },
-                        grid: {
-                            display: true,
-                            drawBorder: false,
-                            color: 'rgba(0, 0, 0, 0.05)'
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        position: 'top',
-                        labels: {
-                            boxWidth: 12,
-                            padding: 20,
-                            font: {
-                                size: 12
-                            }
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                        titleColor: '#5a5c69',
-                        bodyColor: '#5a5c69',
-                        borderColor: '#e3e6f0',
-                        borderWidth: 1,
-                        cornerRadius: 4,
-                        displayColors: true,
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed.y !== null) {
-                                    label += context.parsed.y + ' inspections';
-                                }
-                                return label;
-                            }
-                        }
-                    }
-                }
+                }];
+                chart.update();
+                return;
             }
-        });
+
+            chart.data.labels = data.labels;
+            chart.data.datasets = data.datasets.map((ds, index) => ({
+                label: ds.label,
+                data: ds.data,
+                borderColor: getLineColor(index),
+                backgroundColor: 'rgba(0, 123, 255, 0.05)',
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }));
+
+const titleParts = ['All Inspections'];
+if (selectedCoordinator) {
+    const select = document.getElementById('coordinatorSelect');
+    const name = select.options[select.selectedIndex]?.text;
+    if (name) titleParts.push(`${name} (Coordinator)`);
+}
+if (selectedTechnical) {
+    const select = document.getElementById('technicalCoordinatorSelect');
+    const name = select.options[select.selectedIndex]?.text;
+    if (name) titleParts.push(`${name} (Technical)`);
+}
+if (selectedInspector) {
+    const select = document.getElementById('inspectorSelect');
+    const name = select.options[select.selectedIndex]?.text;
+    if (name) titleParts.push(`${name} (Inspector)`);
+}
+
+chart.options.plugins.title = {
+    display: true,
+    text: titleParts.length > 1
+        ? titleParts.join(' vs ')
+        : 'All Inspections Trend',
+    font: {
+        size: 16,
+        weight: 'bold'
+    },
+    padding: {
+        top: 10,
+        bottom: 20
     }
+};
+            chart.update();
+        })
+        .catch(err => {
+            hideComparisonLoader();
+            console.error("Trend data fetch failed", err);
+            showNotification('Unable to load performance trends.', 'error');
+        });
+}
 
-    // Add event listeners after DOM is loaded
-    document.addEventListener('DOMContentLoaded', function() {
-        // Set up listeners for individual select changes
-        document.getElementById('coordinatorSelect').addEventListener('change', function() {
-            handleCoordinatorChange(this);
-            updateComparisonChart();
-        });
-        document.getElementById('technicalCoordinatorSelect').addEventListener('change', function() {
-            handleTechnicalCoordinatorChange(this);
-            updateComparisonChart();
-        });
-        document.getElementById('inspectorSelect').addEventListener('change', function() {
-            handleInspectorChange(this);
-            updateComparisonChart();
-        });
 
-        // Also update comparison chart when period changes
-        document.getElementById('coordinatorPeriodSelect').addEventListener('change', updateComparisonChart);
-        document.getElementById('technicalPeriodSelect').addEventListener('change', updateComparisonChart);
-        document.getElementById('inspectorPeriodSelect').addEventListener('change', updateComparisonChart);
+
+
+
+
+function getLineColor(index) {
+    const colors = ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'];
+    return colors[index % colors.length];
+}
+
+// Helper function to generate random data for demonstration
+function generateRandomData(count, min, max) {
+    const data = [];
+    for (let i = 0; i < count; i++) {
+        data.push(Math.floor(Math.random() * (max - min + 1)) + min);
+    }
+    return data;
+}
+// Add event listeners after DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Set up listeners for individual select changes
+    document.getElementById('coordinatorSelect').addEventListener('change', function() {
+        handleCoordinatorChange(this);
+
+    });
+    document.getElementById('technicalCoordinatorSelect').addEventListener('change', function() {
+        handleTechnicalCoordinatorChange(this);
+
+    });
+    document.getElementById('inspectorSelect').addEventListener('change', function() {
+        handleInspectorChange(this);
+        x
     });
 
-    /*]]>*/
+    // Also update comparison chart when period changes
+    document.getElementById('coordinatorPeriodSelect').addEventListener('change', updateComparisonChart);
+    document.getElementById('technicalPeriodSelect').addEventListener('change', updateComparisonChart);
+    document.getElementById('inspectorPeriodSelect').addEventListener('change', updateComparisonChart);
+});
+
+/*]]>*/
 </script>
 <style>
     /* Main Container Styles */
@@ -2233,6 +2018,171 @@ totalDisplayEl.innerHTML = `
 
 .bd-no-data-text {
     font-weight: 500;
+}
+    /* Performance Metrics Display Styles */
+.bd-performance-metrics-container {
+    background-color: #fff;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    padding: 20px;
+    min-height: 300px;
+    position: relative;
+}
+
+.bd-metrics-display {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.bd-metrics-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+.bd-metrics-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #5a5c69;
+}
+
+.bd-period-label {
+    font-size: 14px;
+    color: #858796;
+    background-color: rgba(78, 115, 223, 0.1);
+    padding: 4px 12px;
+    border-radius: 12px;
+}
+
+.bd-metrics-total {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    background-color: #f8f9fc;
+    border-radius: 6px;
+}
+
+.bd-total-number {
+    font-size: 36px;
+    font-weight: 700;
+    color: #4e73df;
+    line-height: 1;
+    margin-bottom: 5px;
+}
+
+.bd-total-label {
+    font-size: 16px;
+    color: #858796;
+}
+
+.bd-metrics-breakdown {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.bd-metric-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    background-color: #f8f9fc;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.bd-metric-value {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.bd-metric-label {
+    font-size: 14px;
+    color: #858796;
+}
+
+/* Color coding for different metrics */
+.bd-metric-item:nth-child(1) .bd-metric-value {
+    color: #4e73df; /* New - blue */
+}
+
+.bd-metric-item:nth-child(2) .bd-metric-value {
+    color: #1cc88a; /* Ongoing - green */
+}
+
+.bd-metric-item:nth-child(3) .bd-metric-value {
+    color: #36b9cc; /* Awarded - teal */
+}
+
+.bd-metric-item:nth-child(4) .bd-metric-value {
+    color: #f6c23e; /* Rejected - yellow */
+}
+
+/* Empty state styles */
+.bd-empty-state {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #858796;
+    width: 100%;
+    padding: 20px;
+}
+
+.bd-empty-state-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+    color: #d1d3e2;
+}
+
+.bd-empty-state-text {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+/* Loading overlay styles */
+.bd-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+.bd-loading-spinner {
+    font-size: 36px;
+    color: #4e73df;
+    margin-bottom: 10px;
+    animation: fa-spin 2s infinite linear;
+}
+
+.bd-loading-text {
+    font-size: 14px;
+    color: #5a5c69;
+}
+
+/* Highlight animation */
+@keyframes bd-highlight {
+    0% { background-color: #f8f9fc; }
+    50% { background-color: rgba(78, 115, 223, 0.2); }
+    100% { background-color: #f8f9fc; }
+}
+
+.bd-total-highlight {
+    animation: bd-highlight 1.5s ease;
 }
 </style>
 </body>

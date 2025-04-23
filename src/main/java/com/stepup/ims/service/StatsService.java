@@ -9,6 +9,7 @@ import com.itextpdf.layout.properties.UnitValue;
 import com.stepup.ims.entity.Inspection;
 import com.stepup.ims.model.BusinessStats;
 import com.stepup.ims.model.InpsectionStatsByRole;
+import com.stepup.ims.model.PerformanceTrendResponse;
 import com.stepup.ims.repository.InspectionRepository;
 import com.stepup.ims.repository.StatsRepository;
 import org.apache.poi.ss.usermodel.Row;
@@ -22,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -259,4 +261,63 @@ public class StatsService {
             throw new RuntimeException("Failed to generate Excel", e);
         }
     }
+    public PerformanceTrendResponse getPerformanceTrendData(String coordinator, String technical, String inspector) {
+        List<String> labels = List.of("Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+
+        List<PerformanceTrendResponse.Dataset> datasets = new ArrayList<>();
+
+        // ✅ Total Trend - ALL Inspections
+        List<Inspection> allInspections = inspectionRepository.findAll(); // or filter by year if needed
+        datasets.add(new PerformanceTrendResponse.Dataset(
+                "All Inspections",
+                groupByMonth(allInspections)
+        ));
+
+        if (coordinator != null && !coordinator.isBlank()) {
+            List<Inspection> inspections = inspectionRepository.findByCreatedBy(coordinator);
+            datasets.add(new PerformanceTrendResponse.Dataset(
+                    "Coordinator - " + coordinator,
+                    groupByMonth(inspections)
+            ));
+        }
+
+        if (technical != null && !technical.isBlank()) {
+            List<Inspection> inspections = inspectionRepository
+                    .findByProposedCVs_CvReviewBytechnicalCoordinator_EmpIdOrDocumentsReviewedByTechnicalCoordinatorOrInspectionReviewedBy(
+                            technical, technical, technical
+                    );
+            datasets.add(new PerformanceTrendResponse.Dataset(
+                    "Technical - " + technical,
+                    groupByMonth(inspections)
+            ));
+        }
+
+        if (inspector != null && !inspector.isBlank()) {
+            List<Inspection> inspections = inspectionRepository.findByProposedCVs_Inspector_Email(inspector);
+            datasets.add(new PerformanceTrendResponse.Dataset(
+                    "Inspector - " + inspector,
+                    groupByMonth(inspections)
+            ));
+        }
+
+        return new PerformanceTrendResponse(labels, datasets);
+    }
+
+
+    private List<Integer> groupByMonth(List<Inspection> inspections) {
+        Map<Integer, Long> grouped = inspections.stream()
+                .filter(i -> i.getCreatedDate() != null)
+                .collect(Collectors.groupingBy(
+                        i -> i.getCreatedDate().getMonthValue(),
+                        Collectors.counting()
+                ));
+
+        List<Integer> counts = new ArrayList<>();
+        for (int i = 1; i <= 12; i++) {
+            counts.add(grouped.getOrDefault(i, 0L).intValue());
+        }
+        return counts;
+    }
+
 }
