@@ -1,6 +1,7 @@
 package com.stepup.ims.controller;
 
 import com.stepup.ims.model.InpsectionStatsByRole;
+import com.stepup.ims.model.PerformanceTrendResponse;
 import com.stepup.ims.service.EmployeeService;
 import com.stepup.ims.service.InspectorService;
 import com.stepup.ims.service.StatsService;
@@ -9,9 +10,7 @@ import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -97,6 +96,16 @@ public class BusinessRoleController {
         headers.setContentDisposition(ContentDisposition.attachment().filename("coordinator-report.xlsx").build());
 
         return new ResponseEntity<>(report, headers, HttpStatus.OK);
+    }
+    @GetMapping("/trend-data")
+    @ResponseBody
+    public ResponseEntity<PerformanceTrendResponse> getTrendData(
+            @RequestParam(required = false) String coordinator,
+            @RequestParam(required = false) String technical,
+            @RequestParam(required = false) String inspector) {
+
+        PerformanceTrendResponse trendData = statsService.getPerformanceTrendData(coordinator, technical, inspector);
+        return ResponseEntity.ok(trendData);
     }
 
 }
