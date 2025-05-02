@@ -54,6 +54,9 @@ public class InspectionService {
         if (inspectionEntity.getProposedCVs().size() == 1 && inspectionEntity.getProposedCVs().get(0).getId() == null && inspectionEntity.getProposedCVs().get(0).getInspector().getInspectorId() == null) {
             inspectionEntity.setProposedCVs(null);
         }
+        if (inspectionEntity.getId() == null) {
+            inspectionEntity.setCoordinatorName(employeeService.getEmployeeNameByEmail(SecurityContextHolder.getContext().getAuthentication().getName()));
+        }
         var savedInspectionEntity = inspectionRepository.save(inspectionEntity);
 
         return inspectionModelMapper.toModel(savedInspectionEntity);

@@ -136,6 +136,9 @@ public class Inspection extends Auditable {
     @Column(name = "inspection_status", nullable = false)
     private InspectionStatusType inspectionStatus;
 
+    @Column(name = "coordinator_name", updatable = false)
+    private String coordinatorName;
+
 
     public enum InspectionType {
         MECHANICAL, ELECTRICAL

@@ -91,6 +91,8 @@ public class Inspection {
 
     private InspectionStatusType inspectionStatus;
 
+    private String coordinatorName;
+
     @JsonIgnore
     private List<String> countriesList;
 

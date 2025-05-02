@@ -20,7 +20,7 @@
                     <th>IISPL NO</th>
                     <th>Client Name - Country</th>
                     <th>Inspection Date</th>
-                    <th>Inspection Item</th>
+                    <th>Coordinator</th>
                     <th>Inspection Status</th>
                     <th>Actions</th>
                 </tr>
@@ -41,7 +41,7 @@
 
                         </ul>
                     </td>
-                    <td th:text="${inspection.inspectionItem}" class="text-small"></td>
+                    <td th:text="${inspection.coordinatorName}" class="text-small"></td>
                     <td th:text="${inspection.inspectionStatus.description}" class="text-small"></td>
                     <td>
                         <div class="d-flex justify-content-end">
