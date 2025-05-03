@@ -397,6 +397,15 @@ function prepareContractReview(inspectionId) {
   window.open(url, '_blank', `width=${width},height=${height},left=${left},top=${top}`);
  }
 
+ function viewContractReview(inspectionId) {
+   const url = `/contractReview/view/` + inspectionId;
+   const width = screen.width * 0.9;
+   const height = screen.height * 0.9;
+   const left = (screen.width - width) / 2;
+   const top = (screen.height - height) / 2;
+   window.open(url, '_blank', `width=${width},height=${height},left=${left},top=${top}`);
+  }
+
 /** =================== Inspection Advise ================= **/
 
 function prepareInspectionAdvise(inspectionId) {
@@ -407,10 +416,28 @@ function prepareInspectionAdvise(inspectionId) {
   const top = (screen.height - height) / 2;
   window.open(url, '_blank', `width=${width},height=${height},left=${left},top=${top}`);
  }
+
+ function viewInspectionAdvise(inspectionId) {
+   const url = `/inspectionAdvise/view/` + inspectionId;
+   const width = screen.width * 0.9;
+   const height = screen.height * 0.9;
+   const left = (screen.width - width) / 2;
+   const top = (screen.height - height) / 2;
+   window.open(url, '_blank', `width=${width},height=${height},left=${left},top=${top}`);
+  }
 /** ====================== PQR ========================== **/
 
 function editPQRForm(inspectorId) {
  const url = `/pqr/edit/` + inspectorId;
+ const width = screen.width * 0.9;
+ const height = screen.height * 0.9;
+ const left = (screen.width - width) / 2;
+ const top = (screen.height - height) / 2;
+ window.open(url, '_blank', `width=${width},height=${height},left=${left},top=${top}`);
+}
+
+function viewPQRForm(inspectorId) {
+ const url = `/pqr/view/` + inspectorId;
  const width = screen.width * 0.9;
  const height = screen.height * 0.9;
  const left = (screen.width - width) / 2;

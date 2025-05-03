@@ -21,12 +21,16 @@ public class UIRoutingConstants {
 
     // PQR Management
     public static final String RETURN_TO_PQR_FORM = "pqr/pqr-form";
+    public static final String RETURN_TO_PQR_VIEW = "pqr/pqr-view";
 
     // Contract Review Management
     public static final String RETURN_TO_CONTRACT_REVIEW_FORM = "contract-review/contract-review-form";
+    public static final String RETURN_TO_CONTRACT_REVIEW_VIEW = "contract-review/contract-review-view";
+
 
     // Inspection Advise
     public static final String RETURN_TO_INSPECTION_ADVISE_FORM = "inspection-advise/inspection-advise-form";
+    public static final String RETURN_TO_INSPECTION_ADVISE_VIEW = "inspection-advise/inspection-advise-view";
 
     // Inspection Management
     public static final String RETURN_TO_INSPECTION_FORM = "inspections/inspection-form";
