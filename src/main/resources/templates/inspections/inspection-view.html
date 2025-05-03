@@ -141,9 +141,20 @@
                         <span th:text="${cv.inspector.inspectorName}"></span>
                     </td>
 
-                    <td th:text="${cv.cvCertificatesAvailable != null && cv.cvCertificatesAvailable ? 'Yes' : 'No'}"></td>
+                    <td>
+                        <span th:text="${cv.cvCertificatesAvailable != null && cv.cvCertificatesAvailable ? 'Yes' : 'No'}"></span>
+                        <a href="#" class="btn btn-link btn-sm" th:href="${cv.cvCertificatesLink}" target="_blank">
+                            <i class="fas fa-link"></i></a>
+                    </td>
                     <td th:text="${cv.cvReviewByTechnicalCoordinator.empName}"></td>
-                    <td th:text="${cv.pqrAvailable != null && cv.pqrAvailable ? 'Yes' : 'No'}"></td>
+                    <td>
+                        <span th:text="${cv.pqrAvailable != null && cv.pqrAvailable ? 'Yes' : 'No'}"></span>
+                        <button type="button"
+                                class="btn btn-link btn-sm"
+                                th:onclick="|viewPQRForm(${cv.inspector.inspectorId})|">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </td>
                     <td th:text="${cv.cvSubmittedToClientDate}"></td>
                     <td th:text="${cv.cvStatus ? 'Approved' : 'Not Approved'}"></td>
                 </tr>
@@ -205,7 +216,14 @@
                 <div class="info-content">
                     <div class="info-label">Reference Documents</div>
                     <div class="info-value"
-                         th:text="${inspection.referenceDocumentsForInspectionStatus == true ? 'Available' : 'Not Available'}"></div>
+                         th:text="${inspection.referenceDocumentsForInspectionStatus == true ? 'Available' : 'Not Available'}">
+                        <a href="#"
+                           class="btn btn-link btn-sm"
+                           th:href="${inspection.referenceDocumentsLink}"
+                           target="_blank">
+                            <i class="fas fa-link"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
 
@@ -223,8 +241,14 @@
                 <i class="fas fa-file-alt"></i>
                 <div class="info-content">
                     <div class="info-label">Contract Review Prepared</div>
-                    <div class="info-value"
-                         th:text="${inspection.contractReviewPrepared != null && inspection.contractReviewPrepared ? 'Yes' : 'No'}"></div>
+                    <div class="info-value">
+                        <span th:text="${inspection.contractReviewPrepared != null && inspection.contractReviewPrepared ? 'Yes' : 'No'}"></span>
+                        <button type="button"
+                                class="btn btn-link btn-sm"
+                                th:onclick="|viewContractReview(${inspection.id})|">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -233,8 +257,14 @@
                 <i class="fas fa-sticky-note"></i>
                 <div class="info-content">
                     <div class="info-label">Inspection Advise Note</div>
-                    <div class="info-value"
-                         th:text="${inspection.inspectionAdviseNote != null && inspection.inspectionAdviseNote ? 'Yes' : 'No'}"></div>
+                    <div class="info-value">
+                        <span th:text="${inspection.inspectionAdviseNote != null && inspection.inspectionAdviseNote ? 'Yes' : 'No'}"></span>
+                        <button type="button"
+                                class="btn btn-link btn-sm"
+                                th:onclick="|viewInspectionAdvise(${inspection.id})|">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
