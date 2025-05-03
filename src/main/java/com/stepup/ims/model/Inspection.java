@@ -51,6 +51,8 @@ public class Inspection {
 
     private boolean referenceDocumentsForInspectionStatus;
 
+    private String referenceDocumentsLink;
+
     private String documentsReviewedByTechnicalCoordinator;
 
     private boolean contractReviewPrepared;

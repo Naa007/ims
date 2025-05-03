@@ -14,6 +14,7 @@ public class ProposedCVs {
     @ToString.Exclude
     private Inspector inspector;
     private boolean cvCertificatesAvailable;
+    private String cvCertificatesLink;
     @ToString.Exclude
     private Employee cvReviewByTechnicalCoordinator;
     private boolean pqrAvailable;

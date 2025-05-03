@@ -78,6 +78,9 @@ public class Inspection extends Auditable {
     @Column(name = "reference_documents_for_inspection_status")
     private boolean referenceDocumentsForInspectionStatus;
 
+    @Column(name = "reference_documents_link")
+    private String referenceDocumentsLink;
+
     @Column(name = "documents_reviewed_by_technical_coordinator")
     private String documentsReviewedByTechnicalCoordinator;
 

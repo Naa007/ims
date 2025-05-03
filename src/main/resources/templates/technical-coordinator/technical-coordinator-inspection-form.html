@@ -49,6 +49,15 @@
                             <div class="info-value" th:text="${inspection.client.clientName+ ' - ' + inspection.client.country}"></div>
                         </div>
                     </div>
+
+                    <!-- Coordinator Name -->
+                    <div class="info-item">
+                        <i class="fas fa-user"></i>
+                        <div class="info-content">
+                            <div class="info-label">Coordinator Name</div>
+                            <div class="info-value" th:text="${inspection.coordinatorName}"></div>
+                        </div>
+                    </div>
     
                 </div>
     
@@ -152,7 +161,7 @@
                                 </select>
                             </td>
                             <td class="text-center">
-                                <div class="d-flex justify-content-center align-items-center">
+                                <div class="d-flex justify-content-center">
                                     <select class="form-select form-select-sm"
                                             th:name="proposedCVs[__${iterStat.index}__].cvCertificatesAvailable"
                                             disabled>
@@ -163,6 +172,12 @@
                                             No
                                         </option>
                                     </select>
+                                    <a href="#"
+                                       class="btn btn-link btn-sm"
+                                       th:href="${cv.cvCertificatesLink}"
+                                       target="_blank">
+                                        <i class="fas fa-link"></i>
+                                    </a>
                                 </div>
     
                             </td>
@@ -263,7 +278,14 @@
                         <div class="info-content">
                             <div class="info-label">Reference Documents</div>
                             <div class="info-value"
-                                 th:text="${inspection.referenceDocumentsForInspectionStatus == true ? 'Available' : 'Not Available'}"></div>
+                                 th:text="${inspection.referenceDocumentsForInspectionStatus == true ? 'Available' : 'Not Available'}">
+                                <a href="#"
+                                   class="btn btn-link btn-sm"
+                                   th:href="${inspection.referenceDocumentsLink}"
+                                   target="_blank">
+                                    <i class="fas fa-link"></i>
+                                </a>
+                            </div>
                         </div>
                     </div>
 
