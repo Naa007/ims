@@ -18,7 +18,7 @@
                 <thead>
                 <tr>
                     <th>IISPL NO</th>
-                    <th>Client Name - Country</th>
+                    <th>Vendor - Location</th>
                     <th>Inspection Date</th>
                     <th>Coordinator</th>
                     <th>Inspection Status</th>
@@ -29,7 +29,7 @@
                 <!-- Assuming inspections data comes from backend -->
                 <tr th:each="inspection : ${inspections}">
                     <td th:text="${inspection.inspectionNo}"></td>
-                    <td th:text="${inspection.client.clientName + ' - ' + inspection.client.country}"></td>
+                    <td th:text="${inspection.inspectionLocationDetails}"></td>
                     <td>
                         <ul class="list-unstyled d-inline">
                             <i th:if="${inspection.inspectionDateAsPerNotification.size() > 2}"

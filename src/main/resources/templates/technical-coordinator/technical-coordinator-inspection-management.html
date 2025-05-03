@@ -18,7 +18,7 @@
                 <thead>
                 <tr>
                     <th>IISPL NO</th>
-                    <th>Client Name - Country</th>
+                    <th>Vendor - Location</th>
                     <th>Inspection Date</th>
                     <th>Coordinator</th>
                     <th>Inspection Status</th>
@@ -28,7 +28,7 @@
                 <tbody>
                 <tr th:each="inspection : ${inspections}">
                     <td th:text="${inspection.inspectionNo}" class="text-small"></td>
-                    <td th:text="${inspection.client.clientName + ' - ' + inspection.client.country}"
+                    <td th:text="${inspection.inspectionLocationDetails}"
                         class="text-small"></td>
                     <td class="text-small">
                         <ul class="list-unstyled d-inline">
