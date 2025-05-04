@@ -32,12 +32,12 @@
                         class="text-small"></td>
                     <td class="text-small">
                         <ul class="list-unstyled d-inline">
-                            <i th:if="${inspection.inspectionDateAsPerNotification.size() > 2}"
+                            <li th:each="date, iterStat : ${inspection.inspectionDateAsPerNotification}"
+                                class="d-inline"
+                                th:text="${iterStat.index == 0 ? date : ''}"></li>
+                            <i th:if="${inspection.inspectionDateAsPerNotification.size() > 1}"
                                class="fas fa-info-circle d-inline text-muted ml-1"
                                th:attr="title=${inspection.inspectionDateAsPerNotification}"></i>
-                            <li th:each="date, iterStat : ${inspection.inspectionDateAsPerNotification}"
-                                th:text="${iterStat.index < 2 ? date : ''}"
-                                th:classappend="${iterStat.index > 1 ? 'd-none' : ''}"></li>
 
                         </ul>
                     </td>
