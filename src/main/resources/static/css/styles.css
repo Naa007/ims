@@ -20,6 +20,9 @@
     --button-red-bg: #dc3545; /* Red color button */
     --button-red-border-color: #dc3545; /* Red color button border */
     --card-icon-bg: #e1f0fa; /* Card Icon bg */
+    --font-size-regular: 0.85rem; /* Regular font-size */
+    --font-size-subtitle: 1rem;
+    --font-size-title: 1.7rem;
 
 }
 
@@ -62,13 +65,13 @@ h5 {
 .form-title {
     color: var(--primary-color);
     font-weight: 600;
-    font-size: 2rem; /* Increased font size */
+    font-size: var(--font-size-title); /* Increased font size */
     margin-bottom: 0.5rem;
 }
 
 .form-subtitle {
     color: var(--subtitle-soft-text); /* Softer subtitle color */
-    font-size: 1.1rem; /* Increased font size */
+    font-size: var(--font-size-subtitle); /* Increased font size */
     font-weight: 400;
 }
 
@@ -83,8 +86,8 @@ h5 {
 }
 
 .form-label {
-    font-weight: 500;
-    color: var(--form-label-or-icon-color); /* Darker label color */
+    font-weight: 430;
+    color: var(--subtitle-soft-text); /* Darker label color */
     margin-bottom: 0.5rem;
 }
 
@@ -599,7 +602,7 @@ form {
 }
 
 label {
-    font-size: 1rem;
+    font-size: var(--font-size-regular);
     margin-bottom: 0.5rem;
     font-weight: bold;
 }
