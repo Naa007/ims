@@ -3,11 +3,14 @@ package com.stepup.ims.service;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.stepup.ims.entity.Inspection;
 import com.stepup.ims.model.BusinessStats;
+import com.stepup.ims.model.IndividualStats;
 import com.stepup.ims.model.InpsectionStatsByRole;
 import com.stepup.ims.model.PerformanceTrendResponse;
 import com.stepup.ims.repository.InspectionRepository;
@@ -15,6 +18,7 @@ import com.stepup.ims.repository.StatsRepository;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -176,7 +180,7 @@ public class StatsService {
         return new InpsectionStatsByRole(totalInspections, newInspections, completedInspections, ongoingInspections, rejectedInspections, InpsectionStatsByRole.PeriodType.valueOf(period.toUpperCase()));
     }
     public byte[] generateCoordinatorReport(String email, String period, String format) {
-        Map<String, Integer> stats = getStatsByEmailAndPeriod(email, period);
+        Map<String, Integer> stats = getStatsByEmailAndPeriod(email, "coordinator", period);
 
         if ("pdf".equalsIgnoreCase(format)) {
             return generateCoordinatorPdf(email, period, stats);
@@ -184,8 +188,43 @@ public class StatsService {
             return generateCoordinatorExcel(email, period, stats);
         }
     }
-    private Map<String, Integer> getStatsByEmailAndPeriod(String createdBy, String period) {
-        List<Inspection> allInspections = inspectionRepository.findByCreatedBy(createdBy);
+
+    public byte[] generateTechCoordinatorReport(String empId, String period, String format) {
+        Map<String, Integer> stats = getStatsByEmailAndPeriod(empId, "technical", period);
+
+        if ("pdf".equalsIgnoreCase(format)) {
+            return generateTechnicalCoordinatorPdf(empId, period, stats);
+        } else {
+            return generateTechnicalCoordinatorExcel(empId, period, stats);
+        }
+    }
+
+    public byte[] generateInspectorReport(String email, String period, String format) {
+        Map<String, Integer> stats = getStatsByEmailAndPeriod(email, "inspector", period);
+
+        if ("pdf".equalsIgnoreCase(format)) {
+            return generateInspectorPdf(email, period, stats);
+        } else {
+            return generateInspectorExcel(email, period, stats);
+        }
+    }
+    private Map<String, Integer> getStatsByEmailAndPeriod(String identifier, String role, String period) {
+        List<Inspection> inspections;
+
+        switch(role.toLowerCase()) {
+            case "coordinator":
+                inspections = inspectionRepository.findByCreatedBy(identifier);
+                break;
+            case "technical":
+                inspections = inspectionRepository.findByProposedCVs_CvReviewBytechnicalCoordinator_EmpIdOrDocumentsReviewedByTechnicalCoordinatorOrInspectionReviewedBy(
+                        identifier, identifier, identifier);
+                break;
+            case "inspector":
+                inspections = inspectionRepository.findByProposedCVs_Inspector_Email(identifier);
+                break;
+            default:
+                inspections = new ArrayList<>();
+        }
 
         LocalDate now = LocalDate.now();
         LocalDate startDate;
@@ -197,7 +236,7 @@ public class StatsService {
             default: startDate = now.minusDays(30); break;
         }
 
-        return allInspections.stream()
+        return inspections.stream()
                 .filter(i -> i.getOrderConfirmationDate() != null &&
                         !i.getOrderConfirmationDate().isBefore(startDate))
                 .collect(Collectors.groupingBy(
@@ -261,6 +300,117 @@ public class StatsService {
             throw new RuntimeException("Failed to generate Excel", e);
         }
     }
+    // Technical Coordinator PDF Report
+    private byte[] generateTechnicalCoordinatorPdf(String email, String period, Map<String, Integer> stats) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        PdfWriter writer = new PdfWriter(out);
+        PdfDocument pdf = new PdfDocument(writer);
+        Document document = new Document(pdf);
+
+        document.add(new Paragraph("Technical Coordinator Performance Report").setBold().setFontSize(18));
+        document.add(new Paragraph("Technical Coordinator ID: " + email));
+        document.add(new Paragraph("Period: " + period));
+        document.add(new Paragraph("\n"));
+
+        Table table = new Table(UnitValue.createPercentArray(2)).useAllAvailableWidth();
+        table.addHeaderCell("Inspection Status");
+        table.addHeaderCell("Count");
+
+        stats.forEach((status, count) -> {
+            table.addCell(status);
+            table.addCell(count.toString());
+        });
+
+        document.add(table);
+        document.close();
+        return out.toByteArray();
+    }
+
+    private byte[] generateTechnicalCoordinatorExcel(String email, String period, Map<String, Integer> stats) {
+        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            Sheet sheet = workbook.createSheet("Technical Coordinator Report");
+
+            Row header = sheet.createRow(0);
+            header.createCell(0).setCellValue("Technical Coordinator Report");
+
+            sheet.createRow(1).createCell(0).setCellValue("Technical Coordinator ID: " + email);
+            sheet.createRow(2).createCell(0).setCellValue("Period: " + period);
+
+            Row titleRow = sheet.createRow(4);
+            titleRow.createCell(0).setCellValue("Inspection Status");
+            titleRow.createCell(1).setCellValue("Count");
+
+            int rowIdx = 5;
+            for (Map.Entry<String, Integer> entry : stats.entrySet()) {
+                Row row = sheet.createRow(rowIdx++);
+                row.createCell(0).setCellValue(entry.getKey());
+                row.createCell(1).setCellValue(entry.getValue());
+            }
+
+            sheet.autoSizeColumn(0);
+            sheet.autoSizeColumn(1);
+            workbook.write(out);
+            return out.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to generate Excel", e);
+        }
+    }
+
+    private byte[] generateInspectorPdf(String email, String period, Map<String, Integer> stats) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        PdfWriter writer = new PdfWriter(out);
+        PdfDocument pdf = new PdfDocument(writer);
+        Document document = new Document(pdf);
+
+        document.add(new Paragraph("Inspector Performance Report").setBold().setFontSize(18));
+        document.add(new Paragraph("Inspector email: " + email));
+        document.add(new Paragraph("Period: " + period));
+        document.add(new Paragraph("\n"));
+
+        Table table = new Table(UnitValue.createPercentArray(2)).useAllAvailableWidth();
+        table.addHeaderCell("Inspection Status");
+        table.addHeaderCell("Count");
+
+        stats.forEach((status, count) -> {
+            table.addCell(status);
+            table.addCell(count.toString());
+        });
+
+        document.add(table);
+        document.close();
+        return out.toByteArray();
+    }
+
+    private byte[] generateInspectorExcel(String email, String period, Map<String, Integer> stats) {
+        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            Sheet sheet = workbook.createSheet("Inspector Report");
+
+            Row header = sheet.createRow(0);
+            header.createCell(0).setCellValue("Inspector Report");
+
+            sheet.createRow(1).createCell(0).setCellValue("Inspector email: " + email);
+            sheet.createRow(2).createCell(0).setCellValue("Period: " + period);
+
+            Row titleRow = sheet.createRow(4);
+            titleRow.createCell(0).setCellValue("Inspection Status");
+            titleRow.createCell(1).setCellValue("Count");
+
+            int rowIdx = 5;
+            for (Map.Entry<String, Integer> entry : stats.entrySet()) {
+                Row row = sheet.createRow(rowIdx++);
+                row.createCell(0).setCellValue(entry.getKey());
+                row.createCell(1).setCellValue(entry.getValue());
+            }
+
+            sheet.autoSizeColumn(0);
+            sheet.autoSizeColumn(1);
+            workbook.write(out);
+            return out.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to generate Excel", e);
+        }
+    }
+
     public PerformanceTrendResponse getPerformanceTrendData(String coordinator, String technical, String inspector) {
         List<String> labels = List.of("Jan", "Feb", "Mar", "Apr", "May", "Jun",
                 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
@@ -319,5 +469,31 @@ public class StatsService {
         }
         return counts;
     }
+    public Map<String, Object> getInspections(String email) {
+        IndividualStats stats = statsRepository.getIndividualStats(email);
 
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("Total Inspections", stats.getTotalInspections());
+        result.put("New", stats.getNewInspections());
+        result.put("Ongoing", calculateOngoingInspections(stats));
+        result.put("Awarded", stats.getAwardedInspections());
+        result.put("Rejected", stats.getRejectedInspections());
+        result.put("Closed", stats.getClosedInspections());
+
+        return result;
+    }
+
+    private long calculateOngoingInspections(IndividualStats stats) {
+        return stats.getInspectorAssigned() +
+                stats.getInspectorReviewAwaiting() +
+                stats.getInspectorReviewCompleted() +
+                stats.getInspectorApproved() +
+                stats.getReferenceDocReceived() +
+                stats.getReferenceDocReviewAwaiting() +
+                stats.getReferenceDocReviewCompleted() +
+                stats.getInspectionReportsReceived() +
+                stats.getInspectionReportsReviewAwaiting() +
+                stats.getInspectionReportsReviewCompleted() +
+                stats.getInspectionReportsSentToClient();
+    }
 }

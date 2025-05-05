@@ -97,6 +97,55 @@ public class BusinessRoleController {
 
         return new ResponseEntity<>(report, headers, HttpStatus.OK);
     }
+
+    @GetMapping("/technical-coordinator-report/{empId}/{period}/pdf")
+    public ResponseEntity<byte[]> exportTechCoordinatorPdf(@PathVariable String empId, @PathVariable String period) {
+        byte[] report = statsService.generateTechCoordinatorReport(empId, period, "pdf");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(ContentDisposition.attachment()
+                .filename("TechnicalCoordinator-report.pdf").build());
+
+        return new ResponseEntity<>(report, headers, HttpStatus.OK);
+    }
+
+    @GetMapping("/technical-coordinator-report/{empId}/{period}/excel")
+    public ResponseEntity<byte[]> exportTechCoordinatorExcel(@PathVariable String empId, @PathVariable String period) {
+        byte[] report = statsService.generateTechCoordinatorReport(empId, period, "excel");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+        headers.setContentDisposition(ContentDisposition.attachment()
+                .filename("TechnicalCoordinator-report.xlsx").build());
+
+        return new ResponseEntity<>(report, headers, HttpStatus.OK);
+    }
+
+    @GetMapping("/inspector-report/{email}/{period}/pdf")
+    public ResponseEntity<byte[]> exportInspectorPdf(@PathVariable String email, @PathVariable String period) {
+        byte[] report = statsService.generateInspectorReport(email, period, "pdf");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(ContentDisposition.attachment()
+                .filename("Inspector-report.pdf").build());
+
+        return new ResponseEntity<>(report, headers, HttpStatus.OK);
+    }
+
+    @GetMapping("/inspector-report/{email}/{period}/excel")
+    public ResponseEntity<byte[]> exportInspectorExcel(@PathVariable String email, @PathVariable String period) {
+        byte[] report = statsService.generateInspectorReport(email, period, "excel");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+        headers.setContentDisposition(ContentDisposition.attachment()
+                .filename("Inspector-report.xlsx").build());
+
+        return new ResponseEntity<>(report, headers, HttpStatus.OK);
+    }
+
     @GetMapping("/trend-data")
     @ResponseBody
     public ResponseEntity<PerformanceTrendResponse> getTrendData(
