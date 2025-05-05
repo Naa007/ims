@@ -4,7 +4,6 @@ import com.stepup.ims.model.Inspection;
 import com.stepup.ims.model.ProposedCVs;
 import com.stepup.ims.modelmapper.InspectionModelMapper;
 import com.stepup.ims.service.*;
-import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -66,14 +65,10 @@ public class InspectionController {
 
     @PostMapping(value = "/save")
     public String createInspection(@ModelAttribute Inspection inspection) {
-        inspectionService.saveInspection(inspection);
-        if(inspection.getId() == null){
-            try {
-                emailService.sendNotificationEmail(inspection);
-            } catch (MessagingException ignored) {
-                // TODO: add loggers
-            }
-        }
+        Inspection originalInspection = inspection.getId() == null ? inspection :
+                inspectionService.getInspectionById(inspection.getId()).orElse(null);
+        Inspection savedInspection = inspectionService.saveInspection(inspection);
+        emailService.sendNotificationEmail(originalInspection, savedInspection);
         return REDIRECT_INSPECTION_MANAGEMENT;
     }
 

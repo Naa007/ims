@@ -64,7 +64,6 @@ public class Inspection {
 
     private boolean anyInspectionIssues;
 
-
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
     private LocalDate frSentToClientDate;
 
@@ -120,7 +119,7 @@ public class Inspection {
         INSPECTOR_APPROVED( "Inspector Approved"),
         REFERENCE_DOC_RECEIVED( "Docs Received"),
         REFERENCE_DOC_REVIEW_AWAITING("Docs Review Awaiting"),
-        REFERENCE_DOC_REVIEW_COMPLETED("Docs Review Complete"),
+        REFERENCE_DOC_REVIEW_COMPLETED("Docs Review Completed"),
         INSPECTION_REPORTS_RECEIVED( "Reports Received"),
         INSPECTION_REPORTS_REVIEW_AWAITING( "Reports Review Awaiting"),
         INSPECTION_REPORTS_REVIEW_COMPLETED( "Reports Review Completed"),
