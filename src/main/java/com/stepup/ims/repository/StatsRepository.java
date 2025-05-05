@@ -1,6 +1,7 @@
 package com.stepup.ims.repository;
 
 import com.stepup.ims.model.BusinessStats;
+import com.stepup.ims.model.IndividualStats;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import org.springframework.stereotype.Repository;
@@ -62,5 +63,52 @@ public class StatsRepository {
 
         Query query = entityManager.createNativeQuery(sqlQuery, BusinessStats.class);
         return (BusinessStats) query.getSingleResult();
+    }
+    public IndividualStats getIndividualStats(String email) {
+        String sqlQuery = "SELECT " +
+                // Total inspections for this coordinator
+                "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.created_by = :email) AS totalInspections, " +
+
+                // Inspection status counts for this coordinator
+                "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.created_by = :email AND ins.inspection_status = '0') AS newInspections, " +
+                "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.created_by = :email AND ins.inspection_status = '1') AS inspectorAssigned, " +
+                "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.created_by = :email AND ins.inspection_status = '2') AS inspectorReviewAwaiting, " +
+                "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.created_by = :email AND ins.inspection_status = '3') AS inspectorReviewCompleted, " +
+                "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.created_by = :email AND ins.inspection_status = '4') AS inspectorApproved, " +
+                "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.created_by = :email AND ins.inspection_status = '5') AS referenceDocReceived, " +
+                "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.created_by = :email AND ins.inspection_status = '6') AS referenceDocReviewAwaiting, " +
+                "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.created_by = :email AND ins.inspection_status = '7') AS referenceDocReviewCompleted, " +
+                "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.created_by = :email AND ins.inspection_status = '8') AS inspectionReportsReceived, " +
+                "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.created_by = :email AND ins.inspection_status = '9') AS inspectionReportsReviewAwaiting, " +
+                "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.created_by = :email AND ins.inspection_status = '10') AS inspectionReportsReviewCompleted, " +
+                "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.created_by = :email AND ins.inspection_status = '11') AS inspectionReportsSentToClient, " +
+                "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.created_by = :email AND ins.inspection_status = '12') AS awardedInspections, " +
+                "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.created_by = :email AND ins.inspection_status = '13') AS rejectedInspections, " +
+                "(SELECT COUNT(ins.inspection_id) FROM inspection ins WHERE ins.created_by = :email AND ins.inspection_status = '14') AS closedInspections " +
+                "FROM DUAL";
+
+        Query query = entityManager.createNativeQuery(sqlQuery)
+                .setParameter("email", email);
+
+        Object[] result = (Object[]) query.getSingleResult();
+
+        return new IndividualStats(
+                ((Number) result[0]).longValue(),
+                ((Number) result[1]).longValue(),
+                ((Number) result[2]).longValue(),
+                ((Number) result[3]).longValue(),
+                ((Number) result[4]).longValue(),
+                ((Number) result[5]).longValue(),
+                ((Number) result[6]).longValue(),
+                ((Number) result[7]).longValue(),
+                ((Number) result[8]).longValue(),
+                ((Number) result[9]).longValue(),
+                ((Number) result[10]).longValue(),
+                ((Number) result[11]).longValue(),
+                ((Number) result[12]).longValue(),
+                ((Number) result[13]).longValue(),
+                ((Number) result[14]).longValue(),
+                ((Number) result[15]).longValue()
+        );
     }
 }
