@@ -78,4 +78,10 @@ public class InspectorService {
                         )
                 ));
     }
+
+    public List<Inspector> getInspectorsListByCountry(String country) {
+        return inspectorModelMapper.toModelList(
+                inspectorRepository.findAllByCountryAndInspectorStatus(country, com.stepup.ims.entity.Inspector.InspectorStatusType.ACTIVE));
+    }
+
 }

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<!-- Head -->
+<head th:replace="fragments/head :: head"><title>Inspection Contract Review Add/Edit</title></head>
+<body>
+
+<!-- Main Content -->
+<main>
+
+    <div class="form-card">
+        
+        <div class="form-header">
+            <h1 class="form-title">View Inspection Contract Review</h1>
+            <p class="form-subtitle">This page shows the Contract Review information of the inspection</p>
+        </div>
+
+        <!-- Client/Project Documents -->
+        <h4 class="section-header">
+            <i class="fas fa-briefcase me-2"></i> Client/Project Documents
+        </h4>
+        
+        <div>
+            <!-- Contract Documents -->
+            <div>
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Document Description</th>
+                        <th>Status</th>
+                        <th>Special Remarks</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="contractDocument, iterStat : ${contractReview.contractDocumentList}">
+
+                        <!-- Document Description -->
+                        <td>
+                            <span th:text="*{contractReview.contractDocumentList[__${iterStat.index}__].documentDescription}"></span>
+                        </td>
+
+                        <!-- Status -->
+                        <td>
+                            <span th:text="*{contractReview.contractDocumentList[__${iterStat.index}__].status}"></span>
+                        </td>
+
+                        <!-- Special Remarks -->
+                        <td>                            
+                            <span th:text="*{contractReview.contractDocumentList[__${iterStat.index}__].specialRemarks}"
+                                  class="form-control"></span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div><br/>
+            
+        <!-- Submission List -->
+        <h4 class="section-header">
+            <i class="fas fa-file-alt me-2"></i> Submission List
+        </h4>
+         
+        <div class="info-section">
+
+            <!-- submissionList  -->
+            <div class="info-item">
+                <i class="fas fa-list me-2"></i>
+                <div class="info-content">
+                    <div class="info-label">Submission List</div>
+                    <div th:text="${contractReview.submissionList}"></div>
+                </div>
+            </div>
+            
+        </div>
+
+        <!-- Conclusion -->
+        <h4 class="section-header">
+            <i class="fas fa-check-circle me-2"></i> Conclusion
+        </h4>
+
+        <div class="info-section">
+
+            <!-- Conclusion  -->
+            <div class="info-item">
+                <i class="fas fa-check-circle me-2"></i>
+                <div class="info-content">
+                    <div class="info-label">Conclusion</div>
+                    <div th:text="${contractReview.conclusion}"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="text-end mt-3">
+            <button type="button" class="btn btn-primary" onclick="window.close()">Close</button>
+        </div>
+
+    </div>
+
+</main>
+
+</body>
+</html>

@@ -26,6 +26,9 @@ public class ProposedCVs {
     @Column(name = "cv_certificates_available")
     private boolean cvCertificatesAvailable;
 
+    @Column(name = "cv_certificates_link")
+    private String cvCertificatesLink;
+
     @ManyToOne
     @JoinColumn(name = "technical_coordinator_id", referencedColumnName = "emp_id", unique = false)
     @Filter(name = "technicalCoordinatorFilter", condition = "inspector_type = 'TECHNICAL_COORDINATOR'")

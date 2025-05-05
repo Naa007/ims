@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<!-- Head -->
+<head th:replace="fragments/head :: head"><title>Inspection Advice Note Add/Edit</title></head>
+<body>
+
+<!-- Main Content -->
+<main>
+
+    <div class="form-card">
+
+        <div class="form-header">
+            <h1 class="form-title">View Inspection Advice Note</h1>
+            <p class="form-subtitle">This page shows the Advice Note of the inspection</p>
+        </div>
+
+        <!-- Scope of Inspection -->
+        <h4 class="section-header">
+            <i class="fas fa-sitemap me-2"></i> Scope of Inspection
+        </h4>
+
+        <div>
+            <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Scopes</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="scopeOfInspection, iterStat : ${inspectionAdvise.scopeOfInspectionList}">
+
+                            <!-- scopes -->
+                            <td>
+                                <span th:text="*{inspectionAdvise.scopeOfInspectionList[__${iterStat.index}__].scopeOfInspection.name}"></span>
+                            </td>
+
+                            <!-- Status -->
+                            <td>
+                                <span th:text="*{inspectionAdvise.scopeOfInspectionList[__${iterStat.index}__].status}"></span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+        </div><br/>
+            
+        <!-- Scope of Inspection -->
+        <h4 class="section-header">
+            <i class="fas fa-sitemap me-2"></i> Client Instructions to Inspector
+        </h4>
+
+        <!-- Requirement & Reporting Format -->
+        <div class="info-section">
+
+            <!-- Requirement  -->
+            <div class="info-item">
+                <i class=" fas fa-file-alt me-2"></i>
+                <div class="info-content">
+                    <div class="info-label">Requirement</div>
+                    <div th:text="${inspectionAdvise.requirement}"></div>
+                </div>
+            </div>
+
+            <!-- Reporting Format  -->
+            <div class="info-item">
+                <i class="fas fa-file-alt me-2"></i>
+                <div class="info-content">
+                    <div class="info-label">Reporting Format</div>
+                    <div th:text="*{inspectionAdvise.reportingFormat}"></div>
+                </div>
+            </div>
+         
+        </div>
+
+        <!-- Client Instruction To Inspector-->
+        <div>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Instructions</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="clientInstruction, iterStat : ${inspectionAdvise.clientInstructionToInspectorList}">
+
+                        <!-- Instructions -->
+                        <td>
+                            <span th:text="*{inspectionAdvise.clientInstructionToInspectorList[__${iterStat.index}__].clientInstruction.name}"></span>
+                        </td>
+
+                        <!-- Status -->
+                        <td>
+                            <span th:text="*{inspectionAdvise.clientInstructionToInspectorList[__${iterStat.index}__].status}"></span>
+                        </td>
+
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Instructions From Technical Team -->
+        <h4 class="section-header">
+            <i class="fas fa-check-circle me-2"></i> Instructions from Technical Team
+        </h4>
+
+        <div class="info-section">
+
+            <!-- instructionsFromTechnicalTeam  -->
+            <div class="info-item">
+                <i class="fas fa-file-alt me-2"></i>
+                <div class="info-content">
+                    <div class="info-label">Instructions from Technical Team</div>
+                    <div th:text="${inspectionAdvise.instructionsFromTechnicalTeam}"></div>
+                </div>
+            </div>
+
+        </div>
+        
+
+        <!-- Ackowledge From Inspector -->
+        <h4 class="section-header">
+                <i class="fas fa-check-circle me-2"></i> Acknowledge From Inspector
+            </h4>
+
+        <div>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Scopes</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="acknowledgement, iterStat : ${inspectionAdvise.acknowledgeFromInspectorList}">
+                        <!-- scopes -->
+                        <td>
+                            <span th:text="*{inspectionAdvise.acknowledgeFromInspectorList[__${iterStat.index}__].acknowledgement.name}"></span>
+                        </td>
+
+                        <!-- Status -->
+                        <td>
+                            <span th:text="*{inspectionAdvise.acknowledgeFromInspectorList[__${iterStat.index}__].status}"></span>
+                        </td>
+
+                    </tr>
+                </tbody>
+            </table>
+            </div><br/>
+            
+        <div class="text-end mt-3">
+                <button type="button" class="btn btn-primary" onclick="window.close()">Close</button>
+            </div>
+
+    </div>
+
+</main>
+
+</body>
+</html>

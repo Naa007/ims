@@ -51,6 +51,8 @@ public class Inspection {
 
     private boolean referenceDocumentsForInspectionStatus;
 
+    private String referenceDocumentsLink;
+
     private String documentsReviewedByTechnicalCoordinator;
 
     private boolean contractReviewPrepared;
@@ -61,7 +63,6 @@ public class Inspection {
     private LocalDate instructionsToInspectorDate;
 
     private boolean anyInspectionIssues;
-
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
     private LocalDate frSentToClientDate;
@@ -91,6 +92,8 @@ public class Inspection {
 
     private InspectionStatusType inspectionStatus;
 
+    private String coordinatorName;
+
     @JsonIgnore
     private List<String> countriesList;
 
@@ -114,15 +117,15 @@ public class Inspection {
         INSPECTOR_REVIEW_AWAITING( "Inspector Review Awaiting"),
         INSPECTOR_REVIEW_COMPLETED( "Inspector Review Completed"),
         INSPECTOR_APPROVED( "Inspector Approved"),
-        REFERENCE_DOC_RECEIVED( "Reference Documents Received"),
-        REFERENCE_DOC_REVIEW_AWAITING("Reference Documents Review Awaiting"),
-        REFERENCE_DOC_REVIEW_COMPLETED( "Reference Documents Review Completed"),
-        INSPECTION_REPORTS_RECEIVED( "Inspection Reports Received"),
-        INSPECTION_REPORTS_REVIEW_AWAITING( "Inspection Reports Review Awaiting"),
-        INSPECTION_REPORTS_REVIEW_COMPLETED( "Inspection Reports Review Completed"),
-        INSPECTION_REPORTS_SENT_TO_CLIENT( "Inspection Reports Sent to Client"),
-        INSPECTION_AWARDED( "Inspection Awarded"),
-        INSPECTION_REJECTED( "Inspection Rejected"),
+        REFERENCE_DOC_RECEIVED( "Docs Received"),
+        REFERENCE_DOC_REVIEW_AWAITING("Docs Review Awaiting"),
+        REFERENCE_DOC_REVIEW_COMPLETED("Docs Review Completed"),
+        INSPECTION_REPORTS_RECEIVED( "Reports Received"),
+        INSPECTION_REPORTS_REVIEW_AWAITING( "Reports Review Awaiting"),
+        INSPECTION_REPORTS_REVIEW_COMPLETED( "Reports Review Completed"),
+        INSPECTION_REPORTS_SENT_TO_CLIENT( "Reports Sent to Client"),
+        INSPECTION_AWARDED( "Awarded"),
+        INSPECTION_REJECTED( "Rejected"),
         CLOSED ("Closed");
 
         private final String description;

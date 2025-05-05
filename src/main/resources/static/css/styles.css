@@ -20,6 +20,9 @@
     --button-red-bg: #dc3545; /* Red color button */
     --button-red-border-color: #dc3545; /* Red color button border */
     --card-icon-bg: #e1f0fa; /* Card Icon bg */
+    --font-size-regular: 0.85rem; /* Regular font-size */
+    --font-size-subtitle: 1rem;
+    --font-size-title: 1.7rem;
 
 }
 
@@ -29,6 +32,14 @@ html, body {
     margin: 0;
     display: flex;
     flex-direction: column;
+}
+
+h1 {
+    font-size: 1.7rem;
+}
+
+h5 {
+    font-size: 1.1rem;
 }
 
 .page-container {
@@ -54,13 +65,13 @@ html, body {
 .form-title {
     color: var(--primary-color);
     font-weight: 600;
-    font-size: 2rem; /* Increased font size */
+    font-size: var(--font-size-title); /* Increased font size */
     margin-bottom: 0.5rem;
 }
 
 .form-subtitle {
     color: var(--subtitle-soft-text); /* Softer subtitle color */
-    font-size: 1.1rem; /* Increased font size */
+    font-size: var(--font-size-subtitle); /* Increased font size */
     font-weight: 400;
 }
 
@@ -71,12 +82,12 @@ html, body {
     border-radius: 6px;
     margin: 1.5rem 0 1rem 0;
     font-weight: 500;
-    font-size: 1.2rem; /* Increased font size */
+    font-size: 1.1rem; /* Increased font size */
 }
 
 .form-label {
-    font-weight: 500;
-    color: var(--form-label-or-icon-color); /* Darker label color */
+    font-weight: 430;
+    color: var(--subtitle-soft-text); /* Darker label color */
     margin-bottom: 0.5rem;
 }
 
@@ -117,14 +128,14 @@ table.certificate-table {
 }
 
 .certificate-table thead {
-    background-color: var(--form-lable-or-icon-bg); /* Light background for table header */
+    background-color: var(--primary-color); /* Light background for table header */
 }
 
 .certificate-table th {
     padding: 1rem;
     font-weight: 500;
     text-align: left;
-    color: var(--form-label-or-icon-color); /* Darker text color */
+    color: var(--white-color); /* Darker text color */
 }
 
 .certificate-table td {
@@ -212,6 +223,7 @@ main {
     max-width: 1200px;
     margin: 0 auto;
     width: 100%;
+    font-size: 0.85rem;
 }
 
 header::before {
@@ -323,7 +335,7 @@ footer p {
 .card-header {
    background: var(--primary-color);
    color: var(--white-color);
-   padding: 1.5rem;
+   padding: 1rem;
    font-weight: 600;
    border-bottom: none;
 }
@@ -444,7 +456,7 @@ footer p {
    padding: 15px;
    font-weight: 500;
    text-transform: uppercase;
-   font-size: 0.85rem;
+   font-size: 0.75rem;
    letter-spacing: 0.5px;
    border: none;
 }
@@ -590,7 +602,7 @@ form {
 }
 
 label {
-    font-size: 1rem;
+    font-size: var(--font-size-regular);
     margin-bottom: 0.5rem;
     font-weight: bold;
 }

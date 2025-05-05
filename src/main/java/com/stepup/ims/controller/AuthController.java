@@ -2,7 +2,7 @@ package com.stepup.ims.controller;
 
 import com.stepup.ims.model.AppUser;
 import com.stepup.ims.service.AppUserService;
-import com.stepup.ims.service.EmailOTPService;
+import com.stepup.ims.service.EmailService;
 import com.stepup.ims.service.EmployeeService;
 import com.stepup.ims.service.OTPService;
 import jakarta.servlet.http.HttpSession;
@@ -30,7 +30,7 @@ public class AuthController {
     private OTPService otpService;
 
     @Autowired
-    private EmailOTPService emailService;
+    private EmailService emailService;
 
     @Autowired
     private AppUserService appUserService;

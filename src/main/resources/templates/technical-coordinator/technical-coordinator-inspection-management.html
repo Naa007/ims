@@ -18,9 +18,9 @@
                 <thead>
                 <tr>
                     <th>IISPL NO</th>
-                    <th>Client Name - Country</th>
+                    <th>Vendor - Location</th>
                     <th>Inspection Date</th>
-                    <th>Inspection Item</th>
+                    <th>Coordinator</th>
                     <th>Inspection Status</th>
                     <th>Actions</th>
                 </tr>
@@ -28,20 +28,20 @@
                 <tbody>
                 <tr th:each="inspection : ${inspections}">
                     <td th:text="${inspection.inspectionNo}" class="text-small"></td>
-                    <td th:text="${inspection.client.clientName + ' - ' + inspection.client.country}"
+                    <td th:text="${inspection.inspectionLocationDetails}"
                         class="text-small"></td>
                     <td class="text-small">
                         <ul class="list-unstyled d-inline">
-                            <i th:if="${inspection.inspectionDateAsPerNotification.size() > 2}"
+                            <li th:each="date, iterStat : ${inspection.inspectionDateAsPerNotification}"
+                                class="d-inline"
+                                th:text="${iterStat.index == 0 ? date : ''}"></li>
+                            <i th:if="${inspection.inspectionDateAsPerNotification.size() > 1}"
                                class="fas fa-info-circle d-inline text-muted ml-1"
                                th:attr="title=${inspection.inspectionDateAsPerNotification}"></i>
-                            <li th:each="date, iterStat : ${inspection.inspectionDateAsPerNotification}"
-                                th:text="${iterStat.index < 2 ? date : ''}"
-                                th:classappend="${iterStat.index > 1 ? 'd-none' : ''}"></li>
 
                         </ul>
                     </td>
-                    <td th:text="${inspection.inspectionItem}" class="text-small"></td>
+                    <td th:text="${inspection.coordinatorName}" class="text-small"></td>
                     <td th:text="${inspection.inspectionStatus.description}" class="text-small"></td>
                     <td>
                         <div class="d-flex justify-content-end">

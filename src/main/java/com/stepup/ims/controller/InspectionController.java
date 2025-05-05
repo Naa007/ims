@@ -37,6 +37,9 @@ public class InspectionController {
     @Autowired
     private InspectionModelMapper inspectionModelMapper;
 
+    @Autowired
+    private EmailService emailService;
+
     @GetMapping("/new")
     public String showInspectorForm(Model model) {
         Inspection inspection = new Inspection();
@@ -62,7 +65,10 @@ public class InspectionController {
 
     @PostMapping(value = "/save")
     public String createInspection(@ModelAttribute Inspection inspection) {
-        inspectionService.saveInspection(inspection);
+        Inspection originalInspection = inspection.getId() == null ? inspection :
+                inspectionService.getInspectionById(inspection.getId()).orElse(null);
+        Inspection savedInspection = inspectionService.saveInspection(inspection);
+        emailService.sendNotificationEmail(originalInspection, savedInspection);
         return REDIRECT_INSPECTION_MANAGEMENT;
     }
 

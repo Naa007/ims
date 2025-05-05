@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<!-- Head -->
+<head th:replace="fragments/head :: head"><title>Inspector PQR Add/Edit</title></head>
+<body>
+
+
+<!-- Main Content -->
+<main>
+    <div class="form-card">
+        <div id="successMessage" class="alert alert-success" style="display: none;" th:text="${successMessage}">
+        </div>
+        <div class="form-header">
+            <h1 class="form-title">View Inspector PQR</h1>
+            <p class="form-subtitle">This page shows the PQR information of the inspector</p>
+        </div>
+
+        <!-- Inspector Details -->
+        <h4 class="section-header">
+            <i class="fas fa-user-circle me-2"></i> Inspector Details
+        </h4>
+
+        <div class="info-section">
+
+            <div class="info-item">
+                <i class="fas fa-user"></i>
+                <div class="info-content">
+                    <div class="info-label">Inspector Name</div>
+                    <div class="info-value" th:text="${inspector.inspectorName}">Inspector Name</div>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <i class="fas fa-envelope"></i>
+                <div class="info-content">
+                    <div class="info-label">Email Address</div>
+                    <div class="info-value" th:text="${inspector.email}">johndoe@example.com</div>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <i class="fas fa-id-card"></i>
+                <div class="info-content">
+                    <div class="info-label">Inspector Type</div>
+                    <div class="info-value" th:text="${inspector.inspectorType.description}">Inhouse Inspector</div>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <i class="fas fa-university"></i>
+                <div class="info-content">
+                    <div class="info-label">Education Details</div>
+                    <div class="info-value" th:text="${inspector.educationDetails}">Bachelor of Engineering,
+                        Mechanical
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <i class="fas fa-book"></i>
+                <div class="info-content">
+                    <div class="info-label">Disciplines</div>
+                    <div class="info-value" th:text="${inspector.disciplines}">Mechanical, Structural</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skills -->
+        <h4 class="section-header">
+            <i class="fas fa-tools me-2"></i> Skills & Qualifications
+        </h4>
+
+        <div class="info-section">
+
+            <!-- Primary Skills -->
+            <div class="info-item">
+                <i class="fas fa-tools me-2"></i>
+                <div class="info-content">
+                    <div class="info-label">Skills</div>
+                    <div th:each="skill : *{pqr.skills}">
+                        <div th:text="${skill.getName()}"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Education -->
+            <div class="info-item">
+                <i class="fas fa-graduation-cap me-2"></i>
+                <div class="info-content">
+                    <div class="info-label">Education</div>
+                    <div th:each="education : *{pqr.education}">
+                        <div th:text="${education.getQualification()}"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Experience -->
+            <div class="info-item">
+                <i class="fas fa-briefcase me-2"></i>
+                <div class="info-content">
+                    <div class="info-label">Experience</div>
+                    <div th:each="exp : *{pqr.experience}">
+                        <div th:text="${exp.getName()}"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Communication -->
+            <div class="info-item">
+                <i class="fas fa-comments me-2"></i>
+                <div class="info-content">
+                    <div class="info-label">Communication</div>
+                    <div th:each="englishSkill : *{pqr.englishSkills}">
+                        <div th:text="${englishSkill.getName()}"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Professional Qualifications -->
+            <div class="info-item">
+                <i class="fas fa-briefcase me-2"></i>
+                <div class="info-content">
+                    <div class="info-label">Professional Qualifications</div>
+                    <div th:each="qualification : *{pqr.professionalQualifications}">
+                        <div th:text="${qualification.getName()}"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Other Professional Skills -->
+            <div class="info-item">
+                <i class="fas fa-briefcase me-2"></i>
+                <div class="info-content">
+                    <div class="info-label">Other Professional Skills</div>
+                    <div th:each="qualification : *{pqr.otherProfessionalSkills}">
+                        <div th:text="${qualification.getName()}"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Score -->
+        <h4 class="section-header">
+            <i class="fas fa-star me-2"></i> Score & Remarks
+        </h4>
+
+
+        <div class="info-section">
+
+            <!-- Score -->
+            <div class="info-item">
+                <i class="fas fa-star"></i>
+                <div class="info-content">
+                    <div class="info-label">Score</div>
+                    <div class="info-value" th:text="${pqr.score}">Inspector Name</div>
+                </div>
+            </div>
+
+            <!-- Remarks -->
+            <div class="info-item">
+                <i class="fas fa-comments"></i>
+                <div class="info-content">
+                    <div class="info-label">Remarks</div>
+                    <div class="info-value" th:text="${pqr.remarks}">Inspector Name</div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="text-end mt-3">
+            <button type="button" class="btn btn-primary" onclick="window.close()">Close</button>
+        </div>
+
+    </div>
+</main>
+
+</body>
+</html>

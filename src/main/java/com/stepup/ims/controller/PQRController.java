@@ -8,7 +8,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import static com.stepup.ims.constants.ApplicationConstants.*;
 import static com.stepup.ims.constants.UIRoutingConstants.RETURN_TO_PQR_FORM;
+import static com.stepup.ims.constants.UIRoutingConstants.RETURN_TO_PQR_VIEW;
 
 @Controller
 @RequestMapping("/pqr")
@@ -20,17 +22,25 @@ public class PQRController {
     @GetMapping("/edit/{inspectorId}")
     public String editPQRForm(Model model, @PathVariable Long inspectorId) {
         Inspector inspector = pqrService.getPQRByInspectorId(inspectorId);
-        model.addAttribute("inspector", inspector);
-        model.addAttribute("pqr", inspector.getPqr());
+        model.addAttribute(INSPECTOR_LOWERCASE, inspector);
+        model.addAttribute(PQR, inspector.getPqr());
         return RETURN_TO_PQR_FORM;
+    }
+
+    @GetMapping("/view/{inspectorId}")
+    public String viewPQRForm(Model model, @PathVariable Long inspectorId) {
+        Inspector inspector = pqrService.getPQRByInspectorId(inspectorId);
+        model.addAttribute(INSPECTOR_LOWERCASE, inspector);
+        model.addAttribute(PQR, inspector.getPqr());
+        return RETURN_TO_PQR_VIEW;
     }
 
     @PostMapping("/update")
     public String updateInspectorPRQ(@ModelAttribute PQR pqr, Model model) {
         Inspector inspector = pqrService.updateInspectorPQR(pqr.getInspectorId(), pqr);
-        model.addAttribute("inspector", inspector);
-        model.addAttribute("pqr", inspector.getPqr());
-        model.addAttribute("successMessage", "PQR updated successfully!");
+        model.addAttribute(INSPECTOR_LOWERCASE, inspector);
+        model.addAttribute(PQR, inspector.getPqr());
+        model.addAttribute(SUCCESS_MESSAGE, "PQR updated successfully!");
         return RETURN_TO_PQR_FORM;
     }
 }

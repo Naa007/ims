@@ -240,15 +240,17 @@ function addCVRow() {
 
         const newRow = previousRow.cloneNode(true); // Clone the previous row
 
-        newRow.querySelectorAll("input, select").forEach(input => {
+        newRow.querySelectorAll("input, select, button").forEach(input => {
 
             input.id = input.id.replace(index, index + 1);
             input.name = input.name.replace(index, index + 1);
 
             if (input.tagName === "SELECT") {
                 input.selectedIndex = 0; // Reset dropdowns
-            } else if (input.type === "datetime-local") {
+            } else if (input.type === "datetime-local"  || (input.type === "hidden" && input.id.includes("cvCertificatesLink"))) {
                 input.value = ""; // Reset datetime-local input
+            } else if (input.type === "button" && input.hasAttribute("data-index")) {
+               input.setAttribute("data-index", index + 1); // Update button data-index
             }
         });
         tableBody.appendChild(newRow); // Append the cloned row as a new row
@@ -344,6 +346,36 @@ function showMapLoadingMessage() {
                }, 5000); // Adjust the time as per map loading logic
            }
 
+function openCertificateLinkPopup(button) {
+    const index = button.getAttribute('data-index');
+    // Get the current value of the hidden input field for the certificate link
+    const certificateLinkField = document.getElementById('cvCertificatesLink' + index);
+    const currentLink = certificateLinkField ? certificateLinkField.value : '';
+
+    // Prompt the user to enter or edit the link
+    const newLink = prompt("Enter the certificate link:", currentLink);
+
+    // If a new link is provided, update the hidden input field value
+    if (newLink !== null) {
+    certificateLinkField.value = newLink;
+    }
+}
+
+function openReferenceDocumentsLinkPopup() {
+
+    // Get the current value of the hidden input field for the certificate link
+    const referenceDocumentsLinkField = document.getElementById('referenceDocumentsLink');
+    const currentLink = referenceDocumentsLinkField ? referenceDocumentsLinkField.value : '';
+
+    // Prompt the user to enter or edit the link
+    const newLink = prompt("Enter the reference documents link:", currentLink);
+
+    // If a new link is provided, update the hidden input field value
+    if (newLink !== null) {
+    referenceDocumentsLinkField.value = newLink;
+    }
+}
+
 /** ================== Technical Coordinator =========== **/
 
 function redirectToTechnicalCoordinatorEditInspection(inspectionId) {
@@ -365,6 +397,15 @@ function prepareContractReview(inspectionId) {
   window.open(url, '_blank', `width=${width},height=${height},left=${left},top=${top}`);
  }
 
+ function viewContractReview(inspectionId) {
+   const url = `/contractReview/view/` + inspectionId;
+   const width = screen.width * 0.9;
+   const height = screen.height * 0.9;
+   const left = (screen.width - width) / 2;
+   const top = (screen.height - height) / 2;
+   window.open(url, '_blank', `width=${width},height=${height},left=${left},top=${top}`);
+  }
+
 /** =================== Inspection Advise ================= **/
 
 function prepareInspectionAdvise(inspectionId) {
@@ -375,10 +416,28 @@ function prepareInspectionAdvise(inspectionId) {
   const top = (screen.height - height) / 2;
   window.open(url, '_blank', `width=${width},height=${height},left=${left},top=${top}`);
  }
+
+ function viewInspectionAdvise(inspectionId) {
+   const url = `/inspectionAdvise/view/` + inspectionId;
+   const width = screen.width * 0.9;
+   const height = screen.height * 0.9;
+   const left = (screen.width - width) / 2;
+   const top = (screen.height - height) / 2;
+   window.open(url, '_blank', `width=${width},height=${height},left=${left},top=${top}`);
+  }
 /** ====================== PQR ========================== **/
 
 function editPQRForm(inspectorId) {
  const url = `/pqr/edit/` + inspectorId;
+ const width = screen.width * 0.9;
+ const height = screen.height * 0.9;
+ const left = (screen.width - width) / 2;
+ const top = (screen.height - height) / 2;
+ window.open(url, '_blank', `width=${width},height=${height},left=${left},top=${top}`);
+}
+
+function viewPQRForm(inspectorId) {
+ const url = `/pqr/view/` + inspectorId;
  const width = screen.width * 0.9;
  const height = screen.height * 0.9;
  const left = (screen.width - width) / 2;
