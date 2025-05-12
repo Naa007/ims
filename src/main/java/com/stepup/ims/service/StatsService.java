@@ -262,8 +262,11 @@ public class StatsService {
         table.addHeaderCell("Count");
 
         stats.forEach((status, count) -> {
-            table.addCell(status);
-            table.addCell(count.toString());
+            String safeStatus = status != null ? status : "N/A";
+            String safeCount = count != null ? count.toString() : "0"; // ensures "0" is printed
+
+            table.addCell(new Cell().add(new Paragraph(safeStatus)));
+            table.addCell(new Cell().add(new Paragraph(safeCount)));
         });
 
         document.add(table);
@@ -287,9 +290,12 @@ public class StatsService {
 
             int rowIdx = 5;
             for (Map.Entry<String, Integer> entry : stats.entrySet()) {
+                String status = entry.getKey() != null ? entry.getKey() : "N/A";
+                int count = entry.getValue() != null ? entry.getValue() : 0;
+
                 Row row = sheet.createRow(rowIdx++);
-                row.createCell(0).setCellValue(entry.getKey());
-                row.createCell(1).setCellValue(entry.getValue());
+                row.createCell(0).setCellValue(status);
+                row.createCell(1).setCellValue(count); // even if count = 0, it will be shown
             }
 
             sheet.autoSizeColumn(0);
@@ -342,10 +348,14 @@ public class StatsService {
 
             int rowIdx = 5;
             for (Map.Entry<String, Integer> entry : stats.entrySet()) {
+                String status = entry.getKey() != null ? entry.getKey() : "N/A";
+                int count = entry.getValue() != null ? entry.getValue() : 0;
+
                 Row row = sheet.createRow(rowIdx++);
-                row.createCell(0).setCellValue(entry.getKey());
-                row.createCell(1).setCellValue(entry.getValue());
+                row.createCell(0).setCellValue(status);
+                row.createCell(1).setCellValue(count); // even if count = 0, it will be shown
             }
+
 
             sheet.autoSizeColumn(0);
             sheet.autoSizeColumn(1);
@@ -397,9 +407,12 @@ public class StatsService {
 
             int rowIdx = 5;
             for (Map.Entry<String, Integer> entry : stats.entrySet()) {
+                String status = entry.getKey() != null ? entry.getKey() : "N/A";
+                int count = entry.getValue() != null ? entry.getValue() : 0;
+
                 Row row = sheet.createRow(rowIdx++);
-                row.createCell(0).setCellValue(entry.getKey());
-                row.createCell(1).setCellValue(entry.getValue());
+                row.createCell(0).setCellValue(status);
+                row.createCell(1).setCellValue(count); // even if count = 0, it will be shown
             }
 
             sheet.autoSizeColumn(0);

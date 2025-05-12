@@ -1,31 +1,11 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<!-- Head -->
-<head th:replace="fragments/head :: head"><title>Technical Coordinator Dashboard</title>
-</head>
+<head th:replace="fragments/head :: head"><title>Technical Coordinator Dashboard</title></head>
 <body>
-<!-- Header -->
 <header th:replace="fragments/header :: header"></header>
 
 <main class="container">
-    <!-- Dashboard Container -->
     <div class="dashboard-container">
-        <!-- User Info Section -->
-        <div class="user-info-container">
-            <div class="user-info-card">
-                <div class="user-avatar">
-                    <i class="fas fa-user-circle"></i>
-                </div>
-                <div class="user-details">
-                    <h4 th:text="${employeeName}">Technical Coordinator Name</h4>
-                    <p class="user-email" th:text="${userEmail}">technical.coordinator@example.com</p>
-                    <p class="user-role" th:text="${employeeRole}">TECHNICAL COORDINATOR</p>
-                    <p class="emp-Id" th:text="${employeeId}">0</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Dashboard Tabs -->
         <div class="dashboard-tabs">
             <a href="/technical-coordinator/inspection-management" class="tab">
                 <i class="fas fa-clipboard-check"></i>
@@ -33,7 +13,6 @@
             </a>
         </div>
 
-        <!-- Technical Coordinator Performance Stats -->
         <div class="cd-stats-container">
             <h4 class="section-header">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -41,21 +20,65 @@
                         <i class="fas fa-chart-line me-2"></i>
                         <span th:text="'My Performance Dashboard - ' + ${employeeName}">My Performance Dashboard</span>
                     </div>
+                    <input type="hidden" id="employeeId" th:value="${employeeId}" />
                     <div class="bd-date-filter date">
                         <span th:text="${#temporals.format(#temporals.createNow(), 'MMMM dd, yyyy')}">May 03, 2025</span>
                     </div>
+                    <span class="user-email" th:text="${email}" style="display:none;"></span>
                 </div>
             </h4>
-            <!-- Performance Metrics Display -->
-            <div class="cd-performance-metrics-container" id="performanceContainer">
+
+            <div class="cd-performance-metrics-container">
                 <div class="cd-metrics-display">
                     <div class="cd-metrics-header">
                         <h3>My Performance</h3>
                     </div>
+
+                    <div class="cd-period-selection">
+                        <div class="cd-filter-group">
+                            <label for="periodSelect">Time Range:</label>
+                            <select class="cd-period-select" id="periodSelect" onchange="handlePeriodChange()">
+                                <option value="" disabled selected>Select a range</option>
+                                <option value="week">Last 7 Days</option>
+                                <option value="month">Last 30 Days</option>
+                                <option value="year">Year to Date</option>
+                                <option value="custom">Custom Range</option>
+                            </select>
+                        </div>
+
+                        <div class="cd-export-wrapper">
+                            <div class="bd-filter-group bd-export-group">
+                                <button class="bd-export-btn" onclick="exportTechCoordinatorData('pdf')">
+                                    <i class="fas fa-file-pdf"></i> PDF
+                                </button>
+                                <button class="bd-export-btn" onclick="exportTechCoordinatorData('excel')">
+                                    <i class="fas fa-file-excel"></i> Excel
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="customRangeContainer" style="display: none;">
+                            <div class="cd-custom-range-content">
+                                <div class="cd-date-input-group">
+                                    <label for="startDate">From:</label>
+                                    <input id="startDate" name="startDate" type="date">
+                                </div>
+                                <div class="cd-date-input-group">
+                                    <label for="endDate">To:</label>
+                                    <input id="endDate" name="endDate" type="date">
+                                </div>
+                                <button class="cd-filter-btn" onclick="applyCustomRange()" type="button">
+                                    Apply
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="cd-metrics-total">
                         <span class="cd-total-number" id="totalInspections" th:text="${technicalCoordinatorStats['Total Inspections']}">0</span>
                         <span class="cd-total-label">Total Inspections</span>
                     </div>
+
                     <div class="cd-metrics-breakdown">
                         <div class="cd-metric-item">
                             <span class="cd-metric-value" id="newInspections" th:text="${technicalCoordinatorStats['New']}">0</span>
@@ -76,108 +99,17 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Performance Metrics Section -->
-            <div class="cd-performance-section">
-                <h4 class="section-header">
-                    <div style="display: flex; align-items: center; justify-content: flex-start;">
-                        <i class="fas fa-chart-bar me-2"></i>Performance Metrics
-                    </div>
-                </h4>
-
-                <!-- Time Period Selection -->
-                <div class="cd-period-selection">
-                    <div class="cd-filter-group">
-                        <label for="periodSelect">Time Range:</label>
-                        <select class="cd-period-select" id="periodSelect" onchange="handlePeriodChange()">
-                            <option value="week">Last 7 Days</option>
-                            <option selected value="month">Last 30 Days</option>
-                            <option value="quarter">Last Quarter</option>
-                            <option value="year">Year to Date</option>
-                            <option value="custom">Custom Range</option>
-                        </select>
-                    </div>
-                    <!-- Export Options -->
-                    <div class="cd-export-wrapper">
-                        <div class="bd-filter-group bd-export-group">
-                            <button class="bd-export-btn" onclick="exportTechCoordinatorData('pdf')">
-                                <i class="fas fa-file-pdf"></i> PDF
-                            </button>
-                            <button class="bd-export-btn" onclick="exportTechCoordinatorData('excel')">
-                                <i class="fas fa-file-excel"></i> Excel
-                            </button>
-                        </div>
-                    </div>
-                    <!-- Custom Date Range Container -->
-                    <div id="customRangeContainer" style="display: none;">
-                        <div class="cd-custom-range-content">
-                            <div class="cd-date-input-group">
-                                <label for="startDate">From:</label>
-                                <input id="startDate" name="startDate" type="date">
-                            </div>
-                            <div class="cd-date-input-group">
-                                <label for="endDate">To:</label>
-                                <input id="endDate" name="endDate" type="date">
-                            </div>
-                            <button class="cd-filter-btn" onclick="applyCustomRange()" type="button">
-                                Apply
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Charts Row -->
-                <div class="cd-charts-row">
-                    <!-- Inspection Status Chart -->
-                    <div class="cd-chart-card">
-                        <div class="cd-chart-header">
-                            <h5>Inspection Status Distribution</h5>
-                        </div>
-                        <div class="cd-chart-container" id="statusChartContainer">
-                            <div class="cd-loading-overlay" id="statusChartLoader" style="display: none;">
-                                <div class="cd-loading-spinner">
-                                    <i class="fas fa-circle-notch fa-spin"></i>
-                                </div>
-                                <div class="cd-loading-text">Loading data...</div>
-                            </div>
-                            <canvas id="statusChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </main>
 
-<!-- Footer -->
 <footer th:replace="fragments/footer :: footer"></footer>
 
-<script>
-    // Initialize charts when DOM is loaded
+<script th:inline="javascript">
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialize charts
-        const statusChart = initializeStatusChart();
-
-        // Set current date for date inputs
         initializeDateInputs();
-
-        // Load default data (1 month)
-        updateChartsWithInitialData();
     });
-function updateChartsWithInitialData() {
-    const statusChart = Chart.getChart('statusChart');
-    if (statusChart) {
-        statusChart.data.datasets[0].data = [
-            document.getElementById('newInspections').textContent,
-            document.getElementById('ongoingInspections').textContent,
-            document.getElementById('awardedInspections').textContent,
-            document.getElementById('rejectedInspections').textContent,
-            0 // Closed - if you have this value, include it
-        ];
-        statusChart.update();
-    }
-}
-    // Initialize date inputs with default values
+
     function initializeDateInputs() {
         const today = new Date();
         const thirtyDaysAgo = new Date();
@@ -194,76 +126,6 @@ function updateChartsWithInitialData() {
         document.getElementById('endDate').value = formatDate(today);
     }
 
-    // Initialize status chart (pie/doughnut)
-    function initializeStatusChart() {
-        const ctx = document.getElementById('statusChart').getContext('2d');
-        return new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['New', 'Ongoing', 'Awarded', 'Rejected', 'Closed'],
-                datasets: [{
-                    data: [0, 0, 0, 0, 0],
-                    backgroundColor: [
-                        '#4e73df',
-                        '#1cc88a',
-                        '#36b9cc',
-                        '#f6c23e',
-                        '#e74a3b'
-                    ],
-                    hoverBackgroundColor: [
-                        '#2e59d9',
-                        '#17a673',
-                        '#2c9faf',
-                        '#dda20a',
-                        '#be2617'
-                    ],
-                    hoverBorderColor: "rgba(234, 236, 244, 1)",
-                }]
-            },
-            options: {
-                maintainAspectRatio: false,
-                plugins: {
-                    tooltip: {
-                        backgroundColor: "rgb(255,255,255)",
-                        bodyColor: "#858796",
-                        borderColor: '#dddfeb',
-                        borderWidth: 1,
-                        xPadding: 15,
-                        yPadding: 15,
-                        displayColors: false,
-                        caretPadding: 10,
-                        callbacks: {
-                            label: function(context) {
-                                const label = context.label || '';
-                                const value = context.raw || 0;
-                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
-                                return `${label}: ${value} (${percentage}%)`;
-                            }
-                        }
-                    },
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            padding: 20,
-                            usePointStyle: true,
-                            pointStyle: 'circle'
-                        }
-                    }
-                },
-                cutout: '70%',
-            }
-        });
-    }
-
-
-    // Load default data (1 month)
-    function loadDefaultData() {
-        // Set period select to 'month'
-        document.getElementById('periodSelect').value = 'month';
-    }
-
-    // Handle period change
     function handlePeriodChange() {
         const periodSelect = document.getElementById('periodSelect');
         const customRangeContainer = document.getElementById('customRangeContainer');
@@ -276,7 +138,6 @@ function updateChartsWithInitialData() {
         }
     }
 
-    // Apply custom date range
     function applyCustomRange() {
         const startDate = document.getElementById('startDate').value;
         const endDate = document.getElementById('endDate').value;
@@ -288,67 +149,36 @@ function updateChartsWithInitialData() {
         }
     }
 
-    // Fetch data for a specific period
     function fetchDataForPeriod(period) {
-        showLoadingIndicator('statusChartLoader');
-         // Store the initial values as fallback
-    const initialValues = {
-        'Total Inspections': document.getElementById('totalInspections').textContent,
-        'New': document.getElementById('newInspections').textContent,
-        'Ongoing': document.getElementById('ongoingInspections').textContent,
-        'Awarded': document.getElementById('awardedInspections').textContent,
-        'Rejected': document.getElementById('rejectedInspections').textContent
-    };
+        const employeeID = document.getElementById('employeeId').value;
+        if (!employeeID) {
+            showNotification('Employee ID not found', 'error');
+            return;
+        }
 
-        const technicalCoordinatorEmail = document.querySelector('.user-email').textContent;
-        const employeeID = document.querySelector('.emp-Id').textContent;
-
-        // Fetch data from your backend API
         fetch(`/business/technical-coordinator-stats/${encodeURIComponent(employeeID)}/${period}`)
             .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 return response.json();
             })
             .then(data => {
-                // Update status chart (pie/doughnut)
-                const statusChart = Chart.getChart('statusChart');
-                if (statusChart) {
-                    statusChart.data.datasets[0].data = [
-                        data['New'] || 0,
-                        data['Ongoing'] || 0,
-                        data['Awarded'] || 0,
-                        data['Rejected'] || 0,
-                        data['Closed'] || 0
-                    ];
-                    statusChart.update();
-                }
-
-                // Update the metrics display
                 updateMetricsDisplay(data);
-                hideLoadingIndicator('statusChartLoader');
                 showNotification('Data updated successfully', 'success');
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
-                hideLoadingIndicator('statusChartLoader');
                 showNotification('Failed to load performance data', 'error');
             });
     }
 
-    // Update the metrics display with the latest data
     function updateMetricsDisplay(data) {
-        // Update the total inspections count
         const totalElement = document.getElementById('totalInspections');
         if (totalElement) {
             totalElement.textContent = data['Total Inspections'] || 0;
-            // Add highlight animation
             totalElement.classList.add('cd-total-highlight');
             setTimeout(() => totalElement.classList.remove('cd-total-highlight'), 1500);
         }
 
-        // Update individual metrics
         const metrics = {
             'newInspections': 'New',
             'ongoingInspections': 'Ongoing',
@@ -358,202 +188,122 @@ function updateChartsWithInitialData() {
 
         for (const [elementId, dataKey] of Object.entries(metrics)) {
             const element = document.getElementById(elementId);
-            if (element) {
-                element.textContent = data[dataKey] || 0;
-            }
+            if (element) element.textContent = data[dataKey] || 0;
         }
     }
 
-    // Fetch data for custom date range
     function fetchDataForCustomRange(startDate, endDate) {
-        showLoadingIndicator('statusChartLoader');
-        const technicalCoordinatorEmail = document.querySelector('.user-email').textContent;
-         const employeeID = document.querySelector('.emp-Id').textContent;
+        const employeeID = document.getElementById('employeeId').value;
+        if (!employeeID) {
+            showNotification('Employee ID not found', 'error');
+            return;
+        }
 
-        // For custom range, we'll use the same API but with query parameters
         fetch(`/technical-coordinator/inspection-stats/${encodeURIComponent(employeeID)}/custom?startDate=${startDate}&endDate=${endDate}`)
             .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 return response.json();
             })
             .then(data => {
-                // Update status chart (pie/doughnut)
-                const statusChart = Chart.getChart('statusChart');
-                if (statusChart) {
-                    statusChart.data.datasets[0].data = [
-                        data['New'] || 0,
-                        data['Ongoing'] || 0,
-                        data['Awarded'] || 0,
-                        data['Rejected'] || 0,
-                        data['Closed'] || 0
-                    ];
-                    statusChart.update();
-                }
-
-                // Update the metrics display
                 updateMetricsDisplay(data);
-
-                hideLoadingIndicator('statusChartLoader');
                 showNotification('Custom range data loaded', 'success');
             })
             .catch(error => {
                 console.error('Error fetching custom range data:', error);
-                hideLoadingIndicator('statusChartLoader');
                 showNotification('Failed to load custom range data', 'error');
             });
     }
 
-    // Show loading indicator
-    function showLoadingIndicator(loaderId) {
-        const loader = document.getElementById(loaderId);
-        if (loader) loader.style.display = 'flex';
+    function exportTechCoordinatorData(format) {
+    const exportBtn = event.target;
+    exportBtn.Disabled = true;
+        const employeeID = document.getElementById('employeeId').value;
+        if (!employeeID) {
+            showNotification('Employee ID not found', 'error');
+            return;
+        }
+
+        const dashboardHeader = document.querySelector('.section-header span');
+        const coordinatorName = dashboardHeader ?
+            dashboardHeader.textContent.replace('My Performance Dashboard - ', '') :
+            'technical_coordinator_report';
+
+        let period = document.getElementById('periodSelect').value;
+               // If no period is selected, use current month as default (yyyy-MM)
+       if (!period) {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        period = `${year}-${month}`;
+       }
+        const filename = `${coordinatorName.replace(/\s+/g, '_')}_report.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
+
+        fetch(`/business/technical-coordinator-report/${employeeID}/${period}/${format}`)
+            .then(response => {
+                if (!response.ok) throw new Error(`Error: ${response.status}`);
+                return response.blob();
+            })
+            .then(blob => {
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                setTimeout(() => {
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(link.href);
+                }, 100);
+                showNotification(`${format.toUpperCase()} downloaded successfully`, 'success');
+            })
+            .catch(error => {
+                console.error('Export failed:', error);
+                showNotification(`Export failed: ${error.message}`, 'error');
+            })  .finally(() => {
+            exportBtn.Disabled = false;
+        });
     }
 
-    // Hide loading indicator
-    function hideLoadingIndicator(loaderId) {
-        const loader = document.getElementById(loaderId);
-        if (loader) loader.style.display = 'none';
-    }
-
-    // Show notification
     function showNotification(message, type = 'info') {
         const notificationContainer = document.getElementById('cd-notification-container') || createNotificationContainer();
+        const icon = {
+            'success': 'fa-check-circle',
+            'error': 'fa-times-circle',
+            'warning': 'fa-exclamation-triangle',
+            'info': 'fa-info-circle'
+        }[type] || 'fa-info-circle';
 
         const notification = document.createElement('div');
         notification.className = `cd-notification cd-notification-${type}`;
-
-        let icon;
-        switch (type) {
-            case 'success': icon = 'fa-check-circle'; break;
-            case 'error': icon = 'fa-times-circle'; break;
-            case 'warning': icon = 'fa-exclamation-triangle'; break;
-            default: icon = 'fa-info-circle';
-        }
-
         notification.innerHTML = `
             <div class="cd-notification-icon">
                 <i class="fas ${icon}"></i>
             </div>
-            <div class="cd-notification-content">
-                ${message}
-            </div>
-            <div class="cd-notification-close">
-                <i class="fas fa-times"></i>
-            </div>
+            <div class="cd-notification-content">${message}</div>
+            <div class="cd-notification-close"><i class="fas fa-times"></i></div>
         `;
 
         notificationContainer.appendChild(notification);
-
-        // Add close event
-        notification.querySelector('.cd-notification-close').addEventListener('click', function() {
-            notification.classList.add('cd-notification-hiding');
-            setTimeout(() => notification.remove(), 300);
-        });
-
-        // Auto-remove after 5 seconds
-        setTimeout(() => {
-            notification.classList.add('cd-notification-hiding');
-            setTimeout(() => notification.remove(), 300);
-        }, 5000);
+        notification.querySelector('.cd-notification-close').addEventListener('click', () => removeNotification(notification));
+        setTimeout(() => removeNotification(notification), 5000);
     }
 
-    // Create notification container if it doesn't exist
+    function removeNotification(notification) {
+        notification.classList.add('cd-notification-hiding');
+        setTimeout(() => notification.remove(), 300);
+    }
+
     function createNotificationContainer() {
         const container = document.createElement('div');
         container.id = 'cd-notification-container';
         document.body.appendChild(container);
         return container;
     }
-
-   function exportTechCoordinatorData(format) {
-   const techCoordinatorEmail = encodeURIComponent(document.querySelector('.user-email').textContent);
-   const techCoordinatorName = document.querySelector('.user-details h4')?.textContent.trim() || 'report';
-   const period = document.getElementById('periodSelect').value;
-    const employeeID = document.querySelector('.emp-Id').textContent;
-
-   const endpoint = `/business/technical-coordinator-report/${employeeID}/${period}/${format}`;
-   const filename = `${techCoordinatorName.replace(/\s+/g, '_')}_report.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
-
-   fetch(endpoint)
-       .then(response => {
-           if (!response.ok) {
-               throw new Error(`Error: ${response.status}`);
-           }
-           return response.blob();
-       })
-       .then(blob => {
-           const link = document.createElement('a');
-           link.href = window.URL.createObjectURL(blob);
-           link.download = filename;
-           document.body.appendChild(link);
-           link.click();
-           document.body.removeChild(link);
-           window.URL.revokeObjectURL(link.href);
-
-           showNotification(`${format.toUpperCase()} downloaded successfully.`, 'success');
-       })
-       .catch(error => {
-           console.error('Download failed:', error);
-           showNotification(`Failed to export ${format.toUpperCase()} report.`, 'error');
-       });
-}
 </script>
 
 <style>
-    /* Technical Coordinator Dashboard Specific Styles */
     .cd-stats-container {
         width: 100%;
         padding: 1rem;
-    }
-
-    .user-info-container {
-        margin-bottom: 2rem;
-    }
-
-    .user-info-card {
-        display: flex;
-        align-items: center;
-        background-color: #fff;
-        border-radius: 0.5rem;
-        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-        padding: 1.5rem;
-    }
-
-    .user-avatar {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background-color: #f8f9fc;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 1.5rem;
-        color: #4e73df;
-        font-size: 2.5rem;
-    }
-
-    .user-details h4 {
-        margin: 0 0 0.5rem 0;
-        color: #5a5c69;
-        font-weight: 700;
-    }
-
-    .user-email {
-        margin: 0 0 0.25rem 0;
-        color: #858796;
-        font-size: 0.9rem;
-    }
-
-    .user-role {
-        margin: 0;
-        color: #fff;
-        background-color: #36b9cc; /* Different color for technical coordinator */
-        padding: 0.25rem 0.75rem;
-        border-radius: 1rem;
-        font-size: 0.8rem;
-        display: inline-block;
     }
 
     .cd-performance-metrics-container {
@@ -582,11 +332,6 @@ function updateChartsWithInitialData() {
         font-weight: 700;
     }
 
-    .cd-period-label {
-        color: #858796;
-        font-size: 0.9rem;
-    }
-
     .cd-metrics-total {
         display: flex;
         flex-direction: column;
@@ -597,7 +342,7 @@ function updateChartsWithInitialData() {
     .cd-total-number {
         font-size: 2.5rem;
         font-weight: 700;
-        color: #36b9cc; /* Different color for technical coordinator */
+        color: #36b9cc;
     }
 
     .cd-total-label {
@@ -644,16 +389,13 @@ function updateChartsWithInitialData() {
         100% { color: #36b9cc; }
     }
 
-    .cd-performance-section {
-        margin-top: 2rem;
-    }
-
     .cd-period-selection {
         display: flex;
+        justify-content: space-between;
+        align-items: center;
         flex-wrap: wrap;
         gap: 1rem;
         margin-bottom: 1rem;
-        align-items: center;
     }
 
     .cd-filter-group {
@@ -703,64 +445,36 @@ function updateChartsWithInitialData() {
         background-color: #2c9faf;
     }
 
-    .cd-charts-row {
+    .cd-export-wrapper {
+        margin-left: auto;
+    }
+
+    .bd-export-group {
         display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
-        margin-bottom: 2rem;
+        gap: 0.5rem;
     }
 
-    .cd-chart-card {
-        flex: 1;
-        min-width: 300px;
-        background-color: #fff;
-        border-radius: 0.5rem;
-        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-        overflow: hidden;
-    }
-
-    .cd-chart-header {
-        padding: 1rem;
-        border-bottom: 1px solid #e3e6f0;
-    }
-
-    .cd-chart-header h5 {
-        margin: 0;
-        font-weight: 700;
+    .bd-export-btn {
+        padding: 8px 12px;
+        border: none;
+        border-radius: 4px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        background-color: #f8f9fc;
         color: #5a5c69;
+        border: 1px solid #e3e6f0;
+        transition: all 0.2s ease;
     }
 
-    .cd-chart-container {
-        position: relative;
-        height: 300px;
-        padding: 1rem;
+    .bd-export-btn:hover {
+        background-color: #eaecf4;
     }
 
-    .cd-loading-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        background-color: rgba(255, 255, 255, 0.8);
-        z-index: 10;
+    .bd-export-btn i {
+        margin-right: 5px;
     }
 
-    .cd-loading-spinner {
-        font-size: 2rem;
-        color: #36b9cc;
-        margin-bottom: 0.5rem;
-    }
-
-    .cd-loading-text {
-        color: #5a5c69;
-    }
-
-    /* Notification Component */
     #cd-notification-container {
         position: fixed;
         top: 1rem;
@@ -834,18 +548,21 @@ function updateChartsWithInitialData() {
         color: #5a5c69;
     }
 
-    /* Media Queries */
-    @media (max-width: 992px) {
-        .cd-charts-row {
-            flex-direction: column;
-        }
-
-        .cd-chart-card {
-            min-width: 100%;
-        }
-    }
-
     @media (max-width: 768px) {
+        .cd-period-selection {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .cd-export-wrapper {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        .bd-export-group {
+            justify-content: flex-end;
+        }
+
         .cd-metrics-breakdown {
             flex-direction: column;
         }
@@ -854,88 +571,11 @@ function updateChartsWithInitialData() {
             min-width: 100%;
         }
 
-        .cd-period-selection {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
         .cd-custom-range-content {
             flex-direction: column;
             align-items: flex-start;
         }
-
-        .user-info-card {
-            flex-direction: column;
-            text-align: center;
-        }
-
-        .user-avatar {
-            margin-right: 0;
-            margin-bottom: 1rem;
-        }
     }
-    /* Add these new styles */
-.cd-period-selection {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.cd-export-wrapper {
-    margin-left: auto; /* This pushes the export group to the right */
-}
-
-.bd-export-group {
-    display: flex;
-    gap: 0.5rem;
-}
-
-/* Update existing styles for better alignment */
-.cd-filter-group {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-/* Keep your existing button styles */
-.bd-export-btn {
-    padding: 8px 12px;
-    border: none;
-    border-radius: 4px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    background-color: #f8f9fc;
-    color: #5a5c69;
-    border: 1px solid #e3e6f0;
-    transition: all 0.2s ease;
-}
-
-.bd-export-btn:hover {
-    background-color: #eaecf4;
-}
-
-.bd-export-btn i {
-    margin-right: 5px;
-}
-    @media (max-width: 768px) {
-    .cd-period-selection {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .cd-export-wrapper {
-        margin-left: 0;
-        width: 100%;
-    }
-
-    .bd-export-group {
-        justify-content: flex-end;
-    }
-}
 </style>
 </body>
 </html>
