@@ -1,6 +1,13 @@
-<head xmlns:th="http://www.w3.org/1999/xhtml">
+<head xmlns:th="http://www.w3.org/1999/xhtml"
+      th:fragment="head(title)">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <!-- CSS Libraries -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.png">
+    <title th:utext="${title}">IMS</title>
+
+
+    <!-- CSS Libraries -->
 
     <!-- Add any required CSS frameworks like Bootstrap -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">

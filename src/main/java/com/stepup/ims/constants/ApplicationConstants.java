@@ -31,6 +31,9 @@ public class ApplicationConstants {
     public static final String ACTIVE = "active";
     public static final String INACTIVE = "inactive";
 
+    /* Email constants */
+    public static final String STATUS_CHANGE_EMAIL_SUBJECT = "IISPL Inspection #%d Status Update";
+
 
     public static final String DFAULT_MAP_ADDRESS = "Hyderabad, India";
 

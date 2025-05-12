@@ -23,6 +23,9 @@ public class ContractReviewService {
     @Autowired
     private InspectionModelMapper inspectionModelMapper;
 
+    @Autowired
+    private EmailService emailService;
+
     public Inspection getContractReviewByInspectionId(Long inspectionId) {
         Optional<com.stepup.ims.entity.Inspection> inspection = inspectionRepository.findById(inspectionId);
         if (inspection.isPresent()) {
@@ -57,7 +60,9 @@ public class ContractReviewService {
         com.stepup.ims.entity.Inspection inspectionEntity = inspectionOptional.orElseThrow(() ->
                 new IllegalArgumentException("Inspection not found with id: " + inspectionId));
         inspectionEntity.setContractReview(contractReviewModelMapper.toEntity(updatedContractReview));
-        return inspectionModelMapper.toModel(inspectionRepository.save(inspectionEntity));
+        com.stepup.ims.entity.Inspection updatedInspectionEntity = inspectionRepository.save(inspectionEntity);
+        emailService.sendContractReviewNotification(updatedInspectionEntity);
+        return inspectionModelMapper.toModel(updatedInspectionEntity);
     }
 
 }

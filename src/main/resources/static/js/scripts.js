@@ -427,8 +427,8 @@ function prepareInspectionAdvise(inspectionId) {
   }
 /** ====================== PQR ========================== **/
 
-function editPQRForm(inspectorId) {
- const url = `/pqr/edit/` + inspectorId;
+function editPQRForm(inspectorId, inspectionId) {
+ const url = `/pqr/edit/` + inspectorId + '/' + inspectionId;
  const width = screen.width * 0.9;
  const height = screen.height * 0.9;
  const left = (screen.width - width) / 2;

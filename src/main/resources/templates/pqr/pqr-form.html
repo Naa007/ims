@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <!-- Head -->
-<head th:replace="fragments/head :: head"><title>Inspector PQR Add/Edit</title></head>
+<head th:replace="fragments/head :: head('Inspector PQR Add/Edit')"></head>
 <body>
 
 
@@ -65,7 +65,7 @@
             </div>
         </div>
 
-        <form th:action="@{/pqr/update}" th:object="${pqr}" method="post"
+        <form th:object="${pqr}" method="post"
               class="needs-validation"
               novalidate>
 
@@ -253,8 +253,13 @@
             </div>
 
             <div class="text-end mt-3">
-                <button type="submit" class="btn btn-primary">Submit</button>
-                <button type="button" class="btn btn-primary" onclick="window.close()">Close</button>
+                <button type="submit" class="btn btn-success btn-sm"
+                        th:formaction="@{'/pqr/update/approve/' + ${inspectionId}}">Approve
+                </button>
+                <button type="submit" class="btn btn-danger btn-sm"
+                        th:formaction="@{'/pqr/update/reject/' + ${inspectionId}}">Reject
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="window.close()">Close</button>
             </div>
 
         </form>

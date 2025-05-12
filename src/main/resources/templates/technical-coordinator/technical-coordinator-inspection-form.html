@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <!-- Head -->
-<head th:replace="fragments/head :: head"><title>Review Inspection</title></head>
+<head th:replace="fragments/head :: head('Review Inspection')"></head>
 <body>
 <!-- Header -->
 <header th:replace="fragments/header :: header"></header>
@@ -203,7 +203,7 @@
                             <td>
                                 <div class="d-flex justify-content-end">
                                     <button type="button" class="btn btn-sm btn-primary me-2"
-                                            onclick="editPQRForm(this.closest('tr').querySelector('td select').value)">
+                                            th:onclick="|editPQRForm(this.closest('tr').querySelector('td select').value, ${inspection.id})|">
                                         <i class="fas fa-edit"></i> Manage PQR
                                     </button>
                                 </div>
