@@ -4,13 +4,11 @@ import com.stepup.ims.model.InpsectionStatsByRole;
 import com.stepup.ims.service.StatsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.Map;
 
 @Controller
 @RequestMapping("/stats")
@@ -18,11 +16,6 @@ public class StatsController {
 
     @Autowired
     private StatsService statsService;
-
-    @GetMapping("/{role}/{email}/{empId}/{period}/{from}/{to}/{fileType}")
-    public Map<String, Long> getStats(@PathVariable String role, @PathVariable String email, @PathVariable String empId, @PathVariable String period, @PathVariable String from, @PathVariable String to, @PathVariable String fileType) {
-        return statsService.getStats(role, email, empId, period, from, to, fileType);
-    }
 
     @GetMapping("/coordinator-stats/{email}/{period}")
     public ResponseEntity<InpsectionStatsByRole> getCoordinatorStats(@PathVariable String email, @PathVariable String period) {
