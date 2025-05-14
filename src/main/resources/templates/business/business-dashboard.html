@@ -760,7 +760,7 @@ let lastInspectorData = null;
     function fetchCoordinatorMetricData(coordinatorEmail, period) {
         showLoadingIndicator('coordinatorPerformanceContainer');
 
-        fetch(`/business/coordinator-stats/${encodeURIComponent(coordinatorEmail)}/${encodeURIComponent(period)}`, {
+        fetch(`/stats/coordinator-stats/${encodeURIComponent(coordinatorEmail)}/${encodeURIComponent(period)}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -804,7 +804,7 @@ let lastInspectorData = null;
     function fetchTechnicalMetricData(techCoordinatorId, period) {
         showLoadingIndicator('technicalCoordinatorContainer');
 
-        fetch(`/business/technical-coordinator-stats/${encodeURIComponent(techCoordinatorId)}/${encodeURIComponent(period)}`, {
+        fetch(`/stats/technical-coordinator-stats/${encodeURIComponent(techCoordinatorId)}/${encodeURIComponent(period)}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -848,7 +848,7 @@ let lastInspectorData = null;
     function fetchInspectorMetricData(inspectorEmail, period) {
         showLoadingIndicator('inspectorPerformanceContainer');
 
-        fetch(`/business/inspector-stats/${encodeURIComponent(inspectorEmail)}/${encodeURIComponent(period)}`, {
+        fetch(`/stats/inspector-stats/${encodeURIComponent(inspectorEmail)}/${encodeURIComponent(period)}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -982,7 +982,7 @@ let lastInspectorData = null;
             return;
         }
 
-        const endpoint = `/business/coordinator-report/${coordinatorEmail}/${period}/${format}`;
+        const endpoint = `/stats/coordinator-report/${coordinatorEmail}/${period}/${format}`;
         const filename = `${coordinatorName.replace(/\s+/g, '_')}_report.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
 
         fetch(endpoint)
@@ -1020,7 +1020,7 @@ let lastInspectorData = null;
     }
 
     // For custom range
-    let endpoint = `/business/technical-coordinator-report/${selectedTechCoordinator}/${period}/${format}`;
+    let endpoint = `/stats/technical-coordinator-report/${selectedTechCoordinator}/${period}/${format}`;
 
     if (period === 'custom') {
         const startDate = document.getElementById('technicalStartDate').value;
@@ -1069,7 +1069,7 @@ function exportInspectorData(format) {
     }
 
     // For custom range
-    let endpoint = `/business/inspector-report/${selectedInspector}/${period}/${format}`;
+    let endpoint = `/stats/inspector-report/${selectedInspector}/${period}/${format}`;
 
     if (period === 'custom') {
         const startDate = document.getElementById('inspectorStartDate').value;

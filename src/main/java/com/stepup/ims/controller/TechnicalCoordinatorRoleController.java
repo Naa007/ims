@@ -21,12 +21,12 @@ import static com.stepup.ims.constants.UIRoutingConstants.*;
 @Controller
 @RequestMapping("/technical-coordinator")
 @PreAuthorize("hasRole('TECHNICAL_COORDINATOR')")
-public class TechnicalCoordinatorRoleController {
+public class TechnicalCoordinatorRoleController extends BaseDashboardsController {
 
     @Autowired
     private InspectionService inspectionService;
     @Autowired
-    private  EmployeeService employeeService;
+    private EmployeeService employeeService;
     @Autowired
     private InspectionRepository inspectionRepository;
     @Autowired
@@ -54,20 +54,11 @@ public class TechnicalCoordinatorRoleController {
 
     @GetMapping("/dashboard")
     public String showDashboard(Model model) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUserEmail = authentication.getName();
-
-        // Get the employee details
-        Employee currentEmployee = employeeService.getEmployeeByEmail(currentUserEmail);
-
+        String email = getCurrentUserEmail();
+        Employee employee = getCurrentEmployee(email);
         // Get coordinator-specific stats
-        Map<String, Object> technicalCoordinatorStats = statsService.getInspections(currentUserEmail);
-        // Add attributes to the model
-        model.addAttribute("userEmail", currentUserEmail);
-        model.addAttribute("employeeName", currentEmployee.getEmpName());
-        model.addAttribute("employeeId", currentEmployee.getEmpId());
-        model.addAttribute("employeeRole", currentEmployee.getRole());
-        model.addAttribute("technicalCoordinatorStats", technicalCoordinatorStats);
+        Map<String, Object> technicalCoordinatorStats = statsService.getInspections(email);
+        populateCommonDashboardAttributes(model, employee, email, "technicalCoordinatorStats", technicalCoordinatorStats);
         return RETURN_TO_TECHNICAL_COORDINATOR_DASHBOARD;
     }
 

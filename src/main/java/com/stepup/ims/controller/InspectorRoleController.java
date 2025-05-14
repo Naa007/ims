@@ -21,7 +21,7 @@ import static com.stepup.ims.constants.UIRoutingConstants.*;
 @Controller
 @RequestMapping("/inspector")
 @PreAuthorize("hasRole('INSPECTOR')")
-public class InspectorRoleController {
+public class InspectorRoleController extends BaseDashboardsController {
 
     @Autowired
     private InspectionService inspectionService;
@@ -47,18 +47,11 @@ public class InspectorRoleController {
 
     @GetMapping("/dashboard")
     public String showDashboard(Model model) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUserEmail = authentication.getName();
-
-        // Get the employee details
-        Employee currentEmployee = employeeService.getEmployeeByEmail(currentUserEmail);
-
+        String email = getCurrentUserEmail();
+        Employee employee = getCurrentEmployee(email);
         // Get coordinator-specific stats
-        Map<String, Object> inspectorStats = statsService.getInspections(currentUserEmail);
-        model.addAttribute("userEmail", currentUserEmail);
-        model.addAttribute("employeeName", currentEmployee.getEmpName());
-        model.addAttribute("employeeRole", currentEmployee.getRole());
-        model.addAttribute("inspectorStats", inspectorStats);
+        Map<String, Object> inspectorStats = statsService.getInspections(email);
+        populateCommonDashboardAttributes(model, employee, email, "inspectorStats", inspectorStats);
         return RETURN_TO_INSPECTOR_DASHBOARD;
     }
 }

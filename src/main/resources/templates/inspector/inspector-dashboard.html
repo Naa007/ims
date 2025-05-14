@@ -169,7 +169,7 @@
 
         const inspectorEmail = document.querySelector('.user-email').textContent;
 
-        fetch(`/business/inspector-stats/${encodeURIComponent(inspectorEmail)}/${period}`)
+        fetch(`/stats/inspector-stats/${encodeURIComponent(inspectorEmail)}/${period}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);

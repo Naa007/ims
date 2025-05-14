@@ -168,7 +168,7 @@
 
         const coordinatorEmail = document.querySelector('.user-email').textContent;
 
-        fetch(`/business/coordinator-stats/${encodeURIComponent(coordinatorEmail)}/${period}`)
+        fetch(`/stats/coordinator-stats/${encodeURIComponent(coordinatorEmail)}/${period}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);

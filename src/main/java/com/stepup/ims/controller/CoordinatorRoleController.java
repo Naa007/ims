@@ -23,32 +23,21 @@ import static com.stepup.ims.constants.UIRoutingConstants.RETURN_TO_COORDINATOR_
 @Controller
 @RequestMapping("/coordinator")
 @PreAuthorize("hasRole('COORDINATOR')")
-public class CoordinatorRoleController {
+public class CoordinatorRoleController extends BaseDashboardsController {
     @Autowired
-    private  EmployeeService employeeService;
+    private EmployeeService employeeService;
     @Autowired
     private InspectionRepository inspectionRepository;
     @Autowired
     private StatsService statsService;
 
-
     @GetMapping("/dashboard")
     public String showDashboard(Model model) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUserEmail = authentication.getName();
-
-        // Get the employee details
-        Employee currentEmployee = employeeService.getEmployeeByEmail(currentUserEmail);
-
+        String email = getCurrentUserEmail();
+        Employee employee = getCurrentEmployee(email);
         // Get coordinator-specific stats
-        Map<String, Object> coordinatorStats = statsService.getInspections(currentUserEmail);
-
-        // Add attributes to the model
-        model.addAttribute("userEmail", currentUserEmail);
-        model.addAttribute("employeeName", currentEmployee.getEmpName());
-        model.addAttribute("employeeRole", currentEmployee.getRole());
-        model.addAttribute("coordinatorStats", coordinatorStats);
-
+        Map<String, Object> coordinatorStats = statsService.getInspections(email);
+        populateCommonDashboardAttributes(model, employee, email, "coordinatorStats", coordinatorStats);
         return RETURN_TO_COORDINATOR_DASHBOARD;
     }
 }

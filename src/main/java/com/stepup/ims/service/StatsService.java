@@ -180,34 +180,17 @@ public class StatsService {
         return new InpsectionStatsByRole(totalInspections, newInspections, completedInspections, ongoingInspections, rejectedInspections, InpsectionStatsByRole.PeriodType.valueOf(period.toUpperCase()));
     }
     public byte[] generateCoordinatorReport(String email, String period, String format) {
-        Map<String, Integer> stats = getStatsByEmailAndPeriod(email, "coordinator", period);
-
-        if ("pdf".equalsIgnoreCase(format)) {
-            return generateCoordinatorPdf(email, period, stats);
-        } else {
-            return generateCoordinatorExcel(email, period, stats);
-        }
+        return generateReport(email, period, format, "coordinator");
     }
 
     public byte[] generateTechCoordinatorReport(String empId, String period, String format) {
-        Map<String, Integer> stats = getStatsByEmailAndPeriod(empId, "technical", period);
-
-        if ("pdf".equalsIgnoreCase(format)) {
-            return generateTechnicalCoordinatorPdf(empId, period, stats);
-        } else {
-            return generateTechnicalCoordinatorExcel(empId, period, stats);
-        }
+        return generateReport(empId, period, format, "technical");
     }
 
     public byte[] generateInspectorReport(String email, String period, String format) {
-        Map<String, Integer> stats = getStatsByEmailAndPeriod(email, "inspector", period);
-
-        if ("pdf".equalsIgnoreCase(format)) {
-            return generateInspectorPdf(email, period, stats);
-        } else {
-            return generateInspectorExcel(email, period, stats);
-        }
+        return generateReport(email, period, format, "inspector");
     }
+
     private Map<String, Integer> getStatsByEmailAndPeriod(String identifier, String role, String period) {
         List<Inspection> inspections;
 
@@ -245,15 +228,46 @@ public class StatsService {
                 ));
     }
 
-    private byte[] generateCoordinatorPdf(String email, String period, Map<String, Integer> stats) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+    public byte[] generateReport(String id, String period, String format, String role) {
+        Map<String, Integer> stats = getStatsByEmailAndPeriod(id, role, period);
 
+        String title;
+        String label;
+        String sheetName;
+
+        switch (role.toLowerCase()) {
+            case "coordinator":
+                title = "Coordinator Performance Report";
+                label = "Coordinator email: ";
+                sheetName = "Coordinator Report";
+                break;
+            case "technical":
+                title = "Technical Coordinator Performance Report";
+                label = "Technical Coordinator ID: ";
+                sheetName = "Technical Coordinator Report";
+                break;
+            case "inspector":
+                title = "Inspector Performance Report";
+                label = "Inspector email: ";
+                sheetName = "Inspector Report";
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown role: " + role);
+        }
+
+        return "pdf".equalsIgnoreCase(format)
+                ? generatePdfReport(title, label, id, period, stats)
+                : generateExcelReport(title, label, id, period, stats, sheetName);
+    }
+
+    private byte[] generatePdfReport(String title, String label, String id, String period, Map<String, Integer> stats) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
         PdfWriter writer = new PdfWriter(out);
         PdfDocument pdf = new PdfDocument(writer);
         Document document = new Document(pdf);
 
-        document.add(new Paragraph("Coordinator Performance Report").setBold().setFontSize(18));
-        document.add(new Paragraph("Coordinator email: " + email));
+        document.add(new Paragraph(title).setBold().setFontSize(18));
+        document.add(new Paragraph(label + id));
         document.add(new Paragraph("Period: " + period));
         document.add(new Paragraph("\n"));
 
@@ -263,8 +277,7 @@ public class StatsService {
 
         stats.forEach((status, count) -> {
             String safeStatus = status != null ? status : "N/A";
-            String safeCount = count != null ? count.toString() : "0"; // ensures "0" is printed
-
+            String safeCount = count != null ? count.toString() : "0";
             table.addCell(new Cell().add(new Paragraph(safeStatus)));
             table.addCell(new Cell().add(new Paragraph(safeCount)));
         });
@@ -274,14 +287,14 @@ public class StatsService {
         return out.toByteArray();
     }
 
-    private byte[] generateCoordinatorExcel(String email, String period, Map<String, Integer> stats) {
+    private byte[] generateExcelReport(String title, String label, String id, String period, Map<String, Integer> stats, String sheetName) {
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            Sheet sheet = workbook.createSheet("Coordinator Report");
+            Sheet sheet = workbook.createSheet(sheetName);
 
             Row header = sheet.createRow(0);
-            header.createCell(0).setCellValue("Coordinator Report");
+            header.createCell(0).setCellValue(title);
 
-            sheet.createRow(1).createCell(0).setCellValue("Coordinator email: " + email);
+            sheet.createRow(1).createCell(0).setCellValue(label + id);
             sheet.createRow(2).createCell(0).setCellValue("Period: " + period);
 
             Row titleRow = sheet.createRow(4);
@@ -295,124 +308,7 @@ public class StatsService {
 
                 Row row = sheet.createRow(rowIdx++);
                 row.createCell(0).setCellValue(status);
-                row.createCell(1).setCellValue(count); // even if count = 0, it will be shown
-            }
-
-            sheet.autoSizeColumn(0);
-            sheet.autoSizeColumn(1);
-            workbook.write(out);
-            return out.toByteArray();
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to generate Excel", e);
-        }
-    }
-    // Technical Coordinator PDF Report
-    private byte[] generateTechnicalCoordinatorPdf(String email, String period, Map<String, Integer> stats) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        PdfWriter writer = new PdfWriter(out);
-        PdfDocument pdf = new PdfDocument(writer);
-        Document document = new Document(pdf);
-
-        document.add(new Paragraph("Technical Coordinator Performance Report").setBold().setFontSize(18));
-        document.add(new Paragraph("Technical Coordinator ID: " + email));
-        document.add(new Paragraph("Period: " + period));
-        document.add(new Paragraph("\n"));
-
-        Table table = new Table(UnitValue.createPercentArray(2)).useAllAvailableWidth();
-        table.addHeaderCell("Inspection Status");
-        table.addHeaderCell("Count");
-
-        stats.forEach((status, count) -> {
-            table.addCell(status);
-            table.addCell(count.toString());
-        });
-
-        document.add(table);
-        document.close();
-        return out.toByteArray();
-    }
-
-    private byte[] generateTechnicalCoordinatorExcel(String email, String period, Map<String, Integer> stats) {
-        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            Sheet sheet = workbook.createSheet("Technical Coordinator Report");
-
-            Row header = sheet.createRow(0);
-            header.createCell(0).setCellValue("Technical Coordinator Report");
-
-            sheet.createRow(1).createCell(0).setCellValue("Technical Coordinator ID: " + email);
-            sheet.createRow(2).createCell(0).setCellValue("Period: " + period);
-
-            Row titleRow = sheet.createRow(4);
-            titleRow.createCell(0).setCellValue("Inspection Status");
-            titleRow.createCell(1).setCellValue("Count");
-
-            int rowIdx = 5;
-            for (Map.Entry<String, Integer> entry : stats.entrySet()) {
-                String status = entry.getKey() != null ? entry.getKey() : "N/A";
-                int count = entry.getValue() != null ? entry.getValue() : 0;
-
-                Row row = sheet.createRow(rowIdx++);
-                row.createCell(0).setCellValue(status);
-                row.createCell(1).setCellValue(count); // even if count = 0, it will be shown
-            }
-
-
-            sheet.autoSizeColumn(0);
-            sheet.autoSizeColumn(1);
-            workbook.write(out);
-            return out.toByteArray();
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to generate Excel", e);
-        }
-    }
-
-    private byte[] generateInspectorPdf(String email, String period, Map<String, Integer> stats) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        PdfWriter writer = new PdfWriter(out);
-        PdfDocument pdf = new PdfDocument(writer);
-        Document document = new Document(pdf);
-
-        document.add(new Paragraph("Inspector Performance Report").setBold().setFontSize(18));
-        document.add(new Paragraph("Inspector email: " + email));
-        document.add(new Paragraph("Period: " + period));
-        document.add(new Paragraph("\n"));
-
-        Table table = new Table(UnitValue.createPercentArray(2)).useAllAvailableWidth();
-        table.addHeaderCell("Inspection Status");
-        table.addHeaderCell("Count");
-
-        stats.forEach((status, count) -> {
-            table.addCell(status);
-            table.addCell(count.toString());
-        });
-
-        document.add(table);
-        document.close();
-        return out.toByteArray();
-    }
-
-    private byte[] generateInspectorExcel(String email, String period, Map<String, Integer> stats) {
-        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            Sheet sheet = workbook.createSheet("Inspector Report");
-
-            Row header = sheet.createRow(0);
-            header.createCell(0).setCellValue("Inspector Report");
-
-            sheet.createRow(1).createCell(0).setCellValue("Inspector email: " + email);
-            sheet.createRow(2).createCell(0).setCellValue("Period: " + period);
-
-            Row titleRow = sheet.createRow(4);
-            titleRow.createCell(0).setCellValue("Inspection Status");
-            titleRow.createCell(1).setCellValue("Count");
-
-            int rowIdx = 5;
-            for (Map.Entry<String, Integer> entry : stats.entrySet()) {
-                String status = entry.getKey() != null ? entry.getKey() : "N/A";
-                int count = entry.getValue() != null ? entry.getValue() : 0;
-
-                Row row = sheet.createRow(rowIdx++);
-                row.createCell(0).setCellValue(status);
-                row.createCell(1).setCellValue(count); // even if count = 0, it will be shown
+                row.createCell(1).setCellValue(count);
             }
 
             sheet.autoSizeColumn(0);

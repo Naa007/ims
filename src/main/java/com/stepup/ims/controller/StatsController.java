@@ -47,73 +47,57 @@ public class StatsController {
         }
     }
 
-    @GetMapping("/coordinator-report/{email}/{period}/pdf")
-    public ResponseEntity<byte[]> exportCoordinatorPdf(@PathVariable String email, @PathVariable String period) {
-        byte[] report = statsService.generateCoordinatorReport(email, period, "pdf");
+    @GetMapping("/coordinator-report/{email}/{period}/{format}")
+    public ResponseEntity<byte[]> exportCoordinatorReport(
+            @PathVariable String email,
+            @PathVariable String period,
+            @PathVariable String format) {
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentDisposition(ContentDisposition.attachment().filename("coordinator-report.pdf").build());
-
-        return new ResponseEntity<>(report, headers, HttpStatus.OK);
+        byte[] report = statsService.generateCoordinatorReport(email, period, format);
+        return buildReportResponse(report, "coordinator-report." + format, format);
     }
 
-    @GetMapping("/coordinator-report/{email}/{period}/excel")
-    public ResponseEntity<byte[]> exportCoordinatorExcel(@PathVariable String email, @PathVariable String period) {
-        byte[] report = statsService.generateCoordinatorReport(email, period, "excel");
+    @GetMapping("/technical-coordinator-report/{empId}/{period}/{format}")
+    public ResponseEntity<byte[]> exportTechCoordinatorReport(
+            @PathVariable String empId,
+            @PathVariable String period,
+            @PathVariable String format) {
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
-        headers.setContentDisposition(ContentDisposition.attachment().filename("coordinator-report.xlsx").build());
-
-        return new ResponseEntity<>(report, headers, HttpStatus.OK);
+        byte[] report = statsService.generateTechCoordinatorReport(empId, period, format);
+        return buildReportResponse(report, "TechnicalCoordinator-report." + format, format);
     }
 
-    @GetMapping("/technical-coordinator-report/{empId}/{period}/pdf")
-    public ResponseEntity<byte[]> exportTechCoordinatorPdf(@PathVariable String empId, @PathVariable String period) {
-        byte[] report = statsService.generateTechCoordinatorReport(empId, period, "pdf");
+    @GetMapping("/inspector-report/{email}/{period}/{format}")
+    public ResponseEntity<byte[]> exportInspectorReport(
+            @PathVariable String email,
+            @PathVariable String period,
+            @PathVariable String format) {
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentDisposition(ContentDisposition.attachment()
-                .filename("TechnicalCoordinator-report.pdf").build());
-
-        return new ResponseEntity<>(report, headers, HttpStatus.OK);
+        byte[] report = statsService.generateInspectorReport(email, period, format);
+        return buildReportResponse(report, "Inspector-report." + format, format);
     }
 
-    @GetMapping("/technical-coordinator-report/{empId}/{period}/excel")
-    public ResponseEntity<byte[]> exportTechCoordinatorExcel(@PathVariable String empId, @PathVariable String period) {
-        byte[] report = statsService.generateTechCoordinatorReport(empId, period, "excel");
+    private ResponseEntity<byte[]> buildReportResponse(
+            byte[] reportData,
+            String filename,
+            String format) {
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
-        headers.setContentDisposition(ContentDisposition.attachment()
-                .filename("TechnicalCoordinator-report.xlsx").build());
 
-        return new ResponseEntity<>(report, headers, HttpStatus.OK);
+        switch (format.toLowerCase()) {
+            case "pdf":
+                headers.setContentType(MediaType.APPLICATION_PDF);
+                break;
+            case "excel":
+                headers.setContentType(MediaType.parseMediaType(
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+                break;
+            default:
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
+        headers.setContentDisposition(ContentDisposition.attachment().filename(filename).build());
+        return new ResponseEntity<>(reportData, headers, HttpStatus.OK);
     }
 
-    @GetMapping("/inspector-report/{email}/{period}/pdf")
-    public ResponseEntity<byte[]> exportInspectorPdf(@PathVariable String email, @PathVariable String period) {
-        byte[] report = statsService.generateInspectorReport(email, period, "pdf");
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentDisposition(ContentDisposition.attachment()
-                .filename("Inspector-report.pdf").build());
-
-        return new ResponseEntity<>(report, headers, HttpStatus.OK);
-    }
-
-    @GetMapping("/inspector-report/{email}/{period}/excel")
-    public ResponseEntity<byte[]> exportInspectorExcel(@PathVariable String email, @PathVariable String period) {
-        byte[] report = statsService.generateInspectorReport(email, period, "excel");
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
-        headers.setContentDisposition(ContentDisposition.attachment()
-                .filename("Inspector-report.xlsx").build());
-
-        return new ResponseEntity<>(report, headers, HttpStatus.OK);
-    }
 }

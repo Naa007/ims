@@ -157,7 +157,7 @@
             return;
         }
 
-        fetch(`/business/technical-coordinator-stats/${encodeURIComponent(employeeID)}/${period}`)
+        fetch(`/stats/technical-coordinator-stats/${encodeURIComponent(employeeID)}/${period}`)
             .then(response => {
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 return response.json();
