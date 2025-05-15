@@ -175,16 +175,16 @@
     function updateMetricsDisplay(data) {
         const totalElement = document.getElementById('totalInspections');
         if (totalElement) {
-            totalElement.textContent = data['Total Inspections'] || 0;
+            totalElement.textContent = data['totalInspections'] || 0;
             totalElement.classList.add('cd-total-highlight');
             setTimeout(() => totalElement.classList.remove('cd-total-highlight'), 1500);
         }
 
         const metrics = {
-            'newInspections': 'New',
-            'ongoingInspections': 'Ongoing',
-            'awardedInspections': 'Awarded',
-            'rejectedInspections': 'Rejected'
+            'newInspections': 'newInspections',
+            'ongoingInspections': 'ongoingInspections',
+            'awardedInspections': 'completedInspections',
+            'rejectedInspections': 'rejectedInspections'
         };
 
         for (const [elementId, dataKey] of Object.entries(metrics)) {
@@ -239,7 +239,7 @@
        }
         const filename = `${coordinatorName.replace(/\s+/g, '_')}_report.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
 
-        fetch(`/business/technical-coordinator-report/${employeeID}/${period}/${format}`)
+        fetch(`/stats/technical-coordinator-report/${employeeID}/${period}/${format}`)
             .then(response => {
                 if (!response.ok) throw new Error(`Error: ${response.status}`);
                 return response.blob();

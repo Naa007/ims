@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import static com.stepup.ims.constants.ApplicationConstants.*;
+
 
 @Controller
 @RequestMapping("/stats")
@@ -17,70 +19,52 @@ public class StatsController {
     @Autowired
     private StatsService statsService;
 
-    @GetMapping("/coordinator-stats/{email}/{period}")
-    public ResponseEntity<InpsectionStatsByRole> getCoordinatorStats(@PathVariable String email, @PathVariable String period) {
+    @GetMapping("/{role}-stats/{emailOrEmpId}/{period}")
+    public ResponseEntity<InpsectionStatsByRole> getStats(@PathVariable String role, @PathVariable String emailOrEmpId, @PathVariable String period) {
         try {
-            InpsectionStatsByRole stats = statsService.getCoordinatorStats(email, period);
+            InpsectionStatsByRole stats;
+            switch (role.toLowerCase()) {
+                case COORDINATOR_LOWERCASE:
+                    stats = statsService.getCoordinatorStats(emailOrEmpId, period);
+                    break;
+                case INSPECTOR_LOWERCASE:
+                    stats = statsService.getInspectorStats(emailOrEmpId, period);
+                    break;
+                case TECHNICAL_COORDINATOR_LOWERCASE:
+                    stats = statsService.getTechnicalCoordinatorStats(emailOrEmpId, period);
+                    break;
+                default:
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
             return ResponseEntity.ok(stats);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
-    @GetMapping("/inspector-stats/{email}/{period}")
-    public ResponseEntity<InpsectionStatsByRole> getInspectorStats(@PathVariable String email, @PathVariable String period) {
-        try {
-            InpsectionStatsByRole stats = statsService.getInspectorStats(email, period);
-            return ResponseEntity.ok(stats);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    @GetMapping("/{role}-report/{emailOrEmpId}/{period}/{format}")
+    public ResponseEntity<byte[]> exportReport(@PathVariable String role, @PathVariable String emailOrEmpId, @PathVariable String period, @PathVariable String format) {
+
+        byte[] report;
+
+        switch (role.toLowerCase()) {
+            case COORDINATOR_LOWERCASE:
+                report = statsService.generateCoordinatorReport(emailOrEmpId, period, format);
+                break;
+            case TECHNICAL_COORDINATOR_LOWERCASE:
+                report = statsService.generateTechCoordinatorReport(emailOrEmpId, period, format);
+                break;
+            case INSPECTOR_LOWERCASE:
+                report = statsService.generateInspectorReport(emailOrEmpId, period, format);
+                break;
+            default:
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
+
+        return buildReportResponse(report, role + "-report." + format, format);
     }
 
-    @GetMapping("/technical-coordinator-stats/{empId}/{period}")
-    public ResponseEntity<InpsectionStatsByRole> getTechnicalCoordinatorStats(@PathVariable String empId, @PathVariable String period) {
-        try {
-            InpsectionStatsByRole stats = statsService.getTechnicalCoordinatorStats(empId, period);
-            return ResponseEntity.ok(stats);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }
-
-    @GetMapping("/coordinator-report/{email}/{period}/{format}")
-    public ResponseEntity<byte[]> exportCoordinatorReport(
-            @PathVariable String email,
-            @PathVariable String period,
-            @PathVariable String format) {
-
-        byte[] report = statsService.generateCoordinatorReport(email, period, format);
-        return buildReportResponse(report, "coordinator-report." + format, format);
-    }
-
-    @GetMapping("/technical-coordinator-report/{empId}/{period}/{format}")
-    public ResponseEntity<byte[]> exportTechCoordinatorReport(
-            @PathVariable String empId,
-            @PathVariable String period,
-            @PathVariable String format) {
-
-        byte[] report = statsService.generateTechCoordinatorReport(empId, period, format);
-        return buildReportResponse(report, "TechnicalCoordinator-report." + format, format);
-    }
-
-    @GetMapping("/inspector-report/{email}/{period}/{format}")
-    public ResponseEntity<byte[]> exportInspectorReport(
-            @PathVariable String email,
-            @PathVariable String period,
-            @PathVariable String format) {
-
-        byte[] report = statsService.generateInspectorReport(email, period, format);
-        return buildReportResponse(report, "Inspector-report." + format, format);
-    }
-
-    private ResponseEntity<byte[]> buildReportResponse(
-            byte[] reportData,
-            String filename,
-            String format) {
+    private ResponseEntity<byte[]> buildReportResponse(byte[] reportData, String filename, String format) {
 
         HttpHeaders headers = new HttpHeaders();
 
@@ -89,8 +73,7 @@ public class StatsController {
                 headers.setContentType(MediaType.APPLICATION_PDF);
                 break;
             case "excel":
-                headers.setContentType(MediaType.parseMediaType(
-                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+                headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
                 break;
             default:
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);

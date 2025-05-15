@@ -14,17 +14,22 @@ public abstract class BaseDashboardsController {
 
     protected String getCurrentUserEmail() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication.getName();
+        return (authentication != null) ? authentication.getName() : null;
     }
 
     protected Employee getCurrentEmployee(String email) {
-        return employeeService.getEmployeeByEmail(email);
+        return (email != null) ? employeeService.getEmployeeByEmail(email) : null;
     }
 
     protected void populateCommonDashboardAttributes(Model model, Employee employee, String email, String statsKey, Object statsData) {
-        model.addAttribute("userEmail", email);
-        model.addAttribute("employeeName", employee.getEmpName());
-        model.addAttribute("employeeRole", employee.getRole());
+        if (email != null) {
+            model.addAttribute("userEmail", email);
+        }
+        if (employee != null) {
+            model.addAttribute("employeeName", employee.getEmpName());
+            model.addAttribute("employeeRole", employee.getRole());
+            model.addAttribute("employeeId", employee.getEmpId());
+        }
         model.addAttribute(statsKey, statsData);
     }
 }

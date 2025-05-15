@@ -192,17 +192,17 @@
         // Update the total inspections count
         const totalElement = document.getElementById('totalInspections');
         if (totalElement) {
-            totalElement.textContent = data['Total Inspections'] || 0;
+            totalElement.textContent = data['totalInspections'] || 0;
             totalElement.classList.add('cd-total-highlight');
             setTimeout(() => totalElement.classList.remove('cd-total-highlight'), 1500);
         }
 
         // Update individual metrics
-        const metrics = {
-            'newInspections': 'New',
-            'ongoingInspections': 'Ongoing',
-            'awardedInspections': 'Awarded',
-            'rejectedInspections': 'Rejected'
+       const metrics = {
+            'newInspections': 'newInspections',
+            'ongoingInspections': 'ongoingInspections',
+            'awardedInspections': 'completedInspections',
+            'rejectedInspections': 'rejectedInspections'
         };
 
         for (const [elementId, dataKey] of Object.entries(metrics)) {
@@ -318,7 +318,7 @@
         const employeeName = /*[[${employeeName}]]*/ coordinatorName;
         const encodedName = encodeURIComponent(employeeName.replace(/\s+/g, '_'));
 
-        const endpoint = `/business/coordinator-report/${encodedName}/${period}/${format}`;
+        const endpoint = `/stats/coordinator-report/${encodedName}/${period}/${format}`;
         const filename = `${encodedName}_report.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
 
         fetch(endpoint)
@@ -392,7 +392,7 @@
     .cd-total-number {
         font-size: 2.5rem;
         font-weight: 700;
-        color: #4e73df;
+        color: #36b9cc;
     }
 
     .cd-total-label {

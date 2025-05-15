@@ -6,7 +6,6 @@ import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
-import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.stepup.ims.entity.Inspection;
 import com.stepup.ims.model.BusinessStats;
@@ -18,7 +17,6 @@ import com.stepup.ims.repository.StatsRepository;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,18 +31,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.stepup.ims.constants.ApplicationConstants.*;
+
 @Service
 public class StatsService {
 
     private final StatsRepository statsRepository;
+    @Autowired
+    private InspectionRepository inspectionRepository;
 
     @Autowired
     public StatsService(StatsRepository statsRepository) {
         this.statsRepository = statsRepository;
     }
-    
-    @Autowired
-    private InspectionRepository inspectionRepository;
 
     public Map<String, Object> getBusinessStats() {
         BusinessStats stats = statsRepository.getBusinessStats();
@@ -92,17 +91,7 @@ public class StatsService {
         map.put("New", stats.getNewInspections());
 
         // Calculate ongoing inspections by summing all intermediate statuses
-        long ongoing = stats.getInspectorAssigned()
-                + stats.getInspectorReviewAwaiting()
-                + stats.getInspectorReviewCompleted()
-                + stats.getInspectorApproved()
-                + stats.getReferenceDocReceived()
-                + stats.getReferenceDocReviewAwaiting()
-                + stats.getReferenceDocReviewCompleted()
-                + stats.getInspectionReportsReceived()
-                + stats.getInspectionReportsReviewAwaiting()
-                + stats.getInspectionReportsReviewCompleted()
-                + stats.getInspectionReportsSentToClient();
+        long ongoing = stats.getInspectorAssigned() + stats.getInspectorReviewAwaiting() + stats.getInspectorReviewCompleted() + stats.getInspectorApproved() + stats.getReferenceDocReceived() + stats.getReferenceDocReviewAwaiting() + stats.getReferenceDocReviewCompleted() + stats.getInspectionReportsReceived() + stats.getInspectionReportsReviewAwaiting() + stats.getInspectionReportsReviewCompleted() + stats.getInspectionReportsSentToClient();
         map.put("Ongoing", ongoing);
 
         map.put("Awarded", stats.getInspectionAwarded());
@@ -110,6 +99,7 @@ public class StatsService {
         map.put("Closed", stats.getClosedInspections());
         return map;
     }
+
     private Map<String, Object> createInspectionStatusStats(BusinessStats stats) {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("New", stats.getNewInspections());
@@ -138,94 +128,63 @@ public class StatsService {
         return getInspectionStatsByRole(inspections, period);
     }
 
+    public InpsectionStatsByRole getInspectionStatsByRole(List<Inspection> inspections, String period) {
 
-    public InpsectionStatsByRole getInspectionStatsByRole( List<Inspection> inspections, String period) {
-
-        inspections = inspections.stream()
-                .filter(inspection -> inspection.getCreatedDate() != null)
-                .filter(inspection -> {
-                    if ("WEEK".equalsIgnoreCase(period)) {
-                        return !inspection.getCreatedDate().isBefore(LocalDateTime.now().minusWeeks(1));
-                    } else if ("MONTH".equalsIgnoreCase(period)) {
-                        return !inspection.getCreatedDate().isBefore(LocalDateTime.now().minusMonths(1));
-                    } else if ("YEAR".equalsIgnoreCase(period)) {
-                        return !inspection.getCreatedDate().isBefore(LocalDateTime.now().minusYears(1));
-                    }
-                    return true; // Default case for any other PeriodType
-                })
-                .toList();
+        inspections = inspections.stream().filter(inspection -> inspection.getCreatedDate() != null).filter(inspection -> {
+            if ("WEEK".equalsIgnoreCase(period)) {
+                return !inspection.getCreatedDate().isBefore(LocalDateTime.now().minusWeeks(1));
+            } else if ("MONTH".equalsIgnoreCase(period)) {
+                return !inspection.getCreatedDate().isBefore(LocalDateTime.now().minusMonths(1));
+            } else if ("YEAR".equalsIgnoreCase(period)) {
+                return !inspection.getCreatedDate().isBefore(LocalDateTime.now().minusYears(1));
+            }
+            return true; // Default case for any other PeriodType
+        }).toList();
 
         long totalInspections = inspections.size();
         long newInspections = inspections.stream().filter(inspection -> "NEW".equalsIgnoreCase(inspection.getInspectionStatus().toString())).count();
         long completedInspections = inspections.stream().filter(inspection -> "INSPECTION_AWARDED".equalsIgnoreCase(inspection.getInspectionStatus().toString())).count();
-        long ongoingInspections = inspections.stream()
-                .filter(inspection -> {
-                    String status = inspection.getInspectionStatus().toString();
-                    return "INSPECTOR_ASSIGNED".equalsIgnoreCase(status) ||
-                            "INSPECTOR_REVIEW_AWAITING".equalsIgnoreCase(status) ||
-                            "INSPECTOR_REVIEW_COMPLETED".equalsIgnoreCase(status) ||
-                            "INSPECTOR_APPROVED".equalsIgnoreCase(status) ||
-                            "REFERENCE_DOC_RECEIVED".equalsIgnoreCase(status) ||
-                            "REFERENCE_DOC_REVIEW_AWAITING".equalsIgnoreCase(status) ||
-                            "REFERENCE_DOC_REVIEW_COMPLETED".equalsIgnoreCase(status) ||
-                            "INSPECTION_REPORTS_RECEIVED".equalsIgnoreCase(status) ||
-                            "INSPECTION_REPORTS_REVIEW_AWAITING".equalsIgnoreCase(status) ||
-                            "INSPECTION_REPORTS_REVIEW_COMPLETED".equalsIgnoreCase(status) ||
-                            "INSPECTION_REPORTS_SENT_TO_CLIENT".equalsIgnoreCase(status);
-                })
-                .count();
+        long ongoingInspections = inspections.stream().filter(inspection -> {
+            String status = inspection.getInspectionStatus().toString();
+            return "INSPECTOR_ASSIGNED".equalsIgnoreCase(status) || "INSPECTOR_REVIEW_AWAITING".equalsIgnoreCase(status) || "INSPECTOR_REVIEW_COMPLETED".equalsIgnoreCase(status) || "INSPECTOR_APPROVED".equalsIgnoreCase(status) || "REFERENCE_DOC_RECEIVED".equalsIgnoreCase(status) || "REFERENCE_DOC_REVIEW_AWAITING".equalsIgnoreCase(status) || "REFERENCE_DOC_REVIEW_COMPLETED".equalsIgnoreCase(status) || "INSPECTION_REPORTS_RECEIVED".equalsIgnoreCase(status) || "INSPECTION_REPORTS_REVIEW_AWAITING".equalsIgnoreCase(status) || "INSPECTION_REPORTS_REVIEW_COMPLETED".equalsIgnoreCase(status) || "INSPECTION_REPORTS_SENT_TO_CLIENT".equalsIgnoreCase(status);
+        }).count();
         long rejectedInspections = inspections.stream().filter(inspection -> "INSPECTION_REJECTED".equalsIgnoreCase(inspection.getInspectionStatus().toString())).count();
 
 
         return new InpsectionStatsByRole(totalInspections, newInspections, completedInspections, ongoingInspections, rejectedInspections, InpsectionStatsByRole.PeriodType.valueOf(period.toUpperCase()));
     }
+
     public byte[] generateCoordinatorReport(String email, String period, String format) {
-        return generateReport(email, period, format, "coordinator");
+        return generateReport(email, period, format, COORDINATOR_LOWERCASE);
     }
 
     public byte[] generateTechCoordinatorReport(String empId, String period, String format) {
-        return generateReport(empId, period, format, "technical");
+        return generateReport(empId, period, format, TECHNICAL_COORDINATOR_LOWERCASE);
     }
 
     public byte[] generateInspectorReport(String email, String period, String format) {
-        return generateReport(email, period, format, "inspector");
+        return generateReport(email, period, format, INSPECTOR_LOWERCASE);
     }
 
     private Map<String, Integer> getStatsByEmailAndPeriod(String identifier, String role, String period) {
-        List<Inspection> inspections;
-
-        switch(role.toLowerCase()) {
-            case "coordinator":
-                inspections = inspectionRepository.findByCreatedBy(identifier);
-                break;
-            case "technical":
-                inspections = inspectionRepository.findByProposedCVs_CvReviewBytechnicalCoordinator_EmpIdOrDocumentsReviewedByTechnicalCoordinatorOrInspectionReviewedBy(
-                        identifier, identifier, identifier);
-                break;
-            case "inspector":
-                inspections = inspectionRepository.findByProposedCVs_Inspector_Email(identifier);
-                break;
-            default:
-                inspections = new ArrayList<>();
-        }
+        List<Inspection> inspections = switch (role.toLowerCase()) {
+            case COORDINATOR_LOWERCASE -> inspectionRepository.findByCreatedBy(identifier);
+            case TECHNICAL_COORDINATOR_LOWERCASE ->
+                    inspectionRepository.findByProposedCVs_CvReviewBytechnicalCoordinator_EmpIdOrDocumentsReviewedByTechnicalCoordinatorOrInspectionReviewedBy(identifier, identifier, identifier);
+            case INSPECTOR_LOWERCASE -> inspectionRepository.findByProposedCVs_Inspector_Email(identifier);
+            default -> new ArrayList<>();
+        };
 
         LocalDate now = LocalDate.now();
-        LocalDate startDate;
-        switch (period.toLowerCase()) {
-            case "week": startDate = now.minusDays(7); break;
-            case "month": startDate = now.minusDays(30); break;
-            case "quarter": startDate = now.minusMonths(3); break;
-            case "year": startDate = now.withDayOfYear(1); break;
-            default: startDate = now.minusDays(30); break;
-        }
+        LocalDate startDate = switch (period.toLowerCase()) {
+            case "week" -> now.minusDays(7);
+            case "month" -> now.minusDays(30);
+            case "quarter" -> now.minusMonths(3);
+            case "year" -> now.withDayOfYear(1);
+            default -> now.minusDays(30);
+        };
 
-        return inspections.stream()
-                .filter(i -> i.getOrderConfirmationDate() != null &&
-                        !i.getOrderConfirmationDate().isBefore(startDate))
-                .collect(Collectors.groupingBy(
-                        i -> i.getInspectionStatus().name(),
-                        Collectors.summingInt(i -> 1)
-                ));
+        return inspections.stream().filter(i -> i.getOrderConfirmationDate() != null && !i.getOrderConfirmationDate().isBefore(startDate)).collect(Collectors.groupingBy(i -> i.getInspectionStatus().name(), Collectors.summingInt(i -> 1)));
     }
 
     public byte[] generateReport(String id, String period, String format, String role) {
@@ -236,17 +195,17 @@ public class StatsService {
         String sheetName;
 
         switch (role.toLowerCase()) {
-            case "coordinator":
+            case COORDINATOR_LOWERCASE:
                 title = "Coordinator Performance Report";
                 label = "Coordinator email: ";
                 sheetName = "Coordinator Report";
                 break;
-            case "technical":
+            case TECHNICAL_COORDINATOR_LOWERCASE:
                 title = "Technical Coordinator Performance Report";
                 label = "Technical Coordinator ID: ";
                 sheetName = "Technical Coordinator Report";
                 break;
-            case "inspector":
+            case INSPECTOR_LOWERCASE:
                 title = "Inspector Performance Report";
                 label = "Inspector email: ";
                 sheetName = "Inspector Report";
@@ -255,9 +214,7 @@ public class StatsService {
                 throw new IllegalArgumentException("Unknown role: " + role);
         }
 
-        return "pdf".equalsIgnoreCase(format)
-                ? generatePdfReport(title, label, id, period, stats)
-                : generateExcelReport(title, label, id, period, stats, sheetName);
+        return "pdf".equalsIgnoreCase(format) ? generatePdfReport(title, label, id, period, stats) : generateExcelReport(title, label, id, period, stats, sheetName);
     }
 
     private byte[] generatePdfReport(String title, String label, String id, String period, Map<String, Integer> stats) {
@@ -321,56 +278,34 @@ public class StatsService {
     }
 
     public PerformanceTrendResponse getPerformanceTrendData(String coordinator, String technical, String inspector) {
-        List<String> labels = List.of("Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+        List<String> labels = List.of("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
 
         List<PerformanceTrendResponse.Dataset> datasets = new ArrayList<>();
 
         // ✅ Total Trend - ALL Inspections
         List<Inspection> allInspections = inspectionRepository.findAll(); // or filter by year if needed
-        datasets.add(new PerformanceTrendResponse.Dataset(
-                "All Inspections",
-                groupByMonth(allInspections)
-        ));
+        datasets.add(new PerformanceTrendResponse.Dataset("All Inspections", groupByMonth(allInspections)));
 
         if (coordinator != null && !coordinator.isBlank()) {
             List<Inspection> inspections = inspectionRepository.findByCreatedBy(coordinator);
-            datasets.add(new PerformanceTrendResponse.Dataset(
-                    "Coordinator - " + coordinator,
-                    groupByMonth(inspections)
-            ));
+            datasets.add(new PerformanceTrendResponse.Dataset("Coordinator - " + coordinator, groupByMonth(inspections)));
         }
 
         if (technical != null && !technical.isBlank()) {
-            List<Inspection> inspections = inspectionRepository
-                    .findByProposedCVs_CvReviewBytechnicalCoordinator_EmpIdOrDocumentsReviewedByTechnicalCoordinatorOrInspectionReviewedBy(
-                            technical, technical, technical
-                    );
-            datasets.add(new PerformanceTrendResponse.Dataset(
-                    "Technical - " + technical,
-                    groupByMonth(inspections)
-            ));
+            List<Inspection> inspections = inspectionRepository.findByProposedCVs_CvReviewBytechnicalCoordinator_EmpIdOrDocumentsReviewedByTechnicalCoordinatorOrInspectionReviewedBy(technical, technical, technical);
+            datasets.add(new PerformanceTrendResponse.Dataset("Technical - " + technical, groupByMonth(inspections)));
         }
 
         if (inspector != null && !inspector.isBlank()) {
             List<Inspection> inspections = inspectionRepository.findByProposedCVs_Inspector_Email(inspector);
-            datasets.add(new PerformanceTrendResponse.Dataset(
-                    "Inspector - " + inspector,
-                    groupByMonth(inspections)
-            ));
+            datasets.add(new PerformanceTrendResponse.Dataset("Inspector - " + inspector, groupByMonth(inspections)));
         }
 
         return new PerformanceTrendResponse(labels, datasets);
     }
 
-
     private List<Integer> groupByMonth(List<Inspection> inspections) {
-        Map<Integer, Long> grouped = inspections.stream()
-                .filter(i -> i.getCreatedDate() != null)
-                .collect(Collectors.groupingBy(
-                        i -> i.getCreatedDate().getMonthValue(),
-                        Collectors.counting()
-                ));
+        Map<Integer, Long> grouped = inspections.stream().filter(i -> i.getCreatedDate() != null).collect(Collectors.groupingBy(i -> i.getCreatedDate().getMonthValue(), Collectors.counting()));
 
         List<Integer> counts = new ArrayList<>();
         for (int i = 1; i <= 12; i++) {
@@ -378,6 +313,7 @@ public class StatsService {
         }
         return counts;
     }
+
     public Map<String, Object> getInspections(String email) {
         IndividualStats stats = statsRepository.getIndividualStats(email);
 
@@ -393,16 +329,6 @@ public class StatsService {
     }
 
     private long calculateOngoingInspections(IndividualStats stats) {
-        return stats.getInspectorAssigned() +
-                stats.getInspectorReviewAwaiting() +
-                stats.getInspectorReviewCompleted() +
-                stats.getInspectorApproved() +
-                stats.getReferenceDocReceived() +
-                stats.getReferenceDocReviewAwaiting() +
-                stats.getReferenceDocReviewCompleted() +
-                stats.getInspectionReportsReceived() +
-                stats.getInspectionReportsReviewAwaiting() +
-                stats.getInspectionReportsReviewCompleted() +
-                stats.getInspectionReportsSentToClient();
+        return stats.getInspectorAssigned() + stats.getInspectorReviewAwaiting() + stats.getInspectorReviewCompleted() + stats.getInspectorApproved() + stats.getReferenceDocReceived() + stats.getReferenceDocReviewAwaiting() + stats.getReferenceDocReviewCompleted() + stats.getInspectionReportsReceived() + stats.getInspectionReportsReviewAwaiting() + stats.getInspectionReportsReviewCompleted() + stats.getInspectionReportsSentToClient();
     }
 }
