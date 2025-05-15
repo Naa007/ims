@@ -9,8 +9,7 @@ import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.UnitValue;
 import com.stepup.ims.entity.Inspection;
 import com.stepup.ims.model.BusinessStats;
-import com.stepup.ims.model.IndividualStats;
-import com.stepup.ims.model.InpsectionStatsByRole;
+import com.stepup.ims.model.InspectionStatsByRole;
 import com.stepup.ims.model.PerformanceTrendResponse;
 import com.stepup.ims.repository.InspectionRepository;
 import com.stepup.ims.repository.StatsRepository;
@@ -112,34 +111,37 @@ public class StatsService {
         return map;
     }
 
-    public InpsectionStatsByRole getCoordinatorStats(String email, String period) {
+    public InspectionStatsByRole getCoordinatorStats(String email, String period) {
         List<Inspection> inspections = inspectionRepository.findByCreatedBy(email);
         return getInspectionStatsByRole(inspections, period);
     }
 
-    public InpsectionStatsByRole getInspectorStats(String email, String period) {
+    public InspectionStatsByRole getInspectorStats(String email, String period) {
         List<Inspection> inspections = inspectionRepository.findByProposedCVs_Inspector_Email(email);
         return getInspectionStatsByRole(inspections, period);
     }
 
-    public InpsectionStatsByRole getTechnicalCoordinatorStats(String empId, String period) {
+    public InspectionStatsByRole getTechnicalCoordinatorStats(String empId, String period) {
         List<Inspection> inspections = inspectionRepository.findByProposedCVs_CvReviewBytechnicalCoordinator_EmpIdOrDocumentsReviewedByTechnicalCoordinatorOrInspectionReviewedBy(empId, empId, empId);
 
         return getInspectionStatsByRole(inspections, period);
     }
 
-    public InpsectionStatsByRole getInspectionStatsByRole(List<Inspection> inspections, String period) {
+    public InspectionStatsByRole getInspectionStatsByRole(List<Inspection> inspections, String period) {
 
-        inspections = inspections.stream().filter(inspection -> inspection.getCreatedDate() != null).filter(inspection -> {
-            if ("WEEK".equalsIgnoreCase(period)) {
-                return !inspection.getCreatedDate().isBefore(LocalDateTime.now().minusWeeks(1));
-            } else if ("MONTH".equalsIgnoreCase(period)) {
-                return !inspection.getCreatedDate().isBefore(LocalDateTime.now().minusMonths(1));
-            } else if ("YEAR".equalsIgnoreCase(period)) {
-                return !inspection.getCreatedDate().isBefore(LocalDateTime.now().minusYears(1));
-            }
-            return true; // Default case for any other PeriodType
-        }).toList();
+        LocalDateTime cutoffDate = switch (period.toUpperCase()) {
+            case WEEK -> LocalDateTime.now().minusWeeks(1);
+            case MONTH -> LocalDateTime.now().minusMonths(1);
+            case YEAR -> LocalDateTime.now().minusYears(1);
+            case TOTAL -> null;
+            default -> throw new IllegalArgumentException("Invalid period: " + period);
+        };
+
+        if (cutoffDate != null) {
+            inspections = inspections.stream().filter(inspection -> inspection.getCreatedDate() != null && !inspection.getCreatedDate().isBefore(cutoffDate)).toList();
+        } else {
+            inspections = inspections.stream().filter(inspection -> inspection.getCreatedDate() != null).toList();
+        }
 
         long totalInspections = inspections.size();
         long newInspections = inspections.stream().filter(inspection -> "NEW".equalsIgnoreCase(inspection.getInspectionStatus().toString())).count();
@@ -151,7 +153,7 @@ public class StatsService {
         long rejectedInspections = inspections.stream().filter(inspection -> "INSPECTION_REJECTED".equalsIgnoreCase(inspection.getInspectionStatus().toString())).count();
 
 
-        return new InpsectionStatsByRole(totalInspections, newInspections, completedInspections, ongoingInspections, rejectedInspections, InpsectionStatsByRole.PeriodType.valueOf(period.toUpperCase()));
+        return new InspectionStatsByRole(totalInspections, newInspections, completedInspections, ongoingInspections, rejectedInspections, InspectionStatsByRole.PeriodType.valueOf(period.toUpperCase()));
     }
 
     public byte[] generateCoordinatorReport(String email, String period, String format) {
@@ -314,21 +316,4 @@ public class StatsService {
         return counts;
     }
 
-    public Map<String, Object> getInspections(String email) {
-        IndividualStats stats = statsRepository.getIndividualStats(email);
-
-        Map<String, Object> result = new LinkedHashMap<>();
-        result.put("Total Inspections", stats.getTotalInspections());
-        result.put("New", stats.getNewInspections());
-        result.put("Ongoing", calculateOngoingInspections(stats));
-        result.put("Awarded", stats.getAwardedInspections());
-        result.put("Rejected", stats.getRejectedInspections());
-        result.put("Closed", stats.getClosedInspections());
-
-        return result;
-    }
-
-    private long calculateOngoingInspections(IndividualStats stats) {
-        return stats.getInspectorAssigned() + stats.getInspectorReviewAwaiting() + stats.getInspectorReviewCompleted() + stats.getInspectorApproved() + stats.getReferenceDocReceived() + stats.getReferenceDocReviewAwaiting() + stats.getReferenceDocReviewCompleted() + stats.getInspectionReportsReceived() + stats.getInspectionReportsReviewAwaiting() + stats.getInspectionReportsReviewCompleted() + stats.getInspectionReportsSentToClient();
-    }
 }

@@ -72,24 +72,24 @@
                         </div>
                     </div>
                     <div class="cd-metrics-total">
-                        <span class="cd-total-number" id="totalInspections" th:text="${coordinatorStats['Total Inspections']}">0</span>
+                        <span class="cd-total-number" id="totalInspections" th:text="${inspectionStats.totalInspections}">0</span>
                         <span class="cd-total-label">Total Inspections</span>
                     </div>
                     <div class="cd-metrics-breakdown">
                         <div class="cd-metric-item">
-                            <span class="cd-metric-value" id="newInspections" th:text="${coordinatorStats['New']}">0</span>
+                            <span class="cd-metric-value" id="newInspections" th:text="${inspectionStats.newInspections}">0</span>
                             <span class="cd-metric-label">New</span>
                         </div>
                         <div class="cd-metric-item">
-                            <span class="cd-metric-value" id="ongoingInspections" th:text="${coordinatorStats['Ongoing']}">0</span>
+                            <span class="cd-metric-value" id="ongoingInspections" th:text="${inspectionStats.ongoingInspections}">0</span>
                             <span class="cd-metric-label">Ongoing</span>
                         </div>
                         <div class="cd-metric-item">
-                            <span class="cd-metric-value" id="awardedInspections" th:text="${coordinatorStats['Awarded']}">0</span>
+                            <span class="cd-metric-value" id="awardedInspections" th:text="${inspectionStats.completedInspections}">0</span>
                             <span class="cd-metric-label">Awarded</span>
                         </div>
                         <div class="cd-metric-item">
-                            <span class="cd-metric-value" id="rejectedInspections" th:text="${coordinatorStats['Rejected']}">0</span>
+                            <span class="cd-metric-value" id="rejectedInspections" th:text="${inspectionStats.rejectedInspections}">0</span>
                             <span class="cd-metric-label">Rejected</span>
                         </div>
                     </div>

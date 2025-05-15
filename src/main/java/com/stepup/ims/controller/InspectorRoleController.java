@@ -2,6 +2,7 @@ package com.stepup.ims.controller;
 
 import com.stepup.ims.model.Employee;
 import com.stepup.ims.model.Inspection;
+import com.stepup.ims.model.InspectionStatsByRole;
 import com.stepup.ims.service.InspectionService;
 import com.stepup.ims.service.StatsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.Map;
 
+import static com.stepup.ims.constants.ApplicationConstants.TOTAL;
 import static com.stepup.ims.constants.UIRoutingConstants.*;
 
 @Controller
@@ -44,8 +46,8 @@ public class InspectorRoleController extends BaseDashboardsController {
         String email = getCurrentUserEmail();
         Employee employee = getCurrentEmployee(email);
         // Get coordinator-specific stats
-        Map<String, Object> inspectorStats = statsService.getInspections(email);
-        populateCommonDashboardAttributes(model, employee, email, "inspectorStats", inspectorStats);
+        InspectionStatsByRole stats = statsService.getInspectorStats(email, TOTAL);
+        populateCommonDashboardAttributes(model, employee, email, stats);
         return RETURN_TO_INSPECTOR_DASHBOARD;
     }
 }

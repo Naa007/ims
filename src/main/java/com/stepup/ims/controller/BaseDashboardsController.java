@@ -1,6 +1,7 @@
 package com.stepup.ims.controller;
 
 import com.stepup.ims.model.Employee;
+import com.stepup.ims.model.InspectionStatsByRole;
 import com.stepup.ims.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -21,7 +22,7 @@ public abstract class BaseDashboardsController {
         return (email != null) ? employeeService.getEmployeeByEmail(email) : null;
     }
 
-    protected void populateCommonDashboardAttributes(Model model, Employee employee, String email, String statsKey, Object statsData) {
+    protected void populateCommonDashboardAttributes(Model model, Employee employee, String email, InspectionStatsByRole statsData) {
         if (email != null) {
             model.addAttribute("userEmail", email);
         }
@@ -30,6 +31,6 @@ public abstract class BaseDashboardsController {
             model.addAttribute("employeeRole", employee.getRole());
             model.addAttribute("employeeId", employee.getEmpId());
         }
-        model.addAttribute(statsKey, statsData);
+        model.addAttribute("inspectionStats", statsData);
     }
 }

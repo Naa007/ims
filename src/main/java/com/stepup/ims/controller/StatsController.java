@@ -1,6 +1,6 @@
 package com.stepup.ims.controller;
 
-import com.stepup.ims.model.InpsectionStatsByRole;
+import com.stepup.ims.model.InspectionStatsByRole;
 import com.stepup.ims.service.StatsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -20,9 +20,9 @@ public class StatsController {
     private StatsService statsService;
 
     @GetMapping("/{role}-stats/{emailOrEmpId}/{period}")
-    public ResponseEntity<InpsectionStatsByRole> getStats(@PathVariable String role, @PathVariable String emailOrEmpId, @PathVariable String period) {
+    public ResponseEntity<InspectionStatsByRole> getStats(@PathVariable String role, @PathVariable String emailOrEmpId, @PathVariable String period) {
         try {
-            InpsectionStatsByRole stats;
+            InspectionStatsByRole stats;
             switch (role.toLowerCase()) {
                 case COORDINATOR_LOWERCASE:
                     stats = statsService.getCoordinatorStats(emailOrEmpId, period);

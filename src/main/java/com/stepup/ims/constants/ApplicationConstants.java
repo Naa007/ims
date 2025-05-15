@@ -36,6 +36,11 @@ public class ApplicationConstants {
     public static final String NO = "no";
     public static final String ACTIVE = "active";
     public static final String INACTIVE = "inactive";
+    public static final String WEEK = "WEEK";
+    public static final String MONTH = "MONTH";
+    public static final String YEAR = "YEAR";
+    public static final String TOTAL = "TOTAL";
+
 
     /* Email constants */
     public static final String STATUS_CHANGE_EMAIL_SUBJECT = "IISPL Inspection #%d Status Update";
