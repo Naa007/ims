@@ -1,22 +1,28 @@
 package com.stepup.ims.controller;
 
+import com.stepup.ims.model.Employee;
+import com.stepup.ims.model.InspectionStatsByRole;
 import com.stepup.ims.model.Inspection;
 import com.stepup.ims.service.InspectionService;
+import com.stepup.ims.service.StatsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import static com.stepup.ims.constants.ApplicationConstants.TOTAL;
 import static com.stepup.ims.constants.UIRoutingConstants.*;
 
 @Controller
 @RequestMapping("/technical-coordinator")
 @PreAuthorize("hasRole('TECHNICAL_COORDINATOR')")
-public class TechnicalCoordinatorRoleController {
+public class TechnicalCoordinatorRoleController extends BaseDashboardsController {
 
     @Autowired
     private InspectionService inspectionService;
+    @Autowired
+    private StatsService statsService;
 
     @GetMapping("/inspection-management")
     public String getInspectionsReviewedByLoggedUser(Model model) {
@@ -39,7 +45,12 @@ public class TechnicalCoordinatorRoleController {
     }
 
     @GetMapping("/dashboard")
-    public String showDashboard() {
+    public String showDashboard(Model model) {
+        String email = getCurrentUserEmail();
+        Employee employee = getCurrentEmployee(email);
+        // Get coordinator-specific stats
+        InspectionStatsByRole stats = statsService.getTechnicalCoordinatorStats(employee.getEmpId(), TOTAL);
+        populateCommonDashboardAttributes(model, employee, email, stats);
         return RETURN_TO_TECHNICAL_COORDINATOR_DASHBOARD;
     }
 

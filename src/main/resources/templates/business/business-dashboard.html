@@ -760,7 +760,7 @@ let lastInspectorData = null;
     function fetchCoordinatorMetricData(coordinatorEmail, period) {
         showLoadingIndicator('coordinatorPerformanceContainer');
 
-        fetch(`/business/coordinator-stats/${encodeURIComponent(coordinatorEmail)}/${encodeURIComponent(period)}`, {
+        fetch(`/stats/coordinator-stats/${encodeURIComponent(coordinatorEmail)}/${encodeURIComponent(period)}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -804,7 +804,7 @@ let lastInspectorData = null;
     function fetchTechnicalMetricData(techCoordinatorId, period) {
         showLoadingIndicator('technicalCoordinatorContainer');
 
-        fetch(`/business/technical-coordinator-stats/${encodeURIComponent(techCoordinatorId)}/${encodeURIComponent(period)}`, {
+        fetch(`/stats/technical-coordinator-stats/${encodeURIComponent(techCoordinatorId)}/${encodeURIComponent(period)}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -848,7 +848,7 @@ let lastInspectorData = null;
     function fetchInspectorMetricData(inspectorEmail, period) {
         showLoadingIndicator('inspectorPerformanceContainer');
 
-        fetch(`/business/inspector-stats/${encodeURIComponent(inspectorEmail)}/${encodeURIComponent(period)}`, {
+        fetch(`/stats/inspector-stats/${encodeURIComponent(inspectorEmail)}/${encodeURIComponent(period)}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -982,7 +982,7 @@ let lastInspectorData = null;
             return;
         }
 
-        const endpoint = `/business/coordinator-report/${coordinatorEmail}/${period}/${format}`;
+        const endpoint = `/stats/coordinator-report/${coordinatorEmail}/${period}/${format}`;
         const filename = `${coordinatorName.replace(/\s+/g, '_')}_report.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
 
         fetch(endpoint)
@@ -1012,7 +1012,6 @@ let lastInspectorData = null;
   function exportTechnicalData(format) {
     const selectedTechCoordinator = document.getElementById('technicalCoordinatorSelect').value;
     const techCoordinatorName = document.getElementById('technicalCoordinatorSelect').selectedOptions[0]?.text || 'report';
-
     const period = document.getElementById('technicalPeriodSelect').value;
 
     if (!selectedTechCoordinator) {
@@ -1020,7 +1019,19 @@ let lastInspectorData = null;
         return;
     }
 
-    const endpoint = `/business/technical-coordinator-report/${selectedTechCoordinator}/${period}/${format}`;
+    // For custom range
+    let endpoint = `/stats/technical-coordinator-report/${selectedTechCoordinator}/${period}/${format}`;
+
+    if (period === 'custom') {
+        const startDate = document.getElementById('technicalStartDate').value;
+        const endDate = document.getElementById('technicalEndDate').value;
+        if (!startDate || !endDate) {
+            showNotification('Please select both start and end dates', 'error');
+            return;
+        }
+        endpoint += `?startDate=${startDate}&endDate=${endDate}`;
+    }
+
     const filename = `${techCoordinatorName.replace(/\s+/g, '_')}_report.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
 
     fetch(endpoint)
@@ -1050,7 +1061,6 @@ let lastInspectorData = null;
 function exportInspectorData(format) {
     const selectedInspector = document.getElementById('inspectorSelect').value;
     const inspectorName = document.getElementById('inspectorSelect').selectedOptions[0]?.text || 'report';
-
     const period = document.getElementById('inspectorPeriodSelect').value;
 
     if (!selectedInspector) {
@@ -1058,7 +1068,19 @@ function exportInspectorData(format) {
         return;
     }
 
-    const endpoint = `/business/inspector-report/${selectedInspector}/${period}/${format}`;
+    // For custom range
+    let endpoint = `/stats/inspector-report/${selectedInspector}/${period}/${format}`;
+
+    if (period === 'custom') {
+        const startDate = document.getElementById('inspectorStartDate').value;
+        const endDate = document.getElementById('inspectorEndDate').value;
+        if (!startDate || !endDate) {
+            showNotification('Please select both start and end dates', 'error');
+            return;
+        }
+        endpoint += `?startDate=${startDate}&endDate=${endDate}`;
+    }
+
     const filename = `${inspectorName.replace(/\s+/g, '_')}_report.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
 
     fetch(endpoint)

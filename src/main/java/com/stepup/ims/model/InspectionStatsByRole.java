@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class InpsectionStatsByRole {
+public class InspectionStatsByRole {
     private final Long totalInspections;
     private final Long newInspections;
     private final Long completedInspections;
@@ -16,6 +16,7 @@ public class InpsectionStatsByRole {
     public enum PeriodType {
         WEEK,
         MONTH,
-        YEAR
+        YEAR,
+        TOTAL
     }
 }
