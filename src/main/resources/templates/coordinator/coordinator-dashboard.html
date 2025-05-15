@@ -23,7 +23,7 @@
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div style="display: flex; align-items: center; justify-content: flex-start;">
                         <i class="fas fa-chart-line me-2"></i>
-                        <span th:text="'My Performance Dashboard - ' + ${employeeName}">My Performance Dashboard</span>
+                        <span th:text="${employeeName + '''s Dashboard'}">My Performance Dashboard</span>
                     </div>
                     <div class="bd-date-filter date">
                         <span th:text="${#temporals.format(#temporals.createNow(), 'MMMM dd, yyyy')}">May 03, 2025</span>
@@ -34,9 +34,6 @@
             <!-- Performance Metrics Display -->
             <div class="cd-performance-metrics-container" id="performanceContainer">
                 <div class="cd-metrics-display">
-                    <div class="cd-metrics-header">
-                        <h3>My Performance</h3>
-                    </div>
                     <!-- Time Period Selection -->
                     <div class="cd-period-selection">
                         <div class="cd-filter-group">

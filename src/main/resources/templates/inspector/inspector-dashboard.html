@@ -24,7 +24,7 @@
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div style="display: flex; align-items: center; justify-content: flex-start;">
                         <i class="fas fa-chart-line me-2"></i>
-                        <span th:text="'My Performance Dashboard - ' + ${employeeName}">My Performance Dashboard</span>
+                        <span th:text="${employeeName + '''s Dashboard'}">My Performance Dashboard</span>
                     </div>
                     <div class="bd-date-filter date">
                         <span th:text="${#temporals.format(#temporals.createNow(), 'MMMM dd, yyyy')}">May 03, 2025</span>
