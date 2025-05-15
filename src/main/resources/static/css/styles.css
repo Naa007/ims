@@ -687,6 +687,7 @@ button:hover {
 .tab:hover {
     transform: translateY(-5px);
     box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
 }
 
 .tab:hover::before {
@@ -714,6 +715,27 @@ button:hover {
 
 .tab:hover span {
     color: var(--primary-color);
+}
+
+
+.tab.active {
+    transform: translateY(-5px); /* Adds a slight lift effect */
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2); /* Slightly stronger shadow for emphasis */
+    background: var(--primary-color); /* Changes background color */
+    color: var(--white-color); /* Changes text color to white */
+}
+
+.tab.active span {
+    color: var(--white-color); /* Changes span text color */
+}
+
+.tab.active i {
+    color: var(--accent-color); /* Adds accent color to the icon */
+    transform: scale(1.2); /* Slightly enlarges the icon */
+}
+
+.tab.active i {
+   text-decoration: none;
 }
 
 .required-field::after {

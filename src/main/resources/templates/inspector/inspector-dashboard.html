@@ -16,10 +16,18 @@
                 <i class="fas fa-clipboard-check"></i>
                 <span>Inspections Management</span>
             </a>
+            <a href="#" class="tab" onclick="togglePerformanceContainer(this)">
+                <i class="fas fa-chart-bar"></i>
+                <span>Stats</span>
+            </a>
+            <a href="#" class="tab">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Calendar</span>
+            </a>
         </div>
 
         <!-- Inspector Performance Stats -->
-        <div class="cd-stats-container">
+        <div id="performanceContainer" class="cd-stats-container" style="display: none">
             <h4 class="section-header">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div style="display: flex; align-items: center; justify-content: flex-start;">
@@ -33,7 +41,7 @@
                 </div>
             </h4>
             <!-- Performance Metrics Display -->
-            <div class="cd-performance-metrics-container" id="performanceContainer">
+            <div class="cd-performance-metrics-container">
                 <div class="cd-metrics-display">
                     <!-- Time Period Selection -->
                     <div class="cd-period-selection">
@@ -94,6 +102,15 @@
                 </div>
             </div>
         </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <h2>You are in INSPECTOR DASHBOARD</h2>
+            <p>
+                Use the tabs to generate the reports and many more. Stay organized and efficient with our comprehensive management tools.
+            </p>
+        </div>
+
     </div>
 </main>
 
@@ -339,13 +356,23 @@
                 exportBtn.disabled = false;
             });
     }
+    function togglePerformanceContainer(element) {
+        const performanceContainer = document.getElementById('performanceContainer');
+        if (performanceContainer.style.display === 'none') {
+            performanceContainer.style.display = 'block';
+            document.querySelectorAll('.dashboard-tabs .tab').forEach(tab => tab.classList.remove('active'));
+            element.classList.add('active');
+        } else {
+            performanceContainer.style.display = 'none';
+            element.classList.remove('active');
+        }
+    }
 </script>
 
 <style>
     /* Inspector Dashboard Specific Styles */
     .cd-stats-container {
         width: 100%;
-        padding: 1rem;
     }
 
     .cd-performance-metrics-container {
