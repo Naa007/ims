@@ -49,7 +49,6 @@
                                 <option value="" disabled selected>Select a range</option>
                                 <option value="week">Last 7 Days</option>
                                 <option value="month">Last 30 Days</option>
-                                <option value="year">Year to Date</option>
                                 <option value="custom">Custom Range</option>
                             </select>
                             <div id="customRangeContainer" style="display: none;">
@@ -154,9 +153,9 @@
     function applyCustomRange() {
         const startDate = document.getElementById('startDate').value;
         const endDate = document.getElementById('endDate').value;
-
+        const period = document.getElementById('periodSelect').value;
         if (startDate && endDate) {
-            fetchDataForCustomRange(startDate, endDate);
+            fetchDataForCustomRange(period,startDate, endDate);
         } else {
             showNotification('Please select both start and end dates', 'error');
         }
@@ -205,14 +204,15 @@
         }
     }
 
-    function fetchDataForCustomRange(startDate, endDate) {
+    function fetchDataForCustomRange(period,startDate, endDate) {
         const employeeID = document.getElementById('employeeId').value;
         if (!employeeID) {
             showNotification('Employee ID not found', 'error');
             return;
         }
 
-        fetch(`/technical-coordinator/inspection-stats/${encodeURIComponent(employeeID)}/custom?startDate=${startDate}&endDate=${endDate}`)
+        let url = `/stats/technical-coordinator-stats/${encodeURIComponent(employeeID)}/${period}?startDate=${startDate}&endDate=${endDate}`;
+        fetch(url)
             .then(response => {
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 return response.json();
@@ -257,6 +257,10 @@
                 return response.blob();
             })
             .then(blob => {
+            if (blob.size === 0) {
+                showNotification('No data available for report generation', 'warning');
+                return;
+            }
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
                 link.download = filename;

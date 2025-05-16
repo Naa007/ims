@@ -8,6 +8,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.format.annotation.DateTimeFormat;
+
+
+import java.time.LocalDate;
 
 import static com.stepup.ims.constants.ApplicationConstants.*;
 
@@ -20,18 +25,20 @@ public class StatsController {
     private StatsService statsService;
 
     @GetMapping("/{role}-stats/{emailOrEmpId}/{period}")
-    public ResponseEntity<InspectionStatsByRole> getStats(@PathVariable String role, @PathVariable String emailOrEmpId, @PathVariable String period) {
+    public ResponseEntity<InspectionStatsByRole> getStats(@PathVariable String role, @PathVariable String emailOrEmpId, @PathVariable String period,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                                          @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate){
         try {
             InspectionStatsByRole stats;
             switch (role.toLowerCase()) {
                 case COORDINATOR_LOWERCASE:
-                    stats = statsService.getCoordinatorStats(emailOrEmpId, period);
+                    stats = statsService.getCoordinatorStats(emailOrEmpId, period, startDate, endDate);
                     break;
                 case INSPECTOR_LOWERCASE:
-                    stats = statsService.getInspectorStats(emailOrEmpId, period);
+                    stats = statsService.getInspectorStats(emailOrEmpId, period,startDate, endDate);
                     break;
                 case TECHNICAL_COORDINATOR_LOWERCASE:
-                    stats = statsService.getTechnicalCoordinatorStats(emailOrEmpId, period);
+                    stats = statsService.getTechnicalCoordinatorStats(emailOrEmpId, period,startDate, endDate);
                     break;
                 default:
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -43,19 +50,21 @@ public class StatsController {
     }
 
     @GetMapping("/{role}-report/{emailOrEmpId}/{period}/{format}")
-    public ResponseEntity<byte[]> exportReport(@PathVariable String role, @PathVariable String emailOrEmpId, @PathVariable String period, @PathVariable String format) {
+    public ResponseEntity<byte[]> exportReport(@PathVariable String role, @PathVariable String emailOrEmpId, @PathVariable String period, @PathVariable String format,
+                                               @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                               @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate){
 
         byte[] report;
 
         switch (role.toLowerCase()) {
             case COORDINATOR_LOWERCASE:
-                report = statsService.generateCoordinatorReport(emailOrEmpId, period, format);
+                report = statsService.generateCoordinatorReport(emailOrEmpId, period, format,startDate, endDate);
                 break;
             case TECHNICAL_COORDINATOR_LOWERCASE:
-                report = statsService.generateTechCoordinatorReport(emailOrEmpId, period, format);
+                report = statsService.generateTechCoordinatorReport(emailOrEmpId, period, format,startDate, endDate);
                 break;
             case INSPECTOR_LOWERCASE:
-                report = statsService.generateInspectorReport(emailOrEmpId, period, format);
+                report = statsService.generateInspectorReport(emailOrEmpId, period, format,startDate, endDate);
                 break;
             default:
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);

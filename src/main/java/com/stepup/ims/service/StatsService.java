@@ -111,36 +111,44 @@ public class StatsService {
         return map;
     }
 
-    public InspectionStatsByRole getCoordinatorStats(String email, String period) {
+    public InspectionStatsByRole getCoordinatorStats(String email, String period,LocalDate startDate, LocalDate endDate) {
         List<Inspection> inspections = inspectionRepository.findByCreatedBy(email);
-        return getInspectionStatsByRole(inspections, period);
+        return getInspectionStatsByRole(inspections, period,startDate, endDate);
     }
 
-    public InspectionStatsByRole getInspectorStats(String email, String period) {
+    public InspectionStatsByRole getInspectorStats(String email, String period,LocalDate startDate, LocalDate endDate) {
         List<Inspection> inspections = inspectionRepository.findByProposedCVs_Inspector_Email(email);
-        return getInspectionStatsByRole(inspections, period);
+        return getInspectionStatsByRole(inspections, period,startDate, endDate);
     }
 
-    public InspectionStatsByRole getTechnicalCoordinatorStats(String empId, String period) {
+    public InspectionStatsByRole getTechnicalCoordinatorStats(String empId, String period,LocalDate startDate, LocalDate endDate) {
         List<Inspection> inspections = inspectionRepository.findByProposedCVs_CvReviewBytechnicalCoordinator_EmpIdOrDocumentsReviewedByTechnicalCoordinatorOrInspectionReviewedBy(empId, empId, empId);
 
-        return getInspectionStatsByRole(inspections, period);
+        return getInspectionStatsByRole(inspections, period,startDate, endDate);
     }
 
-    public InspectionStatsByRole getInspectionStatsByRole(List<Inspection> inspections, String period) {
+    public InspectionStatsByRole getInspectionStatsByRole(List<Inspection> inspections, String period,LocalDate startDate, LocalDate endDate) {
+        if (period.equalsIgnoreCase("custom") && startDate != null && endDate != null) {
+            // Handle custom date range
+            inspections = inspections.stream()
+                    .filter(inspection -> inspection.getCreatedDate() != null
+                            && !inspection.getCreatedDate().toLocalDate().isBefore(startDate)
+                            && !inspection.getCreatedDate().toLocalDate().isAfter(endDate))
+                    .toList();
+        }else {
+            LocalDateTime cutoffDate = switch (period.toUpperCase()) {
+                case WEEK -> LocalDateTime.now().minusWeeks(1);
+                case MONTH -> LocalDateTime.now().minusMonths(1);
+                case YEAR -> LocalDateTime.now().minusYears(1);
+                case TOTAL -> null;
+                default -> throw new IllegalArgumentException("Invalid period: " + period);
+            };
 
-        LocalDateTime cutoffDate = switch (period.toUpperCase()) {
-            case WEEK -> LocalDateTime.now().minusWeeks(1);
-            case MONTH -> LocalDateTime.now().minusMonths(1);
-            case YEAR -> LocalDateTime.now().minusYears(1);
-            case TOTAL -> null;
-            default -> throw new IllegalArgumentException("Invalid period: " + period);
-        };
-
-        if (cutoffDate != null) {
-            inspections = inspections.stream().filter(inspection -> inspection.getCreatedDate() != null && !inspection.getCreatedDate().isBefore(cutoffDate)).toList();
-        } else {
-            inspections = inspections.stream().filter(inspection -> inspection.getCreatedDate() != null).toList();
+            if (cutoffDate != null) {
+                inspections = inspections.stream().filter(inspection -> inspection.getCreatedDate() != null && !inspection.getCreatedDate().isBefore(cutoffDate)).toList();
+            } else {
+                inspections = inspections.stream().filter(inspection -> inspection.getCreatedDate() != null).toList();
+            }
         }
 
         long totalInspections = inspections.size();
@@ -156,19 +164,19 @@ public class StatsService {
         return new InspectionStatsByRole(totalInspections, newInspections, completedInspections, ongoingInspections, rejectedInspections, InspectionStatsByRole.PeriodType.valueOf(period.toUpperCase()));
     }
 
-    public byte[] generateCoordinatorReport(String email, String period, String format) {
-        return generateReport(email, period, format, COORDINATOR_LOWERCASE);
+    public byte[] generateCoordinatorReport(String email, String period, String format, LocalDate startDate, LocalDate endDate) {
+        return generateReport(email, period, format, COORDINATOR_LOWERCASE,startDate,endDate);
     }
 
-    public byte[] generateTechCoordinatorReport(String empId, String period, String format) {
-        return generateReport(empId, period, format, TECHNICAL_COORDINATOR_LOWERCASE);
+    public byte[] generateTechCoordinatorReport(String empId, String period, String format, LocalDate startDate, LocalDate endDate) {
+        return generateReport(empId, period, format, TECHNICAL_COORDINATOR_LOWERCASE,startDate,endDate);
     }
 
-    public byte[] generateInspectorReport(String email, String period, String format) {
-        return generateReport(email, period, format, INSPECTOR_LOWERCASE);
+    public byte[] generateInspectorReport(String email, String period, String format, LocalDate startDate, LocalDate endDate) {
+        return generateReport(email, period, format, INSPECTOR_LOWERCASE,startDate,endDate);
     }
 
-    private Map<String, Integer> getStatsByEmailAndPeriod(String identifier, String role, String period) {
+    private Map<String, Integer> getStatsByEmailAndPeriod(String identifier, String role, String period, LocalDate startDate, LocalDate endDate) {
         List<Inspection> inspections = switch (role.toLowerCase()) {
             case COORDINATOR_LOWERCASE -> inspectionRepository.findByCreatedBy(identifier);
             case TECHNICAL_COORDINATOR_LOWERCASE ->
@@ -177,25 +185,39 @@ public class StatsService {
             default -> new ArrayList<>();
         };
 
-        LocalDate now = LocalDate.now();
-        LocalDate startDate = switch (period.toLowerCase()) {
-            case "week" -> now.minusDays(7);
-            case "month" -> now.minusDays(30);
-            case "quarter" -> now.minusMonths(3);
-            case "year" -> now.withDayOfYear(1);
-            default -> now.minusDays(30);
-        };
+        if (period.equalsIgnoreCase("custom") && startDate != null && endDate != null) {
+            LocalDate finalStartDate = startDate;
+            return inspections.stream()
+                    .filter(i -> i.getOrderConfirmationDate() != null
+                            && !i.getOrderConfirmationDate().isBefore(finalStartDate)
+                            && !i.getOrderConfirmationDate().isAfter(endDate))
+                    .collect(Collectors.groupingBy(i -> i.getInspectionStatus().name(), Collectors.summingInt(i -> 1)));
+        } else {
+            LocalDate now = LocalDate.now();
+             startDate = switch (period.toLowerCase()) {
+                case "week" -> now.minusDays(7);
+                case "month" -> now.minusDays(30);
+                case "quarter" -> now.minusMonths(3);
+                case "year" -> now.withDayOfYear(1);
+                default -> now.minusDays(30);
+            };
 
-        return inspections.stream().filter(i -> i.getOrderConfirmationDate() != null && !i.getOrderConfirmationDate().isBefore(startDate)).collect(Collectors.groupingBy(i -> i.getInspectionStatus().name(), Collectors.summingInt(i -> 1)));
+            LocalDate finalStartDate1 = startDate;
+            return inspections.stream()
+                    .filter(i -> i.getOrderConfirmationDate() != null && !i.getOrderConfirmationDate().isBefore(finalStartDate1))
+                    .collect(Collectors.groupingBy(i -> i.getInspectionStatus().name(), Collectors.summingInt(i -> 1)));
+        }
     }
 
-    public byte[] generateReport(String id, String period, String format, String role) {
-        Map<String, Integer> stats = getStatsByEmailAndPeriod(id, role, period);
+    public byte[] generateReport(String id, String period, String format, String role,LocalDate startDate, LocalDate endDate) {
+        Map<String, Integer> stats = getStatsByEmailAndPeriod(id, role, period,startDate, endDate);
 
         String title;
         String label;
         String sheetName;
-
+        if (stats == null || stats.isEmpty()) {
+           return null;
+        }
         switch (role.toLowerCase()) {
             case COORDINATOR_LOWERCASE:
                 title = "Coordinator Performance Report";
