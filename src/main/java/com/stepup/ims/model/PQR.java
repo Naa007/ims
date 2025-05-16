@@ -75,7 +75,7 @@ public class PQR {
 
     @Getter
     public enum Experience {
-        OVER25("Over 25 years", "1", "20"), BETWEEN2025("20~24.99 years", "0.8", "20"), BETWEEN1519("15~19.99 years", "0.6", "20"), BETWEEN1014("10~14.99 years", "0.5", "20"), BETWEEN59("5~9.99 years", "0.4", "20");
+        OVER25("Over 25 years", "1", "20"), BETWEEN2025("20~24.99 years", "0.8", "20"), BETWEEN1519("15~19.99 years", "0.6", "20"), BETWEEN1014("10~14.99 years", "0.5", "20"), BETWEEN59("5~9.99 years", "0.4", "20"), LESS5("0~4.99 years", "0.0", "20");
 
         @Getter
         private final String name;
