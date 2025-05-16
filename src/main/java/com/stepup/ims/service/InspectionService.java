@@ -2,14 +2,18 @@ package com.stepup.ims.service;
 
 import com.stepup.ims.model.Inspection;
 import com.stepup.ims.modelmapper.InspectionModelMapper;
+import com.stepup.ims.modelmapper.InspectorModelMapper;
 import com.stepup.ims.repository.InspectionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
+import static com.stepup.ims.constants.ApplicationConstants.*;
 
 @Service
 public class InspectionService {
@@ -18,10 +22,16 @@ public class InspectionService {
     private EmployeeService employeeService;
 
     @Autowired
+    private InspectorService inspectorService;
+
+    @Autowired
     private InspectionRepository inspectionRepository;
 
     @Autowired
     private InspectionModelMapper inspectionModelMapper;
+    
+    @Autowired
+    private InspectorModelMapper inspectorModelMapper;
 
 
     /**
@@ -90,4 +100,56 @@ public class InspectionService {
                 ? new String[0]
                 : techCoordinators.stream().map(String::trim).distinct().toArray(String[]::new);
     }
+
+    public List<Map<String, String>> fetchInspectionStats(String period) {
+        String startDate;
+        String endDate;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        switch (period.toUpperCase()) {
+            case WEEK -> {
+                startDate = LocalDate.now().minusDays(LocalDate.now().getDayOfWeek().getValue() - 1).format(formatter);
+                endDate = LocalDate.now().format(formatter);
+            }
+            case MONTH -> {
+                startDate = LocalDate.now().withDayOfMonth(1).format(formatter);
+                endDate = LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth()).format(formatter);
+            }
+            case QUARTER -> {
+                int currentQuarter = (LocalDate.now().getMonthValue() - 1) / 3 + 1;
+                startDate = LocalDate.now().withMonth((currentQuarter - 1) * 3 + 1).withDayOfMonth(1).format(formatter);
+                endDate = LocalDate.parse(startDate, formatter).plusMonths(2).withDayOfMonth(LocalDate.parse(startDate, formatter).plusMonths(2).lengthOfMonth()).format(formatter);
+            }
+            case YEAR -> {
+                startDate = LocalDate.now().withDayOfYear(1).format(formatter);
+                endDate = LocalDate.now().withDayOfYear(LocalDate.now().lengthOfYear()).format(formatter);
+            }
+            default -> throw new IllegalArgumentException("Invalid period. Allowed values are: month, quarter, year.");
+        }
+        List<com.stepup.ims.entity.Inspection> inspections = inspectionRepository.findByInspectionDateAsPerNotificationBetween(startDate, endDate);
+        return getInspectionCalendarStats(inspections);
+    }
+
+    private List<Map<String, String>> getInspectionCalendarStats(List<com.stepup.ims.entity.Inspection> inspections) {
+        List<Map<String, String>> detailsList = new ArrayList<>();
+
+        inspections.stream()
+                .filter(inspection -> inspection.getProposedCVs() != null && !inspection.getProposedCVs().isEmpty())
+                .flatMap(inspection -> inspection.getProposedCVs().stream()
+                        .filter(cv -> cv != null && cv.isCvStatus() && cv.getInspector() != null)
+                        .flatMap(cv -> inspection.getInspectionDateAsPerNotification().stream().map(date -> {
+                            Map<String, String> details = new HashMap<>();
+                            details.put("id", String.valueOf(cv.getInspector().getInspectorId()));
+                            details.put("title", cv.getInspector().getInspectorName() + " - " + inspection.getInspectionLocationDetails());
+                            details.put("start", LocalDate.parse(date, DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                                    .format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                            details.put("inspectorType", cv.getInspector().getInspectorType().toString());
+                            details.put("country", inspection.getInspectionCountry().equalsIgnoreCase("india") ? inspection.getInspectionCountry().toLowerCase() : "international");
+                            return details;
+                        })))
+                .forEach(detailsList::add);
+
+        return detailsList;
+    }
+
 }

@@ -62,6 +62,10 @@ public class UIRoutingConstants {
     public static final String RETURN_TO_TECHNICAL_COORDINATOR_DASHBOARD = "technical-coordinator/technical-coordinator-dashboard";
     public static final String RETURN_TO_INSPECTOR_DASHBOARD = "inspector/inspector-dashboard";
 
+    // Calendar
+    public static final String RETURN_TO_CALENDAR = "calendar/calendar";
+
+
     private UIRoutingConstants() {
     }
 }

@@ -7,6 +7,7 @@ import com.stepup.ims.repository.InspectorRepository;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -57,6 +58,7 @@ public class InspectorService {
     /**
      * Save a new or updated Inspector to the database.
      */
+    @Transactional
     public Inspector saveInspector(Inspector inspector) {
         var inspectorEntity = inspectorModelMapper.toEntity(inspector);
 

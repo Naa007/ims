@@ -114,6 +114,93 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    var calendarEl = document.getElementById('calendar');
+    if(calendarEl) {
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        events: function (fetchInfo, successCallback, failureCallback) {
+            fetch('/calendar/inspection-stats?period=month')
+                .then(response => response.json())
+                .then(data => {
+
+                    // Process the data before assigning it to events
+                    let internationalEvents = [];
+                    let indiaEvents = [];
+
+                    // Define color codes for categorization
+                    const colorCodes = {
+                        international: {
+                            INHOUSE_INSPECTOR: '#337dcc',  // Blue
+                            TECHNICAL_COORDINATOR: '#337dcc',  // Blue
+                            PARTNER_INSPECTOR: '#359423', // Green
+                            FREELANCER: '#b1b215' // Yellow
+                        },
+                        india: {
+                            INHOUSE_INSPECTOR: '#337dcc',  // Blue
+                            TECHNICAL_COORDINATOR: '#337dcc',  // Blue
+                            PARTNER_INSPECTOR: '#359423',  // Green
+                            FREELANCER: '#b1b215' // Yellow
+                        }
+                    };
+
+                    // Group the inspections by country and inspector type
+                    data.forEach(item => {
+                        const country = item.country;
+                        const inspectorType = item.inspectorType;
+                        const color = (colorCodes[country] && colorCodes[country][inspectorType]) ? colorCodes[country][inspectorType] : '#CCCCCC'; // Default to gray if no match
+
+                        // Format the event
+                        const event = {
+                            id: item.id,
+                            title: item.title,
+                            start: item.start,
+                            backgroundColor: color,
+                            borderColor: color
+                        };
+
+                        // Add the event to the respective section
+                        if (country === 'international') {
+                            internationalEvents.push(event);
+                        } else if (country === 'india') {
+                            indiaEvents.push(event);
+                        }
+                    });
+
+                    calendar.internationalEvents = internationalEvents;
+                    calendar.indiaEvents = indiaEvents;
+
+                    successCallback([...internationalEvents, ...indiaEvents]);
+                })
+                .catch(error => {
+                    console.error('Error fetching events:', error);
+                    failureCallback(error); // Pass the error to the calendar
+                });
+        },
+        customButtons: {
+            internationalView: {
+                text: 'International',
+                click: function () {
+                    calendar.removeAllEvents();
+                    calendar.addEventSource(calendar.internationalEvents);
+                }
+            },
+            indiaView: {
+                text: 'India',
+                click: function () {
+                    calendar.removeAllEvents();
+                    calendar.addEventSource(calendar.indiaEvents);
+                }
+            }
+        },
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'internationalView,indiaView'
+        }
+    });
+    calendar.render();
+    }
+
 });
 
 /** ================= Universal Form Validation ============== **/
