@@ -119,62 +119,61 @@ document.addEventListener("DOMContentLoaded", function () {
     var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         events: function (fetchInfo, successCallback, failureCallback) {
-            fetch('/calendar/inspection-stats?period=month')
-                .then(response => response.json())
-                .then(data => {
+                    if (!calendar || !calendar.hasLoadedEvents) { // Ensure events load only once
+                        fetch('/calendar/inspection-stats?period=quarter')
+                            .then(response => response.json())
+                            .then(data => {
+                                let internationalEvents = [];
+                                let indiaEvents = [];
 
-                    // Process the data before assigning it to events
-                    let internationalEvents = [];
-                    let indiaEvents = [];
+                                const colorCodes = {
+                                    international: {
+                                        INHOUSE_INSPECTOR: '#337dcc',
+                                        TECHNICAL_COORDINATOR: '#337dcc',
+                                        PARTNER_INSPECTOR: '#359423',
+                                        FREELANCER: '#b1b215'
+                                    },
+                                    india: {
+                                        INHOUSE_INSPECTOR: '#337dcc',
+                                        TECHNICAL_COORDINATOR: '#337dcc',
+                                        PARTNER_INSPECTOR: '#359423',
+                                        FREELANCER: '#b1b215'
+                                    }
+                                };
 
-                    // Define color codes for categorization
-                    const colorCodes = {
-                        international: {
-                            INHOUSE_INSPECTOR: '#337dcc',  // Blue
-                            TECHNICAL_COORDINATOR: '#337dcc',  // Blue
-                            PARTNER_INSPECTOR: '#359423', // Green
-                            FREELANCER: '#b1b215' // Yellow
-                        },
-                        india: {
-                            INHOUSE_INSPECTOR: '#337dcc',  // Blue
-                            TECHNICAL_COORDINATOR: '#337dcc',  // Blue
-                            PARTNER_INSPECTOR: '#359423',  // Green
-                            FREELANCER: '#b1b215' // Yellow
-                        }
-                    };
+                                data.forEach(item => {
+                                    const country = item.country;
+                                    const inspectorType = item.inspectorType;
+                                    const color = (colorCodes[country] && colorCodes[country][inspectorType]) ? colorCodes[country][inspectorType] : '#CCCCCC';
 
-                    // Group the inspections by country and inspector type
-                    data.forEach(item => {
-                        const country = item.country;
-                        const inspectorType = item.inspectorType;
-                        const color = (colorCodes[country] && colorCodes[country][inspectorType]) ? colorCodes[country][inspectorType] : '#CCCCCC'; // Default to gray if no match
+                                    const event = {
+                                        id: item.id,
+                                        title: item.title,
+                                        start: item.start,
+                                        backgroundColor: color,
+                                        borderColor: color
+                                    };
 
-                        // Format the event
-                        const event = {
-                            id: item.id,
-                            title: item.title,
-                            start: item.start,
-                            backgroundColor: color,
-                            borderColor: color
-                        };
+                                    if (country === 'international') {
+                                        internationalEvents.push(event);
+                                    } else if (country === 'india') {
+                                        indiaEvents.push(event);
+                                    }
+                                });
 
-                        // Add the event to the respective section
-                        if (country === 'international') {
-                            internationalEvents.push(event);
-                        } else if (country === 'india') {
-                            indiaEvents.push(event);
-                        }
-                    });
+                                calendar.internationalEvents = internationalEvents;
+                                calendar.indiaEvents = indiaEvents;
+                                calendar.hasLoadedEvents = true; // Set a flag to indicate events are loaded
 
-                    calendar.internationalEvents = internationalEvents;
-                    calendar.indiaEvents = indiaEvents;
-
-                    successCallback([...internationalEvents, ...indiaEvents]);
-                })
-                .catch(error => {
-                    console.error('Error fetching events:', error);
-                    failureCallback(error); // Pass the error to the calendar
-                });
+                                successCallback([...indiaEvents]); // Show only India events by default
+                            })
+                            .catch(error => {
+                                console.error('Error fetching events:', error);
+                                failureCallback(error);
+                            });
+                    } else {
+                        successCallback([]); // Do not fetch new events on navigation
+                    }
         },
         customButtons: {
             internationalView: {
@@ -182,6 +181,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 click: function () {
                     calendar.removeAllEvents();
                     calendar.addEventSource(calendar.internationalEvents);
+
+                    document.querySelector('.fc-internationalView-button').classList.add('highlighted-button');
+                    document.querySelector('.fc-indiaView-button').classList.remove('highlighted-button');
                 }
             },
             indiaView: {
@@ -189,16 +191,79 @@ document.addEventListener("DOMContentLoaded", function () {
                 click: function () {
                     calendar.removeAllEvents();
                     calendar.addEventSource(calendar.indiaEvents);
+
+                    document.querySelector('.fc-indiaView-button').classList.add('highlighted-button');
+                    document.querySelector('.fc-internationalView-button').classList.remove('highlighted-button');
+                }
+            },
+            today: {
+                text: 'Today',
+                click: function () {
+                    calendar.today(); // Navigate to today's date without adding any data
                 }
             }
         },
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
-            right: 'internationalView,indiaView'
-        }
+            right: 'indiaView internationalView'
+        },
+        eventClassNames: function (arg) {
+            return ['custom-event-style'];
+        },
+        dayCellDidMount: function (arg) {
+            if (arg.date.getDay() === 0 || arg.date.getDay() === 6) {
+                arg.el.style.backgroundColor = '#f0f8ff';
+            }
+        },
+        dayCellContent: function (arg) {
+            return {
+                html: '<span class="circle"></span><div>' + arg.dayNumberText + '</div>'
+            };
+        },
+        dayMaxEventRows: true,
+        height: 'auto',
+        firstDay: 1,
+        navLinks: true
     });
+
+    calendarEl.style.backgroundColor = '#f8f9fa';
+    calendarEl.style.border = '1px solid #ddd';
+    calendarEl.style.padding = '10px';
+    calendarEl.style.borderRadius = '5px';
+
     calendar.render();
+
+    // Highlight default 'India' button and add spacing between buttons
+    const internationalViewButton = document.querySelector('.fc-internationalView-button');
+    const indiaViewButton = document.querySelector('.fc-indiaView-button');
+    indiaViewButton.classList.add('highlighted-button'); // Highlight 'India' button by default
+
+    // Add spacing and styling for the buttons
+    internationalViewButton.style.marginRight = '5px';
+    indiaViewButton.style.marginRight = '5px';
+
+    // Additional CSS for highlighted button
+    const style = document.createElement('style');
+    style.innerHTML = `
+      .highlighted-button {
+          background-color: var(--fc-button-bg-color, #2C3E50);
+          color: white;
+          border: none;
+      }
+      .fc-button:not(.highlighted-button) {
+          background-color: white;
+          color: #007bff;
+          border: 1px solid #ddd;
+      }
+      .fc-button {
+          margin-right: 5px;
+          padding: 5px 15px;
+          border-radius: 5px;
+          font-weight: bold;
+      }
+    `;
+    document.head.appendChild(style);
     }
 
 });
