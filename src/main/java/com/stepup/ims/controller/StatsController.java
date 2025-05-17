@@ -50,24 +50,17 @@ public class StatsController {
     }
 
     @GetMapping("/{role}-report/{emailOrEmpId}/{period}/{format}")
-    public ResponseEntity<byte[]> exportReport(@PathVariable String role, @PathVariable String emailOrEmpId, @PathVariable String period, @PathVariable String format,
+    public ResponseEntity<byte[]> exportReport(@PathVariable String role,
+                                               @PathVariable String emailOrEmpId,
+                                               @PathVariable String period,
+                                               @PathVariable String format,
                                                @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                                               @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate){
+                                               @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
 
-        byte[] report;
+        byte[] report = statsService.generateReport(emailOrEmpId, period, format, role, startDate, endDate);
 
-        switch (role.toLowerCase()) {
-            case COORDINATOR_LOWERCASE:
-                report = statsService.generateCoordinatorReport(emailOrEmpId, period, format,startDate, endDate);
-                break;
-            case TECHNICAL_COORDINATOR_LOWERCASE:
-                report = statsService.generateTechCoordinatorReport(emailOrEmpId, period, format,startDate, endDate);
-                break;
-            case INSPECTOR_LOWERCASE:
-                report = statsService.generateInspectorReport(emailOrEmpId, period, format,startDate, endDate);
-                break;
-            default:
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        if (report == null) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
 
         return buildReportResponse(report, role + "-report." + format, format);

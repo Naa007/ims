@@ -41,6 +41,12 @@
             </h4>
 
             <div class="cd-performance-metrics-container">
+                <div class="cd-loading-overlay" style="display: none;">
+                    <div class="cd-loading-spinner">
+                        <i class="fas fa-circle-notch fa-spin"></i>
+                    </div>
+                    <div class="cd-loading-text">Loading data...</div>
+                </div>
                 <div class="cd-metrics-display">
                      <div class="cd-period-selection">
                         <div class="cd-filter-group">
@@ -162,6 +168,7 @@
     }
 
     function fetchDataForPeriod(period) {
+      showLoadingIndicator();
         const employeeID = document.getElementById('employeeId').value;
         if (!employeeID) {
             showNotification('Employee ID not found', 'error');
@@ -175,10 +182,12 @@
             })
             .then(data => {
                 updateMetricsDisplay(data);
+                hideLoadingIndicator();
                 showNotification('Data updated successfully', 'success');
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
+                hideLoadingIndicator();
                 showNotification('Failed to load performance data', 'error');
             });
     }
@@ -230,6 +239,8 @@
     function exportTechCoordinatorData(format) {
     const exportBtn = event.target;
     exportBtn.Disabled = true;
+     const originalText = exportBtn.innerHTML;
+      exportBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
         const employeeID = document.getElementById('employeeId').value;
         if (!employeeID) {
             showNotification('Employee ID not found', 'error');
@@ -240,6 +251,8 @@
         const coordinatorName = dashboardHeader ?
             dashboardHeader.textContent.replace('My Performance Dashboard - ', '') :
             'technical_coordinator_report';
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
 
         let period = document.getElementById('periodSelect').value;
                // If no period is selected, use current month as default (yyyy-MM)
@@ -251,7 +264,7 @@
        }
         const filename = `${coordinatorName.replace(/\s+/g, '_')}_report.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
 
-        fetch(`/stats/technical-coordinator-report/${employeeID}/${period}/${format}`)
+        fetch(`/stats/technical-coordinator-report/${employeeID}/${period}/${format}?startDate=${startDate}&endDate=${endDate}`)
             .then(response => {
                 if (!response.ok) throw new Error(`Error: ${response.status}`);
                 return response.blob();
@@ -277,6 +290,7 @@
                 showNotification(`Export failed: ${error.message}`, 'error');
             })  .finally(() => {
             exportBtn.Disabled = false;
+             exportBtn.innerHTML = originalText;
         });
     }
 
@@ -326,6 +340,29 @@
             element.classList.remove('active');
         }
     }
+    // Show loading indicator
+function showLoadingIndicator() {
+    const container = document.querySelector('.cd-performance-metrics-container');
+    const overlay = container.querySelector('.cd-loading-overlay');
+    const content = container.querySelector('.cd-metrics-display');
+
+    if (overlay) {
+        content.style.opacity = '0.5';
+        overlay.style.display = 'flex';
+    }
+}
+
+// Hide loading indicator
+function hideLoadingIndicator() {
+    const container = document.querySelector('.cd-performance-metrics-container');
+    const overlay = container.querySelector('.cd-loading-overlay');
+    const content = container.querySelector('.cd-metrics-display');
+
+    if (overlay) {
+        content.style.opacity = '1';
+        overlay.style.display = 'none';
+    }
+}
 </script>
 
 <style>
@@ -602,6 +639,39 @@
             align-items: flex-start;
         }
     }
+    /* Loading overlay styles */
+.cd-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    border-radius: 0.5rem;
+}
+
+.cd-loading-spinner {
+    font-size: 2rem;
+    color: #4e73df;
+    margin-bottom: 1rem;
+    animation: fa-spin 2s infinite linear;
+}
+
+.cd-loading-text {
+    color: #5a5c69;
+    font-size: 1rem;
+}
+
+/* Add this for the spinner animation */
+@keyframes fa-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 </style>
 </body>
 </html>

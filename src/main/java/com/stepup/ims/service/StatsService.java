@@ -1,5 +1,8 @@
 package com.stepup.ims.service;
 
+import com.itextpdf.io.font.constants.StandardFonts;
+import com.itextpdf.kernel.font.PdfFont;
+import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
@@ -164,60 +167,30 @@ public class StatsService {
         return new InspectionStatsByRole(totalInspections, newInspections, completedInspections, ongoingInspections, rejectedInspections, InspectionStatsByRole.PeriodType.valueOf(period.toUpperCase()));
     }
 
-    public byte[] generateCoordinatorReport(String email, String period, String format, LocalDate startDate, LocalDate endDate) {
-        return generateReport(email, period, format, COORDINATOR_LOWERCASE,startDate,endDate);
-    }
-
-    public byte[] generateTechCoordinatorReport(String empId, String period, String format, LocalDate startDate, LocalDate endDate) {
-        return generateReport(empId, period, format, TECHNICAL_COORDINATOR_LOWERCASE,startDate,endDate);
-    }
-
-    public byte[] generateInspectorReport(String email, String period, String format, LocalDate startDate, LocalDate endDate) {
-        return generateReport(email, period, format, INSPECTOR_LOWERCASE,startDate,endDate);
-    }
-
-    private Map<String, Integer> getStatsByEmailAndPeriod(String identifier, String role, String period, LocalDate startDate, LocalDate endDate) {
-        List<Inspection> inspections = switch (role.toLowerCase()) {
-            case COORDINATOR_LOWERCASE -> inspectionRepository.findByCreatedBy(identifier);
-            case TECHNICAL_COORDINATOR_LOWERCASE ->
-                    inspectionRepository.findByProposedCVs_CvReviewBytechnicalCoordinator_EmpIdOrDocumentsReviewedByTechnicalCoordinatorOrInspectionReviewedBy(identifier, identifier, identifier);
-            case INSPECTOR_LOWERCASE -> inspectionRepository.findByProposedCVs_Inspector_Email(identifier);
-            default -> new ArrayList<>();
-        };
-
-        if (period.equalsIgnoreCase("custom") && startDate != null && endDate != null) {
-            LocalDate finalStartDate = startDate;
-            return inspections.stream()
-                    .filter(i -> i.getOrderConfirmationDate() != null
-                            && !i.getOrderConfirmationDate().isBefore(finalStartDate)
-                            && !i.getOrderConfirmationDate().isAfter(endDate))
-                    .collect(Collectors.groupingBy(i -> i.getInspectionStatus().name(), Collectors.summingInt(i -> 1)));
-        } else {
-            LocalDate now = LocalDate.now();
-             startDate = switch (period.toLowerCase()) {
-                case "week" -> now.minusDays(7);
-                case "month" -> now.minusDays(30);
-                case "quarter" -> now.minusMonths(3);
-                case "year" -> now.withDayOfYear(1);
-                default -> now.minusDays(30);
-            };
-
-            LocalDate finalStartDate1 = startDate;
-            return inspections.stream()
-                    .filter(i -> i.getOrderConfirmationDate() != null && !i.getOrderConfirmationDate().isBefore(finalStartDate1))
-                    .collect(Collectors.groupingBy(i -> i.getInspectionStatus().name(), Collectors.summingInt(i -> 1)));
+    public byte[] generateReport(String id, String period, String format, String role, LocalDate startDate, LocalDate endDate) {
+        InspectionStatsByRole stats;
+        switch (role.toLowerCase()) {
+            case COORDINATOR_LOWERCASE:
+                stats = getCoordinatorStats(id, period, startDate, endDate);
+                break;
+            case TECHNICAL_COORDINATOR_LOWERCASE:
+                stats = getTechnicalCoordinatorStats(id, period, startDate, endDate);
+                break;
+            case INSPECTOR_LOWERCASE:
+                stats = getInspectorStats(id, period, startDate, endDate);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown role: " + role);
         }
-    }
 
-    public byte[] generateReport(String id, String period, String format, String role,LocalDate startDate, LocalDate endDate) {
-        Map<String, Integer> stats = getStatsByEmailAndPeriod(id, role, period,startDate, endDate);
+        if (stats == null || stats.getTotalInspections() == 0) {
+            return null;
+        }
 
         String title;
         String label;
         String sheetName;
-        if (stats == null || stats.isEmpty()) {
-           return null;
-        }
+
         switch (role.toLowerCase()) {
             case COORDINATOR_LOWERCASE:
                 title = "Coordinator Performance Report";
@@ -238,67 +211,101 @@ public class StatsService {
                 throw new IllegalArgumentException("Unknown role: " + role);
         }
 
-        return "pdf".equalsIgnoreCase(format) ? generatePdfReport(title, label, id, period, stats) : generateExcelReport(title, label, id, period, stats, sheetName);
+        return "pdf".equalsIgnoreCase(format)
+                ? generatePdfReport(title, label, id, period, stats)
+                : generateExcelReport(title, label, id, period, stats, sheetName);
     }
 
-    private byte[] generatePdfReport(String title, String label, String id, String period, Map<String, Integer> stats) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        PdfWriter writer = new PdfWriter(out);
-        PdfDocument pdf = new PdfDocument(writer);
-        Document document = new Document(pdf);
+    private byte[] generatePdfReport(String title, String label, String id, String period, InspectionStatsByRole stats) {
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            PdfWriter writer = new PdfWriter(out);
+            PdfDocument pdf = new PdfDocument(writer);
+            Document document = new Document(pdf);
 
-        document.add(new Paragraph(title).setBold().setFontSize(18));
-        document.add(new Paragraph(label + id));
-        document.add(new Paragraph("Period: " + period));
-        document.add(new Paragraph("\n"));
+            PdfFont font = PdfFontFactory.createFont(StandardFonts.HELVETICA);
+            document.setFont(font);
 
-        Table table = new Table(UnitValue.createPercentArray(2)).useAllAvailableWidth();
-        table.addHeaderCell("Inspection Status");
-        table.addHeaderCell("Count");
+            // Title and metadata
+            document.add(new Paragraph(title).setBold().setFontSize(18));
+            document.add(new Paragraph(label + id));
+            document.add(new Paragraph("Period: " + period.toUpperCase()));
+            document.add(new Paragraph("\n"));
 
-        stats.forEach((status, count) -> {
-            String safeStatus = status != null ? status : "N/A";
-            String safeCount = count != null ? count.toString() : "0";
-            table.addCell(new Cell().add(new Paragraph(safeStatus)));
-            table.addCell(new Cell().add(new Paragraph(safeCount)));
-        });
+            // Summary table
+            Table summaryTable = new Table(new float[]{1, 1});
+            summaryTable.setWidth(UnitValue.createPercentValue(100));
+            summaryTable.addHeaderCell("Metric");
+            summaryTable.addHeaderCell("Count");
 
-        document.add(table);
-        document.close();
-        return out.toByteArray();
+            summaryTable.addCell(new Cell().add(new Paragraph("Total Inspections")));
+            summaryTable.addCell(new Cell().add(new Paragraph(String.valueOf(stats.getTotalInspections()))));
+
+            summaryTable.addCell(new Cell().add(new Paragraph("New Inspections")));
+            summaryTable.addCell(new Cell().add(new Paragraph(String.valueOf(stats.getNewInspections()))));
+
+            summaryTable.addCell(new Cell().add(new Paragraph("Ongoing Inspections")));
+            summaryTable.addCell(new Cell().add(new Paragraph(String.valueOf(stats.getOngoingInspections()))));
+
+            summaryTable.addCell(new Cell().add(new Paragraph("Awarded Inspections")));
+            summaryTable.addCell(new Cell().add(new Paragraph(String.valueOf(stats.getCompletedInspections()))));
+
+            summaryTable.addCell(new Cell().add(new Paragraph("Rejected Inspections")));
+            summaryTable.addCell(new Cell().add(new Paragraph(String.valueOf(stats.getRejectedInspections()))));
+
+            document.add(summaryTable);
+            document.close();
+            return out.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException("Error while generating PDF", e);
+        }
     }
 
-    private byte[] generateExcelReport(String title, String label, String id, String period, Map<String, Integer> stats, String sheetName) {
-        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+
+    private byte[] generateExcelReport(String title, String label, String id, String period,
+                                       InspectionStatsByRole stats, String sheetName) {
+        try (Workbook workbook = new XSSFWorkbook();
+             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+
             Sheet sheet = workbook.createSheet(sheetName);
 
-            Row header = sheet.createRow(0);
-            header.createCell(0).setCellValue(title);
+            // Title and metadata
+            Row titleRow = sheet.createRow(0);
+            titleRow.createCell(0).setCellValue(title);
 
-            sheet.createRow(1).createCell(0).setCellValue(label + id);
-            sheet.createRow(2).createCell(0).setCellValue("Period: " + period);
+            Row infoRow1 = sheet.createRow(1);
+            infoRow1.createCell(0).setCellValue(label + id);
 
-            Row titleRow = sheet.createRow(4);
-            titleRow.createCell(0).setCellValue("Inspection Status");
-            titleRow.createCell(1).setCellValue("Count");
+            Row infoRow2 = sheet.createRow(2);
+            infoRow2.createCell(0).setCellValue("Period: " + period.toUpperCase());
 
+            // Header row
+            Row headerRow = sheet.createRow(4);
+            headerRow.createCell(0).setCellValue("Metric");
+            headerRow.createCell(1).setCellValue("Count");
+
+            // Data rows
             int rowIdx = 5;
-            for (Map.Entry<String, Integer> entry : stats.entrySet()) {
-                String status = entry.getKey() != null ? entry.getKey() : "N/A";
-                int count = entry.getValue() != null ? entry.getValue() : 0;
+            createDataRow(sheet, rowIdx++, "Total Inspections", stats.getTotalInspections());
+            createDataRow(sheet, rowIdx++, "New Inspections", stats.getNewInspections());
+            createDataRow(sheet, rowIdx++, "Ongoing Inspections", stats.getOngoingInspections());
+            createDataRow(sheet, rowIdx++, "Awarded Inspections", stats.getCompletedInspections());
+            createDataRow(sheet, rowIdx++, "Rejected Inspections", stats.getRejectedInspections());
 
-                Row row = sheet.createRow(rowIdx++);
-                row.createCell(0).setCellValue(status);
-                row.createCell(1).setCellValue(count);
-            }
-
+            // Auto-size columns
             sheet.autoSizeColumn(0);
             sheet.autoSizeColumn(1);
+
             workbook.write(out);
             return out.toByteArray();
         } catch (IOException e) {
             throw new RuntimeException("Failed to generate Excel", e);
         }
+    }
+
+    private void createDataRow(Sheet sheet, int rowIdx, String label, long value) {
+        Row row = sheet.createRow(rowIdx);
+        row.createCell(0).setCellValue(label);
+        row.createCell(1).setCellValue(value);
     }
 
     public PerformanceTrendResponse getPerformanceTrendData(String coordinator, String technical, String inspector) {

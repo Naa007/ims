@@ -42,6 +42,12 @@
             </h4>
             <!-- Performance Metrics Display -->
             <div class="cd-performance-metrics-container">
+                <div class="cd-loading-overlay" style="display: none;">
+                    <div class="cd-loading-spinner">
+                        <i class="fas fa-circle-notch fa-spin"></i>
+                    </div>
+                    <div class="cd-loading-text">Loading data...</div>
+                </div>
                 <div class="cd-metrics-display">
                     <!-- Time Period Selection -->
                     <div class="cd-period-selection">
@@ -51,7 +57,6 @@
                                 <option value="" disabled selected>Select a range</option>
                                 <option value="week">Last 7 Days</option>
                                 <option value="month">Last 30 Days</option>
-                                <option value="year">Year to Date</option>
                                 <option value="custom">Custom Range</option>
                             </select>
                             <div id="customRangeContainer" style="display: none;">
@@ -59,7 +64,7 @@
                                     <input id="startDate" name="startDate" type="date" style="width: calc(100% - 1.5rem); padding: 0.375rem 0.75rem; border-radius: 0.25rem; border: 1px solid #d1d3e2; font-size: 0.9rem;">
                                     <input id="endDate" name="endDate" type="date" style="width: calc(100% - 1.5rem); padding: 0.375rem 0.75rem; border-radius: 0.25rem; border: 1px solid #d1d3e2; font-size: 0.9rem;">
 
-                                    <button class="cd-filter-btn" style="width: calc(100% - 1.5rem);padding: 0.375rem 0.75rem;border-radius: 0.25rem;/* border: 1px solid #d1d3e2; */font-size: 0.9rem;" onclick="applyCustomRange()" type="button">
+                                    <button id="applyCustomRangeBtn" class="cd-filter-btn" style="width: calc(100% - 1.5rem);padding: 0.375rem 0.75rem;border-radius: 0.25rem;/* border: 1px solid #d1d3e2; */font-size: 0.9rem;"  type="button">
                                         <i class="fas fa-check-circle" style="margin-right: 5px;"></i>
                                     </button>
                                 </div>
@@ -163,9 +168,13 @@
     function applyCustomRange() {
         const startDate = document.getElementById('startDate').value;
         const endDate = document.getElementById('endDate').value;
-
-        if (startDate && endDate) {
-            fetchDataForCustomRange(startDate, endDate);
+        const period = document.getElementById('periodSelect').value;
+         if (startDate && endDate) {
+        if (new Date(startDate) > new Date(endDate)) {
+        showNotification('Start date cannot be after end date', 'error');
+            return;
+          }
+            fetchDataForCustomRange(period,startDate, endDate);
         } else {
             showNotification('Please select both start and end dates', 'error');
         }
@@ -223,12 +232,12 @@
     }
 
     // Fetch data for custom date range
-    function fetchDataForCustomRange(startDate, endDate) {
+    function fetchDataForCustomRange(period,startDate, endDate) {
         showLoadingIndicator();
 
         const inspectorEmail = document.querySelector('.user-email').textContent;
-
-        fetch(`/stats/inspection-stats/${encodeURIComponent(inspectorEmail)}/custom?startDate=${startDate}&endDate=${endDate}`)
+        let url = `/stats/inspector-stats/${encodeURIComponent(inspectorEmail)}/${period}?startDate=${startDate}&endDate=${endDate}`;
+        fetch(url)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -249,12 +258,26 @@
 
     // Show loading indicator
     function showLoadingIndicator() {
-        // You can implement this if you have a loading indicator element
+       const container = document.querySelector('.cd-performance-metrics-container');
+    const overlay = container.querySelector('.cd-loading-overlay');
+    const content = container.querySelector('.cd-metrics-display');
+
+    if (overlay) {
+        content.style.opacity = '0.5';
+        overlay.style.display = 'flex';
+    }
     }
 
     // Hide loading indicator
     function hideLoadingIndicator() {
-        // You can implement this if you have a loading indicator element
+       const container = document.querySelector('.cd-performance-metrics-container');
+    const overlay = container.querySelector('.cd-loading-overlay');
+    const content = container.querySelector('.cd-metrics-display');
+
+    if (overlay) {
+        content.style.opacity = '1';
+        overlay.style.display = 'none';
+    }
     }
 
     // Show notification
@@ -310,7 +333,8 @@
     function exportInspectorData(format) {
         const exportBtn = event.target;
         exportBtn.disabled = true;
-
+        const originalText = exportBtn.innerHTML;
+ exportBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
         const dashboardHeader = document.querySelector('.section-header span');
         const inspectorName = dashboardHeader ?
             dashboardHeader.textContent.replace('My Performance Dashboard - ', '') :
@@ -338,6 +362,10 @@
                 return response.blob();
             })
             .then(blob => {
+            if (blob.size === 0) {
+                showNotification('No data available for report generation', 'warning');
+                return;
+            }
                 const link = document.createElement('a');
                 link.href = window.URL.createObjectURL(blob);
                 link.download = filename;
@@ -354,6 +382,7 @@
             })
             .finally(() => {
                 exportBtn.disabled = false;
+                exportBtn.innerHTML = originalText;
             });
     }
     function togglePerformanceContainer(element) {
@@ -656,6 +685,39 @@
             min-width: 100%;
         }
     }
+    /* Loading overlay styles */
+.cd-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    border-radius: 0.5rem;
+}
+
+.cd-loading-spinner {
+    font-size: 2rem;
+    color: #4e73df;
+    margin-bottom: 1rem;
+    animation: fa-spin 2s infinite linear;
+}
+
+.cd-loading-text {
+    color: #5a5c69;
+    font-size: 1rem;
+}
+
+/* Add this for the spinner animation */
+@keyframes fa-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 </style>
 </body>
 </html>

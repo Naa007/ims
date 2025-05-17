@@ -42,6 +42,13 @@
             </h4>
             <!-- Performance Metrics Display -->
             <div class="cd-performance-metrics-container">
+                <!-- Loading overlay (initially hidden) -->
+                <div class="cd-loading-overlay" style="display: none;">
+                    <div class="cd-loading-spinner">
+                        <i class="fas fa-circle-notch fa-spin"></i>
+                    </div>
+                    <div class="cd-loading-text">Loading data...</div>
+                </div>
                 <div class="cd-metrics-display">
                     <!-- Time Period Selection -->
                     <div class="cd-period-selection">
@@ -255,12 +262,26 @@ function fetchDataForCustomRange(period, startDate, endDate) {
 
     // Show loading indicator
     function showLoadingIndicator() {
-        // You can implement this if you have a loading indicator element
+          const container = document.querySelector('.cd-performance-metrics-container');
+    const overlay = container.querySelector('.cd-loading-overlay');
+    const content = container.querySelector('.cd-metrics-display');
+
+    if (overlay) {
+        content.style.opacity = '0.5';
+        overlay.style.display = 'flex';
+    }
     }
 
     // Hide loading indicator
     function hideLoadingIndicator() {
-        // You can implement this if you have a loading indicator element
+        const container = document.querySelector('.cd-performance-metrics-container');
+    const overlay = container.querySelector('.cd-loading-overlay');
+    const content = container.querySelector('.cd-metrics-display');
+
+    if (overlay) {
+        content.style.opacity = '1';
+        overlay.style.display = 'none';
+    }
     }
 
     // Show notification
@@ -316,7 +337,8 @@ function fetchDataForCustomRange(period, startDate, endDate) {
     function exportCoordinatorData(format) {
         const exportBtn = event.target;
         exportBtn.disabled = true;
-
+        const originalText = exportBtn.innerHTML;
+ exportBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
         const dashboardHeader = document.querySelector('.section-header span');
         const coordinatorName = dashboardHeader ?
             dashboardHeader.textContent.replace('My Performance Dashboard - ', '') :
@@ -364,6 +386,7 @@ function fetchDataForCustomRange(period, startDate, endDate) {
             })
             .finally(() => {
                 exportBtn.disabled = false;
+                 exportBtn.innerHTML = originalText;
             });
     }
     function togglePerformanceContainer(element) {
@@ -666,6 +689,39 @@ function fetchDataForCustomRange(period, startDate, endDate) {
             min-width: 100%;
         }
     }
+    /* Loading overlay styles */
+.cd-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    border-radius: 0.5rem;
+}
+
+.cd-loading-spinner {
+    font-size: 2rem;
+    color: #4e73df;
+    margin-bottom: 1rem;
+    animation: fa-spin 2s infinite linear;
+}
+
+.cd-loading-text {
+    color: #5a5c69;
+    font-size: 1rem;
+}
+
+/* Add this for the spinner animation */
+@keyframes fa-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 </style>
 </body>
 </html>
