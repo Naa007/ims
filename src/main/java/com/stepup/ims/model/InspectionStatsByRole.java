@@ -17,6 +17,7 @@ public class InspectionStatsByRole {
         WEEK,
         MONTH,
         YEAR,
-        TOTAL
+        TOTAL,
+        CUSTOM
     }
 }

@@ -208,8 +208,6 @@
                                             onchange="handleCoordinatorPeriodChange()">
                                         <option value="week">Last 7 Days</option>
                                         <option selected value="month">Last 30 Days</option>
-                                        <option value="quarter">Last Quarter</option>
-                                        <option value="year">Year to Date</option>
                                         <option value="custom">Custom Range</option>
                                     </select>
 
@@ -283,8 +281,6 @@
                                             onchange="handleTechnicalPeriodChange()">
                                         <option value="week">Last 7 Days</option>
                                         <option selected value="month">Last 30 Days</option>
-                                        <option value="quarter">Last Quarter</option>
-                                        <option value="year">Year to Date</option>
                                         <option value="custom">Custom Range</option>
                                     </select>
                                 </div>
@@ -355,8 +351,6 @@
                                             onchange="handleInspectorPeriodChange()">
                                         <option value="week">Last 7 Days</option>
                                         <option selected value="month">Last 30 Days</option>
-                                        <option value="quarter">Last Quarter</option>
-                                        <option value="year">Year to Date</option>
                                         <option value="custom">Custom Range</option>
                                     </select>
                                 </div>
@@ -625,39 +619,38 @@ let lastInspectorData = null;
         }
     }
 
-    // Custom range handlers
-    function applyCoordinatorCustomRange() {
-        const startDate = document.getElementById('coordinatorStartDate').value;
-        const endDate = document.getElementById('coordinatorEndDate').value;
+ function applyCoordinatorCustomRange() {
+    const period = 'custom'; // Force custom period
+    const selectedCoordinator = document.getElementById('coordinatorSelect').value;
 
-        if (startDate && endDate) {
-            updateCoordinatorChartWithDateRange(startDate, endDate);
-        } else {
-            showNotification('Please select both start and end dates', 'error');
-        }
+    if (selectedCoordinator) {
+        fetchCoordinatorMetricData(selectedCoordinator, period);
+    } else {
+        showNotification('Please select a coordinator first', 'warning');
     }
+}
 
-    function applyTechnicalCustomRange() {
-        const startDate = document.getElementById('technicalStartDate').value;
-        const endDate = document.getElementById('technicalEndDate').value;
+ function applyTechnicalCustomRange() {
+    const period = 'custom'; // Force custom period
+    const selectedTechCoordinator = document.getElementById('technicalCoordinatorSelect').value;
 
-        if (startDate && endDate) {
-            updateTechnicalChartWithDateRange(startDate, endDate);
-        } else {
-            showNotification('Please select both start and end dates', 'error');
-        }
+    if (selectedTechCoordinator) {
+        fetchTechnicalMetricData(selectedTechCoordinator, period);
+    } else {
+        showNotification('Please select a technical coordinator first', 'warning');
     }
+}
 
-    function applyInspectorCustomRange() {
-        const startDate = document.getElementById('inspectorStartDate').value;
-        const endDate = document.getElementById('inspectorEndDate').value;
+function applyInspectorCustomRange() {
+    const period = 'custom'; // Force custom period
+    const selectedInspector = document.getElementById('inspectorSelect').value;
 
-        if (startDate && endDate) {
-            updateInspectorChartWithDateRange(startDate, endDate);
-        } else {
-            showNotification('Please select both start and end dates', 'error');
-        }
+    if (selectedInspector) {
+        fetchInspectorMetricData(selectedInspector, period);
+    } else {
+        showNotification('Please select an inspector first', 'warning');
     }
+}
 
     // Update chart with period
     function updateCoordinatorChartWithPeriod(period) {
@@ -692,26 +685,6 @@ let lastInspectorData = null;
             fetchCoordinatorDateRangeData(selectedCoordinator, startDate, endDate);
         } else {
             showNotification('Please select a coordinator first', 'warning');
-        }
-    }
-
-    function updateTechnicalChartWithDateRange(startDate, endDate) {
-        const selectedTechCoordinator = document.getElementById('technicalCoordinatorSelect').value;
-
-        if (selectedTechCoordinator) {
-            fetchTechnicalDateRangeData(selectedTechCoordinator, startDate, endDate);
-        } else {
-            showNotification('Please select a technical coordinator first', 'warning');
-        }
-    }
-
-    function updateInspectorChartWithDateRange(startDate, endDate) {
-        const selectedInspector = document.getElementById('inspectorSelect').value;
-
-        if (selectedInspector) {
-            fetchInspectorDateRangeData(selectedInspector, startDate, endDate);
-        } else {
-            showNotification('Please select an inspector first', 'warning');
         }
     }
 
@@ -759,8 +732,27 @@ let lastInspectorData = null;
     // Update the fetch functions to match your API endpoints
     function fetchCoordinatorMetricData(coordinatorEmail, period) {
         showLoadingIndicator('coordinatorPerformanceContainer');
+let url = `/stats/coordinator-stats/${encodeURIComponent(coordinatorEmail)}/${encodeURIComponent(period)}`;
+// Handle custom date range
+    if (period === 'custom') {
+        const startDate = document.getElementById('coordinatorStartDate').value;
+        const endDate = document.getElementById('coordinatorEndDate').value;
 
-        fetch(`/stats/coordinator-stats/${encodeURIComponent(coordinatorEmail)}/${encodeURIComponent(period)}`, {
+        if (!startDate || !endDate) {
+            showNotification('Please select both start and end dates', 'error');
+            hideLoadingIndicator('coordinatorPerformanceContainer');
+            return;
+        }
+
+        if (new Date(startDate) > new Date(endDate)) {
+            showNotification('Start date cannot be after end date', 'error');
+            hideLoadingIndicator('coordinatorPerformanceContainer');
+            return;
+        }
+
+        url += `?startDate=${startDate}&endDate=${endDate}`;
+    }
+        fetch(url, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -803,8 +795,26 @@ let lastInspectorData = null;
 
     function fetchTechnicalMetricData(techCoordinatorId, period) {
         showLoadingIndicator('technicalCoordinatorContainer');
+ let url = `/stats/technical-coordinator-stats/${encodeURIComponent(techCoordinatorId)}/${encodeURIComponent(period)}`;
+  if (period === 'custom') {
+        const startDate = document.getElementById('technicalStartDate').value;
+        const endDate = document.getElementById('technicalEndDate').value;
 
-        fetch(`/stats/technical-coordinator-stats/${encodeURIComponent(techCoordinatorId)}/${encodeURIComponent(period)}`, {
+        if (!startDate || !endDate) {
+            showNotification('Please select both start and end dates', 'error');
+            hideLoadingIndicator('technicalCoordinatorContainer');
+            return;
+        }
+
+        if (new Date(startDate) > new Date(endDate)) {
+            showNotification('Start date cannot be after end date', 'error');
+            hideLoadingIndicator('technicalCoordinatorContainer');
+            return;
+        }
+
+        url += `?startDate=${startDate}&endDate=${endDate}`;
+    }
+        fetch(url, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -847,8 +857,27 @@ let lastInspectorData = null;
 
     function fetchInspectorMetricData(inspectorEmail, period) {
         showLoadingIndicator('inspectorPerformanceContainer');
+let url = `/stats/inspector-stats/${encodeURIComponent(inspectorEmail)}/${encodeURIComponent(period)}`;
+     if (period === 'custom') {
+        const startDate = document.getElementById('inspectorStartDate').value;
+        const endDate = document.getElementById('inspectorEndDate').value;
 
-        fetch(`/stats/inspector-stats/${encodeURIComponent(inspectorEmail)}/${encodeURIComponent(period)}`, {
+        if (!startDate || !endDate) {
+            showNotification('Please select both start and end dates', 'error');
+            hideLoadingIndicator('inspectorPerformanceContainer');
+            return;
+        }
+
+        if (new Date(startDate) > new Date(endDate)) {
+            showNotification('Start date cannot be after end date', 'error');
+            hideLoadingIndicator('inspectorPerformanceContainer');
+            return;
+        }
+
+        url += `?startDate=${startDate}&endDate=${endDate}`;
+    }
+
+        fetch(url, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -971,43 +1000,60 @@ let lastInspectorData = null;
     }
 
     function exportCoordinatorData(format) {
-        const coordinatorSelect = document.getElementById('coordinatorSelect');
-        const coordinatorEmail = coordinatorSelect.value;
-        const coordinatorName = coordinatorSelect.selectedOptions[0]?.text || 'report';
+    const coordinatorSelect = document.getElementById('coordinatorSelect');
+    const coordinatorEmail = coordinatorSelect.value;
+    const coordinatorName = coordinatorSelect.selectedOptions[0]?.text || 'report';
 
-        const period = document.getElementById('coordinatorPeriodSelect').value;
+    const period = document.getElementById('coordinatorPeriodSelect').value;
 
-        if (!coordinatorEmail) {
-            showNotification('Please select a coordinator before exporting.', 'warning');
-            return;
-        }
+    const startDate = document.getElementById('startDate')?.value;
+    const endDate = document.getElementById('endDate')?.value;
 
-        const endpoint = `/stats/coordinator-report/${coordinatorEmail}/${period}/${format}`;
-        const filename = `${coordinatorName.replace(/\s+/g, '_')}_report.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
-
-        fetch(endpoint)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Error: ${response.status}`);
-                }
-                return response.blob();
-            })
-            .then(blob => {
-                const link = document.createElement('a');
-                link.href = window.URL.createObjectURL(blob);
-                link.download = filename;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                window.URL.revokeObjectURL(link.href);
-
-                showNotification(`${format.toUpperCase()} downloaded successfully.`, 'success');
-            })
-            .catch(error => {
-                console.error('Download failed:', error);
-                showNotification(`Failed to export ${format.toUpperCase()} report.`, 'error');
-            });
+    if (!coordinatorEmail) {
+        showNotification('Please select a coordinator before exporting.', 'warning');
+        return;
     }
+
+    let endpoint = `/stats/coordinator-report/${coordinatorEmail}/${period}/${format}`;
+    const queryParams = [];
+
+    if (startDate) queryParams.push(`startDate=${encodeURIComponent(startDate)}`);
+    if (endDate) queryParams.push(`endDate=${encodeURIComponent(endDate)}`);
+
+    if (queryParams.length > 0) {
+        endpoint += `?${queryParams.join('&')}`;
+    }
+
+    const filename = `${coordinatorName.replace(/\s+/g, '_')}_report.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
+
+    fetch(endpoint)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Error: ${response.status}`);
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            if (blob.size === 0) {
+                showNotification('No data available for report generation', 'warning');
+                return;
+            }
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(link.href);
+
+            showNotification(`${format.toUpperCase()} downloaded successfully.`, 'success');
+        })
+        .catch(error => {
+            console.error('Download failed:', error);
+            showNotification(`Failed to export ${format.toUpperCase()} report.`, 'error');
+        });
+}
+
 
   function exportTechnicalData(format) {
     const selectedTechCoordinator = document.getElementById('technicalCoordinatorSelect').value;
@@ -1042,6 +1088,10 @@ let lastInspectorData = null;
             return response.blob();
         })
         .then(blob => {
+        if (blob.size === 0) {
+                showNotification('No data available for report generation', 'warning');
+                return;
+            }
             const link = document.createElement('a');
             link.href = window.URL.createObjectURL(blob);
             link.download = filename;
@@ -1091,6 +1141,10 @@ function exportInspectorData(format) {
             return response.blob();
         })
         .then(blob => {
+        if (blob.size === 0) {
+                showNotification('No data available for report generation', 'warning');
+                return;
+            }
             const link = document.createElement('a');
             link.href = window.URL.createObjectURL(blob);
             link.download = filename;

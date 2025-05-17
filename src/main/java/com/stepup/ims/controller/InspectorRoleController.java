@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 import static com.stepup.ims.constants.ApplicationConstants.TOTAL;
@@ -45,8 +46,10 @@ public class InspectorRoleController extends BaseDashboardsController {
     public String showDashboard(Model model) {
         String email = getCurrentUserEmail();
         Employee employee = getCurrentEmployee(email);
+        LocalDate startDate = LocalDate.now().withDayOfMonth(1); // Start of current month
+        LocalDate endDate = LocalDate.now(); // Today
         // Get coordinator-specific stats
-        InspectionStatsByRole stats = statsService.getInspectorStats(email, TOTAL);
+        InspectionStatsByRole stats = statsService.getInspectorStats(email, TOTAL,startDate,endDate);
         populateCommonDashboardAttributes(model, employee, email, stats);
         return RETURN_TO_INSPECTOR_DASHBOARD;
     }

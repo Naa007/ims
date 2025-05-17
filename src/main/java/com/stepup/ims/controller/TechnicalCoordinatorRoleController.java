@@ -11,6 +11,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
 import static com.stepup.ims.constants.ApplicationConstants.TOTAL;
 import static com.stepup.ims.constants.UIRoutingConstants.*;
 
@@ -48,8 +50,10 @@ public class TechnicalCoordinatorRoleController extends BaseDashboardsController
     public String showDashboard(Model model) {
         String email = getCurrentUserEmail();
         Employee employee = getCurrentEmployee(email);
+        LocalDate startDate = LocalDate.now().withDayOfMonth(1); // Start of current month
+        LocalDate endDate = LocalDate.now(); // Today
         // Get coordinator-specific stats
-        InspectionStatsByRole stats = statsService.getTechnicalCoordinatorStats(employee.getEmpId(), TOTAL);
+        InspectionStatsByRole stats = statsService.getTechnicalCoordinatorStats(employee.getEmpId(), TOTAL, startDate, endDate);
         populateCommonDashboardAttributes(model, employee, email, stats);
         return RETURN_TO_TECHNICAL_COORDINATOR_DASHBOARD;
     }
