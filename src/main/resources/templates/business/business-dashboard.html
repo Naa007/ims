@@ -232,10 +232,10 @@
 
                                 <!-- Export Options -->
                                 <div class="bd-filter-group bd-export-group">
-                                    <button class="bd-export-btn" onclick="exportCoordinatorData('pdf')">
+                                    <button class="bd-export-btn" onclick="exportCoordinatorData('pdf',event)">
                                         <i class="fas fa-file-pdf"></i> PDF
                                     </button>
-                                    <button class="bd-export-btn" onclick="exportCoordinatorData('excel')">
+                                    <button class="bd-export-btn" onclick="exportCoordinatorData('excel',event)">
                                         <i class="fas fa-file-excel"></i> Excel
                                     </button>
                                 </div>
@@ -304,10 +304,10 @@
 
                                 <!-- Export Options -->
                                 <div class="bd-filter-group bd-export-group">
-                                    <button class="bd-export-btn" onclick="exportTechnicalData('pdf')">
+                                    <button class="bd-export-btn" onclick="exportTechnicalData('pdf',event)">
                                         <i class="fas fa-file-pdf"></i> PDF
                                     </button>
-                                    <button class="bd-export-btn" onclick="exportTechnicalData('excel')">
+                                    <button class="bd-export-btn" onclick="exportTechnicalData('excel',event)">
                                         <i class="fas fa-file-excel"></i> Excel
                                     </button>
                                 </div>
@@ -374,10 +374,10 @@
 
                                 <!-- Export Options -->
                                 <div class="bd-filter-group bd-export-group">
-                                    <button class="bd-export-btn" onclick="exportInspectorData('pdf')">
+                                    <button class="bd-export-btn" onclick="exportInspectorData('pdf',event)">
                                         <i class="fas fa-file-pdf"></i> PDF
                                     </button>
-                                    <button class="bd-export-btn" onclick="exportInspectorData('excel')">
+                                    <button class="bd-export-btn" onclick="exportInspectorData('excel',event)">
                                         <i class="fas fa-file-excel"></i> Excel
                                     </button>
                                 </div>
@@ -1000,10 +1000,12 @@ let url = `/stats/inspector-stats/${encodeURIComponent(inspectorEmail)}/${encode
     }
 
     function exportCoordinatorData(format) {
+    const exportBtn = event.target.closest('.bd-export-btn');
+    if (!exportBtn) return;
+
     const coordinatorSelect = document.getElementById('coordinatorSelect');
     const coordinatorEmail = coordinatorSelect.value;
     const coordinatorName = coordinatorSelect.selectedOptions[0]?.text || 'report';
-
     const period = document.getElementById('coordinatorPeriodSelect').value;
 
     const startDate = document.getElementById('startDate')?.value;
@@ -1013,6 +1015,11 @@ let url = `/stats/inspector-stats/${encodeURIComponent(inspectorEmail)}/${encode
         showNotification('Please select a coordinator before exporting.', 'warning');
         return;
     }
+
+    // Disable button and show loading state
+    exportBtn.disabled = true;
+    const originalText = exportBtn.innerHTML;
+    exportBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
 
     let endpoint = `/stats/coordinator-report/${coordinatorEmail}/${period}/${format}`;
     const queryParams = [];
@@ -1051,11 +1058,18 @@ let url = `/stats/inspector-stats/${encodeURIComponent(inspectorEmail)}/${encode
         .catch(error => {
             console.error('Download failed:', error);
             showNotification(`Failed to export ${format.toUpperCase()} report.`, 'error');
+        })
+        .finally(() => {
+            // Restore button state
+            exportBtn.disabled = false;
+            exportBtn.innerHTML = originalText;
         });
 }
 
+function exportTechnicalData(format) {
+    const exportBtn = event.target.closest('.bd-export-btn');
+    if (!exportBtn) return;
 
-  function exportTechnicalData(format) {
     const selectedTechCoordinator = document.getElementById('technicalCoordinatorSelect').value;
     const techCoordinatorName = document.getElementById('technicalCoordinatorSelect').selectedOptions[0]?.text || 'report';
     const period = document.getElementById('technicalPeriodSelect').value;
@@ -1065,6 +1079,11 @@ let url = `/stats/inspector-stats/${encodeURIComponent(inspectorEmail)}/${encode
         return;
     }
 
+    // Disable button and show loading state
+    exportBtn.disabled = true;
+    const originalText = exportBtn.innerHTML;
+    exportBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
+
     // For custom range
     let endpoint = `/stats/technical-coordinator-report/${selectedTechCoordinator}/${period}/${format}`;
 
@@ -1073,6 +1092,8 @@ let url = `/stats/inspector-stats/${encodeURIComponent(inspectorEmail)}/${encode
         const endDate = document.getElementById('technicalEndDate').value;
         if (!startDate || !endDate) {
             showNotification('Please select both start and end dates', 'error');
+            exportBtn.disabled = false;
+            exportBtn.innerHTML = originalText;
             return;
         }
         endpoint += `?startDate=${startDate}&endDate=${endDate}`;
@@ -1105,10 +1126,18 @@ let url = `/stats/inspector-stats/${encodeURIComponent(inspectorEmail)}/${encode
         .catch(error => {
             console.error('Download failed:', error);
             showNotification(`Failed to export ${format.toUpperCase()} report.`, 'error');
+        })
+        .finally(() => {
+            // Restore button state
+            exportBtn.disabled = false;
+            exportBtn.innerHTML = originalText;
         });
 }
 
 function exportInspectorData(format) {
+    const exportBtn = event.target.closest('.bd-export-btn');
+    if (!exportBtn) return;
+
     const selectedInspector = document.getElementById('inspectorSelect').value;
     const inspectorName = document.getElementById('inspectorSelect').selectedOptions[0]?.text || 'report';
     const period = document.getElementById('inspectorPeriodSelect').value;
@@ -1118,6 +1147,11 @@ function exportInspectorData(format) {
         return;
     }
 
+    // Disable button and show loading state
+    exportBtn.disabled = true;
+    const originalText = exportBtn.innerHTML;
+    exportBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
+
     // For custom range
     let endpoint = `/stats/inspector-report/${selectedInspector}/${period}/${format}`;
 
@@ -1126,6 +1160,8 @@ function exportInspectorData(format) {
         const endDate = document.getElementById('inspectorEndDate').value;
         if (!startDate || !endDate) {
             showNotification('Please select both start and end dates', 'error');
+            exportBtn.disabled = false;
+            exportBtn.innerHTML = originalText;
             return;
         }
         endpoint += `?startDate=${startDate}&endDate=${endDate}`;
@@ -1158,6 +1194,11 @@ function exportInspectorData(format) {
         .catch(error => {
             console.error('Download failed:', error);
             showNotification(`Failed to export ${format.toUpperCase()} report.`, 'error');
+        })
+        .finally(() => {
+            // Restore button state
+            exportBtn.disabled = false;
+            exportBtn.innerHTML = originalText;
         });
 }
 
