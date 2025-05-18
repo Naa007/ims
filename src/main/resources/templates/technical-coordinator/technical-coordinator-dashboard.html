@@ -214,6 +214,7 @@
     }
 
     function fetchDataForCustomRange(period,startDate, endDate) {
+        showLoadingIndicator();
         const employeeID = document.getElementById('employeeId').value;
         if (!employeeID) {
             showNotification('Employee ID not found', 'error');
@@ -228,16 +229,19 @@
             })
             .then(data => {
                 updateMetricsDisplay(data);
+                hideLoadingIndicator();
                 showNotification('Custom range data loaded', 'success');
             })
             .catch(error => {
                 console.error('Error fetching custom range data:', error);
+                hideLoadingIndicator();
                 showNotification('Failed to load custom range data', 'error');
             });
     }
 
     function exportTechCoordinatorData(format) {
-    const exportBtn = event.target;
+     const exportBtn = event.target.closest('.bd-export-btn');
+     if (!exportBtn) return;
     exportBtn.Disabled = true;
      const originalText = exportBtn.innerHTML;
       exportBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
@@ -255,13 +259,13 @@
         const endDate = document.getElementById('endDate').value;
 
         let period = document.getElementById('periodSelect').value;
-               // If no period is selected, use current month as default (yyyy-MM)
-       if (!period) {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        period = `${year}-${month}`;
-       }
+        // If no period is selected, use current month as default (yyyy-MM)
+        if (!period) {
+            showNotification('Please select a period range before exporting.', 'warning');
+            exportBtn.Disabled = false;
+            exportBtn.innerHTML = originalText;
+            return;
+        }
         const filename = `${coordinatorName.replace(/\s+/g, '_')}_report.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
 
         fetch(`/stats/technical-coordinator-report/${employeeID}/${period}/${format}?startDate=${startDate}&endDate=${endDate}`)
@@ -376,6 +380,7 @@ function hideLoadingIndicator() {
         box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
         padding: 1.5rem;
         margin-bottom: 2rem;
+        position: relative;
     }
 
     .cd-metrics-display {

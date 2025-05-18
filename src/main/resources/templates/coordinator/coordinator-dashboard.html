@@ -335,10 +335,11 @@ function fetchDataForCustomRange(period, startDate, endDate) {
     }
 
     function exportCoordinatorData(format) {
-        const exportBtn = event.target;
+        const exportBtn = event.target.closest('.bd-export-btn');
+        if (!exportBtn) return;
         exportBtn.disabled = true;
         const originalText = exportBtn.innerHTML;
- exportBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
+        exportBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
         const dashboardHeader = document.querySelector('.section-header span');
         const coordinatorName = dashboardHeader ?
             dashboardHeader.textContent.replace('My Performance Dashboard - ', '') :
@@ -347,10 +348,10 @@ function fetchDataForCustomRange(period, startDate, endDate) {
         let period = document.getElementById('periodSelect').value;
          // If no period is selected, use current month as default (yyyy-MM)
        if (!period) {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        period = `${year}-${month}`;
+        showNotification('Please select a period range before exporting.', 'warning');
+            exportBtn.disabled = false;
+            exportBtn.innerHTML = originalText;
+            return;
        }
         const employeeName = /*[[${employeeName}]]*/ coordinatorName;
         const encodedName = encodeURIComponent(employeeName.replace(/\s+/g, '_'));
@@ -414,6 +415,7 @@ function fetchDataForCustomRange(period, startDate, endDate) {
         box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
         padding: 1.5rem;
         margin-bottom: 2rem;
+        position: relative;
     }
 
     .cd-metrics-display {

@@ -41,6 +41,8 @@ public class StatsService {
     private final StatsRepository statsRepository;
     @Autowired
     private InspectionRepository inspectionRepository;
+    @Autowired
+    private EmployeeService employeeService;
 
     @Autowired
     public StatsService(StatsRepository statsRepository) {
@@ -167,8 +169,10 @@ public class StatsService {
         return new InspectionStatsByRole(totalInspections, newInspections, completedInspections, ongoingInspections, rejectedInspections, InspectionStatsByRole.PeriodType.valueOf(period.toUpperCase()));
     }
 
+
     public byte[] generateReport(String id, String period, String format, String role, LocalDate startDate, LocalDate endDate) {
         InspectionStatsByRole stats;
+        String empName = getEmployeeName(id, role);
         switch (role.toLowerCase()) {
             case COORDINATOR_LOWERCASE:
                 stats = getCoordinatorStats(id, period, startDate, endDate);
@@ -188,22 +192,26 @@ public class StatsService {
         }
 
         String title;
+        String nameLabel;
         String label;
         String sheetName;
 
         switch (role.toLowerCase()) {
             case COORDINATOR_LOWERCASE:
                 title = "Coordinator Performance Report";
+                nameLabel = "Coordinator name: ";
                 label = "Coordinator email: ";
                 sheetName = "Coordinator Report";
                 break;
             case TECHNICAL_COORDINATOR_LOWERCASE:
                 title = "Technical Coordinator Performance Report";
+                nameLabel = "Technical Coordinator name: ";
                 label = "Technical Coordinator ID: ";
                 sheetName = "Technical Coordinator Report";
                 break;
             case INSPECTOR_LOWERCASE:
                 title = "Inspector Performance Report";
+                nameLabel = "Inspector name: ";
                 label = "Inspector email: ";
                 sheetName = "Inspector Report";
                 break;
@@ -212,11 +220,11 @@ public class StatsService {
         }
 
         return "pdf".equalsIgnoreCase(format)
-                ? generatePdfReport(title, label, id, period, stats)
-                : generateExcelReport(title, label, id, period, stats, sheetName);
+                ? generatePdfReport(title, label, nameLabel, id, empName, period, stats)
+                : generateExcelReport(title, label, nameLabel, period, id, empName, stats, sheetName);
     }
 
-    private byte[] generatePdfReport(String title, String label, String id, String period, InspectionStatsByRole stats) {
+    private byte[] generatePdfReport(String title, String label, String nameLabel, String id, String empName, String period, InspectionStatsByRole stats) {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             PdfWriter writer = new PdfWriter(out);
             PdfDocument pdf = new PdfDocument(writer);
@@ -227,6 +235,7 @@ public class StatsService {
 
             // Title and metadata
             document.add(new Paragraph(title).setBold().setFontSize(18));
+            document.add(new Paragraph(nameLabel + empName));
             document.add(new Paragraph(label + id));
             document.add(new Paragraph("Period: " + period.toUpperCase()));
             document.add(new Paragraph("\n"));
@@ -261,7 +270,7 @@ public class StatsService {
     }
 
 
-    private byte[] generateExcelReport(String title, String label, String id, String period,
+    private byte[] generateExcelReport(String title, String label, String nameLabel, String id, String name, String period,
                                        InspectionStatsByRole stats, String sheetName) {
         try (Workbook workbook = new XSSFWorkbook();
              ByteArrayOutputStream out = new ByteArrayOutputStream()) {
@@ -275,16 +284,19 @@ public class StatsService {
             Row infoRow1 = sheet.createRow(1);
             infoRow1.createCell(0).setCellValue(label + id);
 
-            Row infoRow2 = sheet.createRow(2);
+            Row infoRowName = sheet.createRow(2);
+            infoRowName.createCell(0).setCellValue(nameLabel + name);
+
+            Row infoRow2 = sheet.createRow(3);
             infoRow2.createCell(0).setCellValue("Period: " + period.toUpperCase());
 
             // Header row
-            Row headerRow = sheet.createRow(4);
+            Row headerRow = sheet.createRow(5);
             headerRow.createCell(0).setCellValue("Metric");
             headerRow.createCell(1).setCellValue("Count");
 
             // Data rows
-            int rowIdx = 5;
+            int rowIdx = 6;
             createDataRow(sheet, rowIdx++, "Total Inspections", stats.getTotalInspections());
             createDataRow(sheet, rowIdx++, "New Inspections", stats.getNewInspections());
             createDataRow(sheet, rowIdx++, "Ongoing Inspections", stats.getOngoingInspections());
@@ -345,4 +357,29 @@ public class StatsService {
         return counts;
     }
 
+    private String getEmployeeName(String id, String role) {
+        try {
+            switch (role.toLowerCase()) {
+                case COORDINATOR_LOWERCASE:
+                case INSPECTOR_LOWERCASE:
+                    // For coordinator and inspector, id is email
+                    String nameByEmail = employeeService.getEmployeeNameByEmail(id);
+                    return nameByEmail != null ? nameByEmail : "Name not found";
+
+                case TECHNICAL_COORDINATOR_LOWERCASE:
+                    // For technical coordinator, id is empId
+                    // We need to find the employee by empId
+                    return employeeService.getAllEmployees().stream()
+                            .filter(emp -> id.equals(emp.getEmpId()))
+                            .map(emp -> emp.getEmpName())
+                            .findFirst()
+                            .orElse("Name not found");
+
+                default:
+                    return "Unknown";
+            }
+        } catch (Exception e) {
+            return "Name not available";
+        }
+    }
 }
