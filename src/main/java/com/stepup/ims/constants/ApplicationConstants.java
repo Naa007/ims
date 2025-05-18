@@ -41,6 +41,23 @@ public class ApplicationConstants {
     public static final String QUARTER = "QUARTER";
     public static final String YEAR = "YEAR";
     public static final String TOTAL = "TOTAL";
+    public static final String ID = "id";
+    public static final String TITLE = "title";
+    public static final String START = "start";
+    public static final String DATE = "date";
+    public static final String ON_FIELD = "onField";
+    public static final String COUNTRY = "country";
+    public static final String INSPECTOR_TYPE = "inspectorType";
+    public static final String REPORT_REVIEW = "reportReview";
+
+
+    /* Countries */
+    public static final String INDIA_UPPERCASE = "INDIA";
+    public static final String INDIA_LOWERCASE = "india";
+    public static final String INTERNATIONAL_UPPERCASE = "INTERNATIONAL";
+    public static final String INTERNATIONAL_LOWERCASE = "international";
+
+
 
 
     /* Email constants */

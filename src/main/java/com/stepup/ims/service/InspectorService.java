@@ -86,4 +86,7 @@ public class InspectorService {
                 inspectorRepository.findAllByCountryAndInspectorStatus(country, com.stepup.ims.entity.Inspector.InspectorStatusType.ACTIVE));
     }
 
+    public String getInspectorIdByEmail(String email) {
+        return inspectorRepository.findInspectorIdByEmail(email);
+    }
 }

@@ -114,6 +114,8 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    /** ================== Calendar View ======================== **/
+
     var calendarEl = document.getElementById('calendar');
     if(calendarEl) {
     var calendar = new FullCalendar.Calendar(calendarEl, {
