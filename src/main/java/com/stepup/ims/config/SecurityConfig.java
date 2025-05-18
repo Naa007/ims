@@ -23,6 +23,7 @@ public class SecurityConfig {
     private static final String[] INSPECTOR_ACCESS = {"/inspector/**"};
     private static final String[] EMPLOYEE_ACCESS = {"/employee/**"};
     private static final String[] STATS_ACCESS = {"/stats/**"};
+    private static final String[] CALENDAR_ACCESS = {"/calendar/**"};
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -36,6 +37,7 @@ public class SecurityConfig {
                         .requestMatchers(INSPECTOR_ACCESS).hasAnyRole(INSPECTOR)
                         .requestMatchers(EMPLOYEE_ACCESS).hasAnyRole(ADMIN)
                         .requestMatchers(STATS_ACCESS).hasAnyRole(BUSINESS, COORDINATOR, TECHNICAL_COORDINATOR, INSPECTOR)
+                        .requestMatchers(CALENDAR_ACCESS).hasAnyRole(COORDINATOR, TECHNICAL_COORDINATOR, INSPECTOR, ADMIN)
                         .anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(form -> form

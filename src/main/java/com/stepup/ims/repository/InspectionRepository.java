@@ -3,6 +3,7 @@ package com.stepup.ims.repository;
 import com.stepup.ims.entity.Inspection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -24,6 +25,12 @@ public interface InspectionRepository extends JpaRepository<Inspection, Long> {
     List<Inspection> findByProposedCVs_CvReviewBytechnicalCoordinator_EmpIdOrDocumentsReviewedByTechnicalCoordinatorOrInspectionReviewedBy(String cvReviewBytechnicalCoordinatorId, String documentsReviewedByTechnicalCoordinator, String inspectionReviewedBy);
 
     List<Inspection> findByProposedCVs_Inspector_Email(String email);
+
+    @Query("SELECT i FROM Inspection i JOIN i.inspectionDateAsPerNotification dates " +
+            "WHERE dates BETWEEN :startDate AND :endDate " +
+            "ORDER BY dates ASC")
+    List<Inspection> findByInspectionDateAsPerNotificationBetween(@Param("startDate") String startDate, @Param("endDate") String endDate);
+   
 
 }
 

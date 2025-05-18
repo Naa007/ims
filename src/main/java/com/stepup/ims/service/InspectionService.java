@@ -1,15 +1,21 @@
 package com.stepup.ims.service;
 
+import com.stepup.ims.model.Employee;
+import com.stepup.ims.model.Inspector;
 import com.stepup.ims.model.Inspection;
 import com.stepup.ims.modelmapper.InspectionModelMapper;
+import com.stepup.ims.modelmapper.InspectorModelMapper;
 import com.stepup.ims.repository.InspectionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
+import static com.stepup.ims.constants.ApplicationConstants.*;
 
 @Service
 public class InspectionService {
@@ -18,10 +24,16 @@ public class InspectionService {
     private EmployeeService employeeService;
 
     @Autowired
+    private InspectorService inspectorService;
+
+    @Autowired
     private InspectionRepository inspectionRepository;
 
     @Autowired
     private InspectionModelMapper inspectionModelMapper;
+    
+    @Autowired
+    private InspectorModelMapper inspectorModelMapper;
 
 
     /**
@@ -90,4 +102,107 @@ public class InspectionService {
                 ? new String[0]
                 : techCoordinators.stream().map(String::trim).distinct().toArray(String[]::new);
     }
+
+    public List<Map<String, String>> fetchInspectionStats(String period) {
+        String startDate;
+        String endDate;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        switch (period.toUpperCase()) {
+            case WEEK -> {
+                startDate = LocalDate.now().minusDays(LocalDate.now().getDayOfWeek().getValue() - 1).format(formatter);
+                endDate = LocalDate.now().format(formatter);
+            }
+            case MONTH -> {
+                startDate = LocalDate.now().withDayOfMonth(1).format(formatter);
+                endDate = LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth()).format(formatter);
+            }
+            case QUARTER -> {
+                int currentQuarter = (LocalDate.now().getMonthValue() - 1) / 3 + 1;
+                startDate = LocalDate.now().withMonth((currentQuarter - 1) * 3 + 1).withDayOfMonth(1).format(formatter);
+                endDate = LocalDate.parse(startDate, formatter).plusMonths(2).withDayOfMonth(LocalDate.parse(startDate, formatter).plusMonths(2).lengthOfMonth()).format(formatter);
+            }
+            case YEAR -> {
+                startDate = LocalDate.now().withDayOfYear(1).format(formatter);
+                endDate = LocalDate.now().withDayOfYear(LocalDate.now().lengthOfYear()).format(formatter);
+            }
+            default -> throw new IllegalArgumentException("Invalid period. Allowed values are: month, quarter, year.");
+        }
+        List<com.stepup.ims.entity.Inspection> inspections = inspectionRepository.findByInspectionDateAsPerNotificationBetween(startDate, endDate);
+        return getInspectionCalendarStats(inspections);
+    }
+
+    private List<Map<String, String>> getInspectionCalendarStats(List<com.stepup.ims.entity.Inspection> inspections) {
+        List<Map<String, String>> detailsList = new ArrayList<>();
+        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        // Pre-calculate inspection dates and participating inspectors
+        Map<String, Set<String>> inspectorsByDate = new HashMap<>();
+        inspections.stream()
+                .filter(inspection -> inspection.getProposedCVs() != null && !inspection.getProposedCVs().isEmpty())
+                .flatMap(inspection -> inspection.getProposedCVs().stream()
+                        .filter(cv -> cv != null && cv.isCvStatus() && cv.getInspector() != null)
+                        .flatMap(cv -> inspection.getInspectionDateAsPerNotification().stream().map(date -> {
+                            String parsedDate = LocalDate.parse(date, inputFormatter).format(outputFormatter);
+                            String inspectorId = String.valueOf(cv.getInspector().getInspectorId());
+                            inspectorsByDate
+                                    .computeIfAbsent(parsedDate, d -> new HashSet<>())
+                                    .add(inspectorId);
+
+                            Map<String, String> details = new HashMap<>();
+                            details.put(ID, inspectorId);
+                            details.put(TITLE, String.format("%s - %s", cv.getInspector().getInspectorName(), inspection.getInspectionLocationDetails()));
+                            details.put(START, parsedDate);
+                            details.put(DATE, parsedDate);
+                            details.put(INSPECTOR_TYPE, cv.getInspector().getInspectorType().toString());
+                            details.put(COUNTRY, INDIA_LOWERCASE.equalsIgnoreCase(inspection.getInspectionCountry())
+                                    ? INDIA_LOWERCASE : INTERNATIONAL_LOWERCASE);
+                            details.put(ON_FIELD, YES);
+                            return details;
+                        })))
+                .forEach(detailsList::add);
+
+        // Cache INHOUSE inspectors list
+        List<Inspector> inHouseInspectors = inspectorService.getInspectorsListByCountry("India").stream()
+                .filter(inspector -> Inspector.InspectorType.INHOUSE_INSPECTOR.equals(inspector.getInspectorType()))
+                .toList();
+
+        // Inspectors who were not participating in the inspection
+        inspectorsByDate.forEach((date, participatingInspectorIds) ->
+            inHouseInspectors.stream()
+                    .filter(inspector -> !participatingInspectorIds.contains(String.valueOf(inspector.getInspectorId())))
+                    .forEach(inspector -> {
+                        Map<String, String> details = new HashMap<>();
+                        details.put(ID, String.valueOf(inspector.getInspectorId()));
+                        details.put(TITLE, inspector.getInspectorName());
+                        details.put(START, date);
+                        details.put(INSPECTOR_TYPE, inspector.getInspectorType().toString());
+                        details.put(COUNTRY, INDIA_LOWERCASE);
+                        details.put(ON_FIELD, NO);
+                        detailsList.add(details);
+                    })
+        );
+
+        // Cache all technical coordinators and process them
+        List<Employee> technicalCoordinators = employeeService.getAllTechnicalCoordinateEmployees();
+        inspectorsByDate.forEach((date, participatingInspectorIds) ->
+            technicalCoordinators.forEach(technicalCoord -> {
+                String inspectorId = inspectorService.getInspectorIdByEmail(technicalCoord.getEmail());
+                if (!participatingInspectorIds.contains(inspectorId)) {
+                    Map<String, String> details = new HashMap<>();
+                    details.put(ID, String.valueOf(technicalCoord.getEmpId()));
+                    details.put(TITLE, technicalCoord.getEmpName());
+                    details.put(START, date);
+                    details.put(INSPECTOR_TYPE, "TECHNICAL_COORDINATOR");
+                    details.put(COUNTRY, INDIA_LOWERCASE);
+                    details.put(ON_FIELD, REPORT_REVIEW);
+                    detailsList.add(details);
+                }
+            })
+        );
+
+        return detailsList;
+    }
+
 }
