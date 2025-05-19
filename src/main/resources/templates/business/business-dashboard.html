@@ -9,127 +9,10 @@
 <main class="bd-container">
     <div class="bd-dashboard-container">
 
-        <!-- Enterprises Performance Analytics Section -->
-        <h4 class="section-header">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div style="display: flex; align-items: center; justify-content: flex-start;">
-                    <i class="fas fa-chart-line me-2"></i>Enterprise Performance Analytics
-                </div>
-                <div class="bd-date-filter date">
-                    <span th:text="${#temporals.format(#temporals.createNow(), 'MMMM dd, yyyy')}">April 14, 2025</span>
-                </div>
-            </div>
-        </h4>
-
-        <!-- Stats Grid -->
-        <div class="bd-stats-grid">
-            <!-- Inspection Stats Card -->
-            <div class="bd-stat-card" th:if="${inspectionStats != null}">
-                <div class="bd-stat-header" data-target="inspection-stats">
-                    <div class="bd-stat-icon bd-inspection-icon">
-                        <i class="fas fa-clipboard-check"></i>
-                    </div>
-                    <div class="bd-stat-title">Inspections</div>
-                    <i class="fas fa-chevron-down bd-dropdown-icon"></i>
-                </div>
-                <div class="bd-stat-summary">
-                    <div class="bd-summary-label">Total Inspections</div>
-                    <div class="bd-summary-value" th:text="${inspectionStats['Total Inspections']}">0</div>
-                </div>
-                <div class="bd-stat-content" id="inspection-stats">
-                    <div class="bd-stat-item">
-                        <div class="bd-stat-label">New</div>
-                        <div class="bd-stat-value" th:text="${inspectionStats['New']}">0</div>
-                    </div>
-                    <div class="bd-stat-item">
-                        <div class="bd-stat-label">Ongoing</div>
-                        <div class="bd-stat-value" th:text="${inspectionStats['Ongoing']}">0</div>
-                    </div>
-                    <div class="bd-stat-item">
-                        <div class="bd-stat-label">Awarded</div>
-                        <div class="bd-stat-value" th:text="${inspectionStats['Awarded']}">0</div>
-                    </div>
-                    <div class="bd-stat-item">
-                        <div class="bd-stat-label">Rejected</div>
-                        <div class="bd-stat-value" th:text="${inspectionStats['Rejected']}">0</div>
-                    </div>
-                    <div class="bd-stat-item">
-                        <div class="bd-stat-label">Closed</div>
-                        <div class="bd-stat-value" th:text="${inspectionStats['Closed']}">0</div>
-                    </div>
-                </div>
-            </div>
-            <!-- Employee Stats Card -->
-            <div class="bd-stat-card" th:if="${employeeStats!= null}">
-                <div class="bd-stat-header" data-target="employee-stats">
-                    <div class="bd-stat-icon bd-employee-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div class="bd-stat-title">Employees</div>
-                    <i class="fas fa-chevron-down bd-dropdown-icon"></i>
-                </div>
-                <div class="bd-stat-summary">
-                    <div class="bd-summary-label">Total Employees</div>
-                    <div class="bd-summary-value" th:text="${employeeStats['Total Employees']}">0</div>
-                </div>
-                <div class="bd-stat-content" id="employee-stats">
-                    <div class="bd-stat-item" th:each="stat : ${employeeStats}"
-                         th:if="${!stat.key.equals('Total Employees')}">
-                        <div class="bd-stat-label" th:text="${stat.key}">Active Employees</div>
-                        <div class="bd-stat-value" th:text="${stat.value}">0</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Client Stats Card -->
-            <div class="bd-stat-card" th:if="${clientStats != null}">
-                <div class="bd-stat-header" data-target="client-stats">
-                    <div class="bd-stat-icon bd-client-icon">
-                        <i class="fas fa-building"></i>
-                    </div>
-                    <div class="bd-stat-title">Clients</div>
-                    <i class="fas fa-chevron-down bd-dropdown-icon"></i>
-                </div>
-                <div class="bd-stat-summary">
-                    <div class="bd-summary-label">Total Clients</div>
-                    <div class="bd-summary-value" th:text="${clientStats['Total Clients']}">0</div>
-                </div>
-                <div class="bd-stat-content" id="client-stats">
-                    <div class="bd-stat-item" th:each="stat : ${clientStats}"
-                         th:if="${!stat.key.equals('Total Clients')}">
-                        <div class="bd-stat-label" th:text="${stat.key}">Active Clients</div>
-                        <div class="bd-stat-value" th:text="${stat.value}">0</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Inspector Stats Card -->
-            <div class="bd-stat-card" th:if="${inspectorStats != null}">
-                <div class="bd-stat-header" data-target="inspector-stats">
-                    <div class="bd-stat-icon bd-inspector-icon">
-                        <i class="fas fa-user-tie"></i>
-                    </div>
-                    <div class="bd-stat-title">Inspectors</div>
-                    <i class="fas fa-chevron-down bd-dropdown-icon"></i>
-                </div>
-                <div class="bd-stat-summary">
-                    <div class="bd-summary-label">Total Inspectors</div>
-                    <div class="bd-summary-value" th:text="${inspectorStats['Total Inspectors']}">0</div>
-                </div>
-                <div class="bd-stat-content" id="inspector-stats">
-                    <div class="bd-stat-item" th:each="stat : ${inspectorStats}"
-                         th:if="${!stat.key.equals('Total Inspectors')}">
-                        <div class="bd-stat-label" th:text="${stat.key}">Inhouse Inspectors</div>
-                        <div class="bd-stat-value" th:text="${stat.value}">0</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Individual Performance Charts Section -->
+        <!-- IISPL Performance Charts Section -->
         <h4 class="section-header">
             <div style="display: flex; align-items: center; justify-content: flex-start;">
-                <i class="fas fa-chart-line me-2"></i>Individual Performance Matrices
+                <i class="fas fa-chart-line me-2"></i>IISPL Performance Matrices
             </div>
         </h4>
 
@@ -399,12 +282,12 @@
 
         </div>
 
-        <!-- Performance Trends Section -->
+        <!-- IISPL Performance Trends Section -->
         <div class="bd-trends-section">
 
             <h4 class="section-header">
                 <div style="display: flex; align-items: center; justify-content: flex-start;">
-                    <i class="fas fa-chart-line me-2"></i>Individual Performance Trends
+                    <i class="fas fa-chart-line me-2"></i>IISPL Performance Trends
                 </div>
             </h4>
 
@@ -420,6 +303,123 @@
                         <canvas id="comparisonChart"></canvas>
                     </div>
 
+                </div>
+            </div>
+        </div>
+
+        <!-- Enterprises Performance Analytics Section -->
+        <h4 class="section-header">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; justify-content: flex-start;">
+                    <i class="fas fa-chart-line me-2"></i>IISPL Data Analytics
+                </div>
+                <div class="bd-date-filter date">
+                    <span th:text="${#temporals.format(#temporals.createNow(), 'MMMM dd, yyyy')}">April 14, 2025</span>
+                </div>
+            </div>
+        </h4>
+
+        <!-- Stats Grid -->
+        <div class="bd-stats-grid">
+            <!-- Inspection Stats Card -->
+            <div class="bd-stat-card" th:if="${inspectionStats != null}">
+                <div class="bd-stat-header" data-target="inspection-stats">
+                    <div class="bd-stat-icon bd-inspection-icon">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+                    <div class="bd-stat-title">Inspections</div>
+                    <i class="fas fa-chevron-down bd-dropdown-icon"></i>
+                </div>
+                <div class="bd-stat-summary">
+                    <div class="bd-summary-label">Total Inspections</div>
+                    <div class="bd-summary-value" th:text="${inspectionStats['Total Inspections']}">0</div>
+                </div>
+                <div class="bd-stat-content" id="inspection-stats">
+                    <div class="bd-stat-item">
+                        <div class="bd-stat-label">New</div>
+                        <div class="bd-stat-value" th:text="${inspectionStats['New']}">0</div>
+                    </div>
+                    <div class="bd-stat-item">
+                        <div class="bd-stat-label">Ongoing</div>
+                        <div class="bd-stat-value" th:text="${inspectionStats['Ongoing']}">0</div>
+                    </div>
+                    <div class="bd-stat-item">
+                        <div class="bd-stat-label">Awarded</div>
+                        <div class="bd-stat-value" th:text="${inspectionStats['Awarded']}">0</div>
+                    </div>
+                    <div class="bd-stat-item">
+                        <div class="bd-stat-label">Rejected</div>
+                        <div class="bd-stat-value" th:text="${inspectionStats['Rejected']}">0</div>
+                    </div>
+                    <div class="bd-stat-item">
+                        <div class="bd-stat-label">Closed</div>
+                        <div class="bd-stat-value" th:text="${inspectionStats['Closed']}">0</div>
+                    </div>
+                </div>
+            </div>
+            <!-- Employee Stats Card -->
+            <div class="bd-stat-card" th:if="${employeeStats!= null}">
+                <div class="bd-stat-header" data-target="employee-stats">
+                    <div class="bd-stat-icon bd-employee-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="bd-stat-title">Employees</div>
+                    <i class="fas fa-chevron-down bd-dropdown-icon"></i>
+                </div>
+                <div class="bd-stat-summary">
+                    <div class="bd-summary-label">Total Employees</div>
+                    <div class="bd-summary-value" th:text="${employeeStats['Total Employees']}">0</div>
+                </div>
+                <div class="bd-stat-content" id="employee-stats">
+                    <div class="bd-stat-item" th:each="stat : ${employeeStats}"
+                         th:if="${!stat.key.equals('Total Employees')}">
+                        <div class="bd-stat-label" th:text="${stat.key}">Active Employees</div>
+                        <div class="bd-stat-value" th:text="${stat.value}">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Client Stats Card -->
+            <div class="bd-stat-card" th:if="${clientStats != null}">
+                <div class="bd-stat-header" data-target="client-stats">
+                    <div class="bd-stat-icon bd-client-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <div class="bd-stat-title">Clients</div>
+                    <i class="fas fa-chevron-down bd-dropdown-icon"></i>
+                </div>
+                <div class="bd-stat-summary">
+                    <div class="bd-summary-label">Total Clients</div>
+                    <div class="bd-summary-value" th:text="${clientStats['Total Clients']}">0</div>
+                </div>
+                <div class="bd-stat-content" id="client-stats">
+                    <div class="bd-stat-item" th:each="stat : ${clientStats}"
+                         th:if="${!stat.key.equals('Total Clients')}">
+                        <div class="bd-stat-label" th:text="${stat.key}">Active Clients</div>
+                        <div class="bd-stat-value" th:text="${stat.value}">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inspector Stats Card -->
+            <div class="bd-stat-card" th:if="${inspectorStats != null}">
+                <div class="bd-stat-header" data-target="inspector-stats">
+                    <div class="bd-stat-icon bd-inspector-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="bd-stat-title">Inspectors</div>
+                    <i class="fas fa-chevron-down bd-dropdown-icon"></i>
+                </div>
+                <div class="bd-stat-summary">
+                    <div class="bd-summary-label">Total Inspectors</div>
+                    <div class="bd-summary-value" th:text="${inspectorStats['Total Inspectors']}">0</div>
+                </div>
+                <div class="bd-stat-content" id="inspector-stats">
+                    <div class="bd-stat-item" th:each="stat : ${inspectorStats}"
+                         th:if="${!stat.key.equals('Total Inspectors')}">
+                        <div class="bd-stat-label" th:text="${stat.key}">Inhouse Inspectors</div>
+                        <div class="bd-stat-value" th:text="${stat.value}">0</div>
+                    </div>
                 </div>
             </div>
         </div>
