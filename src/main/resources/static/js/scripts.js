@@ -129,24 +129,28 @@ document.addEventListener("DOMContentLoaded", function () {
                                 let indiaEvents = [];
 
                                 const colorCodes = {
-                                    international: {
+                                    yes: {
                                         INHOUSE_INSPECTOR: '#337dcc',
                                         TECHNICAL_COORDINATOR: '#337dcc',
-                                        PARTNER_INSPECTOR: '#359423',
-                                        FREELANCER: '#b1b215'
+                                        PARTNER_INSPECTOR: '#337dcc',
+                                        FREELANCER: '#337dcc'
                                     },
-                                    india: {
-                                        INHOUSE_INSPECTOR: '#337dcc',
-                                        TECHNICAL_COORDINATOR: '#337dcc',
-                                        PARTNER_INSPECTOR: '#359423',
-                                        FREELANCER: '#b1b215'
+                                    no: {
+                                        INHOUSE_INSPECTOR: '#8ec6a4',
+                                        TECHNICAL_COORDINATOR: '#8ec6a4',
+                                        PARTNER_INSPECTOR: '#8ec6a4',
+                                        FREELANCER: '#8ec6a4'
+                                    },
+                                    reportReview: {
+                                       TECHNICAL_COORDINATOR: '#b1b215'
                                     }
                                 };
 
                                 data.forEach(item => {
                                     const country = item.country;
+                                    const onField = item.onField;
                                     const inspectorType = item.inspectorType;
-                                    const color = (colorCodes[country] && colorCodes[country][inspectorType]) ? colorCodes[country][inspectorType] : '#CCCCCC';
+                                    const color = (colorCodes[onField] && colorCodes[onField][inspectorType]) ? colorCodes[onField][inspectorType] : '#CCCCCC';
 
                                     const event = {
                                         id: item.id,
@@ -230,7 +234,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     calendarEl.style.backgroundColor = '#f8f9fa';
-    calendarEl.style.border = '1px solid #ddd';
+    calendarEl.style.border = '0px solid #ddd';
     calendarEl.style.padding = '10px';
     calendarEl.style.borderRadius = '5px';
 
@@ -260,7 +264,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       .fc-button {
           margin-right: 5px;
-          padding: 5px 15px;
+          padding: 5px 5px;
           border-radius: 5px;
           font-weight: bold;
       }
