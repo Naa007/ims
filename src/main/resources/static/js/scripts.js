@@ -221,6 +221,12 @@ document.addEventListener("DOMContentLoaded", function () {
             if (arg.date.getDay() === 0 || arg.date.getDay() === 6) {
                 arg.el.style.backgroundColor = '#f0f8ff';
             }
+            // Ensure every event displays its title without wrapping and includes tooltips
+            if (arg.el.querySelector('.fc-daygrid-event')) {
+                arg.el.style.whiteSpace = 'nowrap';
+                arg.el.style.overflow = 'hidden';
+                arg.el.title = info.event.title;
+            }
         },
         dayCellContent: function (arg) {
             return {
@@ -234,7 +240,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     calendarEl.style.backgroundColor = '#f8f9fa';
-    calendarEl.style.border = '0px solid #ddd';
+    calendarEl.style.border = '1px solid #ddd';
     calendarEl.style.padding = '10px';
     calendarEl.style.borderRadius = '5px';
 
@@ -264,9 +270,21 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       .fc-button {
           margin-right: 5px;
-          padding: 5px 5px;
+          padding: 5px 15px;
           border-radius: 5px;
           font-weight: bold;
+      }
+      .day-cell .section {
+          margin-top: 5px;
+          padding: 5px;
+          border-radius: 3px;
+      }
+      .fc-daygrid-event {
+           position: relative;
+           white-space: wrap;
+           border-radius: 3px;
+           font-size: .60rem;
+           font-size: var(--fc-small-font-size, .85em);
       }
     `;
     document.head.appendChild(style);
