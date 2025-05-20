@@ -1,5 +1,8 @@
 package com.stepup.ims.service;
 
+import com.itextpdf.io.font.constants.StandardFonts;
+import com.itextpdf.kernel.font.PdfFont;
+import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
@@ -38,6 +41,8 @@ public class StatsService {
     private final StatsRepository statsRepository;
     @Autowired
     private InspectionRepository inspectionRepository;
+    @Autowired
+    private EmployeeService employeeService;
 
     @Autowired
     public StatsService(StatsRepository statsRepository) {
@@ -111,36 +116,44 @@ public class StatsService {
         return map;
     }
 
-    public InspectionStatsByRole getCoordinatorStats(String email, String period) {
+    public InspectionStatsByRole getCoordinatorStats(String email, String period,LocalDate startDate, LocalDate endDate) {
         List<Inspection> inspections = inspectionRepository.findByCreatedBy(email);
-        return getInspectionStatsByRole(inspections, period);
+        return getInspectionStatsByRole(inspections, period,startDate, endDate);
     }
 
-    public InspectionStatsByRole getInspectorStats(String email, String period) {
+    public InspectionStatsByRole getInspectorStats(String email, String period,LocalDate startDate, LocalDate endDate) {
         List<Inspection> inspections = inspectionRepository.findByProposedCVs_Inspector_Email(email);
-        return getInspectionStatsByRole(inspections, period);
+        return getInspectionStatsByRole(inspections, period,startDate, endDate);
     }
 
-    public InspectionStatsByRole getTechnicalCoordinatorStats(String empId, String period) {
+    public InspectionStatsByRole getTechnicalCoordinatorStats(String empId, String period,LocalDate startDate, LocalDate endDate) {
         List<Inspection> inspections = inspectionRepository.findByProposedCVs_CvReviewBytechnicalCoordinator_EmpIdOrDocumentsReviewedByTechnicalCoordinatorOrInspectionReviewedBy(empId, empId, empId);
 
-        return getInspectionStatsByRole(inspections, period);
+        return getInspectionStatsByRole(inspections, period,startDate, endDate);
     }
 
-    public InspectionStatsByRole getInspectionStatsByRole(List<Inspection> inspections, String period) {
+    public InspectionStatsByRole getInspectionStatsByRole(List<Inspection> inspections, String period,LocalDate startDate, LocalDate endDate) {
+        if (period.equalsIgnoreCase("custom") && startDate != null && endDate != null) {
+            // Handle custom date range
+            inspections = inspections.stream()
+                    .filter(inspection -> inspection.getCreatedDate() != null
+                            && !inspection.getCreatedDate().toLocalDate().isBefore(startDate)
+                            && !inspection.getCreatedDate().toLocalDate().isAfter(endDate))
+                    .toList();
+        }else {
+            LocalDateTime cutoffDate = switch (period.toUpperCase()) {
+                case WEEK -> LocalDateTime.now().minusWeeks(1);
+                case MONTH -> LocalDateTime.now().minusMonths(1);
+                case YEAR -> LocalDateTime.now().minusYears(1);
+                case TOTAL -> null;
+                default -> throw new IllegalArgumentException("Invalid period: " + period);
+            };
 
-        LocalDateTime cutoffDate = switch (period.toUpperCase()) {
-            case WEEK -> LocalDateTime.now().minusWeeks(1);
-            case MONTH -> LocalDateTime.now().minusMonths(1);
-            case YEAR -> LocalDateTime.now().minusYears(1);
-            case TOTAL -> null;
-            default -> throw new IllegalArgumentException("Invalid period: " + period);
-        };
-
-        if (cutoffDate != null) {
-            inspections = inspections.stream().filter(inspection -> inspection.getCreatedDate() != null && !inspection.getCreatedDate().isBefore(cutoffDate)).toList();
-        } else {
-            inspections = inspections.stream().filter(inspection -> inspection.getCreatedDate() != null).toList();
+            if (cutoffDate != null) {
+                inspections = inspections.stream().filter(inspection -> inspection.getCreatedDate() != null && !inspection.getCreatedDate().isBefore(cutoffDate)).toList();
+            } else {
+                inspections = inspections.stream().filter(inspection -> inspection.getCreatedDate() != null).toList();
+            }
         }
 
         long totalInspections = inspections.size();
@@ -156,59 +169,49 @@ public class StatsService {
         return new InspectionStatsByRole(totalInspections, newInspections, completedInspections, ongoingInspections, rejectedInspections, InspectionStatsByRole.PeriodType.valueOf(period.toUpperCase()));
     }
 
-    public byte[] generateCoordinatorReport(String email, String period, String format) {
-        return generateReport(email, period, format, COORDINATOR_LOWERCASE);
-    }
 
-    public byte[] generateTechCoordinatorReport(String empId, String period, String format) {
-        return generateReport(empId, period, format, TECHNICAL_COORDINATOR_LOWERCASE);
-    }
+    public byte[] generateReport(String id, String period, String format, String role, LocalDate startDate, LocalDate endDate) {
+        InspectionStatsByRole stats;
+        String empName = getEmployeeName(id, role);
+        switch (role.toLowerCase()) {
+            case COORDINATOR_LOWERCASE:
+                stats = getCoordinatorStats(id, period, startDate, endDate);
+                break;
+            case TECHNICAL_COORDINATOR_LOWERCASE:
+                stats = getTechnicalCoordinatorStats(id, period, startDate, endDate);
+                break;
+            case INSPECTOR_LOWERCASE:
+                stats = getInspectorStats(id, period, startDate, endDate);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown role: " + role);
+        }
 
-    public byte[] generateInspectorReport(String email, String period, String format) {
-        return generateReport(email, period, format, INSPECTOR_LOWERCASE);
-    }
-
-    private Map<String, Integer> getStatsByEmailAndPeriod(String identifier, String role, String period) {
-        List<Inspection> inspections = switch (role.toLowerCase()) {
-            case COORDINATOR_LOWERCASE -> inspectionRepository.findByCreatedBy(identifier);
-            case TECHNICAL_COORDINATOR_LOWERCASE ->
-                    inspectionRepository.findByProposedCVs_CvReviewBytechnicalCoordinator_EmpIdOrDocumentsReviewedByTechnicalCoordinatorOrInspectionReviewedBy(identifier, identifier, identifier);
-            case INSPECTOR_LOWERCASE -> inspectionRepository.findByProposedCVs_Inspector_Email(identifier);
-            default -> new ArrayList<>();
-        };
-
-        LocalDate now = LocalDate.now();
-        LocalDate startDate = switch (period.toLowerCase()) {
-            case "week" -> now.minusDays(7);
-            case "month" -> now.minusDays(30);
-            case "quarter" -> now.minusMonths(3);
-            case "year" -> now.withDayOfYear(1);
-            default -> now.minusDays(30);
-        };
-
-        return inspections.stream().filter(i -> i.getOrderConfirmationDate() != null && !i.getOrderConfirmationDate().isBefore(startDate)).collect(Collectors.groupingBy(i -> i.getInspectionStatus().name(), Collectors.summingInt(i -> 1)));
-    }
-
-    public byte[] generateReport(String id, String period, String format, String role) {
-        Map<String, Integer> stats = getStatsByEmailAndPeriod(id, role, period);
+        if (stats == null || stats.getTotalInspections() == 0) {
+            return null;
+        }
 
         String title;
+        String nameLabel;
         String label;
         String sheetName;
 
         switch (role.toLowerCase()) {
             case COORDINATOR_LOWERCASE:
                 title = "Coordinator Performance Report";
+                nameLabel = "Coordinator name: ";
                 label = "Coordinator email: ";
                 sheetName = "Coordinator Report";
                 break;
             case TECHNICAL_COORDINATOR_LOWERCASE:
                 title = "Technical Coordinator Performance Report";
+                nameLabel = "Technical Coordinator name: ";
                 label = "Technical Coordinator ID: ";
                 sheetName = "Technical Coordinator Report";
                 break;
             case INSPECTOR_LOWERCASE:
                 title = "Inspector Performance Report";
+                nameLabel = "Inspector name: ";
                 label = "Inspector email: ";
                 sheetName = "Inspector Report";
                 break;
@@ -216,67 +219,105 @@ public class StatsService {
                 throw new IllegalArgumentException("Unknown role: " + role);
         }
 
-        return "pdf".equalsIgnoreCase(format) ? generatePdfReport(title, label, id, period, stats) : generateExcelReport(title, label, id, period, stats, sheetName);
+        return "pdf".equalsIgnoreCase(format)
+                ? generatePdfReport(title, label, nameLabel, id, empName, period, stats)
+                : generateExcelReport(title, label, nameLabel, period, id, empName, stats, sheetName);
     }
 
-    private byte[] generatePdfReport(String title, String label, String id, String period, Map<String, Integer> stats) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        PdfWriter writer = new PdfWriter(out);
-        PdfDocument pdf = new PdfDocument(writer);
-        Document document = new Document(pdf);
+    private byte[] generatePdfReport(String title, String label, String nameLabel, String id, String empName, String period, InspectionStatsByRole stats) {
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            PdfWriter writer = new PdfWriter(out);
+            PdfDocument pdf = new PdfDocument(writer);
+            Document document = new Document(pdf);
 
-        document.add(new Paragraph(title).setBold().setFontSize(18));
-        document.add(new Paragraph(label + id));
-        document.add(new Paragraph("Period: " + period));
-        document.add(new Paragraph("\n"));
+            PdfFont font = PdfFontFactory.createFont(StandardFonts.HELVETICA);
+            document.setFont(font);
 
-        Table table = new Table(UnitValue.createPercentArray(2)).useAllAvailableWidth();
-        table.addHeaderCell("Inspection Status");
-        table.addHeaderCell("Count");
+            // Title and metadata
+            document.add(new Paragraph(title).setBold().setFontSize(18));
+            document.add(new Paragraph(nameLabel + empName));
+            document.add(new Paragraph(label + id));
+            document.add(new Paragraph("Period: " + period.toUpperCase()));
+            document.add(new Paragraph("\n"));
 
-        stats.forEach((status, count) -> {
-            String safeStatus = status != null ? status : "N/A";
-            String safeCount = count != null ? count.toString() : "0";
-            table.addCell(new Cell().add(new Paragraph(safeStatus)));
-            table.addCell(new Cell().add(new Paragraph(safeCount)));
-        });
+            // Summary table
+            Table summaryTable = new Table(new float[]{1, 1});
+            summaryTable.setWidth(UnitValue.createPercentValue(100));
+            summaryTable.addHeaderCell("Metric");
+            summaryTable.addHeaderCell("Count");
 
-        document.add(table);
-        document.close();
-        return out.toByteArray();
+            summaryTable.addCell(new Cell().add(new Paragraph("Total Inspections")));
+            summaryTable.addCell(new Cell().add(new Paragraph(String.valueOf(stats.getTotalInspections()))));
+
+            summaryTable.addCell(new Cell().add(new Paragraph("New Inspections")));
+            summaryTable.addCell(new Cell().add(new Paragraph(String.valueOf(stats.getNewInspections()))));
+
+            summaryTable.addCell(new Cell().add(new Paragraph("Ongoing Inspections")));
+            summaryTable.addCell(new Cell().add(new Paragraph(String.valueOf(stats.getOngoingInspections()))));
+
+            summaryTable.addCell(new Cell().add(new Paragraph("Awarded Inspections")));
+            summaryTable.addCell(new Cell().add(new Paragraph(String.valueOf(stats.getCompletedInspections()))));
+
+            summaryTable.addCell(new Cell().add(new Paragraph("Rejected Inspections")));
+            summaryTable.addCell(new Cell().add(new Paragraph(String.valueOf(stats.getRejectedInspections()))));
+
+            document.add(summaryTable);
+            document.close();
+            return out.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException("Error while generating PDF", e);
+        }
     }
 
-    private byte[] generateExcelReport(String title, String label, String id, String period, Map<String, Integer> stats, String sheetName) {
-        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+
+    private byte[] generateExcelReport(String title, String label, String nameLabel, String id, String name, String period,
+                                       InspectionStatsByRole stats, String sheetName) {
+        try (Workbook workbook = new XSSFWorkbook();
+             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+
             Sheet sheet = workbook.createSheet(sheetName);
 
-            Row header = sheet.createRow(0);
-            header.createCell(0).setCellValue(title);
+            // Title and metadata
+            Row titleRow = sheet.createRow(0);
+            titleRow.createCell(0).setCellValue(title);
 
-            sheet.createRow(1).createCell(0).setCellValue(label + id);
-            sheet.createRow(2).createCell(0).setCellValue("Period: " + period);
+            Row infoRow1 = sheet.createRow(1);
+            infoRow1.createCell(0).setCellValue(label + id);
 
-            Row titleRow = sheet.createRow(4);
-            titleRow.createCell(0).setCellValue("Inspection Status");
-            titleRow.createCell(1).setCellValue("Count");
+            Row infoRowName = sheet.createRow(2);
+            infoRowName.createCell(0).setCellValue(nameLabel + name);
 
-            int rowIdx = 5;
-            for (Map.Entry<String, Integer> entry : stats.entrySet()) {
-                String status = entry.getKey() != null ? entry.getKey() : "N/A";
-                int count = entry.getValue() != null ? entry.getValue() : 0;
+            Row infoRow2 = sheet.createRow(3);
+            infoRow2.createCell(0).setCellValue("Period: " + period.toUpperCase());
 
-                Row row = sheet.createRow(rowIdx++);
-                row.createCell(0).setCellValue(status);
-                row.createCell(1).setCellValue(count);
-            }
+            // Header row
+            Row headerRow = sheet.createRow(5);
+            headerRow.createCell(0).setCellValue("Metric");
+            headerRow.createCell(1).setCellValue("Count");
 
+            // Data rows
+            int rowIdx = 6;
+            createDataRow(sheet, rowIdx++, "Total Inspections", stats.getTotalInspections());
+            createDataRow(sheet, rowIdx++, "New Inspections", stats.getNewInspections());
+            createDataRow(sheet, rowIdx++, "Ongoing Inspections", stats.getOngoingInspections());
+            createDataRow(sheet, rowIdx++, "Awarded Inspections", stats.getCompletedInspections());
+            createDataRow(sheet, rowIdx++, "Rejected Inspections", stats.getRejectedInspections());
+
+            // Auto-size columns
             sheet.autoSizeColumn(0);
             sheet.autoSizeColumn(1);
+
             workbook.write(out);
             return out.toByteArray();
         } catch (IOException e) {
             throw new RuntimeException("Failed to generate Excel", e);
         }
+    }
+
+    private void createDataRow(Sheet sheet, int rowIdx, String label, long value) {
+        Row row = sheet.createRow(rowIdx);
+        row.createCell(0).setCellValue(label);
+        row.createCell(1).setCellValue(value);
     }
 
     public PerformanceTrendResponse getPerformanceTrendData(String coordinator, String technical, String inspector) {
@@ -316,4 +357,29 @@ public class StatsService {
         return counts;
     }
 
+    private String getEmployeeName(String id, String role) {
+        try {
+            switch (role.toLowerCase()) {
+                case COORDINATOR_LOWERCASE:
+                case INSPECTOR_LOWERCASE:
+                    // For coordinator and inspector, id is email
+                    String nameByEmail = employeeService.getEmployeeNameByEmail(id);
+                    return nameByEmail != null ? nameByEmail : "Name not found";
+
+                case TECHNICAL_COORDINATOR_LOWERCASE:
+                    // For technical coordinator, id is empId
+                    // We need to find the employee by empId
+                    return employeeService.getAllEmployees().stream()
+                            .filter(emp -> id.equals(emp.getEmpId()))
+                            .map(emp -> emp.getEmpName())
+                            .findFirst()
+                            .orElse("Name not found");
+
+                default:
+                    return "Unknown";
+            }
+        } catch (Exception e) {
+            return "Name not available";
+        }
+    }
 }

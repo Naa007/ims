@@ -37,6 +37,12 @@
             </h4>
 
             <div class="cd-performance-metrics-container">
+                <div class="cd-loading-overlay" style="display: none;">
+                    <div class="cd-loading-spinner">
+                        <i class="fas fa-circle-notch fa-spin"></i>
+                    </div>
+                    <div class="cd-loading-text">Loading data...</div>
+                </div>
                 <div class="cd-metrics-display">
                      <div class="cd-period-selection">
                         <div class="cd-filter-group">
@@ -45,7 +51,6 @@
                                 <option value="" disabled selected>Select a range</option>
                                 <option value="week">Last 7 Days</option>
                                 <option value="month">Last 30 Days</option>
-                                <option value="year">Year to Date</option>
                                 <option value="custom">Custom Range</option>
                             </select>
                             <div id="customRangeContainer" style="display: none;">
@@ -150,15 +155,16 @@
     function applyCustomRange() {
         const startDate = document.getElementById('startDate').value;
         const endDate = document.getElementById('endDate').value;
-
+        const period = document.getElementById('periodSelect').value;
         if (startDate && endDate) {
-            fetchDataForCustomRange(startDate, endDate);
+            fetchDataForCustomRange(period,startDate, endDate);
         } else {
             showNotification('Please select both start and end dates', 'error');
         }
     }
 
     function fetchDataForPeriod(period) {
+      showLoadingIndicator();
         const employeeID = document.getElementById('employeeId').value;
         if (!employeeID) {
             showNotification('Employee ID not found', 'error');
@@ -172,10 +178,12 @@
             })
             .then(data => {
                 updateMetricsDisplay(data);
+                hideLoadingIndicator();
                 showNotification('Data updated successfully', 'success');
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
+                hideLoadingIndicator();
                 showNotification('Failed to load performance data', 'error');
             });
     }
@@ -201,31 +209,38 @@
         }
     }
 
-    function fetchDataForCustomRange(startDate, endDate) {
+    function fetchDataForCustomRange(period,startDate, endDate) {
+        showLoadingIndicator();
         const employeeID = document.getElementById('employeeId').value;
         if (!employeeID) {
             showNotification('Employee ID not found', 'error');
             return;
         }
 
-        fetch(`/technical-coordinator/inspection-stats/${encodeURIComponent(employeeID)}/custom?startDate=${startDate}&endDate=${endDate}`)
+        let url = `/stats/technical-coordinator-stats/${encodeURIComponent(employeeID)}/${period}?startDate=${startDate}&endDate=${endDate}`;
+        fetch(url)
             .then(response => {
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 return response.json();
             })
             .then(data => {
                 updateMetricsDisplay(data);
+                hideLoadingIndicator();
                 showNotification('Custom range data loaded', 'success');
             })
             .catch(error => {
                 console.error('Error fetching custom range data:', error);
+                hideLoadingIndicator();
                 showNotification('Failed to load custom range data', 'error');
             });
     }
 
     function exportTechCoordinatorData(format) {
-    const exportBtn = event.target;
+     const exportBtn = event.target.closest('.bd-export-btn');
+     if (!exportBtn) return;
     exportBtn.Disabled = true;
+     const originalText = exportBtn.innerHTML;
+      exportBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
         const employeeID = document.getElementById('employeeId').value;
         if (!employeeID) {
             showNotification('Employee ID not found', 'error');
@@ -236,23 +251,29 @@
         const coordinatorName = dashboardHeader ?
             dashboardHeader.textContent.replace('My Performance Dashboard - ', '') :
             'technical_coordinator_report';
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
 
         let period = document.getElementById('periodSelect').value;
-               // If no period is selected, use current month as default (yyyy-MM)
-       if (!period) {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        period = `${year}-${month}`;
-       }
+        // If no period is selected, use current month as default (yyyy-MM)
+        if (!period) {
+            showNotification('Please select a period range before exporting.', 'warning');
+            exportBtn.Disabled = false;
+            exportBtn.innerHTML = originalText;
+            return;
+        }
         const filename = `${coordinatorName.replace(/\s+/g, '_')}_report.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
 
-        fetch(`/stats/technical-coordinator-report/${employeeID}/${period}/${format}`)
+        fetch(`/stats/technical-coordinator-report/${employeeID}/${period}/${format}?startDate=${startDate}&endDate=${endDate}`)
             .then(response => {
                 if (!response.ok) throw new Error(`Error: ${response.status}`);
                 return response.blob();
             })
             .then(blob => {
+            if (blob.size === 0) {
+                showNotification('No data available for report generation', 'warning');
+                return;
+            }
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
                 link.download = filename;
@@ -269,6 +290,7 @@
                 showNotification(`Export failed: ${error.message}`, 'error');
             })  .finally(() => {
             exportBtn.Disabled = false;
+             exportBtn.innerHTML = originalText;
         });
     }
 
@@ -318,6 +340,29 @@
             element.classList.remove('active');
         }
     }
+    // Show loading indicator
+function showLoadingIndicator() {
+    const container = document.querySelector('.cd-performance-metrics-container');
+    const overlay = container.querySelector('.cd-loading-overlay');
+    const content = container.querySelector('.cd-metrics-display');
+
+    if (overlay) {
+        content.style.opacity = '0.5';
+        overlay.style.display = 'flex';
+    }
+}
+
+// Hide loading indicator
+function hideLoadingIndicator() {
+    const container = document.querySelector('.cd-performance-metrics-container');
+    const overlay = container.querySelector('.cd-loading-overlay');
+    const content = container.querySelector('.cd-metrics-display');
+
+    if (overlay) {
+        content.style.opacity = '1';
+        overlay.style.display = 'none';
+    }
+}
 </script>
 
 <style>
@@ -331,6 +376,7 @@
         box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
         padding: 1.5rem;
         margin-bottom: 2rem;
+        position: relative;
     }
 
     .cd-metrics-display {
@@ -594,6 +640,39 @@
             align-items: flex-start;
         }
     }
+    /* Loading overlay styles */
+.cd-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    border-radius: 0.5rem;
+}
+
+.cd-loading-spinner {
+    font-size: 2rem;
+    color: #4e73df;
+    margin-bottom: 1rem;
+    animation: fa-spin 2s infinite linear;
+}
+
+.cd-loading-text {
+    color: #5a5c69;
+    font-size: 1rem;
+}
+
+/* Add this for the spinner animation */
+@keyframes fa-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 </style>
 </body>
 </html>

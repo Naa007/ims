@@ -9,11 +9,309 @@
 <main class="bd-container">
     <div class="bd-dashboard-container">
 
+        <!-- IISPL Performance Charts Section -->
+        <h4 class="section-header">
+            <div style="display: flex; align-items: center; justify-content: flex-start;">
+                <i class="fas fa-chart-line me-2"></i>IISPL Performance Matrices
+            </div>
+        </h4>
+
+        <div class="bd-chart-section">
+
+            <!-- Tab Navigation for Individual Charts -->
+            <div class="bd-tab-navigation">
+                <button class="bd-tab-button active" data-target="all-chart-panel">All</button>
+                <button class="bd-tab-button" data-target="coordinator-chart-panel">Coordinators</button>
+                <button class="bd-tab-button" data-target="technical-chart-panel">Technical Coordinators</button>
+                <button class="bd-tab-button" data-target="inspector-chart-panel">Inspectors</button>
+            </div>
+
+            <!-- Chart Panels -->
+            <div class="bd-chart-panels">
+                <!-- All Panel -->
+                <div class="bd-chart-panel active" id="all-chart-panel">
+                    <div class="bd-chart-card">
+                        <div class="bd-performance-metrics-container" id="allPerformanceContainer">
+                            <div class="bd-metrics-display">
+                                <div class="bd-metrics-header">
+                                    <h3>All Inspections</h3>
+                                    <span class="bd-period-label">Current Status</span>
+                                </div>
+                                <div class="bd-metrics-total">
+                                    <span class="bd-total-number" th:text="${inspectionStats['Total Inspections']}">0</span>
+                                    <span class="bd-total-label">Total Inspections</span>
+                                </div>
+                                <div class="bd-metrics-breakdown">
+                                    <div class="bd-metric-item">
+                                        <span class="bd-metric-value" th:text="${inspectionStats['New']}">0</span>
+                                        <span class="bd-metric-label">New</span>
+                                    </div>
+                                    <div class="bd-metric-item">
+                                        <span class="bd-metric-value" th:text="${inspectionStats['Ongoing']}">0</span>
+                                        <span class="bd-metric-label">Ongoing</span>
+                                    </div>
+                                    <div class="bd-metric-item">
+                                        <span class="bd-metric-value" th:text="${inspectionStats['Awarded']}">0</span>
+                                        <span class="bd-metric-label">Awarded</span>
+                                    </div>
+                                    <div class="bd-metric-item">
+                                        <span class="bd-metric-value" th:text="${inspectionStats['Rejected']}">0</span>
+                                        <span class="bd-metric-label">Rejected</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Coordinator Panel -->
+                <div class="bd-chart-panel" id="coordinator-chart-panel">
+                    <div class="bd-chart-card">
+                        <div class="bd-chart-controls-container">
+
+                            <div class="bd-filters-container">
+
+                                <!-- Primary Selector -->
+                                <div class="bd-filter-group bd-primary-filter">
+
+                                    <label for="coordinatorSelect">Select Coordinator:</label>
+                                    <select class="bd-select bd-primary-select" id="coordinatorSelect"
+                                            onchange="handleCoordinatorChange(this)">
+                                        <option disabled selected value="">Choose a coordinator</option>
+                                        <option th:each="coordinator : ${coordinatorsList}"
+                                                th:text="${coordinator.empName}"
+                                                th:value="${coordinator.email}">
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <!-- Chart Period Selection -->
+                                <div class="bd-filter-group">
+                                    <label for="coordinatorPeriodSelect">Time Range:</label>
+                                    <select class="bd-period-select" id="coordinatorPeriodSelect"
+                                            onchange="handleCoordinatorPeriodChange()">
+                                        <option value="week">Last 7 Days</option>
+                                        <option selected value="month">Last 30 Days</option>
+                                        <option value="custom">Custom Range</option>
+                                    </select>
+
+                                </div>
+
+                                <!-- Custom Date Range Container -->
+                                <div id="coordinatorCustomRangeContainer" style="display: none;">
+                                    <div class="bd-custom-range-content">
+                                        <div class="bd-date-input-group">
+                                            <label for="coordinatorStartDate">From:</label>
+                                            <input id="coordinatorStartDate" name="coordinatorStartDate" type="date">
+                                        </div>
+                                        <div class="bd-date-input-group">
+                                            <label for="coordinatorEndDate">To:</label>
+                                            <input id="coordinatorEndDate" name="coordinatorEndDate" type="date">
+                                        </div>
+                                        <button class="bd-filter-btn" onclick="applyCoordinatorCustomRange()" type="button">
+                                            Apply
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Export Options -->
+                                <div class="bd-filter-group bd-export-group">
+                                    <button class="bd-export-btn" onclick="exportCoordinatorData('pdf',event)">
+                                        <i class="fas fa-file-pdf"></i> PDF
+                                    </button>
+                                    <button class="bd-export-btn" onclick="exportCoordinatorData('excel',event)">
+                                        <i class="fas fa-file-excel"></i> Excel
+                                    </button>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Performance Metrics Container -->
+                        <div class="bd-performance-metrics-container" id="coordinatorPerformanceContainer">
+                            <div class="bd-empty-state">
+                                <div class="bd-empty-state-icon">
+                                    <i class="fas fa-chart-bar"></i>
+                                </div>
+                                <div class="bd-empty-state-text">Select a coordinator and time period to view data</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Technical Coordinator Panel -->
+                <div class="bd-chart-panel" id="technical-chart-panel">
+                    <div class="bd-chart-card">
+                        <div class="bd-chart-controls-container">
+                            <div class="bd-filters-container">
+                                <!-- Primary Selector -->
+                                <div class="bd-filter-group bd-primary-filter">
+                                    <label for="technicalCoordinatorSelect">Select Technical Coordinator:</label>
+                                    <select class="bd-select bd-primary-select" id="technicalCoordinatorSelect"
+                                            onchange="handleTechnicalCoordinatorChange(this)">
+                                        <option disabled selected value="">Choose a technical coordinator</option>
+                                        <option th:each="technicalCoordinator : ${technicalCoordinatorsList}"
+                                                th:text="${technicalCoordinator.empName}"
+                                                th:value="${technicalCoordinator.empId}">
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <!-- Chart Period Selection -->
+                                <div class="bd-filter-group">
+                                    <label for="technicalPeriodSelect">Time Range:</label>
+                                    <select class="bd-period-select" id="technicalPeriodSelect"
+                                            onchange="handleTechnicalPeriodChange()">
+                                        <option value="week">Last 7 Days</option>
+                                        <option selected value="month">Last 30 Days</option>
+                                        <option value="custom">Custom Range</option>
+                                    </select>
+                                </div>
+
+                                <!-- Custom Date Range Container -->
+                                <div id="technicalCustomRangeContainer" style="display: none;">
+                                    <div class="bd-custom-range-content">
+                                        <div class="bd-date-input-group">
+                                            <label for="technicalStartDate">From:</label>
+                                            <input id="technicalStartDate" name="technicalStartDate" type="date">
+                                        </div>
+                                        <div class="bd-date-input-group">
+                                            <label for="technicalEndDate">To:</label>
+                                            <input id="technicalEndDate" name="technicalEndDate" type="date">
+                                        </div>
+                                        <button class="bd-filter-btn" onclick="applyTechnicalCustomRange()" type="button">
+                                            Apply
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Export Options -->
+                                <div class="bd-filter-group bd-export-group">
+                                    <button class="bd-export-btn" onclick="exportTechnicalData('pdf',event)">
+                                        <i class="fas fa-file-pdf"></i> PDF
+                                    </button>
+                                    <button class="bd-export-btn" onclick="exportTechnicalData('excel',event)">
+                                        <i class="fas fa-file-excel"></i> Excel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Performance Metrics Container -->
+                        <div class="bd-performance-metrics-container" id="technicalCoordinatorContainer">
+                            <div class="bd-empty-state">
+                                <div class="bd-empty-state-icon">
+                                    <i class="fas fa-chart-bar"></i>
+                                </div>
+                                <div class="bd-empty-state-text">Select a technical coordinator and time period to view data</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inspector Panel -->
+                <div class="bd-chart-panel" id="inspector-chart-panel">
+                    <div class="bd-chart-card">
+                        <div class="bd-chart-controls-container">
+                            <div class="bd-filters-container">
+                                <!-- Primary Selector -->
+                                <div class="bd-filter-group bd-primary-filter">
+                                    <label for="inspectorSelect">Select Inspector:</label>
+                                    <select class="bd-select bd-primary-select" id="inspectorSelect"
+                                            onchange="handleInspectorChange(this)">
+                                        <option disabled selected value="">Choose an inspector</option>
+                                        <option th:each="inspector : ${inspectorsList}"
+                                                th:text="${inspector.inspectorName}"
+                                                th:value="${inspector.email}">
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <!-- Chart Period Selection -->
+                                <div class="bd-filter-group">
+                                    <label for="inspectorPeriodSelect">Time Range:</label>
+                                    <select class="bd-period-select" id="inspectorPeriodSelect"
+                                            onchange="handleInspectorPeriodChange()">
+                                        <option value="week">Last 7 Days</option>
+                                        <option selected value="month">Last 30 Days</option>
+                                        <option value="custom">Custom Range</option>
+                                    </select>
+                                </div>
+
+                                <!-- Custom Date Range Container -->
+                                <div id="inspectorCustomRangeContainer" style="display: none;">
+                                    <div class="bd-custom-range-content">
+                                        <div class="bd-date-input-group">
+                                            <label for="inspectorStartDate">From:</label>
+                                            <input id="inspectorStartDate" name="inspectorStartDate" type="date">
+                                        </div>
+                                        <div class="bd-date-input-group">
+                                            <label for="inspectorEndDate">To:</label>
+                                            <input id="inspectorEndDate" name="inspectorEndDate" type="date">
+                                        </div>
+                                        <button class="bd-filter-btn" onclick="applyInspectorCustomRange()" type="button">
+                                            Apply
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Export Options -->
+                                <div class="bd-filter-group bd-export-group">
+                                    <button class="bd-export-btn" onclick="exportInspectorData('pdf',event)">
+                                        <i class="fas fa-file-pdf"></i> PDF
+                                    </button>
+                                    <button class="bd-export-btn" onclick="exportInspectorData('excel',event)">
+                                        <i class="fas fa-file-excel"></i> Excel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Performance Metrics Container -->
+                        <div class="bd-performance-metrics-container" id="inspectorPerformanceContainer">
+                            <div class="bd-empty-state">
+                                <div class="bd-empty-state-icon">
+                                    <i class="fas fa-chart-bar"></i>
+                                </div>
+                                <div class="bd-empty-state-text">Select an inspector and time period to view data</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- IISPL Performance Trends Section -->
+        <div class="bd-trends-section">
+
+            <h4 class="section-header">
+                <div style="display: flex; align-items: center; justify-content: flex-start;">
+                    <i class="fas fa-chart-line me-2"></i>IISPL Performance Trends
+                </div>
+            </h4>
+
+            <div class="bd-trends-container">
+                <div class="bd-trend-card">
+                    <div class="bd-chart-container" id="comparisonChartContainer" style="position: relative; height:400px;">
+                        <div class="bd-loading-overlay" id="comparisonChartLoader" style="display: none;">
+                            <div class="bd-loading-spinner">
+                                <i class="fas fa-circle-notch fa-spin"></i>
+                            </div>
+                            <div class="bd-loading-text">Loading data...</div>
+                        </div>
+                        <canvas id="comparisonChart"></canvas>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
         <!-- Enterprises Performance Analytics Section -->
         <h4 class="section-header">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div style="display: flex; align-items: center; justify-content: flex-start;">
-                    <i class="fas fa-chart-line me-2"></i>Enterprise Performance Analytics
+                    <i class="fas fa-chart-line me-2"></i>IISPL Data Analytics
                 </div>
                 <div class="bd-date-filter date">
                     <span th:text="${#temporals.format(#temporals.createNow(), 'MMMM dd, yyyy')}">April 14, 2025</span>
@@ -122,310 +420,6 @@
                         <div class="bd-stat-label" th:text="${stat.key}">Inhouse Inspectors</div>
                         <div class="bd-stat-value" th:text="${stat.value}">0</div>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Individual Performance Charts Section -->
-        <h4 class="section-header">
-            <div style="display: flex; align-items: center; justify-content: flex-start;">
-                <i class="fas fa-chart-line me-2"></i>Individual Performance Matrices
-            </div>
-        </h4>
-
-        <div class="bd-chart-section">
-
-            <!-- Tab Navigation for Individual Charts -->
-            <div class="bd-tab-navigation">
-                <button class="bd-tab-button active" data-target="all-chart-panel">All</button>
-                <button class="bd-tab-button" data-target="coordinator-chart-panel">Coordinators</button>
-                <button class="bd-tab-button" data-target="technical-chart-panel">Technical Coordinators</button>
-                <button class="bd-tab-button" data-target="inspector-chart-panel">Inspectors</button>
-            </div>
-
-            <!-- Chart Panels -->
-            <div class="bd-chart-panels">
-                <!-- All Panel -->
-                <div class="bd-chart-panel active" id="all-chart-panel">
-                    <div class="bd-chart-card">
-                        <div class="bd-performance-metrics-container" id="allPerformanceContainer">
-                            <div class="bd-metrics-display">
-                                <div class="bd-metrics-header">
-                                    <h3>All Inspections</h3>
-                                    <span class="bd-period-label">Current Status</span>
-                                </div>
-                                <div class="bd-metrics-total">
-                                    <span class="bd-total-number" th:text="${inspectionStats['Total Inspections']}">0</span>
-                                    <span class="bd-total-label">Total Inspections</span>
-                                </div>
-                                <div class="bd-metrics-breakdown">
-                                    <div class="bd-metric-item">
-                                        <span class="bd-metric-value" th:text="${inspectionStats['New']}">0</span>
-                                        <span class="bd-metric-label">New</span>
-                                    </div>
-                                    <div class="bd-metric-item">
-                                        <span class="bd-metric-value" th:text="${inspectionStats['Ongoing']}">0</span>
-                                        <span class="bd-metric-label">Ongoing</span>
-                                    </div>
-                                    <div class="bd-metric-item">
-                                        <span class="bd-metric-value" th:text="${inspectionStats['Awarded']}">0</span>
-                                        <span class="bd-metric-label">Awarded</span>
-                                    </div>
-                                    <div class="bd-metric-item">
-                                        <span class="bd-metric-value" th:text="${inspectionStats['Rejected']}">0</span>
-                                        <span class="bd-metric-label">Rejected</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Coordinator Panel -->
-                <div class="bd-chart-panel" id="coordinator-chart-panel">
-                    <div class="bd-chart-card">
-                        <div class="bd-chart-controls-container">
-
-                            <div class="bd-filters-container">
-
-                                <!-- Primary Selector -->
-                                <div class="bd-filter-group bd-primary-filter">
-
-                                    <label for="coordinatorSelect">Select Coordinator:</label>
-                                    <select class="bd-select bd-primary-select" id="coordinatorSelect"
-                                            onchange="handleCoordinatorChange(this)">
-                                        <option disabled selected value="">Choose a coordinator</option>
-                                        <option th:each="coordinator : ${coordinatorsList}"
-                                                th:text="${coordinator.empName}"
-                                                th:value="${coordinator.email}">
-                                        </option>
-                                    </select>
-                                </div>
-
-                                <!-- Chart Period Selection -->
-                                <div class="bd-filter-group">
-                                    <label for="coordinatorPeriodSelect">Time Range:</label>
-                                    <select class="bd-period-select" id="coordinatorPeriodSelect"
-                                            onchange="handleCoordinatorPeriodChange()">
-                                        <option value="week">Last 7 Days</option>
-                                        <option selected value="month">Last 30 Days</option>
-                                        <option value="quarter">Last Quarter</option>
-                                        <option value="year">Year to Date</option>
-                                        <option value="custom">Custom Range</option>
-                                    </select>
-
-                                </div>
-
-                                <!-- Custom Date Range Container -->
-                                <div id="coordinatorCustomRangeContainer" style="display: none;">
-                                    <div class="bd-custom-range-content">
-                                        <div class="bd-date-input-group">
-                                            <label for="coordinatorStartDate">From:</label>
-                                            <input id="coordinatorStartDate" name="coordinatorStartDate" type="date">
-                                        </div>
-                                        <div class="bd-date-input-group">
-                                            <label for="coordinatorEndDate">To:</label>
-                                            <input id="coordinatorEndDate" name="coordinatorEndDate" type="date">
-                                        </div>
-                                        <button class="bd-filter-btn" onclick="applyCoordinatorCustomRange()" type="button">
-                                            Apply
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- Export Options -->
-                                <div class="bd-filter-group bd-export-group">
-                                    <button class="bd-export-btn" onclick="exportCoordinatorData('pdf')">
-                                        <i class="fas fa-file-pdf"></i> PDF
-                                    </button>
-                                    <button class="bd-export-btn" onclick="exportCoordinatorData('excel')">
-                                        <i class="fas fa-file-excel"></i> Excel
-                                    </button>
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        <!-- Performance Metrics Container -->
-                        <div class="bd-performance-metrics-container" id="coordinatorPerformanceContainer">
-                            <div class="bd-empty-state">
-                                <div class="bd-empty-state-icon">
-                                    <i class="fas fa-chart-bar"></i>
-                                </div>
-                                <div class="bd-empty-state-text">Select a coordinator and time period to view data</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Technical Coordinator Panel -->
-                <div class="bd-chart-panel" id="technical-chart-panel">
-                    <div class="bd-chart-card">
-                        <div class="bd-chart-controls-container">
-                            <div class="bd-filters-container">
-                                <!-- Primary Selector -->
-                                <div class="bd-filter-group bd-primary-filter">
-                                    <label for="technicalCoordinatorSelect">Select Technical Coordinator:</label>
-                                    <select class="bd-select bd-primary-select" id="technicalCoordinatorSelect"
-                                            onchange="handleTechnicalCoordinatorChange(this)">
-                                        <option disabled selected value="">Choose a technical coordinator</option>
-                                        <option th:each="technicalCoordinator : ${technicalCoordinatorsList}"
-                                                th:text="${technicalCoordinator.empName}"
-                                                th:value="${technicalCoordinator.empId}">
-                                        </option>
-                                    </select>
-                                </div>
-
-                                <!-- Chart Period Selection -->
-                                <div class="bd-filter-group">
-                                    <label for="technicalPeriodSelect">Time Range:</label>
-                                    <select class="bd-period-select" id="technicalPeriodSelect"
-                                            onchange="handleTechnicalPeriodChange()">
-                                        <option value="week">Last 7 Days</option>
-                                        <option selected value="month">Last 30 Days</option>
-                                        <option value="quarter">Last Quarter</option>
-                                        <option value="year">Year to Date</option>
-                                        <option value="custom">Custom Range</option>
-                                    </select>
-                                </div>
-
-                                <!-- Custom Date Range Container -->
-                                <div id="technicalCustomRangeContainer" style="display: none;">
-                                    <div class="bd-custom-range-content">
-                                        <div class="bd-date-input-group">
-                                            <label for="technicalStartDate">From:</label>
-                                            <input id="technicalStartDate" name="technicalStartDate" type="date">
-                                        </div>
-                                        <div class="bd-date-input-group">
-                                            <label for="technicalEndDate">To:</label>
-                                            <input id="technicalEndDate" name="technicalEndDate" type="date">
-                                        </div>
-                                        <button class="bd-filter-btn" onclick="applyTechnicalCustomRange()" type="button">
-                                            Apply
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- Export Options -->
-                                <div class="bd-filter-group bd-export-group">
-                                    <button class="bd-export-btn" onclick="exportTechnicalData('pdf')">
-                                        <i class="fas fa-file-pdf"></i> PDF
-                                    </button>
-                                    <button class="bd-export-btn" onclick="exportTechnicalData('excel')">
-                                        <i class="fas fa-file-excel"></i> Excel
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Performance Metrics Container -->
-                        <div class="bd-performance-metrics-container" id="technicalCoordinatorContainer">
-                            <div class="bd-empty-state">
-                                <div class="bd-empty-state-icon">
-                                    <i class="fas fa-chart-bar"></i>
-                                </div>
-                                <div class="bd-empty-state-text">Select a technical coordinator and time period to view data</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Inspector Panel -->
-                <div class="bd-chart-panel" id="inspector-chart-panel">
-                    <div class="bd-chart-card">
-                        <div class="bd-chart-controls-container">
-                            <div class="bd-filters-container">
-                                <!-- Primary Selector -->
-                                <div class="bd-filter-group bd-primary-filter">
-                                    <label for="inspectorSelect">Select Inspector:</label>
-                                    <select class="bd-select bd-primary-select" id="inspectorSelect"
-                                            onchange="handleInspectorChange(this)">
-                                        <option disabled selected value="">Choose an inspector</option>
-                                        <option th:each="inspector : ${inspectorsList}"
-                                                th:text="${inspector.inspectorName}"
-                                                th:value="${inspector.email}">
-                                        </option>
-                                    </select>
-                                </div>
-
-                                <!-- Chart Period Selection -->
-                                <div class="bd-filter-group">
-                                    <label for="inspectorPeriodSelect">Time Range:</label>
-                                    <select class="bd-period-select" id="inspectorPeriodSelect"
-                                            onchange="handleInspectorPeriodChange()">
-                                        <option value="week">Last 7 Days</option>
-                                        <option selected value="month">Last 30 Days</option>
-                                        <option value="quarter">Last Quarter</option>
-                                        <option value="year">Year to Date</option>
-                                        <option value="custom">Custom Range</option>
-                                    </select>
-                                </div>
-
-                                <!-- Custom Date Range Container -->
-                                <div id="inspectorCustomRangeContainer" style="display: none;">
-                                    <div class="bd-custom-range-content">
-                                        <div class="bd-date-input-group">
-                                            <label for="inspectorStartDate">From:</label>
-                                            <input id="inspectorStartDate" name="inspectorStartDate" type="date">
-                                        </div>
-                                        <div class="bd-date-input-group">
-                                            <label for="inspectorEndDate">To:</label>
-                                            <input id="inspectorEndDate" name="inspectorEndDate" type="date">
-                                        </div>
-                                        <button class="bd-filter-btn" onclick="applyInspectorCustomRange()" type="button">
-                                            Apply
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- Export Options -->
-                                <div class="bd-filter-group bd-export-group">
-                                    <button class="bd-export-btn" onclick="exportInspectorData('pdf')">
-                                        <i class="fas fa-file-pdf"></i> PDF
-                                    </button>
-                                    <button class="bd-export-btn" onclick="exportInspectorData('excel')">
-                                        <i class="fas fa-file-excel"></i> Excel
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Performance Metrics Container -->
-                        <div class="bd-performance-metrics-container" id="inspectorPerformanceContainer">
-                            <div class="bd-empty-state">
-                                <div class="bd-empty-state-icon">
-                                    <i class="fas fa-chart-bar"></i>
-                                </div>
-                                <div class="bd-empty-state-text">Select an inspector and time period to view data</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Performance Trends Section -->
-        <div class="bd-trends-section">
-
-            <h4 class="section-header">
-                <div style="display: flex; align-items: center; justify-content: flex-start;">
-                    <i class="fas fa-chart-line me-2"></i>Individual Performance Trends
-                </div>
-            </h4>
-
-            <div class="bd-trends-container">
-                <div class="bd-trend-card">
-                    <div class="bd-chart-container" id="comparisonChartContainer" style="position: relative; height:400px;">
-                        <div class="bd-loading-overlay" id="comparisonChartLoader" style="display: none;">
-                            <div class="bd-loading-spinner">
-                                <i class="fas fa-circle-notch fa-spin"></i>
-                            </div>
-                            <div class="bd-loading-text">Loading data...</div>
-                        </div>
-                        <canvas id="comparisonChart"></canvas>
-                    </div>
-
                 </div>
             </div>
         </div>
@@ -625,39 +619,38 @@ let lastInspectorData = null;
         }
     }
 
-    // Custom range handlers
-    function applyCoordinatorCustomRange() {
-        const startDate = document.getElementById('coordinatorStartDate').value;
-        const endDate = document.getElementById('coordinatorEndDate').value;
+ function applyCoordinatorCustomRange() {
+    const period = 'custom'; // Force custom period
+    const selectedCoordinator = document.getElementById('coordinatorSelect').value;
 
-        if (startDate && endDate) {
-            updateCoordinatorChartWithDateRange(startDate, endDate);
-        } else {
-            showNotification('Please select both start and end dates', 'error');
-        }
+    if (selectedCoordinator) {
+        fetchCoordinatorMetricData(selectedCoordinator, period);
+    } else {
+        showNotification('Please select a coordinator first', 'warning');
     }
+}
 
-    function applyTechnicalCustomRange() {
-        const startDate = document.getElementById('technicalStartDate').value;
-        const endDate = document.getElementById('technicalEndDate').value;
+ function applyTechnicalCustomRange() {
+    const period = 'custom'; // Force custom period
+    const selectedTechCoordinator = document.getElementById('technicalCoordinatorSelect').value;
 
-        if (startDate && endDate) {
-            updateTechnicalChartWithDateRange(startDate, endDate);
-        } else {
-            showNotification('Please select both start and end dates', 'error');
-        }
+    if (selectedTechCoordinator) {
+        fetchTechnicalMetricData(selectedTechCoordinator, period);
+    } else {
+        showNotification('Please select a technical coordinator first', 'warning');
     }
+}
 
-    function applyInspectorCustomRange() {
-        const startDate = document.getElementById('inspectorStartDate').value;
-        const endDate = document.getElementById('inspectorEndDate').value;
+function applyInspectorCustomRange() {
+    const period = 'custom'; // Force custom period
+    const selectedInspector = document.getElementById('inspectorSelect').value;
 
-        if (startDate && endDate) {
-            updateInspectorChartWithDateRange(startDate, endDate);
-        } else {
-            showNotification('Please select both start and end dates', 'error');
-        }
+    if (selectedInspector) {
+        fetchInspectorMetricData(selectedInspector, period);
+    } else {
+        showNotification('Please select an inspector first', 'warning');
     }
+}
 
     // Update chart with period
     function updateCoordinatorChartWithPeriod(period) {
@@ -692,26 +685,6 @@ let lastInspectorData = null;
             fetchCoordinatorDateRangeData(selectedCoordinator, startDate, endDate);
         } else {
             showNotification('Please select a coordinator first', 'warning');
-        }
-    }
-
-    function updateTechnicalChartWithDateRange(startDate, endDate) {
-        const selectedTechCoordinator = document.getElementById('technicalCoordinatorSelect').value;
-
-        if (selectedTechCoordinator) {
-            fetchTechnicalDateRangeData(selectedTechCoordinator, startDate, endDate);
-        } else {
-            showNotification('Please select a technical coordinator first', 'warning');
-        }
-    }
-
-    function updateInspectorChartWithDateRange(startDate, endDate) {
-        const selectedInspector = document.getElementById('inspectorSelect').value;
-
-        if (selectedInspector) {
-            fetchInspectorDateRangeData(selectedInspector, startDate, endDate);
-        } else {
-            showNotification('Please select an inspector first', 'warning');
         }
     }
 
@@ -759,8 +732,27 @@ let lastInspectorData = null;
     // Update the fetch functions to match your API endpoints
     function fetchCoordinatorMetricData(coordinatorEmail, period) {
         showLoadingIndicator('coordinatorPerformanceContainer');
+let url = `/stats/coordinator-stats/${encodeURIComponent(coordinatorEmail)}/${encodeURIComponent(period)}`;
+// Handle custom date range
+    if (period === 'custom') {
+        const startDate = document.getElementById('coordinatorStartDate').value;
+        const endDate = document.getElementById('coordinatorEndDate').value;
 
-        fetch(`/stats/coordinator-stats/${encodeURIComponent(coordinatorEmail)}/${encodeURIComponent(period)}`, {
+        if (!startDate || !endDate) {
+            showNotification('Please select both start and end dates', 'error');
+            hideLoadingIndicator('coordinatorPerformanceContainer');
+            return;
+        }
+
+        if (new Date(startDate) > new Date(endDate)) {
+            showNotification('Start date cannot be after end date', 'error');
+            hideLoadingIndicator('coordinatorPerformanceContainer');
+            return;
+        }
+
+        url += `?startDate=${startDate}&endDate=${endDate}`;
+    }
+        fetch(url, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -803,8 +795,26 @@ let lastInspectorData = null;
 
     function fetchTechnicalMetricData(techCoordinatorId, period) {
         showLoadingIndicator('technicalCoordinatorContainer');
+ let url = `/stats/technical-coordinator-stats/${encodeURIComponent(techCoordinatorId)}/${encodeURIComponent(period)}`;
+  if (period === 'custom') {
+        const startDate = document.getElementById('technicalStartDate').value;
+        const endDate = document.getElementById('technicalEndDate').value;
 
-        fetch(`/stats/technical-coordinator-stats/${encodeURIComponent(techCoordinatorId)}/${encodeURIComponent(period)}`, {
+        if (!startDate || !endDate) {
+            showNotification('Please select both start and end dates', 'error');
+            hideLoadingIndicator('technicalCoordinatorContainer');
+            return;
+        }
+
+        if (new Date(startDate) > new Date(endDate)) {
+            showNotification('Start date cannot be after end date', 'error');
+            hideLoadingIndicator('technicalCoordinatorContainer');
+            return;
+        }
+
+        url += `?startDate=${startDate}&endDate=${endDate}`;
+    }
+        fetch(url, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -847,8 +857,27 @@ let lastInspectorData = null;
 
     function fetchInspectorMetricData(inspectorEmail, period) {
         showLoadingIndicator('inspectorPerformanceContainer');
+let url = `/stats/inspector-stats/${encodeURIComponent(inspectorEmail)}/${encodeURIComponent(period)}`;
+     if (period === 'custom') {
+        const startDate = document.getElementById('inspectorStartDate').value;
+        const endDate = document.getElementById('inspectorEndDate').value;
 
-        fetch(`/stats/inspector-stats/${encodeURIComponent(inspectorEmail)}/${encodeURIComponent(period)}`, {
+        if (!startDate || !endDate) {
+            showNotification('Please select both start and end dates', 'error');
+            hideLoadingIndicator('inspectorPerformanceContainer');
+            return;
+        }
+
+        if (new Date(startDate) > new Date(endDate)) {
+            showNotification('Start date cannot be after end date', 'error');
+            hideLoadingIndicator('inspectorPerformanceContainer');
+            return;
+        }
+
+        url += `?startDate=${startDate}&endDate=${endDate}`;
+    }
+
+        fetch(url, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -971,45 +1000,76 @@ let lastInspectorData = null;
     }
 
     function exportCoordinatorData(format) {
-        const coordinatorSelect = document.getElementById('coordinatorSelect');
-        const coordinatorEmail = coordinatorSelect.value;
-        const coordinatorName = coordinatorSelect.selectedOptions[0]?.text || 'report';
+    const exportBtn = event.target.closest('.bd-export-btn');
+    if (!exportBtn) return;
 
-        const period = document.getElementById('coordinatorPeriodSelect').value;
+    const coordinatorSelect = document.getElementById('coordinatorSelect');
+    const coordinatorEmail = coordinatorSelect.value;
+    const coordinatorName = coordinatorSelect.selectedOptions[0]?.text || 'report';
+    const period = document.getElementById('coordinatorPeriodSelect').value;
 
-        if (!coordinatorEmail) {
-            showNotification('Please select a coordinator before exporting.', 'warning');
-            return;
-        }
+    const startDate = document.getElementById('startDate')?.value;
+    const endDate = document.getElementById('endDate')?.value;
 
-        const endpoint = `/stats/coordinator-report/${coordinatorEmail}/${period}/${format}`;
-        const filename = `${coordinatorName.replace(/\s+/g, '_')}_report.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
-
-        fetch(endpoint)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Error: ${response.status}`);
-                }
-                return response.blob();
-            })
-            .then(blob => {
-                const link = document.createElement('a');
-                link.href = window.URL.createObjectURL(blob);
-                link.download = filename;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                window.URL.revokeObjectURL(link.href);
-
-                showNotification(`${format.toUpperCase()} downloaded successfully.`, 'success');
-            })
-            .catch(error => {
-                console.error('Download failed:', error);
-                showNotification(`Failed to export ${format.toUpperCase()} report.`, 'error');
-            });
+    if (!coordinatorEmail) {
+        showNotification('Please select a coordinator before exporting.', 'warning');
+        return;
     }
 
-  function exportTechnicalData(format) {
+    // Disable button and show loading state
+    exportBtn.disabled = true;
+    const originalText = exportBtn.innerHTML;
+    exportBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
+
+    let endpoint = `/stats/coordinator-report/${coordinatorEmail}/${period}/${format}`;
+    const queryParams = [];
+
+    if (startDate) queryParams.push(`startDate=${encodeURIComponent(startDate)}`);
+    if (endDate) queryParams.push(`endDate=${encodeURIComponent(endDate)}`);
+
+    if (queryParams.length > 0) {
+        endpoint += `?${queryParams.join('&')}`;
+    }
+
+    const filename = `${coordinatorName.replace(/\s+/g, '_')}_report.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
+
+    fetch(endpoint)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Error: ${response.status}`);
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            if (blob.size === 0) {
+                showNotification('No data available for report generation', 'warning');
+                return;
+            }
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(link.href);
+
+            showNotification(`${format.toUpperCase()} downloaded successfully.`, 'success');
+        })
+        .catch(error => {
+            console.error('Download failed:', error);
+            showNotification(`Failed to export ${format.toUpperCase()} report.`, 'error');
+        })
+        .finally(() => {
+            // Restore button state
+            exportBtn.disabled = false;
+            exportBtn.innerHTML = originalText;
+        });
+}
+
+function exportTechnicalData(format) {
+    const exportBtn = event.target.closest('.bd-export-btn');
+    if (!exportBtn) return;
+
     const selectedTechCoordinator = document.getElementById('technicalCoordinatorSelect').value;
     const techCoordinatorName = document.getElementById('technicalCoordinatorSelect').selectedOptions[0]?.text || 'report';
     const period = document.getElementById('technicalPeriodSelect').value;
@@ -1019,6 +1079,11 @@ let lastInspectorData = null;
         return;
     }
 
+    // Disable button and show loading state
+    exportBtn.disabled = true;
+    const originalText = exportBtn.innerHTML;
+    exportBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
+
     // For custom range
     let endpoint = `/stats/technical-coordinator-report/${selectedTechCoordinator}/${period}/${format}`;
 
@@ -1027,6 +1092,8 @@ let lastInspectorData = null;
         const endDate = document.getElementById('technicalEndDate').value;
         if (!startDate || !endDate) {
             showNotification('Please select both start and end dates', 'error');
+            exportBtn.disabled = false;
+            exportBtn.innerHTML = originalText;
             return;
         }
         endpoint += `?startDate=${startDate}&endDate=${endDate}`;
@@ -1042,6 +1109,10 @@ let lastInspectorData = null;
             return response.blob();
         })
         .then(blob => {
+        if (blob.size === 0) {
+                showNotification('No data available for report generation', 'warning');
+                return;
+            }
             const link = document.createElement('a');
             link.href = window.URL.createObjectURL(blob);
             link.download = filename;
@@ -1055,10 +1126,18 @@ let lastInspectorData = null;
         .catch(error => {
             console.error('Download failed:', error);
             showNotification(`Failed to export ${format.toUpperCase()} report.`, 'error');
+        })
+        .finally(() => {
+            // Restore button state
+            exportBtn.disabled = false;
+            exportBtn.innerHTML = originalText;
         });
 }
 
 function exportInspectorData(format) {
+    const exportBtn = event.target.closest('.bd-export-btn');
+    if (!exportBtn) return;
+
     const selectedInspector = document.getElementById('inspectorSelect').value;
     const inspectorName = document.getElementById('inspectorSelect').selectedOptions[0]?.text || 'report';
     const period = document.getElementById('inspectorPeriodSelect').value;
@@ -1068,6 +1147,11 @@ function exportInspectorData(format) {
         return;
     }
 
+    // Disable button and show loading state
+    exportBtn.disabled = true;
+    const originalText = exportBtn.innerHTML;
+    exportBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
+
     // For custom range
     let endpoint = `/stats/inspector-report/${selectedInspector}/${period}/${format}`;
 
@@ -1076,6 +1160,8 @@ function exportInspectorData(format) {
         const endDate = document.getElementById('inspectorEndDate').value;
         if (!startDate || !endDate) {
             showNotification('Please select both start and end dates', 'error');
+            exportBtn.disabled = false;
+            exportBtn.innerHTML = originalText;
             return;
         }
         endpoint += `?startDate=${startDate}&endDate=${endDate}`;
@@ -1091,6 +1177,10 @@ function exportInspectorData(format) {
             return response.blob();
         })
         .then(blob => {
+        if (blob.size === 0) {
+                showNotification('No data available for report generation', 'warning');
+                return;
+            }
             const link = document.createElement('a');
             link.href = window.URL.createObjectURL(blob);
             link.download = filename;
@@ -1104,6 +1194,11 @@ function exportInspectorData(format) {
         .catch(error => {
             console.error('Download failed:', error);
             showNotification(`Failed to export ${format.toUpperCase()} report.`, 'error');
+        })
+        .finally(() => {
+            // Restore button state
+            exportBtn.disabled = false;
+            exportBtn.innerHTML = originalText;
         });
 }
 
