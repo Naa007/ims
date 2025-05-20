@@ -355,8 +355,9 @@ function fetchDataForCustomRange(period, startDate, endDate) {
        }
         const employeeName = /*[[${employeeName}]]*/ coordinatorName;
         const encodedName = encodeURIComponent(employeeName.replace(/\s+/g, '_'));
+        const coordinatorEmail = document.querySelector('.user-email').textContent;
 
-        const endpoint = `/stats/coordinator-report/${encodedName}/${period}/${format}`;
+        const endpoint = `/stats/coordinator-report/${coordinatorEmail}/${period}/${format}`;
         const filename = `${encodedName}_report.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
 
         fetch(endpoint)

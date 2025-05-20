@@ -351,8 +351,9 @@
         }
         const employeeName = /*[[${employeeName}]]*/ inspectorName;
         const encodedName = encodeURIComponent(employeeName.replace(/\s+/g, '_'));
+        const inspectorEmail = document.querySelector('.user-email').textContent;
 
-        const endpoint = `/stats/inspector-report/${encodedName}/${period}/${format}`;
+        const endpoint = `/stats/inspector-report/${inspectorEmail}/${period}/${format}`;
         const filename = `${encodedName}_report.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
 
         fetch(endpoint)
