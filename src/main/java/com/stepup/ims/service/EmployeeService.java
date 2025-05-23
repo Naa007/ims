@@ -58,11 +58,7 @@ public class EmployeeService {
 
 
     public String getRoleByEmail(String email) {
-        return employeeRepository.findAll().stream()
-                .filter(employee -> email.equalsIgnoreCase(employee.getEmail()))
-                .map(com.stepup.ims.entity.Employee::getRole)
-                .findFirst()
-                .orElse(null);
+        return employeeRepository.findRoleByEmail(email);
     }
 
     public Employee getEmployeeByEmail(String email) {
@@ -74,11 +70,11 @@ public class EmployeeService {
     }
 
     public String getEmployeeNameByEmail(String email) {
-        return employeeRepository.findAll().stream()
-                .filter(employee -> email.equalsIgnoreCase(employee.getEmail()))
-                .map(com.stepup.ims.entity.Employee::getEmpName)
-                .findFirst()
-                .orElse(null);
+        return employeeRepository.findEmpNameByEmail(email);
+    }
+
+    public String getEmployeeNameByEmpId(String id) {
+        return employeeRepository.findEmpNameByEmpId(id);
     }
 
 }

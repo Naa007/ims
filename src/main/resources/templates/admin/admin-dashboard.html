@@ -6,9 +6,10 @@
 <!-- Header -->
 <header th:replace="fragments/header :: header"></header>
 
-<main>
+<main class="container">
     <!-- Dashboard Container -->
     <div class="dashboard-container">
+
         <!-- Dashboard Tabs -->
         <div class="dashboard-tabs">
             <a href="/employee/employee-management" class="tab">
@@ -23,12 +24,8 @@
                 <i class="fas fa-building"></i>
                 <span>Client Management</span>
             </a>
-            <a href="#" class="tab" onclick="togglePerformanceContainer(this)">
-                <i class="fas fa-chart-bar"></i>
-                <span>Stats</span>
-            </a>
             <a href="#" class="tab" onclick="toggleReportsContainer(this)">
-                <i class="fas fa-chart-bar"></i>
+                <i class="fas fa-file-alt"></i>
                 <span>Reports</span>
             </a>
             <a href="/calendar/view" class="tab">
@@ -36,6 +33,61 @@
                 <span>Calendar</span>
             </a>
         </div>
+
+        <!-- Inspection Reports -->
+        <div id="reportsContainer" class="cd-stats-container" style="display: none">
+            <h4 class="section-header">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; justify-content: flex-start;">
+                        <i class="fas fa-chart-line me-2"></i>
+                        <span>Download Inspection Reports</span>
+                    </div>
+                    <div class="bd-date-filter date">
+                        <span th:text="${#temporals.format(#temporals.createNow(), 'MMMM dd, yyyy')}">May 03, 2025</span>
+                    </div>
+                    <span class="user-email" th:text="${userEmail}" style="display:none;"></span>
+                </div>
+            </h4>
+            <!-- Performance Metrics Display -->
+            <div class="cd-performance-metrics-container">
+                <div class="cd-metrics-display">
+                    <!-- Time Period Selection -->
+                    <div class="cd-period-selection">
+                        <div class="cd-filter-group">
+                            <label for="reportPeriodSelect">Time Range:</label>
+                            <select class="cd-period-select" id="reportPeriodSelect">
+                                <option value="" disabled selected>Select a range</option>
+                                <option value="today">Today</option>
+                                <option value="week">Week</option>
+                                <option value="month">Month</option>
+                                <option value="year">Year</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                            <div id="reportsCustomRangeContainer" style="display: none;">
+                                <div class="cd-custom-range-content">
+                                    <input id="reportStartDate" name="startDate" type="date" style="width: calc(100% - 1.5rem); padding: 0.375rem 0.75rem; border-radius: 0.25rem; border: 1px solid #d1d3e2; font-size: 0.9rem;">
+                                    <input id="reportEndDate" name="endDate" type="date" style="width: calc(100% - 1.5rem); padding: 0.375rem 0.75rem; border-radius: 0.25rem; border: 1px solid #d1d3e2; font-size: 0.9rem;">
+
+                                    <button class="cd-filter-btn" style="width: calc(100% - 1.5rem);padding: 0.375rem 0.75rem;border-radius: 0.25rem;/* border: 1px solid #d1d3e2; */font-size: 0.9rem;" onclick="applyReportsCustomRange()" type="button">
+                                        <i class="fas fa-check-circle" style="margin-right: 5px;"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Export Options -->
+                        <div class="cd-export-wrapper">
+                            <div class="bd-filter-group bd-export-group">
+                                <button class="bd-export-btn" id="exportReportExcelBtn">
+                                    <i class="fas fa-file-excel"></i> Excel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
 
         <!-- Main Content -->
         <div class="main-content">
@@ -45,7 +97,6 @@
             </p>
         </div>
     </div>
-
 </main>
 
 <!-- Footer -->

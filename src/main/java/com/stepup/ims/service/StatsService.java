@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -116,45 +115,23 @@ public class StatsService {
         return map;
     }
 
-    public InspectionStatsByRole getCoordinatorStats(String email, String period,LocalDate startDate, LocalDate endDate) {
-        List<Inspection> inspections = inspectionRepository.findByCreatedBy(email);
-        return getInspectionStatsByRole(inspections, period,startDate, endDate);
+    public InspectionStatsByRole getCoordinatorStats(String email, String period, LocalDateTime startDate, LocalDateTime endDate) {
+        List<Inspection> inspections = inspectionRepository.findByCreatedByAndCreatedDateBetween(email, startDate, endDate);
+        return getInspectionStatsByRole(inspections, period);
     }
 
-    public InspectionStatsByRole getInspectorStats(String email, String period,LocalDate startDate, LocalDate endDate) {
-        List<Inspection> inspections = inspectionRepository.findByProposedCVs_Inspector_Email(email);
-        return getInspectionStatsByRole(inspections, period,startDate, endDate);
+    public InspectionStatsByRole getInspectorStats(String email, String period, LocalDateTime startDate, LocalDateTime endDate) {
+        List<Inspection> inspections = inspectionRepository.findByProposedCVs_Inspector_EmailAndCreatedDateBetween(email, startDate, endDate);
+        return getInspectionStatsByRole(inspections, period);
     }
 
-    public InspectionStatsByRole getTechnicalCoordinatorStats(String empId, String period,LocalDate startDate, LocalDate endDate) {
-        List<Inspection> inspections = inspectionRepository.findByProposedCVs_CvReviewBytechnicalCoordinator_EmpIdOrDocumentsReviewedByTechnicalCoordinatorOrInspectionReviewedBy(empId, empId, empId);
+    public InspectionStatsByRole getTechnicalCoordinatorStats(String empId, String period, LocalDateTime startDate, LocalDateTime endDate) {
+        List<Inspection> inspections = inspectionRepository.inspectionsReviewedByTechnicalCoordinatorsBetweenDates(empId, empId, empId, startDate, endDate);
 
-        return getInspectionStatsByRole(inspections, period,startDate, endDate);
+        return getInspectionStatsByRole(inspections, period);
     }
 
-    public InspectionStatsByRole getInspectionStatsByRole(List<Inspection> inspections, String period,LocalDate startDate, LocalDate endDate) {
-        if (period.equalsIgnoreCase("custom") && startDate != null && endDate != null) {
-            // Handle custom date range
-            inspections = inspections.stream()
-                    .filter(inspection -> inspection.getCreatedDate() != null
-                            && !inspection.getCreatedDate().toLocalDate().isBefore(startDate)
-                            && !inspection.getCreatedDate().toLocalDate().isAfter(endDate))
-                    .toList();
-        }else {
-            LocalDateTime cutoffDate = switch (period.toUpperCase()) {
-                case WEEK -> LocalDateTime.now().minusWeeks(1);
-                case MONTH -> LocalDateTime.now().minusMonths(1);
-                case YEAR -> LocalDateTime.now().minusYears(1);
-                case TOTAL -> null;
-                default -> throw new IllegalArgumentException("Invalid period: " + period);
-            };
-
-            if (cutoffDate != null) {
-                inspections = inspections.stream().filter(inspection -> inspection.getCreatedDate() != null && !inspection.getCreatedDate().isBefore(cutoffDate)).toList();
-            } else {
-                inspections = inspections.stream().filter(inspection -> inspection.getCreatedDate() != null).toList();
-            }
-        }
+    public InspectionStatsByRole getInspectionStatsByRole(List<Inspection> inspections, String period) {
 
         long totalInspections = inspections.size();
         long newInspections = inspections.stream().filter(inspection -> "NEW".equalsIgnoreCase(inspection.getInspectionStatus().toString())).count();
@@ -170,26 +147,18 @@ public class StatsService {
     }
 
 
-    public byte[] generateReport(String id, String period, String format, String role, LocalDate startDate, LocalDate endDate) {
+    public byte[] generateReport(String id,
+                                 String period,
+                                 String format,
+                                 String role,
+                                 Long totalInspections,
+                                 Long newInspections,
+                                 Long completedInspections,
+                                 Long ongoingInspections,
+                                 Long rejectedInspections) {
         InspectionStatsByRole stats;
         String empName = getEmployeeName(id, role);
-        switch (role.toLowerCase()) {
-            case COORDINATOR_LOWERCASE:
-                stats = getCoordinatorStats(id, period, startDate, endDate);
-                break;
-            case TECHNICAL_COORDINATOR_LOWERCASE:
-                stats = getTechnicalCoordinatorStats(id, period, startDate, endDate);
-                break;
-            case INSPECTOR_LOWERCASE:
-                stats = getInspectorStats(id, period, startDate, endDate);
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown role: " + role);
-        }
-
-        if (stats == null || stats.getTotalInspections() == 0) {
-            return null;
-        }
+        stats = new InspectionStatsByRole(totalInspections, newInspections, completedInspections, ongoingInspections, rejectedInspections, InspectionStatsByRole.PeriodType.valueOf(period.toUpperCase()));
 
         String title;
         String nameLabel;
@@ -219,9 +188,7 @@ public class StatsService {
                 throw new IllegalArgumentException("Unknown role: " + role);
         }
 
-        return "pdf".equalsIgnoreCase(format)
-                ? generatePdfReport(title, label, nameLabel, id, empName, period, stats)
-                : generateExcelReport(title, label, nameLabel, period, id, empName, stats, sheetName);
+        return "pdf".equalsIgnoreCase(format) ? generatePdfReport(title, label, nameLabel, id, empName, period, stats) : generateExcelReport(title, label, nameLabel, period, id, empName, stats, sheetName);
     }
 
     private byte[] generatePdfReport(String title, String label, String nameLabel, String id, String empName, String period, InspectionStatsByRole stats) {
@@ -270,10 +237,8 @@ public class StatsService {
     }
 
 
-    private byte[] generateExcelReport(String title, String label, String nameLabel, String id, String name, String period,
-                                       InspectionStatsByRole stats, String sheetName) {
-        try (Workbook workbook = new XSSFWorkbook();
-             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+    private byte[] generateExcelReport(String title, String label, String nameLabel, String id, String name, String period, InspectionStatsByRole stats, String sheetName) {
+        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
             Sheet sheet = workbook.createSheet(sheetName);
 
@@ -359,25 +324,13 @@ public class StatsService {
 
     private String getEmployeeName(String id, String role) {
         try {
-            switch (role.toLowerCase()) {
-                case COORDINATOR_LOWERCASE:
-                case INSPECTOR_LOWERCASE:
-                    // For coordinator and inspector, id is email
-                    String nameByEmail = employeeService.getEmployeeNameByEmail(id);
-                    return nameByEmail != null ? nameByEmail : "Name not found";
-
-                case TECHNICAL_COORDINATOR_LOWERCASE:
-                    // For technical coordinator, id is empId
-                    // We need to find the employee by empId
-                    return employeeService.getAllEmployees().stream()
-                            .filter(emp -> id.equals(emp.getEmpId()))
-                            .map(emp -> emp.getEmpName())
-                            .findFirst()
-                            .orElse("Name not found");
-
-                default:
-                    return "Unknown";
-            }
+            return switch (role.toLowerCase()) {
+                case COORDINATOR_LOWERCASE, INSPECTOR_LOWERCASE -> employeeService.getEmployeeNameByEmail(id);
+                case TECHNICAL_COORDINATOR_LOWERCASE -> employeeService.getEmployeeNameByEmpId(id);
+                default -> "Unknown";
+            };
+        } catch (NumberFormatException e) {
+            return "Invalid ID format";
         } catch (Exception e) {
             return "Name not available";
         }

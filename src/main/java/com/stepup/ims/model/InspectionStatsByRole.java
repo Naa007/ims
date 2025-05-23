@@ -14,6 +14,7 @@ public class InspectionStatsByRole {
     private final PeriodType period;
 
     public enum PeriodType {
+        TODAY,
         WEEK,
         MONTH,
         YEAR,

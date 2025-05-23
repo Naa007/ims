@@ -95,14 +95,20 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
         });
     }
-    
-    
-    // Check if the window title is "Coordinator Dashboard"
-    if (document.title === "Coordinator Dashboard" || document.title === "Admin Dashboard") {
-        const stats = (document.title == "Coordinator Dashboard") ? true : false;
+
+
+   if (["Coordinator Dashboard", "Admin Dashboard", "Inspector Dashboard", "Technical Coordinator Dashboard"].includes(document.title)) {
+       const stats = ["Coordinator Dashboard", "Inspector Dashboard", "Technical Coordinator Dashboard"].includes(document.title);
+       const reports = ["Coordinator Dashboard", "Admin Dashboard"].includes(document.title);
+       const context = {
+           "Coordinator Dashboard": "coordinator",
+           "Technical Coordinator Dashboard": "technical-coordinator",
+           "Inspector Dashboard": "inspector"
+       }[document.title] || null;
+
        // Initialize date inputs
-        initializeDateInputs(stats);
-    }
+       initializeDateInputs(context, stats, reports);
+   }
 
     /** ================= Map Initialization Section ================= **/
 
@@ -700,14 +706,14 @@ function disableButton() {
 /** ================= Coordinator Dashboard =================== **/
 
     // Initialize date inputs with default values
-    function initializeDateInputs(stats) {
+    function initializeDateInputs(context, stats, reports) {
 
         if(stats) {
              // Set up event listeners for stats
             document.getElementById('periodSelect').addEventListener('change', handlePeriodChange);
             document.getElementById('applyCustomRangeBtn').addEventListener('click', applyCustomRange);
-            document.getElementById('exportPdfBtn').addEventListener('click', () => exportCoordinatorData('pdf'));
-            document.getElementById('exportExcelBtn').addEventListener('click', () => exportCoordinatorData('excel'));
+            document.getElementById('exportPdfBtn').addEventListener('click', () => exportData(context, 'pdf'));
+            document.getElementById('exportExcelBtn').addEventListener('click', () => exportData(context, 'excel'));
 
             const today = new Date();
             const thirtyDaysAgo = new Date();
@@ -724,9 +730,11 @@ function disableButton() {
             document.getElementById('endDate').value = formatDate(today);
         }
 
-        // Set up event listeners for reports
-        document.getElementById('reportPeriodSelect').addEventListener('change', handleReportPeriodChange);
-        document.getElementById('exportReportExcelBtn').addEventListener('click', () => exportReports('excel'));
+        if(reports) {
+            // Set up event listeners for reports
+            document.getElementById('reportPeriodSelect').addEventListener('change', handleReportPeriodChange);
+            document.getElementById('exportReportExcelBtn').addEventListener('click', () => exportData('reports', 'excel'));
+        }
     }
 
     // Handle period change
@@ -767,7 +775,7 @@ function disableButton() {
         showNotification('Start date cannot be after end date', 'error');
             return;
           }
-            fetchDataForCustomRange(period,startDate, endDate);
+            fetchDataForCustomRange(period, startDate, endDate);
         } else {
             showNotification('Please select both start and end dates', 'error');
         }
@@ -790,15 +798,38 @@ function disableButton() {
         }
     }
 
-
-
     // Fetch data for a specific period
     function fetchDataForPeriod(period) {
         showLoadingIndicator();
+        if (!period) {
+            showNotification('Invalid Period Selection.', 'warning');
+            resetExportButton(exportBtn, originalText);
+            return;
+        }
+        [from, to] = getStartAndEndDate(period, 'startDate', 'endDate');
+        const context = {
+                   "Coordinator Dashboard": "coordinator",
+                   "Technical Coordinator Dashboard": "technical-coordinator",
+                   "Inspector Dashboard": "inspector"
+               }[document.title] || null;
 
-        const coordinatorEmail = document.querySelector('.user-email').textContent;
+        if(context == null) {
+          showNotification('Failed to load performance data', 'error');
+        }
 
-        fetch(`/stats/coordinator-stats/${encodeURIComponent(coordinatorEmail)}/${period}`)
+        var userEmail = document.querySelector('.user-email').textContent;
+
+        if(context == 'technical-coordinator') {
+            userEmail = document.getElementById('employeeId').value;
+            if (!userEmail) {
+                showNotification('Employee ID not found', 'error');
+                return;
+            }
+        }
+
+        const url = `/stats/${context}-stats/${encodeURIComponent(userEmail)}/${period}?from=${from}&to=${to}`
+
+        fetch(url)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -843,12 +874,28 @@ function disableButton() {
         }
     }
 
-   // Fetch data for custom date range
-function fetchDataForCustomRange(period, startDate, endDate) {
+    // Fetch data for custom date range
+    function fetchDataForCustomRange(period, from, to) {
     showLoadingIndicator();
 
-    const coordinatorEmail = document.querySelector('.user-email').textContent;
-    let url = `/stats/coordinator-stats/${encodeURIComponent(coordinatorEmail)}/${period}?startDate=${startDate}&endDate=${endDate}`;
+    const context = {
+               "Coordinator Dashboard": "coordinator",
+               "Technical Coordinator Dashboard": "technical-coordinator",
+               "Inspector Dashboard": "inspector"
+           }[document.title] || null;
+
+    if(context == null) {
+      showNotification('Failed to load performance data', 'error');
+    }
+
+    var email = document.querySelector('.user-email').textContent;
+    from += 'T00:00:00.0001';
+    to += 'T23:59:59.9999';
+
+    if(context == 'technical-coordinator') {
+        email = document.getElementById('employeeId').value;
+    }
+    let url = `/stats/${context}-stats/${encodeURIComponent(email)}/${period}?from=${from}&to=${to}`;
 
     fetch(url)
         .then(response => {
@@ -943,144 +990,155 @@ function fetchDataForCustomRange(period, startDate, endDate) {
         return container;
     }
 
-    function exportCoordinatorData(format) {
-        const exportBtn = event.target.closest('.bd-export-btn');
-        if (!exportBtn) return;
-        exportBtn.disabled = true;
-        const originalText = exportBtn.innerHTML;
-        exportBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
-        const dashboardHeader = document.querySelector('.section-header span');
-        const coordinatorName = dashboardHeader ?
-            dashboardHeader.textContent.replace('My Performance Dashboard - ', '') :
-            'coordinator_report';
 
-        let period = document.getElementById('periodSelect').value;
-         // If no period is selected, use current month as default (yyyy-MM)
-       if (!period) {
+    function exportData(context, format) {
+    const exportBtn = event.target.closest('.bd-export-btn') || event.target;
+    if (!exportBtn) return;
+    exportBtn.disabled = true;
+    const originalText = exportBtn.innerHTML;
+    exportBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
+
+    const dashboardHeader = document.querySelector('.section-header span');
+    const contextName = dashboardHeader
+        ? dashboardHeader.textContent.replace('My Performance Dashboard - ', '')
+        : `${context}_report`;
+
+    const encodedName = encodeURIComponent(contextName.replace(/\s+/g, '_'));
+
+    const getInspectionMetrics = () => ({
+        totalInspections: document.getElementById("totalInspections")?.innerText || 0,
+        newInspections: document.getElementById("newInspections")?.innerText || 0,
+        completedInspections: document.getElementById("awardedInspections")?.innerText || 0,
+        ongoingInspections: document.getElementById("ongoingInspections")?.innerText || 0,
+        rejectedInspections: document.getElementById("rejectedInspections")?.innerText || 0,
+    });
+
+    const buildFilename = (suffix) => `${encodedName}_report.${suffix}`;
+    const showPeriodWarning = () => {
         showNotification('Please select a period range before exporting.', 'warning');
-            exportBtn.disabled = false;
-            exportBtn.innerHTML = originalText;
+        resetExportButton(exportBtn, originalText);
+    };
+
+    let endpoint, filename, period, startDate, endDate;
+
+    switch (context) {
+        case 'coordinator':
+        case 'inspector': {
+            const metrics = getInspectionMetrics();
+            const email = document.querySelector('.user-email')?.textContent;
+            period = document.getElementById('periodSelect')?.value || '';
+            if (!period) return showPeriodWarning();
+            endpoint = `/stats/${context}-report/${email}/${period}/${format}?` +
+                `totalInspections=${metrics.totalInspections}&newInspections=${metrics.newInspections}` +
+                `&completedInspections=${metrics.completedInspections}&ongoingInspections=${metrics.ongoingInspections}` +
+                `&rejectedInspections=${metrics.rejectedInspections}`;
+            filename = buildFilename(format === 'pdf' ? 'pdf' : 'xlsx');
+            break;
+        }
+        case 'technical-coordinator': {
+            const metrics = getInspectionMetrics();
+            const employeeID = document.getElementById('employeeId')?.value;
+            if (!employeeID) {
+                showNotification('Employee ID not found', 'error');
+                resetExportButton(exportBtn, originalText);
+                return;
+            }
+            period = document.getElementById('periodSelect')?.value || '';
+            if (!period) return showPeriodWarning();
+            endpoint = `/stats/technical-coordinator-report/${employeeID}/${period}/${format}?` +
+                `totalInspections=${metrics.totalInspections}&newInspections=${metrics.newInspections}` +
+                `&completedInspections=${metrics.completedInspections}&ongoingInspections=${metrics.ongoingInspections}` +
+                `&rejectedInspections=${metrics.rejectedInspections}`;
+            filename = buildFilename(format === 'pdf' ? 'pdf' : 'xlsx');
+            break;
+        }
+        case 'reports': {
+            period = document.getElementById('reportPeriodSelect')?.value;
+            if (!period) return showPeriodWarning();
+            [startDate, endDate] = getStartAndEndDate(period, 'reportStartDate', 'reportEndDate');
+            endpoint = `/reports/inspections/${period}/${startDate}/${endDate}/${format}`;
+            filename = `inspections_report_${period}_${startDate}_${endDate}.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
+            break;
+        }
+        default:
+            showNotification('Invalid context for export operation.', 'error');
+            resetExportButton(exportBtn, originalText);
             return;
-       }
-        const employeeName = /*[[${employeeName}]]*/ coordinatorName;
-        const encodedName = encodeURIComponent(employeeName.replace(/\s+/g, '_'));
-        const coordinatorEmail = document.querySelector('.user-email').textContent;
+    }
 
-        const endpoint = `/stats/coordinator-report/${coordinatorEmail}/${period}/${format}`;
-        const filename = `${encodedName}_report.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
-
-        fetch(endpoint)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Error: ${response.status}`);
-                }
-                return response.blob();
-            })
-            .then(blob => {
-              if (blob.size === 0) {
+    fetch(endpoint)
+        .then(response => {
+            if (!response.ok) throw new Error(`Error: ${response.status}`);
+            return response.blob();
+        })
+        .then(blob => {
+            if (blob.size === 0) {
                 showNotification('No data available for report generation', 'warning');
                 return;
             }
-                const link = document.createElement('a');
-                link.href = window.URL.createObjectURL(blob);
-                link.download = filename;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                window.URL.revokeObjectURL(link.href);
-
-                showNotification(`${format.toUpperCase()} downloaded successfully.`, 'success');
-            })
-            .catch(error => {
-                console.error('Download failed:', error);
-                showNotification(`Failed to export ${format.toUpperCase()} report.`, 'error');
-            })
-            .finally(() => {
-                exportBtn.disabled = false;
-                 exportBtn.innerHTML = originalText;
-            });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(link.href);
+            showNotification(`${format.toUpperCase()} downloaded successfully.`, 'success');
+        })
+        .catch(error => {
+            console.error('Export failed:', error);
+            showNotification(`Failed to export ${format.toUpperCase()} report.`, 'error');
+        })
+        .finally(() => {
+            resetExportButton(exportBtn, originalText);
+        });
     }
-    function exportReports(format) {
-        const exportBtn = event.target;
-        exportBtn.disabled = true;
-        const originalText = exportBtn.innerHTML;
-        exportBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
-        let period = document.getElementById('reportPeriodSelect').value;
-         // If no period is selected, use current month as default (yyyy-MM)
-       if (!period) {
-        showNotification('Please select a period range before exporting.', 'warning');
-         exportBtn.disabled = false;
-         exportBtn.innerHTML = originalText;
-         return;
-       }
-       
+
+    function resetExportButton(button, originalText) {
+        button.disabled = false;
+        button.innerHTML = originalText;
+    }
+
+    function getStartAndEndDate(period, customStartDateId, customEndDateId) {
         let from, to;
+        const today = new Date();
 
         switch (period.toUpperCase()) {
             case 'TODAY':
-                to = new Date().toISOString().split('T')[0];
-                from = to;
+                from = to = today.toISOString().split('T')[0];
                 break;
             case 'WEEK':
-                to = new Date().toISOString().split('T')[0];
-                from = new Date(new Date().setDate(new Date().getDate() - 7)).toISOString().split('T')[0];
+                to = today.toISOString().split('T')[0];
+                from = new Date(today.setDate(today.getDate() - 7)).toISOString().split('T')[0];
                 break;
             case 'MONTH':
-                to = new Date().toISOString().split('T')[0];
-                from = new Date(new Date().setDate(new Date().getDate() - 30)).toISOString().split('T')[0];
+                to = today.toISOString().split('T')[0];
+                from = new Date(today.setDate(today.getDate() - 30)).toISOString().split('T')[0];
                 break;
             case 'YEAR':
-                to = new Date().toISOString().split('T')[0];
-                from = new Date(new Date().setDate(new Date().getDate() - 365)).toISOString().split('T')[0];
+                to = today.toISOString().split('T')[0];
+                from = new Date(today.setDate(today.getDate() - 365)).toISOString().split('T')[0];
+                break;
             case 'CUSTOM':
-                from = new Date(document.getElementById('reportStartDate').value).toISOString().split('T')[0];
-                to = new Date(document.getElementById('reportEndDate').value).toISOString().split('T')[0];
+                from = new Date(document.getElementById(customStartDateId).value).toISOString().split('T')[0];
+                to = new Date(document.getElementById(customEndDateId).value).toISOString().split('T')[0];
                 break;
             default:
                 throw new Error(`Invalid period: ${period}`);
         }
+
         from += 'T00:00:00.0001';
         to += 'T23:59:59.9999';
-        const endpoint = `/reports/inspections/${period}/${from}/${to}/${format}`;
-        const filename = `inspections_report_${period}_${from}_${to}.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
-
-        fetch(endpoint)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Error: ${response.status}`);
-                }
-                return response.blob();
-            })
-            .then(blob => {
-                if (blob.size === 0) {
-                    showNotification('No data available for report generation', 'warning');
-                    return;
-                }
-                const link = document.createElement('a');
-                link.href = window.URL.createObjectURL(blob);
-                link.download = filename;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                window.URL.revokeObjectURL(link.href);
-
-                showNotification(`${format.toUpperCase()} downloaded successfully.`, 'success');
-            })
-            .catch(error => {
-                console.error('Download failed:', error);
-                showNotification(`Failed to export ${format.toUpperCase()} report.`, 'error');
-            })
-            .finally(() => {
-                exportBtn.disabled = false;
-                exportBtn.innerHTML = originalText;
-            });
+        return [from, to];
     }
 
     function togglePerformanceContainer(element) {
         const performanceContainer = document.getElementById('performanceContainer');
         if (performanceContainer.style.display === 'none') {
             performanceContainer.style.display = 'block';
-            document.getElementById('reportsContainer').style.display = 'none';
+            if (document.getElementById('reportsContainer')) {
+                document.getElementById('reportsContainer').style.display = 'none';
+            }
             document.querySelectorAll('.dashboard-tabs .tab').forEach(tab => tab.classList.remove('active'));
             element.classList.add('active');
         } else {
@@ -1093,7 +1151,7 @@ function fetchDataForCustomRange(period, startDate, endDate) {
         const reportsContainer = document.getElementById('reportsContainer');
         if (reportsContainer.style.display === 'none') {
             reportsContainer.style.display = 'block';
-            
+
             if (document.getElementById('performanceContainer')) {
                 document.getElementById('performanceContainer').style.display = 'none';
             }
