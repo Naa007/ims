@@ -98,9 +98,10 @@ document.addEventListener("DOMContentLoaded", function () {
     
     
     // Check if the window title is "Coordinator Dashboard"
-    if (document.title === "Coordinator Dashboard" || document.title === "Admin Dashboard" || document.title === "Business Dashboard") {
+    if (document.title === "Coordinator Dashboard" || document.title === "Admin Dashboard") {
+        const stats = (document.title == "Coordinator Dashboard") ? true : false;
        // Initialize date inputs
-        initializeDateInputs();
+        initializeDateInputs(stats);
     }
 
     /** ================= Map Initialization Section ================= **/
@@ -699,30 +700,33 @@ function disableButton() {
 /** ================= Coordinator Dashboard =================== **/
 
     // Initialize date inputs with default values
-    function initializeDateInputs() {
-         // Set up event listeners for stats
-        document.getElementById('periodSelect').addEventListener('change', handlePeriodChange);
-        document.getElementById('applyCustomRangeBtn').addEventListener('click', applyCustomRange);
-        document.getElementById('exportPdfBtn').addEventListener('click', () => exportCoordinatorData('pdf'));
-        document.getElementById('exportExcelBtn').addEventListener('click', () => exportCoordinatorData('excel'));
+    function initializeDateInputs(stats) {
+
+        if(stats) {
+             // Set up event listeners for stats
+            document.getElementById('periodSelect').addEventListener('change', handlePeriodChange);
+            document.getElementById('applyCustomRangeBtn').addEventListener('click', applyCustomRange);
+            document.getElementById('exportPdfBtn').addEventListener('click', () => exportCoordinatorData('pdf'));
+            document.getElementById('exportExcelBtn').addEventListener('click', () => exportCoordinatorData('excel'));
+
+            const today = new Date();
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(today.getDate() - 30);
+
+            const formatDate = (date) => {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
+
+            document.getElementById('startDate').value = formatDate(thirtyDaysAgo);
+            document.getElementById('endDate').value = formatDate(today);
+        }
 
         // Set up event listeners for reports
         document.getElementById('reportPeriodSelect').addEventListener('change', handleReportPeriodChange);
         document.getElementById('exportReportExcelBtn').addEventListener('click', () => exportReports('excel'));
-
-        const today = new Date();
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(today.getDate() - 30);
-
-        const formatDate = (date) => {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        };
-
-        document.getElementById('startDate').value = formatDate(thirtyDaysAgo);
-        document.getElementById('endDate').value = formatDate(today);
     }
 
     // Handle period change
@@ -1089,7 +1093,10 @@ function fetchDataForCustomRange(period, startDate, endDate) {
         const reportsContainer = document.getElementById('reportsContainer');
         if (reportsContainer.style.display === 'none') {
             reportsContainer.style.display = 'block';
-            document.getElementById('performanceContainer').style.display = 'none';
+            
+            if (document.getElementById('performanceContainer')) {
+                document.getElementById('performanceContainer').style.display = 'none';
+            }
             document.querySelectorAll('.dashboard-tabs .tab').forEach(tab => tab.classList.remove('active'));
             element.classList.add('active');
         } else {
