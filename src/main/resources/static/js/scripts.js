@@ -98,7 +98,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
     
     // Check if the window title is "Coordinator Dashboard"
-    if (document.title === "Coordinator Dashboard") {
+    if (document.title === "Coordinator Dashboard" || document.title === "Admin Dashboard" || document.title === "Business Dashboard") {
        // Initialize date inputs
         initializeDateInputs();
     }
