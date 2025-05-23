@@ -1,5 +1,7 @@
 package com.stepup.ims.constants;
 
+import java.time.format.DateTimeFormatter;
+
 public class ApplicationConstants {
 
     /* Terminologies in IMS */
@@ -36,10 +38,12 @@ public class ApplicationConstants {
     public static final String NO = "no";
     public static final String ACTIVE = "active";
     public static final String INACTIVE = "inactive";
+    public static final String TODAY = "TODAY";
     public static final String WEEK = "WEEK";
     public static final String MONTH = "MONTH";
     public static final String QUARTER = "QUARTER";
     public static final String YEAR = "YEAR";
+    public static final String CUSTOM = "CUSTOM";
     public static final String TOTAL = "TOTAL";
     public static final String ID = "id";
     public static final String TITLE = "title";
@@ -56,6 +60,9 @@ public class ApplicationConstants {
     public static final String INDIA_LOWERCASE = "india";
     public static final String INTERNATIONAL_UPPERCASE = "INTERNATIONAL";
     public static final String INTERNATIONAL_LOWERCASE = "international";
+
+    public static final DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    public static final DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 
 

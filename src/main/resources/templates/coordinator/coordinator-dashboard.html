@@ -20,6 +20,10 @@
                 <i class="fas fa-chart-bar"></i>
                 <span>Stats</span>
             </a>
+            <a href="#" class="tab" onclick="toggleReportsContainer(this)">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reports</span>
+            </a>
             <a href="/calendar/view" class="tab">
                 <i class="fas fa-calendar-alt"></i>
                 <span>Calendar</span>
@@ -109,6 +113,61 @@
             </div>
         </div>
 
+        <!-- Inspection Reports -->
+        <div id="reportsContainer" class="cd-stats-container" style="display: none">
+            <h4 class="section-header">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; justify-content: flex-start;">
+                        <i class="fas fa-chart-line me-2"></i>
+                        <span>Download Inspection Reports</span>
+                    </div>
+                    <div class="bd-date-filter date">
+                        <span th:text="${#temporals.format(#temporals.createNow(), 'MMMM dd, yyyy')}">May 03, 2025</span>
+                    </div>
+                    <span class="user-email" th:text="${userEmail}" style="display:none;"></span>
+                </div>
+            </h4>
+            <!-- Performance Metrics Display -->
+            <div class="cd-performance-metrics-container">
+                <div class="cd-metrics-display">
+                    <!-- Time Period Selection -->
+                    <div class="cd-period-selection">
+                        <div class="cd-filter-group">
+                            <label for="reportPeriodSelect">Time Range:</label>
+                            <select class="cd-period-select" id="reportPeriodSelect">
+                                <option value="" disabled selected>Select a range</option>
+                                <option value="today">Today</option>
+                                <option value="week">Week</option>
+                                <option value="month">Month</option>
+                                <option value="year">Year</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                            <div id="reportsCustomRangeContainer" style="display: none;">
+                                <div class="cd-custom-range-content">
+                                    <input id="reportStartDate" name="startDate" type="date" style="width: calc(100% - 1.5rem); padding: 0.375rem 0.75rem; border-radius: 0.25rem; border: 1px solid #d1d3e2; font-size: 0.9rem;">
+                                    <input id="reportEndDate" name="endDate" type="date" style="width: calc(100% - 1.5rem); padding: 0.375rem 0.75rem; border-radius: 0.25rem; border: 1px solid #d1d3e2; font-size: 0.9rem;">
+
+                                    <button class="cd-filter-btn" style="width: calc(100% - 1.5rem);padding: 0.375rem 0.75rem;border-radius: 0.25rem;/* border: 1px solid #d1d3e2; */font-size: 0.9rem;" onclick="applyReportsCustomRange()" type="button">
+                                        <i class="fas fa-check-circle" style="margin-right: 5px;"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Export Options -->
+                        <div class="cd-export-wrapper">
+                            <div class="bd-filter-group bd-export-group">
+                                <button class="bd-export-btn" id="exportReportExcelBtn">
+                                    <i class="fas fa-file-excel"></i> Excel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Main Content -->
         <div class="main-content">
             <h2>You are in COORDINATOR DASHBOARD</h2>
@@ -123,286 +182,6 @@
 
 <!-- Footer -->
 <footer th:replace="fragments/footer :: footer"></footer>
-
-<script th:inline="javascript">
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize date inputs
-        initializeDateInputs();
-
-        // Set up event listeners
-        document.getElementById('periodSelect').addEventListener('change', handlePeriodChange);
-        document.getElementById('applyCustomRangeBtn').addEventListener('click', applyCustomRange);
-        document.getElementById('exportPdfBtn').addEventListener('click', () => exportCoordinatorData('pdf'));
-        document.getElementById('exportExcelBtn').addEventListener('click', () => exportCoordinatorData('excel'));
-    });
-
-    // Initialize date inputs with default values
-    function initializeDateInputs() {
-        const today = new Date();
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(today.getDate() - 30);
-
-        const formatDate = (date) => {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        };
-
-        document.getElementById('startDate').value = formatDate(thirtyDaysAgo);
-        document.getElementById('endDate').value = formatDate(today);
-    }
-
-    // Handle period change
-    function handlePeriodChange() {
-        const periodSelect = document.getElementById('periodSelect');
-        const customRangeContainer = document.getElementById('customRangeContainer');
-
-        if (periodSelect.value === 'custom') {
-            customRangeContainer.style.display = 'block';
-        } else {
-            customRangeContainer.style.display = 'none';
-            fetchDataForPeriod(periodSelect.value);
-        }
-    }
-
-    // Apply custom date range
-    function applyCustomRange() {
-        const period = document.getElementById('periodSelect').value;
-        const startDate = document.getElementById('startDate').value;
-        const endDate = document.getElementById('endDate').value;
-
-        if (startDate && endDate) {
-        if (new Date(startDate) > new Date(endDate)) {
-        showNotification('Start date cannot be after end date', 'error');
-            return;
-          }
-            fetchDataForCustomRange(period,startDate, endDate);
-        } else {
-            showNotification('Please select both start and end dates', 'error');
-        }
-    }
-
-    // Fetch data for a specific period
-    function fetchDataForPeriod(period) {
-        showLoadingIndicator();
-
-        const coordinatorEmail = document.querySelector('.user-email').textContent;
-
-        fetch(`/stats/coordinator-stats/${encodeURIComponent(coordinatorEmail)}/${period}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                updateMetricsDisplay(data);
-                hideLoadingIndicator();
-                showNotification('Data updated successfully', 'success');
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-                hideLoadingIndicator();
-                showNotification('Failed to load performance data', 'error');
-            });
-    }
-
-    // Update the metrics display with the latest data
-    function updateMetricsDisplay(data) {
-        // Update the total inspections count
-        const totalElement = document.getElementById('totalInspections');
-        if (totalElement) {
-            totalElement.textContent = data['totalInspections'] || 0;
-            totalElement.classList.add('cd-total-highlight');
-            setTimeout(() => totalElement.classList.remove('cd-total-highlight'), 1500);
-        }
-
-        // Update individual metrics
-       const metrics = {
-            'newInspections': 'newInspections',
-            'ongoingInspections': 'ongoingInspections',
-            'awardedInspections': 'completedInspections',
-            'rejectedInspections': 'rejectedInspections'
-        };
-
-        for (const [elementId, dataKey] of Object.entries(metrics)) {
-            const element = document.getElementById(elementId);
-            if (element) {
-                element.textContent = data[dataKey] || 0;
-            }
-        }
-    }
-
-   // Fetch data for custom date range
-function fetchDataForCustomRange(period, startDate, endDate) {
-    showLoadingIndicator();
-
-    const coordinatorEmail = document.querySelector('.user-email').textContent;
-    let url = `/stats/coordinator-stats/${encodeURIComponent(coordinatorEmail)}/${period}?startDate=${startDate}&endDate=${endDate}`;
-
-    fetch(url)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            updateMetricsDisplay(data);
-            hideLoadingIndicator();
-            showNotification('Custom range data loaded', 'success');
-        })
-        .catch(error => {
-            console.error('Error fetching custom range data:', error);
-            hideLoadingIndicator();
-            showNotification('Failed to load custom range data', 'error');
-        });
-}
-
-    // Show loading indicator
-    function showLoadingIndicator() {
-          const container = document.querySelector('.cd-performance-metrics-container');
-    const overlay = container.querySelector('.cd-loading-overlay');
-    const content = container.querySelector('.cd-metrics-display');
-
-    if (overlay) {
-        content.style.opacity = '0.5';
-        overlay.style.display = 'flex';
-    }
-    }
-
-    // Hide loading indicator
-    function hideLoadingIndicator() {
-        const container = document.querySelector('.cd-performance-metrics-container');
-    const overlay = container.querySelector('.cd-loading-overlay');
-    const content = container.querySelector('.cd-metrics-display');
-
-    if (overlay) {
-        content.style.opacity = '1';
-        overlay.style.display = 'none';
-    }
-    }
-
-    // Show notification
-    function showNotification(message, type = 'info') {
-        const notificationContainer = document.getElementById('cd-notification-container') || createNotificationContainer();
-
-        const notification = document.createElement('div');
-        notification.className = `cd-notification cd-notification-${type}`;
-
-        let icon;
-        switch (type) {
-            case 'success': icon = 'fa-check-circle'; break;
-            case 'error': icon = 'fa-times-circle'; break;
-            case 'warning': icon = 'fa-exclamation-triangle'; break;
-            default: icon = 'fa-info-circle';
-        }
-
-        notification.innerHTML = `
-            <div class="cd-notification-icon">
-                <i class="fas ${icon}"></i>
-            </div>
-            <div class="cd-notification-content">
-                ${message}
-            </div>
-            <div class="cd-notification-close">
-                <i class="fas fa-times"></i>
-            </div>
-        `;
-
-        notificationContainer.appendChild(notification);
-
-        // Add close event
-        notification.querySelector('.cd-notification-close').addEventListener('click', function() {
-            notification.classList.add('cd-notification-hiding');
-            setTimeout(() => notification.remove(), 300);
-        });
-
-        // Auto-remove after 5 seconds
-        setTimeout(() => {
-            notification.classList.add('cd-notification-hiding');
-            setTimeout(() => notification.remove(), 300);
-        }, 5000);
-    }
-
-    // Create notification container if it doesn't exist
-    function createNotificationContainer() {
-        const container = document.createElement('div');
-        container.id = 'cd-notification-container';
-        document.body.appendChild(container);
-        return container;
-    }
-
-    function exportCoordinatorData(format) {
-        const exportBtn = event.target.closest('.bd-export-btn');
-        if (!exportBtn) return;
-        exportBtn.disabled = true;
-        const originalText = exportBtn.innerHTML;
-        exportBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
-        const dashboardHeader = document.querySelector('.section-header span');
-        const coordinatorName = dashboardHeader ?
-            dashboardHeader.textContent.replace('My Performance Dashboard - ', '') :
-            'coordinator_report';
-
-        let period = document.getElementById('periodSelect').value;
-         // If no period is selected, use current month as default (yyyy-MM)
-       if (!period) {
-        showNotification('Please select a period range before exporting.', 'warning');
-            exportBtn.disabled = false;
-            exportBtn.innerHTML = originalText;
-            return;
-       }
-        const employeeName = /*[[${employeeName}]]*/ coordinatorName;
-        const encodedName = encodeURIComponent(employeeName.replace(/\s+/g, '_'));
-        const coordinatorEmail = document.querySelector('.user-email').textContent;
-
-        const endpoint = `/stats/coordinator-report/${coordinatorEmail}/${period}/${format}`;
-        const filename = `${encodedName}_report.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
-
-        fetch(endpoint)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Error: ${response.status}`);
-                }
-                return response.blob();
-            })
-            .then(blob => {
-              if (blob.size === 0) {
-                showNotification('No data available for report generation', 'warning');
-                return;
-            }
-                const link = document.createElement('a');
-                link.href = window.URL.createObjectURL(blob);
-                link.download = filename;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                window.URL.revokeObjectURL(link.href);
-
-                showNotification(`${format.toUpperCase()} downloaded successfully.`, 'success');
-            })
-            .catch(error => {
-                console.error('Download failed:', error);
-                showNotification(`Failed to export ${format.toUpperCase()} report.`, 'error');
-            })
-            .finally(() => {
-                exportBtn.disabled = false;
-                 exportBtn.innerHTML = originalText;
-            });
-    }
-    function togglePerformanceContainer(element) {
-        const performanceContainer = document.getElementById('performanceContainer');
-        if (performanceContainer.style.display === 'none') {
-            performanceContainer.style.display = 'block';
-            document.querySelectorAll('.dashboard-tabs .tab').forEach(tab => tab.classList.remove('active'));
-            element.classList.add('active');
-        } else {
-            performanceContainer.style.display = 'none';
-            element.classList.remove('active');
-        }
-    }
-</script>
 
 <style>
     /* Coordinator Dashboard Specific Styles */

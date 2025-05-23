@@ -23,6 +23,7 @@ public class SecurityConfig {
     private static final String[] INSPECTOR_ACCESS = {"/inspector/**"};
     private static final String[] EMPLOYEE_ACCESS = {"/employee/**"};
     private static final String[] STATS_ACCESS = {"/stats/**"};
+    private static final String[] REPORT_ACCESS = {"/reports/**"};
     private static final String[] CALENDAR_ACCESS = {"/calendar/**"};
 
     @Bean
@@ -37,6 +38,7 @@ public class SecurityConfig {
                         .requestMatchers(INSPECTOR_ACCESS).hasAnyRole(INSPECTOR)
                         .requestMatchers(EMPLOYEE_ACCESS).hasAnyRole(ADMIN)
                         .requestMatchers(STATS_ACCESS).hasAnyRole(BUSINESS, COORDINATOR, TECHNICAL_COORDINATOR, INSPECTOR)
+                        .requestMatchers(REPORT_ACCESS).hasAnyRole(COORDINATOR, BUSINESS, ADMIN)
                         .requestMatchers(CALENDAR_ACCESS).hasAnyRole(COORDINATOR, BUSINESS, ADMIN)
                         .anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable)

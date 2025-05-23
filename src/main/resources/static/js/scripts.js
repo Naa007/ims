@@ -95,6 +95,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
         });
     }
+    
+    
+    // Check if the window title is "Coordinator Dashboard"
+    if (document.title === "Coordinator Dashboard") {
+       // Initialize date inputs
+        initializeDateInputs();
+    }
 
     /** ================= Map Initialization Section ================= **/
 
@@ -688,5 +695,407 @@ function disableButton() {
 /** ================== Business Dashboard ================= **/
 
 
+
+/** ================= Coordinator Dashboard =================== **/
+
+    // Initialize date inputs with default values
+    function initializeDateInputs() {
+         // Set up event listeners for stats
+        document.getElementById('periodSelect').addEventListener('change', handlePeriodChange);
+        document.getElementById('applyCustomRangeBtn').addEventListener('click', applyCustomRange);
+        document.getElementById('exportPdfBtn').addEventListener('click', () => exportCoordinatorData('pdf'));
+        document.getElementById('exportExcelBtn').addEventListener('click', () => exportCoordinatorData('excel'));
+
+        // Set up event listeners for reports
+        document.getElementById('reportPeriodSelect').addEventListener('change', handleReportPeriodChange);
+        document.getElementById('exportReportExcelBtn').addEventListener('click', () => exportReports('excel'));
+
+        const today = new Date();
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(today.getDate() - 30);
+
+        const formatDate = (date) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+
+        document.getElementById('startDate').value = formatDate(thirtyDaysAgo);
+        document.getElementById('endDate').value = formatDate(today);
+    }
+
+    // Handle period change
+    function handlePeriodChange() {
+        const periodSelect = document.getElementById('periodSelect');
+        const customRangeContainer = document.getElementById('customRangeContainer');
+
+        if (periodSelect.value === 'custom') {
+            customRangeContainer.style.display = 'block';
+        } else {
+            customRangeContainer.style.display = 'none';
+            fetchDataForPeriod(periodSelect.value);
+        }
+    }
+
+    // Handle report period change
+    function handleReportPeriodChange() {
+        const periodSelect = document.getElementById('reportPeriodSelect');
+        const reportsCustomRangeContainer = document.getElementById('reportsCustomRangeContainer');
+
+        if (periodSelect.value === 'custom') {
+            document.getElementById('exportReportExcelBtn').disabled = true;
+            reportsCustomRangeContainer.style.display = 'block';
+        } else {
+            document.getElementById('exportReportExcelBtn').disabled = false;
+            reportsCustomRangeContainer.style.display = 'none';
+        }
+    }
+
+    // Apply custom date range
+    function applyCustomRange() {
+        const period = document.getElementById('periodSelect').value;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        if (startDate && endDate) {
+        if (new Date(startDate) > new Date(endDate)) {
+        showNotification('Start date cannot be after end date', 'error');
+            return;
+          }
+            fetchDataForCustomRange(period,startDate, endDate);
+        } else {
+            showNotification('Please select both start and end dates', 'error');
+        }
+    }
+
+     // Apply custom date range
+    function applyReportsCustomRange() {
+        const period = document.getElementById('reportPeriodSelect').value;
+        const startDate = document.getElementById('reportStartDate').value;
+        const endDate = document.getElementById('reportEndDate').value;
+
+        if (startDate && endDate) {
+            if (new Date(startDate) > new Date(endDate)) {
+                showNotification('Start date cannot be after end date', 'error');
+                return;
+              }
+            document.getElementById('exportReportExcelBtn').disabled = false;
+        } else {
+            showNotification('Please select both start and end dates', 'error');
+        }
+    }
+
+
+
+    // Fetch data for a specific period
+    function fetchDataForPeriod(period) {
+        showLoadingIndicator();
+
+        const coordinatorEmail = document.querySelector('.user-email').textContent;
+
+        fetch(`/stats/coordinator-stats/${encodeURIComponent(coordinatorEmail)}/${period}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                updateMetricsDisplay(data);
+                hideLoadingIndicator();
+                showNotification('Data updated successfully', 'success');
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                hideLoadingIndicator();
+                showNotification('Failed to load performance data', 'error');
+            });
+    }
+
+    // Update the metrics display with the latest data
+    function updateMetricsDisplay(data) {
+        // Update the total inspections count
+        const totalElement = document.getElementById('totalInspections');
+        if (totalElement) {
+            totalElement.textContent = data['totalInspections'] || 0;
+            totalElement.classList.add('cd-total-highlight');
+            setTimeout(() => totalElement.classList.remove('cd-total-highlight'), 1500);
+        }
+
+        // Update individual metrics
+       const metrics = {
+            'newInspections': 'newInspections',
+            'ongoingInspections': 'ongoingInspections',
+            'awardedInspections': 'completedInspections',
+            'rejectedInspections': 'rejectedInspections'
+        };
+
+        for (const [elementId, dataKey] of Object.entries(metrics)) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = data[dataKey] || 0;
+            }
+        }
+    }
+
+   // Fetch data for custom date range
+function fetchDataForCustomRange(period, startDate, endDate) {
+    showLoadingIndicator();
+
+    const coordinatorEmail = document.querySelector('.user-email').textContent;
+    let url = `/stats/coordinator-stats/${encodeURIComponent(coordinatorEmail)}/${period}?startDate=${startDate}&endDate=${endDate}`;
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            updateMetricsDisplay(data);
+            hideLoadingIndicator();
+            showNotification('Custom range data loaded', 'success');
+        })
+        .catch(error => {
+            console.error('Error fetching custom range data:', error);
+            hideLoadingIndicator();
+            showNotification('Failed to load custom range data', 'error');
+        });
+}
+
+    // Show loading indicator
+    function showLoadingIndicator() {
+          const container = document.querySelector('.cd-performance-metrics-container');
+    const overlay = container.querySelector('.cd-loading-overlay');
+    const content = container.querySelector('.cd-metrics-display');
+
+    if (overlay) {
+        content.style.opacity = '0.5';
+        overlay.style.display = 'flex';
+    }
+    }
+
+    // Hide loading indicator
+    function hideLoadingIndicator() {
+        const container = document.querySelector('.cd-performance-metrics-container');
+    const overlay = container.querySelector('.cd-loading-overlay');
+    const content = container.querySelector('.cd-metrics-display');
+
+    if (overlay) {
+        content.style.opacity = '1';
+        overlay.style.display = 'none';
+    }
+    }
+
+    // Show notification
+    function showNotification(message, type = 'info') {
+        const notificationContainer = document.getElementById('cd-notification-container') || createNotificationContainer();
+
+        const notification = document.createElement('div');
+        notification.className = `cd-notification cd-notification-${type}`;
+
+        let icon;
+        switch (type) {
+            case 'success': icon = 'fa-check-circle'; break;
+            case 'error': icon = 'fa-times-circle'; break;
+            case 'warning': icon = 'fa-exclamation-triangle'; break;
+            default: icon = 'fa-info-circle';
+        }
+
+        notification.innerHTML = `
+            <div class="cd-notification-icon">
+                <i class="fas ${icon}"></i>
+            </div>
+            <div class="cd-notification-content">
+                ${message}
+            </div>
+            <div class="cd-notification-close">
+                <i class="fas fa-times"></i>
+            </div>
+        `;
+
+        notificationContainer.appendChild(notification);
+
+        // Add close event
+        notification.querySelector('.cd-notification-close').addEventListener('click', function() {
+            notification.classList.add('cd-notification-hiding');
+            setTimeout(() => notification.remove(), 300);
+        });
+
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            notification.classList.add('cd-notification-hiding');
+            setTimeout(() => notification.remove(), 300);
+        }, 5000);
+    }
+
+    // Create notification container if it doesn't exist
+    function createNotificationContainer() {
+        const container = document.createElement('div');
+        container.id = 'cd-notification-container';
+        document.body.appendChild(container);
+        return container;
+    }
+
+    function exportCoordinatorData(format) {
+        const exportBtn = event.target.closest('.bd-export-btn');
+        if (!exportBtn) return;
+        exportBtn.disabled = true;
+        const originalText = exportBtn.innerHTML;
+        exportBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
+        const dashboardHeader = document.querySelector('.section-header span');
+        const coordinatorName = dashboardHeader ?
+            dashboardHeader.textContent.replace('My Performance Dashboard - ', '') :
+            'coordinator_report';
+
+        let period = document.getElementById('periodSelect').value;
+         // If no period is selected, use current month as default (yyyy-MM)
+       if (!period) {
+        showNotification('Please select a period range before exporting.', 'warning');
+            exportBtn.disabled = false;
+            exportBtn.innerHTML = originalText;
+            return;
+       }
+        const employeeName = /*[[${employeeName}]]*/ coordinatorName;
+        const encodedName = encodeURIComponent(employeeName.replace(/\s+/g, '_'));
+        const coordinatorEmail = document.querySelector('.user-email').textContent;
+
+        const endpoint = `/stats/coordinator-report/${coordinatorEmail}/${period}/${format}`;
+        const filename = `${encodedName}_report.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
+
+        fetch(endpoint)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.status}`);
+                }
+                return response.blob();
+            })
+            .then(blob => {
+              if (blob.size === 0) {
+                showNotification('No data available for report generation', 'warning');
+                return;
+            }
+                const link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(link.href);
+
+                showNotification(`${format.toUpperCase()} downloaded successfully.`, 'success');
+            })
+            .catch(error => {
+                console.error('Download failed:', error);
+                showNotification(`Failed to export ${format.toUpperCase()} report.`, 'error');
+            })
+            .finally(() => {
+                exportBtn.disabled = false;
+                 exportBtn.innerHTML = originalText;
+            });
+    }
+    function exportReports(format) {
+        const exportBtn = event.target;
+        exportBtn.disabled = true;
+        const originalText = exportBtn.innerHTML;
+        exportBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
+        let period = document.getElementById('reportPeriodSelect').value;
+         // If no period is selected, use current month as default (yyyy-MM)
+       if (!period) {
+        showNotification('Please select a period range before exporting.', 'warning');
+         exportBtn.disabled = false;
+         exportBtn.innerHTML = originalText;
+         return;
+       }
+       
+        let from, to;
+
+        switch (period.toUpperCase()) {
+            case 'TODAY':
+                to = new Date().toISOString().split('T')[0];
+                from = to;
+                break;
+            case 'WEEK':
+                to = new Date().toISOString().split('T')[0];
+                from = new Date(new Date().setDate(new Date().getDate() - 7)).toISOString().split('T')[0];
+                break;
+            case 'MONTH':
+                to = new Date().toISOString().split('T')[0];
+                from = new Date(new Date().setDate(new Date().getDate() - 30)).toISOString().split('T')[0];
+                break;
+            case 'YEAR':
+                to = new Date().toISOString().split('T')[0];
+                from = new Date(new Date().setDate(new Date().getDate() - 365)).toISOString().split('T')[0];
+            case 'CUSTOM':
+                from = new Date(document.getElementById('reportStartDate').value).toISOString().split('T')[0];
+                to = new Date(document.getElementById('reportEndDate').value).toISOString().split('T')[0];
+                break;
+            default:
+                throw new Error(`Invalid period: ${period}`);
+        }
+        from += 'T00:00:00.0001';
+        to += 'T23:59:59.9999';
+        const endpoint = `/reports/inspections/${period}/${from}/${to}/${format}`;
+        const filename = `inspections_report_${period}_${from}_${to}.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
+
+        fetch(endpoint)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.status}`);
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                if (blob.size === 0) {
+                    showNotification('No data available for report generation', 'warning');
+                    return;
+                }
+                const link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(link.href);
+
+                showNotification(`${format.toUpperCase()} downloaded successfully.`, 'success');
+            })
+            .catch(error => {
+                console.error('Download failed:', error);
+                showNotification(`Failed to export ${format.toUpperCase()} report.`, 'error');
+            })
+            .finally(() => {
+                exportBtn.disabled = false;
+                exportBtn.innerHTML = originalText;
+            });
+    }
+
+    function togglePerformanceContainer(element) {
+        const performanceContainer = document.getElementById('performanceContainer');
+        if (performanceContainer.style.display === 'none') {
+            performanceContainer.style.display = 'block';
+            document.getElementById('reportsContainer').style.display = 'none';
+            document.querySelectorAll('.dashboard-tabs .tab').forEach(tab => tab.classList.remove('active'));
+            element.classList.add('active');
+        } else {
+            performanceContainer.style.display = 'none';
+            element.classList.remove('active');
+        }
+    }
+
+    function toggleReportsContainer(element) {
+        const reportsContainer = document.getElementById('reportsContainer');
+        if (reportsContainer.style.display === 'none') {
+            reportsContainer.style.display = 'block';
+            document.getElementById('performanceContainer').style.display = 'none';
+            document.querySelectorAll('.dashboard-tabs .tab').forEach(tab => tab.classList.remove('active'));
+            element.classList.add('active');
+        } else {
+            reportsContainer.style.display = 'none';
+            element.classList.remove('active');
+        }
+    }
 
 

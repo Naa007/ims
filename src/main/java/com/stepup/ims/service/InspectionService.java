@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -41,6 +42,35 @@ public class InspectionService {
      */
     public List<Inspection> getAllInspections() {
         return inspectionModelMapper.toModelList(inspectionRepository.findAll());
+    }
+
+    /**
+     * Get all inspections by date.
+     */
+    public List<Inspection> getInspectionsByDate(String date) {
+        try {
+            LocalDateTime selectedDate = LocalDate.parse(date, inputFormatter).atStartOfDay();
+            List<com.stepup.ims.entity.Inspection> inspections = inspectionRepository.findByCreatedDate(selectedDate);
+            return inspectionModelMapper.toModelList(inspections);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid date format. Please use the correct format: " + inputFormatter.toString(), e);
+        }
+    }
+
+
+    /**
+     * Get all inspections between two dates.
+     */
+    public List<Inspection> getInspectionsBetweenDates(String fromDate, String toDate) {
+        try {
+            LocalDateTime start = LocalDateTime.parse(fromDate);
+            LocalDateTime end = LocalDateTime.parse(toDate);
+            List<com.stepup.ims.entity.Inspection> inspections = inspectionRepository.findByCreatedDateBetween(start, end);
+            return inspectionModelMapper.toModelList(inspections);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(
+                    "Invalid date format. Please use the correct format: " + inputFormatter.toString(), e);
+        }
     }
 
 
@@ -134,8 +164,6 @@ public class InspectionService {
 
     private List<Map<String, String>> getInspectionCalendarStats(List<com.stepup.ims.entity.Inspection> inspections) {
         List<Map<String, String>> detailsList = new ArrayList<>();
-        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         // Pre-calculate inspection dates and participating inspectors
         Map<String, Set<String>> inspectorsByDate = new HashMap<>();
