@@ -8,11 +8,15 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.UnitValue;
 import com.stepup.ims.model.Inspection;
+import com.stepup.ims.model.ProposedCVs;
 import com.stepup.ims.modelmapper.InspectionModelMapper;
 import com.stepup.ims.repository.InspectionRepository;
+import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -98,33 +103,185 @@ public class ReportsService {
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet(sheetName);
 
+            // Create styles
+            var headerCellStyle = workbook.createCellStyle();
+            var font = workbook.createFont();
+            font.setBold(true);
+            headerCellStyle.setFont(font);
+            headerCellStyle.setWrapText(true);
+            var lightGrey = new XSSFColor(new java.awt.Color(211, 211, 211), null);
+            ((XSSFCellStyle) headerCellStyle).setFillForegroundColor(lightGrey);
+            headerCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+            var evenRowCellStyle = workbook.createCellStyle();
+            ((XSSFCellStyle) evenRowCellStyle).setFillForegroundColor(new XSSFColor(new java.awt.Color(245, 245, 245), null));
+            evenRowCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            evenRowCellStyle.setWrapText(true);
+
+            var oddRowCellStyle = workbook.createCellStyle();
+            oddRowCellStyle.setWrapText(true);
+
             // Setting up header row
             Row headerRow = sheet.createRow(0);
             if (!inspections.isEmpty()) {
-                Inspection sampleInspection = inspections.get(0);
-                var fields = sampleInspection.getClass().getDeclaredFields();
-                for (int i = 0; i < fields.length; i++) {
-                    fields[i].setAccessible(true);
-                    headerRow.createCell(i).setCellValue(fields[i].getName());
+                String[] headers = {
+                        "Job Alloted No (IISPL No)", "Notification received Date & Time", "Client Name",
+                        "Inspection Country", "Notification No", "Inspection Date as per Notification",
+                        "Inspection Item", "Inspection Activity with Stages", "Mechanical / Electrical",
+                        "Vendor/Sub Vendor Name", "CV's proposed to client (Inspector Name)", "CV & Certificates",
+                        "CV's Reviewed Technical Coordinator Name", "PQR", "CV submitted to client Date/time",
+                        "CV Status", "Approved inspector name", "Date of order confirmation",
+                        "Scope Sector/Applicable only for selected Job", "End Client Name", "Project Name",
+                        "Status of Reference Documents for Inspection", "Documents Reviewed by Technical Coordinator with Name",
+                        "Contract Review Prepared", "Inspection Advise Note",
+                        "Documents and Instructions Sent Inspector on",
+                        "Any issues before Inspection or after Inspection", "FR sent to Client on",
+                        "Receipt of Inspection Reports from Inspector on", "Inspection Reports Reviewed Person Name",
+                        "IR and Supporting Documents Sent to Client on", "Inspection Report Number",
+                        "NCR Raised", "IRN Sent to Client on", "Impartiality & Confidentiality",
+                        "Job Folder Link"
+                };
+
+                for (int i = 0; i < headers.length; i++) {
+                    var cell = headerRow.createCell(i);
+                    cell.setCellValue(headers[i]);
+                    cell.setCellStyle(headerCellStyle);
                 }
 
-                // Writing data rows
+                // Adding data rows with alternating background colors and wrapping text
                 for (int rowIndex = 0; rowIndex < inspections.size(); rowIndex++) {
                     Row dataRow = sheet.createRow(rowIndex + 1);
                     Inspection inspection = inspections.get(rowIndex);
-                    for (int colIndex = 0; colIndex < fields.length; colIndex++) {
-                        fields[colIndex].setAccessible(true);
-                        Object value = fields[colIndex].get(inspection);
-                        dataRow.createCell(colIndex).setCellValue(value != null ? value.toString() : "");
+                    var style = (rowIndex % 2 == 0) ? evenRowCellStyle : oddRowCellStyle;
+
+                    dataRow.createCell(0).setCellValue(inspection.getInspectionNo());
+                    dataRow.getCell(0).setCellStyle(style);
+
+                    dataRow.createCell(1).setCellValue(inspection.getNotificationReceivedDateTime().toString());
+                    dataRow.getCell(1).setCellStyle(style);
+
+                    dataRow.createCell(2).setCellValue(inspection.getClient().getClientName() + " - " + inspection.getClient().getCountry());
+                    dataRow.getCell(2).setCellStyle(style);
+
+                    dataRow.createCell(3).setCellValue(inspection.getInspectionCountry());
+                    dataRow.getCell(3).setCellStyle(style);
+
+                    dataRow.createCell(4).setCellValue(inspection.getNotificationNo());
+                    dataRow.getCell(4).setCellStyle(style);
+
+                    dataRow.createCell(5).setCellValue(inspection.getInspectionDateAsPerNotification().toString());
+                    dataRow.getCell(5).setCellStyle(style);
+
+                    dataRow.createCell(6).setCellValue(inspection.getInspectionItem());
+                    dataRow.getCell(6).setCellStyle(style);
+
+                    dataRow.createCell(7).setCellValue(inspection.getInspectionActivityWithStages());
+                    dataRow.getCell(7).setCellStyle(style);
+
+                    dataRow.createCell(8).setCellValue(inspection.getInspectionType().toString().toLowerCase());
+                    dataRow.getCell(8).setCellStyle(style);
+
+                    dataRow.createCell(9).setCellValue(inspection.getInspectionLocationDetails());
+                    dataRow.getCell(9).setCellStyle(style);
+
+                    if (inspection.getProposedCVs() != null && !inspection.getProposedCVs().isEmpty()) {
+                        ProposedCVs latestCV = inspection.getProposedCVs().stream()
+                                .max(Comparator.comparing(ProposedCVs::getId))
+                                .orElse(null);
+                        dataRow.createCell(10).setCellValue(
+                                latestCV.getInspector() != null && latestCV.getInspector().getInspectorName() != null ? latestCV.getInspector().getInspectorName() : "");
+                        dataRow.getCell(10).setCellStyle(style);
+
+                        dataRow.createCell(11).setCellValue(latestCV.isCvCertificatesAvailable() ? "Yes" : "No");
+                        dataRow.getCell(11).setCellStyle(style);
+
+                        dataRow.createCell(12).setCellValue(
+                                latestCV.getCvReviewByTechnicalCoordinator() != null && latestCV.getCvReviewByTechnicalCoordinator().getEmpName() != null ? latestCV.getCvReviewByTechnicalCoordinator().getEmpName() : "");
+                        dataRow.getCell(12).setCellStyle(style);
+
+                        dataRow.createCell(13).setCellValue(latestCV.isPqrAvailable() ? "Yes" : "No");
+                        dataRow.getCell(13).setCellStyle(style);
+
+                        dataRow.createCell(14).setCellValue(latestCV.getCvSubmittedToClientDate() != null ? latestCV.getCvSubmittedToClientDate().toString() : "");
+                        dataRow.getCell(14).setCellStyle(style);
+
+                        dataRow.createCell(15).setCellValue(latestCV.isCvStatus() ? "Approved" : "Not Approved");
+                        dataRow.getCell(15).setCellStyle(style);
                     }
+
+                    dataRow.createCell(16).setCellValue(inspection.getApprovedInspectorName());
+                    dataRow.getCell(16).setCellStyle(style);
+
+                    dataRow.createCell(17).setCellValue(inspection.getOrderConfirmationDate());
+                    dataRow.getCell(17).setCellStyle(style);
+
+                    dataRow.createCell(18).setCellValue(inspection.getSectorScope());
+                    dataRow.getCell(18).setCellStyle(style);
+
+                    dataRow.createCell(19).setCellValue(inspection.getEndClientName());
+                    dataRow.getCell(19).setCellStyle(style);
+
+                    dataRow.createCell(20).setCellValue(inspection.getProjectName());
+                    dataRow.getCell(20).setCellStyle(style);
+
+                    dataRow.createCell(21).setCellValue(inspection.isReferenceDocumentsForInspectionStatus() ? "Available" : "Not Available");
+                    dataRow.getCell(21).setCellStyle(style);
+
+                    dataRow.createCell(22).setCellValue(inspection.getDocumentsReviewedByTechnicalCoordinator());
+                    dataRow.getCell(22).setCellStyle(style);
+
+                    dataRow.createCell(23).setCellValue(inspection.isContractReviewPrepared() ? "Yes" : "No");
+                    dataRow.getCell(23).setCellStyle(style);
+
+                    dataRow.createCell(24).setCellValue(inspection.isInspectionAdviseNote() ? "Yes" : "No");
+                    dataRow.getCell(24).setCellStyle(style);
+
+                    dataRow.createCell(25).setCellValue(inspection.getInstructionsToInspectorDate());
+                    dataRow.getCell(25).setCellStyle(style);
+
+                    dataRow.createCell(26).setCellValue(inspection.isAnyInspectionIssues() ? "Yes" : "No");
+                    dataRow.getCell(26).setCellStyle(style);
+
+                    dataRow.createCell(27).setCellValue(inspection.getFrSentToClientDate());
+                    dataRow.getCell(27).setCellStyle(style);
+
+                    dataRow.createCell(28).setCellValue(inspection.getInspectionReportsReceivedDate());
+                    dataRow.getCell(28).setCellStyle(style);
+
+                    dataRow.createCell(29).setCellValue(inspection.getInspectionReviewedBy());
+                    dataRow.getCell(29).setCellStyle(style);
+
+                    dataRow.createCell(30).setCellValue(inspection.getInspectionSupportDocumentsSentDate());
+                    dataRow.getCell(30).setCellStyle(style);
+
+                    dataRow.createCell(31).setCellValue(inspection.getInspectionReportNumber());
+                    dataRow.getCell(31).setCellStyle(style);
+
+                    dataRow.createCell(32).setCellValue(inspection.isNcrRaised() ? "Yes" : "No");
+                    dataRow.getCell(32).setCellStyle(style);
+
+                    dataRow.createCell(33).setCellValue(inspection.getIrnSentDate());
+                    dataRow.getCell(33).setCellStyle(style);
+
+                    dataRow.createCell(34).setCellValue(inspection.isImpartialityAndConfidentiality() ? "Yes" : "No");
+                    dataRow.getCell(34).setCellStyle(style);
+
+                    dataRow.createCell(35).setCellValue(inspection.getJobFolderLink());
+                    dataRow.getCell(35).setCellStyle(style);
                 }
             }
 
+            for (int i = 0; i < 36; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
             workbook.write(out);
-        } catch (IOException | IllegalAccessException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("Error creating Excel report", e);
         }
         return out.toByteArray();
     }
+
+
 }
