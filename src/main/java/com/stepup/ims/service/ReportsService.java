@@ -43,10 +43,18 @@ public class ReportsService {
     @Autowired
     private InspectionModelMapper inspectionModelMapper;
 
-    public byte[] generateReport(String period, String from, String to, String format) throws IllegalAccessException {
+    public byte[] generateReport(String client, String period, String from, String to, String format) throws IllegalAccessException {
 
-        List<Inspection> inspections = inspectionService.getInspectionsBetweenDates(from, to);
-        String reportName = "Inspections_" + period + "_" + from.split("T")[0] + "_" + to.split("T")[0] + "." + format.toLowerCase();
+        List<Inspection> inspections;
+        String reportName;
+
+        if (client == null || client.isEmpty() || client.equalsIgnoreCase("All")) {
+            inspections = inspectionService.getInspectionsBetweenDates(from, to);
+            reportName = "Inspections_" + period + "_" + from.split("T")[0] + "_" + to.split("T")[0] + "." + format.toLowerCase();
+        } else {
+            inspections = inspectionService.getInspectionsByClientAndBetweenDates(client, from, to);
+            reportName = client.toUpperCase() + "Inspections_" + period + "_" + from.split("T")[0] + "_" + to.split("T")[0] + "." + format.toLowerCase();
+        }
         return switch (format.toLowerCase()) {
             case "pdf" -> generatePdfReport(reportName, inspections);
             case "excel" -> generateExcelReport(reportName, inspections);

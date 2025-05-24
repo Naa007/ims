@@ -73,6 +73,20 @@ public class InspectionService {
         }
     }
 
+    /**
+     * Get inspections by client and between two dates.
+     */
+    public List<Inspection> getInspectionsByClientAndBetweenDates(String client, String fromDate, String toDate) {
+        try {
+            LocalDateTime start = LocalDateTime.parse(fromDate);
+            LocalDateTime end = LocalDateTime.parse(toDate);
+            List<com.stepup.ims.entity.Inspection> inspections = inspectionRepository.findByClient_ClientIdAndCreatedDateBetween(Long.valueOf(client), start, end);
+            return inspectionModelMapper.toModelList(inspections);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(
+                    "Invalid date format. Please use the correct format: " + inputFormatter.toString(), e);
+        }
+    }
 
     /**
      * Get all inspections created by the current user.

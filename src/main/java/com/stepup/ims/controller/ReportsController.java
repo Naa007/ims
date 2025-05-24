@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/reports")
@@ -22,9 +23,10 @@ public class ReportsController {
                                                        @PathVariable String from,
                                                        @PathVariable String to,
                                                        @PathVariable String format,
+                                                       @RequestParam(required = false) String client,
                                                        Model model) throws IllegalAccessException {
 
-        byte[] report = reportsService.generateReport(period, from, to, format);
+        byte[] report = reportsService.generateReport(client, period, from, to, format);
         return buildReportResponse(report, period + "-report." + format, format);
     }
 

@@ -36,6 +36,8 @@ public interface InspectionRepository extends JpaRepository<Inspection, Long> {
 
     List<Inspection> findByCreatedDateBetween(LocalDateTime from, LocalDateTime to);
 
+    List<Inspection> findByClient_ClientIdAndCreatedDateBetween(Long clientId, LocalDateTime startDate, LocalDateTime endDate);
+
     List<Inspection> findByCreatedByAndCreatedDateBetween(String createdBy, LocalDateTime from, LocalDateTime to);
 
     List<Inspection> findByProposedCVs_Inspector_EmailAndCreatedDateBetween(String email, LocalDateTime from, LocalDateTime to);

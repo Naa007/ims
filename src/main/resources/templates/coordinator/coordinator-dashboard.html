@@ -134,7 +134,14 @@
                     <!-- Time Period Selection -->
                     <div class="cd-period-selection">
                         <div class="cd-filter-group">
-                            <label for="reportPeriodSelect">Time Range:</label>
+
+                            <label for="clientSelect">Clients</label>
+                            <select class="cd-period-select" id="clientSelect">
+                                <option value="all" selected>All</option>
+                                <option th:each="client : ${clients}" th:value="${client.clientId}"
+                                        th:text="${client.clientName + ' - ' + client.country}"></option>
+                            </select>
+                            <label for="reportPeriodSelect">Period</label>
                             <select class="cd-period-select" id="reportPeriodSelect">
                                 <option value="" disabled selected>Select a range</option>
                                 <option value="today">Today</option>

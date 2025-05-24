@@ -723,8 +723,29 @@ function disableButton() {
         // Set current date for date inputs
         initializeDateInputs();
         updateComparisonChart();
+
+        initializeSelects();
     }
 
+    function initializeSelects() {
+        // Set up listeners for individual select changes
+        document.getElementById('coordinatorSelect').addEventListener('change', function() {
+            handleCoordinatorChange(this);
+
+        });
+        document.getElementById('technicalCoordinatorSelect').addEventListener('change', function() {
+            handleTechnicalCoordinatorChange(this);
+
+        });
+        document.getElementById('inspectorSelect').addEventListener('change', function() {
+            handleInspectorChange(this);
+        });
+
+        // Also update comparison chart when period changes
+        document.getElementById('coordinatorPeriodSelect').addEventListener('change', updateComparisonChart);
+        document.getElementById('technicalPeriodSelect').addEventListener('change', updateComparisonChart);
+        document.getElementById('inspectorPeriodSelect').addEventListener('change', updateComparisonChart);
+    }
     function initializeStatCardToggles() {
         const statHeaders = document.querySelectorAll('.bd-stat-header');
 
@@ -1506,11 +1527,6 @@ chart.options.plugins.title = {
         });
 }
 
-
-
-
-
-
 function getLineColor(index) {
     const colors = ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'];
     return colors[index % colors.length];
@@ -1524,27 +1540,6 @@ function generateRandomData(count, min, max) {
     }
     return data;
 }
-// Add event listeners after DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    // Set up listeners for individual select changes
-    document.getElementById('coordinatorSelect').addEventListener('change', function() {
-        handleCoordinatorChange(this);
-
-    });
-    document.getElementById('technicalCoordinatorSelect').addEventListener('change', function() {
-        handleTechnicalCoordinatorChange(this);
-
-    });
-    document.getElementById('inspectorSelect').addEventListener('change', function() {
-        handleInspectorChange(this);
-        x
-    });
-
-    // Also update comparison chart when period changes
-    document.getElementById('coordinatorPeriodSelect').addEventListener('change', updateComparisonChart);
-    document.getElementById('technicalPeriodSelect').addEventListener('change', updateComparisonChart);
-    document.getElementById('inspectorPeriodSelect').addEventListener('change', updateComparisonChart);
-});
 
 /*]]>*/
 
@@ -1865,7 +1860,7 @@ document.addEventListener('DOMContentLoaded', function() {
         resetExportButton(exportBtn, originalText);
     };
 
-    let endpoint, filename, period, startDate, endDate;
+    let endpoint, filename, client, period, startDate, endDate;
 
     switch (context) {
         case 'coordinator':
@@ -1903,6 +1898,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!period) return showPeriodWarning();
             [startDate, endDate] = getStartAndEndDate(period, 'reportStartDate', 'reportEndDate');
             endpoint = `/reports/inspections/${period}/${startDate}/${endDate}/${format}`;
+            client = document.getElementById('clientSelect')?.value;
+            if (client && client !== 'all') {
+                endpoint += `?client=${client}`;
+            }
             filename = `inspections_report_${period}_${startDate}_${endDate}.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
             break;
         }
