@@ -35,7 +35,7 @@ public class SecurityConfig {
                         .requestMatchers(BUSINESS_ACCESS).hasRole(BUSINESS)
                         .requestMatchers(COORDINATOR_ACCESS).hasAnyRole(COORDINATOR)
                         .requestMatchers(TECHNICAL_COORDINATOR_ACCESS).hasAnyRole(TECHNICAL_COORDINATOR)
-                        .requestMatchers(INSPECTOR_ACCESS).hasAnyRole(INSPECTOR)
+                        .requestMatchers(INSPECTOR_ACCESS).hasAnyRole(INSPECTOR, TECHNICAL_COORDINATOR)
                         .requestMatchers(EMPLOYEE_ACCESS).hasAnyRole(ADMIN)
                         .requestMatchers(STATS_ACCESS).hasAnyRole(BUSINESS, COORDINATOR, TECHNICAL_COORDINATOR, INSPECTOR)
                         .requestMatchers(REPORT_ACCESS).hasAnyRole(COORDINATOR, ADMIN)

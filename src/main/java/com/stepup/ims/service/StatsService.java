@@ -42,6 +42,9 @@ public class StatsService {
     private InspectionRepository inspectionRepository;
     @Autowired
     private EmployeeService employeeService;
+    @Autowired
+    private InspectorService inspctorService;
+
 
     @Autowired
     public StatsService(StatsRepository statsRepository) {
@@ -188,7 +191,9 @@ public class StatsService {
                 throw new IllegalArgumentException("Unknown role: " + role);
         }
 
-        return "pdf".equalsIgnoreCase(format) ? generatePdfReport(title, label, nameLabel, id, empName, period, stats) : generateExcelReport(title, label, nameLabel, period, id, empName, stats, sheetName);
+        return "pdf".equalsIgnoreCase(format) ?
+                generatePdfReport(title, label, nameLabel, id, empName, period, stats) :
+                generateExcelReport(title, label, nameLabel, id, empName, period, stats, sheetName);
     }
 
     private byte[] generatePdfReport(String title, String label, String nameLabel, String id, String empName, String period, InspectionStatsByRole stats) {
@@ -325,7 +330,8 @@ public class StatsService {
     private String getEmployeeName(String id, String role) {
         try {
             return switch (role.toLowerCase()) {
-                case COORDINATOR_LOWERCASE, INSPECTOR_LOWERCASE -> employeeService.getEmployeeNameByEmail(id);
+                case COORDINATOR_LOWERCASE -> employeeService.getEmployeeNameByEmail(id);
+                case INSPECTOR_LOWERCASE -> inspctorService.getInspectorNameByEmail(id);
                 case TECHNICAL_COORDINATOR_LOWERCASE -> employeeService.getEmployeeNameByEmpId(id);
                 default -> "Unknown";
             };

@@ -19,4 +19,7 @@ public interface InspectorRepository extends JpaRepository<Inspector, Long> {
 
     @Query("SELECT i.id FROM Inspector i WHERE i.email = :email")
     String findInspectorIdByEmail(@Param("email") String email);
+
+    @Query("SELECT i.inspectorName FROM Inspector i WHERE i.email = :email")
+    String findInspectorNameByEmail(@Param("email") String email);
 }

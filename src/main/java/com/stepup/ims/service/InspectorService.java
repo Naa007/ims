@@ -89,4 +89,8 @@ public class InspectorService {
     public String getInspectorIdByEmail(String email) {
         return inspectorRepository.findInspectorIdByEmail(email);
     }
+
+    public String getInspectorNameByEmail(String emaill) {
+        return inspectorRepository.findInspectorNameByEmail(emaill);
+    }
 }

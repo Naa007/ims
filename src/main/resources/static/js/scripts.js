@@ -1,3 +1,7 @@
+let lastCoordinatorData = null;
+let lastTechnicalData = null;
+let lastInspectorData = null;
+
 document.addEventListener("DOMContentLoaded", function () {
     console.log("All events hooks here !!!");
 
@@ -96,7 +100,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-
    if (["Coordinator Dashboard", "Admin Dashboard", "Inspector Dashboard", "Technical Coordinator Dashboard"].includes(document.title)) {
        const stats = ["Coordinator Dashboard", "Inspector Dashboard", "Technical Coordinator Dashboard"].includes(document.title);
        const reports = ["Coordinator Dashboard", "Admin Dashboard"].includes(document.title);
@@ -108,6 +111,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
        // Initialize date inputs
        initializeDateInputs(context, stats, reports);
+   }
+
+   if (["Business Dashboard"].includes(document.title)) {
+       initializeBD();
    }
 
     /** ================= Map Initialization Section ================= **/
@@ -701,9 +708,848 @@ function disableButton() {
 
 /** ================== Business Dashboard ================= **/
 
+ /*<![CDATA[*/
+
+   function initializeBD() {
+        // Initialize toggle for stat cards
+        initializeStatCardToggles();
+
+        // Initialize tab navigation
+        initializeTabNavigation();
+
+        // Initialize comparison chart
+        initializeComparisonChart();
+
+        // Set current date for date inputs
+        initializeDateInputs();
+        updateComparisonChart();
+    }
+
+    function initializeStatCardToggles() {
+        const statHeaders = document.querySelectorAll('.bd-stat-header');
+
+        statHeaders.forEach(header => {
+            header.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const content = document.getElementById(targetId);
+                const icon = this.querySelector('.bd-dropdown-icon');
+
+                content.classList.toggle('expanded');
+                icon.classList.toggle('active');
+            });
+        });
+    }
+
+   function initializeTabNavigation() {
+    const tabButtons = document.querySelectorAll('.bd-tab-button');
+
+    tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons and panels
+            document.querySelectorAll('.bd-tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.bd-chart-panel').forEach(panel => panel.classList.remove('active'));
+
+            // Add active class to clicked button
+            this.classList.add('active');
+
+            // Show the corresponding panel
+            const targetPanelId = this.getAttribute('data-target');
+            document.getElementById(targetPanelId).classList.add('active');
+
+        });
+    });
+}
+    function initializeDateInputs() {
+        // Set default dates to 30 days ago and today
+        const today = new Date();
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(today.getDate() - 30);
+
+        // Format dates for input fields
+        const formatDate = (date) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+
+        // Set date values for all custom range inputs
+        const startDateInputs = document.querySelectorAll('[id$="StartDate"]');
+        const endDateInputs = document.querySelectorAll('[id$="EndDate"]');
+
+        startDateInputs.forEach(input => input.value = formatDate(thirtyDaysAgo));
+        endDateInputs.forEach(input => input.value = formatDate(today));
+    }
+
+    function initializeComparisonChart() {
+        const ctx = document.getElementById('comparisonChart').getContext('2d');
+        return new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'Select users above to compare performance',
+                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    borderColor: '#858796',
+                    backgroundColor: 'rgba(133, 135, 150, 0.1)',
+                    borderWidth: 1,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Inspections Completed'
+                        },
+                        grid: {
+                            display: true,
+                            drawBorder: false,
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 20,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        titleColor: '#5a5c69',
+                        bodyColor: '#5a5c69',
+                        borderColor: '#e3e6f0',
+                        borderWidth: 1,
+                        cornerRadius: 4,
+                        displayColors: true,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += context.parsed.y + ' inspections';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Period change handlers
+    function handleCoordinatorPeriodChange() {
+        const periodSelect = document.getElementById('coordinatorPeriodSelect');
+        const customRangeContainer = document.getElementById('coordinatorCustomRangeContainer');
+
+        if (periodSelect.value === 'custom') {
+            customRangeContainer.style.display = 'block';
+        } else {
+            customRangeContainer.style.display = 'none';
+            updateCoordinatorChartWithPeriod(periodSelect.value);
+        }
+    }
+
+    function handleTechnicalPeriodChange() {
+        const periodSelect = document.getElementById('technicalPeriodSelect');
+        const customRangeContainer = document.getElementById('technicalCustomRangeContainer');
+
+        if (periodSelect.value === 'custom') {
+            customRangeContainer.style.display = 'block';
+        } else {
+            customRangeContainer.style.display = 'none';
+            updateTechnicalChartWithPeriod(periodSelect.value);
+        }
+    }
+
+    function handleInspectorPeriodChange() {
+        const periodSelect = document.getElementById('inspectorPeriodSelect');
+        const customRangeContainer = document.getElementById('inspectorCustomRangeContainer');
+
+        if (periodSelect.value === 'custom') {
+            customRangeContainer.style.display = 'block';
+        } else {
+            customRangeContainer.style.display = 'none';
+            updateInspectorChartWithPeriod(periodSelect.value);
+        }
+    }
+
+ function applyCoordinatorCustomRange() {
+    const period = 'custom'; // Force custom period
+    const selectedCoordinator = document.getElementById('coordinatorSelect').value;
+
+    if (selectedCoordinator) {
+        fetchCoordinatorMetricData(selectedCoordinator, period);
+    } else {
+        showNotification('Please select a coordinator first', 'warning');
+    }
+}
+
+ function applyTechnicalCustomRange() {
+    const period = 'custom'; // Force custom period
+    const selectedTechCoordinator = document.getElementById('technicalCoordinatorSelect').value;
+
+    if (selectedTechCoordinator) {
+        fetchTechnicalMetricData(selectedTechCoordinator, period);
+    } else {
+        showNotification('Please select a technical coordinator first', 'warning');
+    }
+}
+
+function applyInspectorCustomRange() {
+    const period = 'custom'; // Force custom period
+    const selectedInspector = document.getElementById('inspectorSelect').value;
+
+    if (selectedInspector) {
+        fetchInspectorMetricData(selectedInspector, period);
+    } else {
+        showNotification('Please select an inspector first', 'warning');
+    }
+}
+
+    // Update chart with period
+    function updateCoordinatorChartWithPeriod(period) {
+        const selectedCoordinator = document.getElementById('coordinatorSelect').value;
+
+        if (selectedCoordinator) {
+            fetchCoordinatorMetricData(selectedCoordinator, period);
+        }
+    }
+
+    function updateTechnicalChartWithPeriod(period) {
+        const selectedTechCoordinator = document.getElementById('technicalCoordinatorSelect').value;
+
+        if (selectedTechCoordinator) {
+            fetchTechnicalMetricData(selectedTechCoordinator, period);
+        }
+    }
+
+    function updateInspectorChartWithPeriod(period) {
+        const selectedInspector = document.getElementById('inspectorSelect').value;
+
+        if (selectedInspector) {
+            fetchInspectorMetricData(selectedInspector, period);
+        }
+    }
+
+    // Update chart with date range
+    function updateCoordinatorChartWithDateRange(startDate, endDate) {
+        const selectedCoordinator = document.getElementById('coordinatorSelect').value;
+
+        if (selectedCoordinator) {
+            fetchCoordinatorDateRangeData(selectedCoordinator, startDate, endDate);
+        } else {
+            showNotification('Please select a coordinator first', 'warning');
+        }
+    }
+
+    // Handler for individual selection
+    function handleCoordinatorChange(selectElement) {
+        const selectedCoordinatorEmail = selectElement.value;
+        const period = document.getElementById('coordinatorPeriodSelect').value;
+
+        if (!selectedCoordinatorEmail) return;
+
+        // Remove empty state and show loading
+        removeEmptyState('coordinatorPerformanceContainer');
+        showBDLoadingIndicator('coordinatorPerformanceContainer');
+
+        fetchCoordinatorMetricData(selectedCoordinatorEmail, period);
+    }
+
+    function handleTechnicalCoordinatorChange(selectElement) {
+        const selectedTechnicalCoordinator = selectElement.value;
+        const period = document.getElementById('technicalPeriodSelect').value;
+
+        if (!selectedTechnicalCoordinator) return;
+
+        // Remove empty state and show loading
+        removeEmptyState('technicalCoordinatorContainer');
+        showBDLoadingIndicator('technicalCoordinatorContainer');
+
+        fetchTechnicalMetricData(selectedTechnicalCoordinator, period);
+
+    }
+
+    function handleInspectorChange(selectElement) {
+        const selectedInspector = selectElement.value;
+        const period = document.getElementById('inspectorPeriodSelect').value;
+
+        if (!selectedInspector) return;
+
+        // Remove empty state and show loading
+        removeEmptyState('inspectorPerformanceContainer');
+        showBDLoadingIndicator('inspectorPerformanceContainer');
+
+        fetchInspectorMetricData(selectedInspector, period);
+    }
+
+function fetchMetricData(role, identifier, period) {
+    const roleConfig = {
+        coordinator: {
+            containerId: 'coordinatorPerformanceContainer',
+            urlPath: 'coordinator-stats',
+            startDateId: 'coordinatorStartDate',
+            endDateId: 'coordinatorEndDate',
+            totalDisplayId: 'coordinatorTotalDisplay',
+            lastDataKey: 'lastCoordinatorData'
+        },
+        technical: {
+            containerId: 'technicalCoordinatorContainer',
+            urlPath: 'technical-coordinator-stats',
+            startDateId: 'technicalStartDate',
+            endDateId: 'technicalEndDate',
+            totalDisplayId: 'techCoordinatorTotalDisplay',
+            lastDataKey: 'lastTechnicalData'
+        },
+        inspector: {
+            containerId: 'inspectorPerformanceContainer',
+            urlPath: 'inspector-stats',
+            startDateId: 'inspectorStartDate',
+            endDateId: 'inspectorEndDate',
+            totalDisplayId: 'inspectorTotalDisplay',
+            lastDataKey: 'lastInspectorData'
+        }
+    };
+
+    const config = roleConfig[role];
+    if (!config) {
+        console.error(`Invalid role: ${role}`);
+        return;
+    }
+
+    // Show loading indicator
+    showBDLoadingIndicator(config.containerId);
+
+    // Construct the base URL
+    let url = `/stats/${config.urlPath}/${encodeURIComponent(identifier)}/${encodeURIComponent(period)}`;
+
+    // Handle custom date range
+    if (period === 'custom') {
+        const startDate = document.getElementById(`${role}StartDate`).value;
+        const endDate = document.getElementById(`${role}EndDate`).value;
+
+        if (!startDate || !endDate) {
+            showNotification('Please select both start and end dates', 'error');
+            hideBDLoadingIndicator(config.containerId);
+            return;
+        }
+
+        if (new Date(startDate) > new Date(endDate)) {
+            showNotification('Start date cannot be after end date', 'error');
+            hideBDLoadingIndicator(config.containerId);
+            return;
+        }
+    }
+
+    [from, to] = getStartAndEndDate(period, config.startDateId, config.endDateId);
+    url += `?from=${from}&to=${to}`;
+    // Fetch data from the server
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            hideBDLoadingIndicator(config.containerId);
+            updateRoleMetricsDisplay(role, data);
+
+            const isNew = JSON.stringify(data) !== JSON.stringify(window[config.lastDataKey]);
+
+            if (isNew) {
+                window[config.lastDataKey] = data;
+
+                if (hasMeaningfulInspectionData(data)) {
+                    const totalDisplay = document.getElementById(config.totalDisplayId);
+                    if (totalDisplay) {
+                        totalDisplay.classList.add('bd-total-highlight');
+                        setTimeout(() => totalDisplay.classList.remove('bd-total-highlight'), 1500);
+                    }
+                    showNotification(`${role.charAt(0).toUpperCase() + role.slice(1)} data updated successfully`, 'success');
+                    updateComparisonChart();
+                } else {
+                    showNotification(`No data available for selected ${role}`, 'warning');
+                }
+            }
+        })
+        .catch(error => {
+            hideBDLoadingIndicator(config.containerId);
+            console.error('Error:', error);
+            showNotification(`Failed to fetch ${role} data. Please try again.`, 'error');
+        });
+}
+    // Update the fetch functions to match your API endpoints
+    function fetchCoordinatorMetricData(coordinatorEmail, period) {
+        fetchMetricData('coordinator', coordinatorEmail, period)
+    }
+
+    function fetchTechnicalMetricData(techCoordinatorId, period) {
+        fetchMetricData('technical', techCoordinatorId, period)
+    }
+
+    function fetchInspectorMetricData(inspectorEmail, period) {
+        fetchMetricData('inspector', inspectorEmail, period)
+    }
+
+    function hasMeaningfulInspectionData(data) {
+        return data.totalInspections > 0 ||
+               data.newInspections > 0 ||
+               data.completedInspections > 0 ||
+               data.ongoingInspections > 0 ||
+               data.rejectedInspections > 0;
+    }
+
+    function updateRoleMetricsDisplay(roleType, data) {
+        let containerId;
+        if (roleType === 'technical') {
+            containerId = 'technicalCoordinatorContainer';
+        } else {
+            containerId = `${roleType}PerformanceContainer`;
+        }
+
+        const container = document.getElementById(containerId);
+
+        // Get the selected name from the dropdown
+        let selectedName = "";
+        if (roleType === 'coordinator') {
+            const select = document.getElementById('coordinatorSelect');
+            selectedName = select.options[select.selectedIndex].text;
+        } else if (roleType === 'technical') {
+            const select = document.getElementById('technicalCoordinatorSelect');
+            selectedName = select.options[select.selectedIndex].text;
+        } else if (roleType === 'inspector') {
+            const select = document.getElementById('inspectorSelect');
+            selectedName = select.options[select.selectedIndex].text;
+        }
+
+        // Format period text
+        const periodText = formatPeriodText(data.period);
+
+        // Create the metrics display HTML
+        const metricsHTML = `
+            <div class="bd-metrics-display">
+                <div class="bd-metrics-header">
+                    <h3>${selectedName}</h3>
+                    <span class="bd-period-label">${periodText}</span>
+                </div>
+                <div class="bd-metrics-total">
+                    <span class="bd-total-number">${data.totalInspections}</span>
+                    <span class="bd-total-label">Total Inspections</span>
+                </div>
+                <div class="bd-metrics-breakdown">
+                    <div class="bd-metric-item">
+                        <span class="bd-metric-value">${data.newInspections || 0}</span>
+                        <span class="bd-metric-label">New</span>
+                    </div>
+                    <div class="bd-metric-item">
+                        <span class="bd-metric-value">${data.ongoingInspections || 0}</span>
+                        <span class="bd-metric-label">Ongoing</span>
+                    </div>
+                    <div class="bd-metric-item">
+                        <span class="bd-metric-value">${data.completedInspections || 0}</span>
+                        <span class="bd-metric-label">Awarded</span>
+                    </div>
+                    <div class="bd-metric-item">
+                        <span class="bd-metric-value">${data.rejectedInspections || 0}</span>
+                        <span class="bd-metric-label">Rejected</span>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        container.innerHTML = metricsHTML;
+    }
+
+    // Helper function to format period text
+    function formatPeriodText(period) {
+        switch(period) {
+            case 'WEEK': return 'Last 7 Days';
+            case 'MONTH': return 'Last 30 Days';
+            case 'QUARTER': return 'Last Quarter';
+            case 'YEAR': return 'Year to Date';
+            case 'CUSTOM': return 'Custom Range';
+            default: return period;
+        }
+    }
+
+function exportBDData(role, format) {
+    const roleConfig = {
+        coordinator: {
+            selectId: 'coordinatorSelect',
+            periodSelectId: 'coordinatorPeriodSelect',
+            startDateId: 'startDate',
+            endDateId: 'endDate',
+            reportPath: '/stats/coordinator-report',
+            container: 'coordinatorPerformanceContainer'
+        },
+        technical: {
+            selectId: 'technicalCoordinatorSelect',
+            periodSelectId: 'technicalPeriodSelect',
+            startDateId: 'technicalStartDate',
+            endDateId: 'technicalEndDate',
+            reportPath: '/stats/technical-coordinator-report',
+            container: 'technicalCoordinatorContainer'
+        },
+        inspector: {
+            selectId: 'inspectorSelect',
+            periodSelectId: 'inspectorPeriodSelect',
+            startDateId: 'inspectorStartDate',
+            endDateId: 'inspectorEndDate',
+            reportPath: '/stats/inspector-report',
+            container: 'inspectorPerformanceContainer'
+        }
+    };
+
+    const config = roleConfig[role];
+    if (!config) {
+        console.error(`Invalid role: ${role}`);
+        return;
+    }
+
+    const exportBtn = event.target.closest('.bd-export-btn');
+    if (!exportBtn) return;
+
+    const selectElement = document.getElementById(config.selectId);
+    const selectedValue = selectElement.value;
+    const selectedName = selectElement.selectedOptions[0]?.text || 'report';
+    const period = document.getElementById(config.periodSelectId).value;
+
+    if (!selectedValue) {
+        showNotification(`Please select a ${role} before exporting.`, 'warning');
+        return;
+    }
+    const containerId = config.container;
+    const totalInspections= document.querySelector(`#${containerId} > div > div.bd-metrics-total > span.bd-total-number`)?.innerText || 0;
+    const newInspections= document.querySelector(`#${containerId} > div > div.bd-metrics-breakdown > div:nth-child(1) > span.bd-metric-value`)?.innerText || 0;
+    const ongoingInspections= document.querySelector(`#${containerId} > div > div.bd-metrics-breakdown > div:nth-child(2) > span.bd-metric-value`)?.innerText || 0;
+    const completedInspections= document.querySelector(`#${containerId} > div > div.bd-metrics-breakdown > div:nth-child(3) > span.bd-metric-value`)?.innerText || 0;
+    const rejectedInspections= document.querySelector(`#${containerId} > div > div.bd-metrics-breakdown > div:nth-child(4) > span.bd-metric-value`)?.innerText || 0;
+
+    // Disable button and show loading state
+    exportBtn.disabled = true;
+    const originalText = exportBtn.innerHTML;
+    exportBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
+
+    // Build endpoint URL
+    let endpoint = `${config.reportPath}/${encodeURIComponent(selectedValue)}/${encodeURIComponent(period)}/${format}?`+
+                     `totalInspections=${totalInspections}&newInspections=${newInspections}` +
+                                    `&completedInspections=${completedInspections}&ongoingInspections=${ongoingInspections}` +
+                                    `&rejectedInspections=${rejectedInspections}`;
+    // Generate filename
+    const filename = `${selectedName.replace(/\s+/g, '_')}_report.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
+
+    // Fetch data and handle file download
+    fetch(endpoint)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Error: ${response.status}`);
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            if (blob.size === 0) {
+                showNotification('No data available for report generation.', 'warning');
+                return;
+            }
+
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(link.href);
+
+            showNotification(`${format.toUpperCase()} downloaded successfully.`, 'success');
+        })
+        .catch(error => {
+            console.error('Download failed:', error);
+            showNotification(`Failed to export ${format.toUpperCase()} report.`, 'error');
+        })
+        .finally(() => {
+            // Restore button state
+            exportBtn.disabled = false;
+            exportBtn.innerHTML = originalText;
+        });
+}
+
+// Utility functions
+function showBDLoadingIndicator(containerId) {
+    const container = document.getElementById(containerId);
+
+    // Create loading overlay if it doesn't exist
+    if (!container.querySelector('.bd-loading-overlay')) {
+        const loadingOverlay = document.createElement('div');
+        loadingOverlay.className = 'bd-loading-overlay';
+        loadingOverlay.innerHTML = `
+            <div class="bd-loading-spinner">
+                <i class="fas fa-circle-notch fa-spin"></i>
+            </div>
+            <div class="bd-loading-text">Loading data...</div>
+        `;
+
+        container.style.position = 'relative';
+        container.appendChild(loadingOverlay);
+    } else {
+        container.querySelector('.bd-loading-overlay').style.display = 'flex';
+    }
+}
+
+function hideBDLoadingIndicator(containerId) {
+    const container = document.getElementById(containerId);
+    const loadingOverlay = container.querySelector('.bd-loading-overlay');
+
+    if (loadingOverlay) {
+        loadingOverlay.style.display = 'none';
+    }
+}
+
+function removeEmptyState(containerId) {
+    const container = document.getElementById(containerId);
+    const emptyState = container.querySelector('.bd-empty-state');
+
+    if (emptyState) {
+        container.removeChild(emptyState);
+    }
+}
+
+function showNotification(message, type = 'info') {
+    // Check if notification container exists, if not create it
+    let notificationContainer = document.getElementById('bd-notification-container');
+    if (!notificationContainer) {
+        notificationContainer = document.createElement('div');
+        notificationContainer.id = 'bd-notification-container';
+        document.body.appendChild(notificationContainer);
+    }
+
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `bd-notification bd-notification-${type}`;
+
+    // Set icon based on type
+    let icon;
+    switch (type) {
+        case 'success':
+            icon = 'fa-check-circle';
+            break;
+        case 'error':
+            icon = 'fa-times-circle';
+            break;
+        case 'warning':
+            icon = 'fa-exclamation-triangle';
+            break;
+        default:
+            icon = 'fa-info-circle';
+    }
+
+    notification.innerHTML = `
+        <div class="bd-notification-icon">
+            <i class="fas ${icon}"></i>
+        </div>
+        <div class="bd-notification-content">
+            ${message}
+        </div>
+        <div class="bd-notification-close">
+            <i class="fas fa-times"></i>
+        </div>
+    `;
+
+    // Add to container
+    notificationContainer.appendChild(notification);
+
+    // Add event listener to close button
+    notification.querySelector('.bd-notification-close').addEventListener('click', function() {
+        notification.classList.add('bd-notification-hiding');
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    });
+
+    // Auto-remove after delay
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.classList.add('bd-notification-hiding');
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }
+    }, 5000);
+}
+function showComparisonLoader() {
+    const loader = document.getElementById('comparisonChartLoader');
+    if (loader) loader.style.display = 'flex';
+}
+
+function hideComparisonLoader() {
+    const loader = document.getElementById('comparisonChartLoader');
+    if (loader) loader.style.display = 'none';
+}
+function updateComparisonChart() {
+    const chart = Chart.getChart('comparisonChart');
+    if (!chart) return;
+
+    const coordinator = document.getElementById('coordinatorSelect')?.value;
+    const technical = document.getElementById('technicalCoordinatorSelect')?.value;
+    const inspector = document.getElementById('inspectorSelect')?.value;
+
+    // Only pass selected values if actually chosen (non-placeholder)
+    const selectedCoordinator = coordinator !== "" ? coordinator : null;
+    const selectedTechnical = technical !== "" ? technical : null;
+    const selectedInspector = inspector !== "" ? inspector : null;
+
+    const url = `/business/trend-data?coordinator=${encodeURIComponent(selectedCoordinator || "")}&technical=${encodeURIComponent(selectedTechnical || "")}&inspector=${encodeURIComponent(selectedInspector || "")}`;
+
+    showComparisonLoader();
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            hideComparisonLoader();
+
+            if (!data || !data.datasets || data.datasets.length === 0) {
+                chart.data.labels = [];
+                chart.data.datasets = [{
+                    label: 'No Data Available',
+                    data: [],
+                    borderColor: '#e74a3b',
+                    backgroundColor: 'rgba(231, 74, 59, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true
+                }];
+                chart.update();
+                return;
+            }
+
+            chart.data.labels = data.labels;
+            chart.data.datasets = data.datasets.map((ds, index) => ({
+                label: ds.label,
+                data: ds.data,
+                borderColor: getLineColor(index),
+                backgroundColor: 'rgba(0, 123, 255, 0.05)',
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }));
+
+const titleParts = ['All Inspections'];
+if (selectedCoordinator) {
+    const select = document.getElementById('coordinatorSelect');
+    const name = select.options[select.selectedIndex]?.text;
+    if (name) titleParts.push(`${name} (Coordinator)`);
+}
+if (selectedTechnical) {
+    const select = document.getElementById('technicalCoordinatorSelect');
+    const name = select.options[select.selectedIndex]?.text;
+    if (name) titleParts.push(`${name} (Technical)`);
+}
+if (selectedInspector) {
+    const select = document.getElementById('inspectorSelect');
+    const name = select.options[select.selectedIndex]?.text;
+    if (name) titleParts.push(`${name} (Inspector)`);
+}
+
+chart.options.plugins.title = {
+    display: true,
+    text: titleParts.length > 1
+        ? titleParts.join(' vs ')
+        : 'All Inspections Trend',
+    font: {
+        size: 16,
+        weight: 'bold'
+    },
+    padding: {
+        top: 10,
+        bottom: 20
+    }
+};
+            chart.update();
+        })
+        .catch(err => {
+            hideComparisonLoader();
+            console.error("Trend data fetch failed", err);
+            showNotification('Unable to load performance trends.', 'error');
+        });
+}
 
 
-/** ================= Coordinator Dashboard =================== **/
+
+
+
+
+function getLineColor(index) {
+    const colors = ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'];
+    return colors[index % colors.length];
+}
+
+// Helper function to generate random data for demonstration
+function generateRandomData(count, min, max) {
+    const data = [];
+    for (let i = 0; i < count; i++) {
+        data.push(Math.floor(Math.random() * (max - min + 1)) + min);
+    }
+    return data;
+}
+// Add event listeners after DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Set up listeners for individual select changes
+    document.getElementById('coordinatorSelect').addEventListener('change', function() {
+        handleCoordinatorChange(this);
+
+    });
+    document.getElementById('technicalCoordinatorSelect').addEventListener('change', function() {
+        handleTechnicalCoordinatorChange(this);
+
+    });
+    document.getElementById('inspectorSelect').addEventListener('change', function() {
+        handleInspectorChange(this);
+        x
+    });
+
+    // Also update comparison chart when period changes
+    document.getElementById('coordinatorPeriodSelect').addEventListener('change', updateComparisonChart);
+    document.getElementById('technicalPeriodSelect').addEventListener('change', updateComparisonChart);
+    document.getElementById('inspectorPeriodSelect').addEventListener('change', updateComparisonChart);
+});
+
+/*]]>*/
+
+
+/** ================= Coordinator, Technical Coordinator, Inspector, Admin Dashboard =================== **/
 
     // Initialize date inputs with default values
     function initializeDateInputs(context, stats, reports) {
