@@ -165,7 +165,7 @@ public class ReportsService {
                     dataRow.createCell(0).setCellValue(inspection.getInspectionNo());
                     dataRow.getCell(0).setCellStyle(style);
 
-                    dataRow.createCell(1).setCellValue(inspection.getNotificationReceivedDateTime().toString());
+                    dataRow.createCell(1).setCellValue(inspection.getNotificationReceivedDateTime() != null ? inspection.getNotificationReceivedDateTime().toString() : "");
                     dataRow.getCell(1).setCellStyle(style);
 
                     dataRow.createCell(2).setCellValue(inspection.getClient().getClientName() + " - " + inspection.getClient().getCountry());
@@ -177,7 +177,7 @@ public class ReportsService {
                     dataRow.createCell(4).setCellValue(inspection.getNotificationNo());
                     dataRow.getCell(4).setCellStyle(style);
 
-                    dataRow.createCell(5).setCellValue(inspection.getInspectionDateAsPerNotification().toString());
+                    dataRow.createCell(5).setCellValue(inspection.getInspectionDateAsPerNotification() != null ? inspection.getInspectionDateAsPerNotification().toString() : "");
                     dataRow.getCell(5).setCellStyle(style);
 
                     dataRow.createCell(6).setCellValue(inspection.getInspectionItem());
@@ -220,7 +220,7 @@ public class ReportsService {
                     dataRow.createCell(16).setCellValue(inspection.getApprovedInspectorName());
                     dataRow.getCell(16).setCellStyle(style);
 
-                    dataRow.createCell(17).setCellValue(inspection.getOrderConfirmationDate());
+                    dataRow.createCell(17).setCellValue(inspection.getOrderConfirmationDate() != null ? inspection.getOrderConfirmationDate().toString() : "");
                     dataRow.getCell(17).setCellStyle(style);
 
                     dataRow.createCell(18).setCellValue(inspection.getSectorScope());
@@ -244,22 +244,22 @@ public class ReportsService {
                     dataRow.createCell(24).setCellValue(inspection.isInspectionAdviseNote() ? "Yes" : "No");
                     dataRow.getCell(24).setCellStyle(style);
 
-                    dataRow.createCell(25).setCellValue(inspection.getInstructionsToInspectorDate());
+                    dataRow.createCell(25).setCellValue(inspection.getInstructionsToInspectorDate() != null ? inspection.getInstructionsToInspectorDate().toString() : "");
                     dataRow.getCell(25).setCellStyle(style);
 
                     dataRow.createCell(26).setCellValue(inspection.isAnyInspectionIssues() ? "Yes" : "No");
                     dataRow.getCell(26).setCellStyle(style);
 
-                    dataRow.createCell(27).setCellValue(inspection.getFrSentToClientDate());
+                    dataRow.createCell(27).setCellValue(inspection.getFrSentToClientDate() != null ? inspection.getFrSentToClientDate().toString() : "");
                     dataRow.getCell(27).setCellStyle(style);
 
-                    dataRow.createCell(28).setCellValue(inspection.getInspectionReportsReceivedDate());
+                    dataRow.createCell(28).setCellValue(inspection.getInspectionReportsReceivedDate() != null ? inspection.getInspectionReportsReceivedDate().toString() : "");
                     dataRow.getCell(28).setCellStyle(style);
 
                     dataRow.createCell(29).setCellValue(inspection.getInspectionReviewedBy());
                     dataRow.getCell(29).setCellStyle(style);
 
-                    dataRow.createCell(30).setCellValue(inspection.getInspectionSupportDocumentsSentDate());
+                    dataRow.createCell(30).setCellValue(inspection.getInspectionSupportDocumentsSentDate() != null ? inspection.getInspectionSupportDocumentsSentDate().toString() : "");
                     dataRow.getCell(30).setCellStyle(style);
 
                     dataRow.createCell(31).setCellValue(inspection.getInspectionReportNumber());
@@ -268,7 +268,7 @@ public class ReportsService {
                     dataRow.createCell(32).setCellValue(inspection.isNcrRaised() ? "Yes" : "No");
                     dataRow.getCell(32).setCellStyle(style);
 
-                    dataRow.createCell(33).setCellValue(inspection.getIrnSentDate());
+                    dataRow.createCell(33).setCellValue(inspection.getIrnSentDate() != null ? inspection.getIrnSentDate().toString() : "");
                     dataRow.getCell(33).setCellStyle(style);
 
                     dataRow.createCell(34).setCellValue(inspection.isImpartialityAndConfidentiality() ? "Yes" : "No");
