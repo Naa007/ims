@@ -116,6 +116,9 @@ document.addEventListener("DOMContentLoaded", function () {
    if (["Business Dashboard"].includes(document.title)) {
        initializeBD();
    }
+   if(["Inspectors Management"].includes(document.title)) {
+    document.getElementById('exportInspectorsExcelBtn').addEventListener('click', () => exportInspectorsData('reports', 'excel'));
+   }
 
     /** ================= Map Initialization Section ================= **/
 
@@ -2008,4 +2011,43 @@ function generateRandomData(count, min, max) {
         }
     }
 
+/** ============================ Inspectors Management ============================== **/
 
+function exportInspectorsData(context, format) {
+    const exportBtn = event.target.closest('.bd-export-btn') || event.target;
+    if (!exportBtn) return;
+    exportBtn.disabled = true;
+    const originalText = exportBtn.innerHTML;
+    exportBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing...`;
+    let endpoint, filename;
+
+    endpoint = `/reports/inspectors`;
+    filename = 'inspectors_report.xlsx'
+
+    fetch(endpoint)
+        .then(response => {
+            if (!response.ok) throw new Error(`Error: ${response.status}`);
+            return response.blob();
+        })
+        .then(blob => {
+            if (blob.size === 0) {
+                showNotification('No data available for report generation', 'warning');
+                return;
+            }
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(link.href);
+            showNotification(`${format.toUpperCase()} downloaded successfully.`, 'success');
+        })
+        .catch(error => {
+            console.error('Export failed:', error);
+            showNotification(`Failed to export ${format.toUpperCase()} report.`, 'error');
+        })
+        .finally(() => {
+            resetExportButton(exportBtn, originalText);
+        });
+    }
