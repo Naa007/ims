@@ -354,16 +354,44 @@ $(document).ready(function () {
 
 /** ================= Inspector ================= **/
 
-// Function to add a certificate row
 function addCertificate(tableBodyId) {
  const tableBody = document.getElementById(tableBodyId);
  const rowCount = tableBody.children.length;
  const newRow = document.createElement("tr");
+ const today = new Date().toISOString().split('T')[0];
  newRow.innerHTML = `
-     <td><input type="text" name="certificates[${rowCount}].name" class="form-control" placeholder="Certificate Name"/></td>
-     <td><input type="date" name="certificates[${rowCount}].dateIssued" class="form-control"/></td>
-     <td><input type="date" name="certificates[${rowCount}].expiryDate" class="form-control"/></td>
-     <td><input type="text" name="certificates[${rowCount}].issuer" class="form-control" placeholder="Issuer"/></td>
+     <td><input type="text" name="certificates[${rowCount}].name" class="form-control"
+                            placeholder="Certificate Name" required
+                            minlength="2" maxlength="100"
+                            oninvalid="this.setCustomValidity('Please enter a certificate name (2-100 characters)')"
+                            oninput="this.setCustomValidity('')"/>
+                     <div class="invalid-feedback">
+                         Please provide a certificate name (2-100 characters).
+                     </div></td>
+     <td><input type="date" name="certificates[${rowCount}].dateIssued" class="form-control issue-date"
+                            required max="${today}"
+                            onchange="validateCertificateDates(this)"
+                            oninvalid="this.setCustomValidity('Please select a valid issue date (not in future)')"
+                            oninput="this.setCustomValidity('')"/>
+                     <div class="invalid-feedback">
+                         Please provide a valid issue date (not in future).
+                     </div></td>
+     <td><input type="date" name="certificates[${rowCount}].expiryDate" class="form-control expiry-date"
+                            required
+                            onchange="validateCertificateDates(this)"
+                            oninvalid="this.setCustomValidity('Please select a valid expiry date (after issue date)')"
+                            oninput="this.setCustomValidity('')"/>
+                     <div class="invalid-feedback">
+                         Please provide a valid expiry date (after issue date).
+                     </div></td>
+     <td><input type="text" name="certificates[${rowCount}].issuer" class="form-control"
+                            placeholder="Issuer" required
+                            minlength="2" maxlength="100"
+                            oninvalid="this.setCustomValidity('Please enter an issuer name (2-100 characters)')"
+                            oninput="this.setCustomValidity('')"/>
+                     <div class="invalid-feedback">
+                         Please provide an issuer name (2-100 characters).
+                     </div></td>
      <td><button type="button" class="btn btn-danger" onclick="removeCertificateRow(this)"><i class="fas fa-trash"></i></button></td>
  `;
  tableBody.appendChild(newRow);
@@ -2007,5 +2035,91 @@ function generateRandomData(count, min, max) {
             element.classList.remove('active');
         }
     }
+
+     /** ================= common-validation Section ================= **/
+
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.getElementsByClassName('needs-validation');
+            // Loop over them and prevent submission
+            var validation = Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+
+    // Function to validate international phone numbers more thoroughly
+    function validatePhoneNumber(phone) {
+        // Basic pattern for international phone numbers
+        const pattern = /^(\+?\d{1,3}[- ]?)?\d{6,14}$/;
+        return pattern.test(phone);
+    }
+
+    // Phone number validation setup
+    function setupPhoneValidation() {
+        const phoneInputs = document.querySelectorAll('input[type="tel"]');
+        phoneInputs.forEach(function(input) {
+            input.addEventListener('input', function() {
+                if (!validatePhoneNumber(this.value)) {
+                    this.setCustomValidity('Please enter a valid international phone number (6-14 digits, optional country code)');
+                } else {
+                    this.setCustomValidity('');
+                }
+            });
+        });
+    }
+
+    // Date validation for certificates
+    function setupCertificateDateValidation() {
+        const today = new Date().toISOString().split('T')[0];
+        document.querySelectorAll('.issue-date').forEach(input => {
+            input.max = today;
+        });
+
+        // Initialize date validation for existing certificates
+        document.querySelectorAll('.issue-date, .expiry-date').forEach(input => {
+            validateCertificateDates(input);
+        });
+    }
+
+    // Function to validate certificate dates
+    function validateCertificateDates(input) {
+        const row = input.closest('tr');
+        const issueDateInput = row.querySelector('.issue-date');
+        const expiryDateInput = row.querySelector('.expiry-date');
+
+        // Set max date for issue date (today)
+        const today = new Date().toISOString().split('T')[0];
+        if (issueDateInput) issueDateInput.max = today;
+
+        if (issueDateInput && issueDateInput.value && expiryDateInput && expiryDateInput.value) {
+            const issueDate = new Date(issueDateInput.value);
+            const expiryDate = new Date(expiryDateInput.value);
+
+            if (expiryDate < issueDate) {
+                expiryDateInput.setCustomValidity('Expiry date must be after issue date');
+                expiryDateInput.reportValidity();
+            } else {
+                expiryDateInput.setCustomValidity('');
+            }
+
+            // Update min date for expiry date
+            expiryDateInput.min = issueDateInput.value;
+        }
+    }
+
+    // Initialize all common validations
+    document.addEventListener('DOMContentLoaded', function() {
+        setupPhoneValidation();
+        setupCertificateDateValidation();
+    });
 
 

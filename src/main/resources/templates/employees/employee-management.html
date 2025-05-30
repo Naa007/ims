@@ -550,77 +550,107 @@
                     <div class="form-header">
                         <p class="form-subtitle">Please Add the information below</p>
                     </div>
-                <!-- Add Employee Form -->
-                <form method="post" th:action="@{/employee/save-employee}" th:object="${employee}" class="needs-validation" novalidate>
-                    <div class="row">
-                        <!-- Employee Name -->
-                        <div class="col-md-6 mb-3">
-                            <label for="empName">Employee Name</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-user icon-blue"></i></span>
-                                <input class="form-control" id="empName" required th:field="*{empName}" type="text">
-                            </div>
-                        </div>
-                        <!-- Employee ID -->
-                        <div class="col-md-6 mb-3">
-                            <label for="empId">Employee ID</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-id-badge icon-blue"></i></span>
-                                <input class="form-control" id="empId" required th:field="*{empId}" type="text">
-                            </div>
-                        </div>
-                        <!-- Role -->
-                        <div class="col-md-6 mb-3">
-                            <label for="role">Role</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-briefcase icon-blue"></i></span>
-                                <select class="form-select custom-select" id="role" required th:field="*{role}">
-                                    <option value="">Select Role</option>
-                                    <option value="COORDINATOR">Coordinator</option>
-                                    <option value="INSPECTOR">Inspector</option>
-                                    <option value="TECHNICAL_COORDINATOR">Technical Coordinator</option>
-                                    <option value="ADMIN">Admin</option>
-                                    <option value="BUSINESS">Business</option>
-                                </select>
-                            </div>
-                        </div>
-                        <!-- Active Status -->
-                        <div class="col-md-6 mb-3">
-                            <label>Active</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-check-circle icon-blue"></i></span>
-                                <div class="form-check form-check-inline"  style="margin-left: 10px;">
-                                    <input class="form-check-input" id="activeYes" th:field="*{active}" type="radio" value="Yes" required>
-                                    <label class="form-check-label" for="activeYes">Yes</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" id="activeNo" th:field="*{active}" type="radio" value="No" required>
-                                    <label class="form-check-label" for="activeNo">No</label>
+                    <!-- Add Employee Form -->
+                    <form method="post" th:action="@{/employee/save-employee}" th:object="${employee}" class="needs-validation" novalidate>
+                        <div class="row">
+                            <!-- Employee Name -->
+                            <div class="col-md-6 mb-3">
+                                <label for="empName">Employee Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user icon-blue"></i></span>
+                                    <input class="form-control" id="empName" required th:field="*{empName}" type="text"
+                                           minlength="2" maxlength="50"
+                                           pattern="[A-Za-z\s]+"
+                                           oninvalid="this.setCustomValidity('Please enter a valid name (letters only, 2-50 characters)')"
+                                           oninput="this.setCustomValidity('')">
+                                    <div class="invalid-feedback">
+                                        Please provide a valid employee name.
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <!-- Email -->
-                        <div class="col-md-6 mb-3">
-                            <label for="email">Email</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-envelope icon-blue"></i></span>
-                                <input class="form-control" id="email" required th:field="*{email}" type="email">
+                            <!-- Employee ID -->
+                            <div class="col-md-6 mb-3">
+                                <label for="empId">Employee ID</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-id-badge icon-blue"></i></span>
+                                    <input class="form-control" id="empId" required th:field="*{empId}" type="text"
+                                           minlength="3" maxlength="30"
+                                           pattern="[A-Za-z0-9\-]+"
+                                           oninvalid="this.setCustomValidity('Please enter a valid ID (alphanumeric, 3-30 characters)')"
+                                           oninput="this.setCustomValidity('')">
+                                    <div class="invalid-feedback">
+                                        Please provide a valid employee ID.
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Role -->
+                            <div class="col-md-6 mb-3">
+                                <label for="role">Role</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-briefcase icon-blue"></i></span>
+                                    <select class="form-select custom-select" id="role" required th:field="*{role}">
+                                        <option value="">Select Role</option>
+                                        <option value="COORDINATOR">Coordinator</option>
+                                        <option value="INSPECTOR">Inspector</option>
+                                        <option value="TECHNICAL_COORDINATOR">Technical Coordinator</option>
+                                        <option value="ADMIN">Admin</option>
+                                        <option value="BUSINESS">Business</option>
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Please select a role.
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Active Status -->
+                            <div class="col-md-6 mb-3">
+                                <label>Active</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-check-circle icon-blue"></i></span>
+                                    <div class="form-check form-check-inline" style="margin-left: 10px;">
+                                        <input class="form-check-input" id="activeYes" th:field="*{active}" type="radio" value="Yes" required>
+                                        <label class="form-check-label" for="activeYes">Yes</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" id="activeNo" th:field="*{active}" type="radio" value="No" required>
+                                        <label class="form-check-label" for="activeNo">No</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Email -->
+                            <div class="col-md-6 mb-3">
+                                <label for="email">Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-envelope icon-blue"></i></span>
+                                    <input class="form-control" id="email" required th:field="*{email}" type="email"
+                                           pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
+                                           maxlength="100"
+                                           oninvalid="this.setCustomValidity('Please enter a valid email address')"
+                                           oninput="this.setCustomValidity('')">
+                                    <div class="invalid-feedback">
+                                        Please provide a valid email address.
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Phone Number -->
+                            <div class="col-md-6 mb-3">
+                                <label for="phoneNumber">Phone Number</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-phone icon-blue"></i></span>
+                                    <input class="form-control" id="phoneNumber" required th:field="*{phoneNumber}" type="tel"
+                                           pattern="\d{10}"
+                                           oninvalid="this.setCustomValidity('Please enter a 10-digit phone number')"
+                                           oninput="this.setCustomValidity('')">
+                                    <div class="invalid-feedback">
+                                        Please provide a 10-digit phone number.
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <!-- Phone Number -->
-                        <div class="col-md-6 mb-3">
-                            <label for="phoneNumber">Phone Number</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-phone icon-blue"></i></span>
-                                <input class="form-control" id="phoneNumber" required th:field="*{phoneNumber}" type="text">
-                            </div>
+                        <!-- Submit Button -->
+                        <div class="text-center mt-4">
+                            <button class="btn btn-primary" type="submit">Submit</button>
                         </div>
-                    </div>
-                    <!-- Submit Button -->
-                    <div class="text-center mt-4">
-                        <button class="btn btn-primary" type="submit">Submit</button>
-                    </div>
-                </form>
+                    </form>
             </div>
         </div>
     </div>
@@ -651,7 +681,14 @@
                                 <label for="editEmpName">Employee Name</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-user icon-blue"></i></span>
-                                    <input class="form-control" id="editEmpName" name="empName" required type="text">
+                                    <input class="form-control" id="editEmpName" name="empName" required type="text"
+                                           minlength="2" maxlength="50"
+                                           pattern="[A-Za-z\s]+"
+                                           oninvalid="this.setCustomValidity('Please enter a valid name (letters only, 2-50 characters)')"
+                                           oninput="this.setCustomValidity('')">
+                                    <div class="invalid-feedback">
+                                        Please provide a valid employee name (2-50 letters).
+                                    </div>
                                 </div>
                             </div>
                             <!-- Employee ID -->
@@ -675,6 +712,9 @@
                                         <option value="ADMIN">Admin</option>
                                         <option value="BUSINESS">Business</option>
                                     </select>
+                                    <div class="invalid-feedback">
+                                        Please select a role.
+                                    </div>
                                 </div>
                             </div>
                             <!-- Active Status -->
@@ -690,6 +730,9 @@
                                         <input class="form-check-input" id="editActiveNo" name="active" type="radio" value="No" required>
                                         <label class="form-check-label" for="editActiveNo">No</label>
                                     </div>
+                                    <div class="invalid-feedback" style="display: block;">
+                                        Please select active status.
+                                    </div>
                                 </div>
                             </div>
                             <!-- Email -->
@@ -697,7 +740,14 @@
                                 <label for="editEmail">Email</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-envelope icon-blue"></i></span>
-                                    <input type="email" id="editEmail" name="email" class="form-control" required />
+                                    <input type="email" id="editEmail" name="email" class="form-control"
+                                           pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
+                                           maxlength="100"
+                                           oninvalid="this.setCustomValidity('Please enter a valid email address')"
+                                           oninput="this.setCustomValidity('')" required />
+                                    <div class="invalid-feedback">
+                                        Please provide a valid email address.
+                                    </div>
                                 </div>
                             </div>
                             <!-- Phone Number -->
@@ -705,7 +755,13 @@
                                 <label for="editPhoneNumber">Phone Number</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-phone icon-blue"></i></span>
-                                    <input type="text" id="editPhoneNumber" name="phoneNumber" class="form-control" required />
+                                    <input type="tel" id="editPhoneNumber" name="phoneNumber" class="form-control"
+                                           pattern="\d{10}"
+                                           oninvalid="this.setCustomValidity('Please enter a 10-digit phone number')"
+                                           oninput="this.setCustomValidity('')" required />
+                                    <div class="invalid-feedback">
+                                        Please provide a 10-digit phone number.
+                                    </div>
                                 </div>
                             </div>
                         </div>
