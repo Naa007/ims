@@ -5,6 +5,12 @@
 <body>
 <!-- Header -->
 <header th:replace="fragments/header :: header"></header>
+
+<!-- Breadcrumb -->
+<div id="breadcrumbContainer"
+     th:attr="data-page='dashboard:/role/dashboard,inspection-management:/technical-coordinator/inspection-management,manage:'"
+     class="breadcrumb-wrapper"></div>
+
 <!-- Main Content -->
 <main>
     <div class="page-container">
