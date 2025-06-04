@@ -1,10 +1,16 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <!-- Head -->
-<head th:replace="fragments/head :: head('Inspection Management')"></head>
+<head th:replace="~{fragments/head :: head('Inspection Management')}"></head>
 <body>
 <!-- Header -->
-<header th:replace="fragments/header :: header"></header>
+<header th:replace="~{fragments/header :: header}"></header>
+
+<!-- Breadcrumb -->
+<div id="breadcrumbContainer"
+     th:attr="data-page='dashboard:/role/dashboard,inspection-management:'"
+     class="breadcrumb-wrapper"></div>
+
 <!-- Main Content -->
 <main>
     <div class="data-card">
@@ -67,6 +73,6 @@
     </div>
 </main>
 <!-- Footer -->
-<footer th:replace="fragments/footer :: footer"></footer>
+<footer th:replace="~{fragments/footer :: footer}"></footer>
 </body>
 </html>

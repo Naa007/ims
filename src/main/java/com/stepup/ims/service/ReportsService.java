@@ -8,6 +8,7 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.UnitValue;
 import com.stepup.ims.model.Inspection;
+import com.stepup.ims.model.Inspector;
 import com.stepup.ims.model.ProposedCVs;
 import com.stepup.ims.modelmapper.InspectionModelMapper;
 import com.stepup.ims.repository.InspectionRepository;
@@ -36,6 +37,9 @@ public class ReportsService {
 
     @Autowired
     private EmployeeService employeeService;
+
+    @Autowired
+    private InspectorService inspectorService;
 
     @Autowired
     private InspectionRepository inspectionRepository;
@@ -291,5 +295,111 @@ public class ReportsService {
         return out.toByteArray();
     }
 
+    public byte[] generateInspectorsReport() {
+        List<Inspector> inspectors = inspectorService.getAllInspectors();
 
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try (Workbook workbook = new XSSFWorkbook()) {
+
+            Sheet sheet = workbook.createSheet("Inspectors List");
+
+            // Create styles
+            var headerCellStyle = workbook.createCellStyle();
+            var font = workbook.createFont();
+            font.setBold(true);
+            headerCellStyle.setFont(font);
+            headerCellStyle.setWrapText(true);
+
+            var lightGrey = new XSSFColor(new java.awt.Color(211, 211, 211), null);
+            ((XSSFCellStyle) headerCellStyle).setFillForegroundColor(lightGrey);
+            headerCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+            var evenRowCellStyle = workbook.createCellStyle();
+            ((XSSFCellStyle) evenRowCellStyle).setFillForegroundColor(new XSSFColor(new java.awt.Color(245, 245, 245), null));
+            evenRowCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            evenRowCellStyle.setWrapText(true);
+
+            var oddRowCellStyle = workbook.createCellStyle();
+            oddRowCellStyle.setWrapText(true);
+
+            // Define headers
+            String[] headers = {
+                    "Inspector Id", "Inspector Name", "Inspector Type", "Phone", "Email", "Country", "Address",
+                    "DOB", "Education Details", "Disciplines", "Certificates", "Special Qualification",
+                    "Main Qualification", "Inspector Status", "Remarks"
+            };
+
+            // Header row
+            Row headerRow = sheet.createRow(0);
+            for (int i = 0; i < headers.length; i++) {
+                var cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+                cell.setCellStyle(headerCellStyle);
+            }
+
+            // Data rows
+            for (int rowIndex = 0; rowIndex < inspectors.size(); rowIndex++) {
+                Row dataRow = sheet.createRow(rowIndex + 1);
+                Inspector inspector = inspectors.get(rowIndex);
+
+                var style = (rowIndex % 2 == 0) ? evenRowCellStyle : oddRowCellStyle;
+
+                dataRow.createCell(0).setCellValue(inspector.getInspectorId());
+                dataRow.getCell(0).setCellStyle(style);
+
+                dataRow.createCell(1).setCellValue(inspector.getInspectorName());
+                dataRow.getCell(1).setCellStyle(style);
+
+                dataRow.createCell(2).setCellValue(inspector.getInspectorType() != null ? inspector.getInspectorType().toString().toLowerCase() : "");
+                dataRow.getCell(2).setCellStyle(style);
+
+                dataRow.createCell(3).setCellValue(inspector.getPhone());
+                dataRow.getCell(3).setCellStyle(style);
+
+                dataRow.createCell(4).setCellValue(inspector.getEmail());
+                dataRow.getCell(4).setCellStyle(style);
+
+                dataRow.createCell(5).setCellValue(inspector.getCountry());
+                dataRow.getCell(5).setCellStyle(style);
+
+                dataRow.createCell(6).setCellValue(inspector.getAddress());
+                dataRow.getCell(6).setCellStyle(style);
+
+                dataRow.createCell(7).setCellValue(inspector.getDob() != null ? inspector.getDob().toString() : "");
+                dataRow.getCell(7).setCellStyle(style);
+
+                dataRow.createCell(8).setCellValue(inspector.getEducationDetails());
+                dataRow.getCell(8).setCellStyle(style);
+
+                dataRow.createCell(9).setCellValue(inspector.getDisciplines());
+                dataRow.getCell(9).setCellStyle(style);
+
+                dataRow.createCell(10).setCellValue(inspector.getCertificates().toString().replace("[", "").replace("]", ""));
+                dataRow.getCell(10).setCellStyle(style);
+
+                dataRow.createCell(11).setCellValue(inspector.getSpecialQualification().toString().replace("[", "").replace("]", ""));
+                dataRow.getCell(11).setCellStyle(style);
+
+                dataRow.createCell(12).setCellValue(inspector.getMainQualificationCategory().toString().replace("[", "").replace("]", ""));
+                dataRow.getCell(12).setCellStyle(style);
+
+                dataRow.createCell(13).setCellValue(inspector.getInspectorStatus() != null ? inspector.getInspectorStatus().toString().toLowerCase() : "");
+                dataRow.getCell(13).setCellStyle(style);
+
+                dataRow.createCell(14).setCellValue(inspector.getRemarks());
+                dataRow.getCell(14).setCellStyle(style);
+            }
+
+            for (int i = 0; i < 15; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            workbook.write(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error creating Inspectors Excel report", e);
+        }
+
+        return out.toByteArray();
+    }
 }

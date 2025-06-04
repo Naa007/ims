@@ -1,10 +1,16 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <!-- Head -->
-<head th:replace="fragments/head :: head('Inspector Management')"></head>
+<head th:replace="~{fragments/head :: head('Inspectors Management')}"></head>
 <body>
 <!-- Header -->
-<header th:replace="fragments/header :: header"></header>
+<header th:replace="~{fragments/header :: header}"></header>
+
+<!-- Breadcrumb -->
+<div id="breadcrumbContainer"
+     th:attr="data-page='dashboard:/role/dashboard,inspectors-management:'"
+     class="breadcrumb-wrapper"></div>
+
 <!-- Main Content -->
 <main>
     <div class="data-card">
@@ -13,10 +19,22 @@
         </div>
 
         <!-- Add Inspector Button -->
-        <div class="text-center mb-4">
-            <button class="btn btn-primary" onclick="openInspectorForm()">
-                <i class="fas fa-plus"></i> Add Inspector
-            </button>
+        <div class="d-flex justify-content-between align-items-center text-center mb-4">
+            <div style="flex: 30%;"></div>
+            <div style="flex: 40%;">
+                <button class="btn btn-primary" onclick="openInspectorForm()">
+                    <i class="fas fa-plus"></i> Add Inspector
+                </button>
+            </div>
+            <div style="flex: 30%;">
+                <div class="cd-export-wrapper">
+                    <div class="bd-filter-group bd-export-group"  style="flex-direction: row-reverse;">
+                        <button class="bd-export-btn" id="exportInspectorsExcelBtn">
+                            <i class="fas fa-file-excel"></i> Excel
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Inspector List Table -->
@@ -62,6 +80,6 @@
     </div>
 </main>
 <!-- Footer -->
-<footer th:replace="fragments/footer :: footer"></footer>
+<footer th:replace="~{fragments/footer :: footer}"></footer>
 </body>
 </html>

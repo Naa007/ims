@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <!-- Head -->
-<head th:replace="fragments/head :: head('Coordinator Dashboard')"></head>
+<head th:replace="~{fragments/head :: head('Coordinator Dashboard')}"></head>
 <body>
 <!-- Header -->
-<header th:replace="fragments/header :: header"></header>
+<header th:replace="~{fragments/header :: header}"></header>
 
 <main class="container">
     <!-- Dashboard Container -->
@@ -21,12 +21,16 @@
                 <span>Stats</span>
             </a>
             <a href="#" class="tab" onclick="toggleReportsContainer(this)">
-                <i class="fas fa-chart-bar"></i>
+                <i class="fas fa-file-alt"></i>
                 <span>Reports</span>
             </a>
             <a href="/calendar/view" class="tab">
                 <i class="fas fa-calendar-alt"></i>
                 <span>Calendar</span>
+            </a>
+            <a href="/inspectors/list" class="tab">
+                <i class="fas fa-user-tie"></i>
+                <span>Inspector Management</span>
             </a>
         </div>
 
@@ -188,7 +192,7 @@
 </main>
 
 <!-- Footer -->
-<footer th:replace="fragments/footer :: footer"></footer>
+<footer th:replace="~{fragments/footer :: footer}"></footer>
 
 </body>
 </html>

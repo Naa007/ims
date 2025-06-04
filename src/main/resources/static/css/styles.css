@@ -2024,3 +2024,47 @@ button:hover {
 .bd-total-highlight {
     animation: bd-highlight 1.5s ease;
 }
+
+.breadcrumb-wrapper {
+        padding: 8px 15px;
+        border-bottom: 1px solid #ddd;
+        font-size: 14px;
+        margin-bottom: 15px;
+    }
+
+    .breadcrumb {
+        background-color: var(--light-bg);
+        display: flex;
+        align-items: center;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .breadcrumb li {
+        margin-right: 5px;
+        color: #007bff;
+    }
+
+    .breadcrumb li + li::before {
+        content: ">";
+        margin-right: 5px;
+        color: #6c757d;
+    }
+
+    .breadcrumb li:last-child {
+        color: #6c757d;
+    }
+
+    .breadcrumb li a {
+        text-decoration: none;
+        color: var(--primary-color);
+    }
+
+    .breadcrumb li a:hover {
+        text-decoration: none;
+    }
+
+    .breadcrumb li:last-child a {
+        pointer-events: none; /* Disable link for the current page */
+    }

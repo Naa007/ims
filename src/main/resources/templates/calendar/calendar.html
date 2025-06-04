@@ -6,6 +6,12 @@
 <!-- Header -->
 <header th:replace="~{fragments/header :: header}"></header>
 
+<!-- Breadcrumb -->
+<div id="breadcrumbContainer"
+     th:attr="data-page='dashboard:/role/dashboard,Calendar:'"
+class="breadcrumb-wrapper">
+</div>
+
 <!-- Main Content -->
 <main class="container">
         <h1>Inspection Calendar</h1>

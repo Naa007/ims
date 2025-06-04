@@ -93,6 +93,8 @@ public class AuthController {
 
             String employeeName = employeeService.getEmployeeNameByEmail(email);
             session.setAttribute("employeeName", employeeName);
+            session.setAttribute("role", user.getRole().toLowerCase());
+
 
             String redirectUrl;
             switch (user.getRole().toUpperCase()) {

@@ -48,4 +48,13 @@ public class ReportsController {
         return new ResponseEntity<>(reportData, headers, HttpStatus.OK);
     }
 
+    @GetMapping("/inspectors")
+    public ResponseEntity<byte[]> getInspectorsReports(@RequestParam(required = false) String country,
+                                                       @RequestParam(required = false) String skill,
+                                                       Model model) {
+
+        byte[] report = reportsService.generateInspectorsReport();
+        return buildReportResponse(report, "inspectors_report" + ".xlsx", "excel");
+    }
+
 }

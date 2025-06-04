@@ -13,6 +13,7 @@
     <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css" rel="stylesheet">
     <!-- Custom CSS -->
+    <link th:href="@{/css/styles.css}" rel="stylesheet">
     <style>
         /* Root Variables for Consistent Design System */
         :root {
@@ -50,7 +51,7 @@
 
   main {
     flex: 1; /* Allow main to grow and fill available space */
-    padding: 80px 20px 30px; /* Adjust the top padding to ensure content is below the header */
+    padding: 0px 20px 30px; /* Adjust the top padding to ensure content is below the header */
     max-width: 1200px;
     margin: 0 auto;
     width: 100%;
@@ -295,9 +296,10 @@
     max-width: 750px; /* Set your desired width */
     width: 80%; /* Ensure it takes full width on smaller screens */
 }
-         .info-section {
-    margin-bottom: 20px; /* Space below the info section */
-}
+          .info-section {
+            margin-bottom: 20px !important;
+             display: block !important;
+        }
 
 .info-item {
     display: flex; /* Flexbox for alignment */
@@ -363,7 +365,7 @@
        }
 
        .card-title i {
-           background-color: var(--primary-color);
+           background-color: var(--primary-color) !important;
            color: white;
            padding: 10px;
            border-radius: 50%;
@@ -383,11 +385,28 @@
     color: #2c3e50; /* Set the text color */
 }
     </style>
+
+    <!-- Include Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Include DataTables JS -->
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+    <!-- Custom JS -->
+    <script th:inline="javascript" th:src="@{/js/scripts.js}"></script>
+    <script th:inline="javascript" th:src="@{/js/breadcrumb.js}"></script>
 </head>
 <body>
 <!-- Header -->
-<header th:replace="fragments/header :: header"></header>
+<header th:replace="~{fragments/header :: header}"></header>
 
+<!-- Breadcrumb -->
+<div id="breadcrumbContainer"
+     th:attr="data-page='dashboard:/role/dashboard,employee-management:'"
+     class="breadcrumb-wrapper"></div>
 
 <main>
     <div class="data-card">
@@ -778,15 +797,7 @@
     </div>
 </div>
 
-<!-- Include Bootstrap JS and dependencies -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<!-- Include DataTables JS -->
-<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+
 <!-- Custom JS -->
 <script>
     // Initialize DataTable with responsive extension
@@ -848,9 +859,8 @@
         document.getElementById("viewPhoneNumber").textContent = phoneNumber;
     }
 </script>
-<!-- Custom JS -->
-<script th:inline="javascript" th:src="@{/js/scripts.js}"></script>
+
 <!-- Footer -->
-<footer th:replace="fragments/footer :: footer"></footer>
+<footer th:replace="~{fragments/footer :: footer}"></footer>
 </body>
 </html>

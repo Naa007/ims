@@ -307,7 +307,8 @@
         }
 
         .info-section {
-            margin-bottom: 20px; /* Space below the info section */
+            margin-bottom: 20px !important;
+            display: block !important;
         }
 
         .info-item {
@@ -376,7 +377,7 @@
         }
 
         .card-title i {
-            background-color: var(--primary-color);
+            background-color: var(--primary-color) !important;
             color: white;
             padding: 10px;
             border-radius: 50%;
@@ -398,10 +399,113 @@
             color: #2c3e50; /* Set the text color */
         }
     </style>
+    <link th:href="@{/css/styles.css}" rel="stylesheet">
+
+    <!-- Include Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Include DataTables JS -->
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+    <!-- Custom JS -->
+    <script>
+        // Initialize DataTable with responsive extension
+        $(document).ready(function () {
+            $('#clientTable').DataTable({
+                responsive: true,
+                paging: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                lengthMenu: [5, 10, 25, 50],
+                pageLength: 10
+            });
+        });
+
+        // Function to load client data into the edit modal
+        function loadClientData(button) {
+            const id = button.getAttribute("data-id");
+            const clientName = button.getAttribute("data-clientname");
+            const country = button.getAttribute("data-country");
+            const address = button.getAttribute("data-address");
+            const email = button.getAttribute("data-email");
+            const phone = button.getAttribute("data-phone");
+            const reference = button.getAttribute("data-reference");
+            const confirmationDate = button.getAttribute("data-confirmationdate");
+            const employeeId = button.getAttribute("data-employeeid");
+            const coordinator = button.getAttribute("data-coordinator");
+
+            document.getElementById("editClientId").value = id;
+            document.getElementById("editClientName").value = clientName;
+            document.getElementById("editCountry").value = country;
+            document.getElementById("editAddress").value = address;
+            document.getElementById("editEmail").value = email;
+            document.getElementById("editPhone").value = phone;
+            document.getElementById("editConfirmationDate").value = confirmationDate;
+
+            // Set the reference radio buttons based on the client's reference type
+            if (reference === "EMAIL_CONFIRMATION") {
+                document.getElementById("editReferenceEmail").checked = true;
+                document.getElementById("editReferencePhone").checked = false;
+            } else if (reference === "PHONE_CONFIRMATION") {
+                document.getElementById("editReferenceEmail").checked = false;
+                document.getElementById("editReferencePhone").checked = true;
+            }
+
+            // Set the selected coordinator
+            if (coordinator != null) {
+                // Iterate over the select box options to find and set the coordinator as selected
+                let editEmployeeSelect = document.getElementById("editEmployee");
+                for (let i = 0; i < editEmployeeSelect.options.length; i++) {
+                    if (editEmployeeSelect.options[i].value === coordinator) {
+                        editEmployeeSelect.options[i].selected = true;
+                        break;
+                    }
+                }
+            } else {
+                document.getElementById("editEmployee").value = "N/A"; // Default to N/A
+            }
+        }
+
+        // Function to view client data in the view modal
+        function viewClientData(button) {
+            const clientId = button.getAttribute("data-id");
+            const clientName = button.getAttribute("data-clientname");
+            const country = button.getAttribute("data-country");
+            const address = button.getAttribute("data-address");
+            const email = button.getAttribute("data-email");
+            const phone = button.getAttribute("data-phone");
+            const reference = button.getAttribute("data-reference");
+            const confirmationDate = button.getAttribute("data-confirmationdate");
+            const coordinator = button.getAttribute("data-coordinator");
+
+            document.getElementById("viewClientId").textContent = clientId ? clientId : "N/A";
+            document.getElementById("viewClientName").textContent = clientName ? clientName : "N/A";
+            document.getElementById("viewCountry").textContent = country ? country : "N/A";
+            document.getElementById("viewAddress").textContent = address ? address : "N/A";
+            document.getElementById("viewEmail").textContent = email ? email : "N/A";
+            document.getElementById("viewPhone").textContent = phone ? phone : "N/A";
+            document.getElementById("viewReference").textContent = reference ? reference : "N/A";
+            document.getElementById("viewConfirmationDate").textContent = confirmationDate ? confirmationDate : "N/A";
+            document.getElementById("viewCoordinator").innerText = coordinator ? coordinator : "N/A";
+        }
+
+    </script>
+    <!-- Custom JS -->
+    <script th:inline="javascript" th:src="@{/js/scripts.js}"></script>
+    <script th:inline="javascript" th:src="@{/js/breadcrumb.js}"></script>
 </head>
 <body>
 <!-- Header -->
-<header th:replace="fragments/header :: header"></header>
+<header th:replace="~{fragments/header :: header}"></header>
+
+<!-- Breadcrumb -->
+<div id="breadcrumbContainer"
+     th:attr="data-page='dashboard:/role/dashboard,client-management:'"
+     class="breadcrumb-wrapper"></div>
 
 <main>
     <div class="data-card">
@@ -866,103 +970,7 @@
     </div>
 </div>
 
-<!-- Include Bootstrap JS and dependencies -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<!-- Include DataTables JS -->
-<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
-<!-- Custom JS -->
-<script>
-
-   // Initialize DataTable with responsive extension
-   $(document).ready(function () {
-       $('#clientTable').DataTable({
-           responsive: true,
-           paging: true,
-           searching: true,
-           ordering: true,
-           info: true,
-           lengthMenu: [5, 10, 25, 50],
-           pageLength: 10
-       });
-   });
-
-   // Function to load client data into the edit modal
-   function loadClientData(button) {
-       const id = button.getAttribute("data-id");
-       const clientName = button.getAttribute("data-clientname");
-       const country = button.getAttribute("data-country");
-       const address = button.getAttribute("data-address");
-       const email = button.getAttribute("data-email");
-       const phone = button.getAttribute("data-phone");
-       const reference = button.getAttribute("data-reference");
-       const confirmationDate = button.getAttribute("data-confirmationdate");
-       const employeeId = button.getAttribute("data-employeeid");
-       const coordinator = button.getAttribute("data-coordinator");
-
-       document.getElementById("editClientId").value = id;
-       document.getElementById("editClientName").value = clientName;
-       document.getElementById("editCountry").value = country;
-       document.getElementById("editAddress").value = address;
-       document.getElementById("editEmail").value = email;
-       document.getElementById("editPhone").value = phone;
-       document.getElementById("editConfirmationDate").value = confirmationDate;
-
-       // Set the reference radio buttons based on the client's reference type
-       if (reference === "EMAIL_CONFIRMATION") {
-           document.getElementById("editReferenceEmail").checked = true;
-           document.getElementById("editReferencePhone").checked = false;
-       } else if (reference === "PHONE_CONFIRMATION") {
-           document.getElementById("editReferenceEmail").checked = false;
-           document.getElementById("editReferencePhone").checked = true;
-       }
-
-       // Set the selected coordinator
-       if (coordinator != null) {
-           // Iterate over the select box options to find and set the coordinator as selected
-           let editEmployeeSelect = document.getElementById("editEmployee");
-           for (let i = 0; i < editEmployeeSelect.options.length; i++) {
-               if (editEmployeeSelect.options[i].value === coordinator) {
-                   editEmployeeSelect.options[i].selected = true;
-                   break;
-               }
-           }
-       } else {
-           document.getElementById("editEmployee").value = "N/A"; // Default to N/A
-       }
-   }
-
-   // Function to view client data in the view modal
-   function viewClientData(button) {
-       const clientId = button.getAttribute("data-id");
-       const clientName = button.getAttribute("data-clientname");
-       const country = button.getAttribute("data-country");
-       const address = button.getAttribute("data-address");
-       const email = button.getAttribute("data-email");
-       const phone = button.getAttribute("data-phone");
-       const reference = button.getAttribute("data-reference");
-       const confirmationDate = button.getAttribute("data-confirmationdate");
-       const coordinator = button.getAttribute("data-coordinator");
-
-       document.getElementById("viewClientId").textContent = clientId ? clientId : "N/A";
-       document.getElementById("viewClientName").textContent = clientName ? clientName : "N/A";
-       document.getElementById("viewCountry").textContent = country ? country : "N/A";
-       document.getElementById("viewAddress").textContent = address ? address : "N/A";
-       document.getElementById("viewEmail").textContent = email ? email : "N/A";
-       document.getElementById("viewPhone").textContent = phone ? phone : "N/A";
-       document.getElementById("viewReference").textContent = reference ? reference : "N/A";
-       document.getElementById("viewConfirmationDate").textContent = confirmationDate ? confirmationDate : "N/A";
-       document.getElementById("viewCoordinator").innerText = coordinator ? coordinator : "N/A";
-   }
-
-</script>
-<!-- Custom JS -->
-<script th:inline="javascript" th:src="@{/js/scripts.js}"></script>
 <!-- Footer -->
-<footer th:replace="fragments/footer :: footer"></footer>
+<footer th:replace="~{fragments/footer :: footer}"></footer>
 </body>
 </html>
