@@ -39,12 +39,12 @@
                         </thead>
                         <tbody>
                         <tr th:each="scopeOfInspection, iterStat : ${inspectionAdvise.scopeOfInspectionList}">
-                            <input type="hidden" th:field="*{scopeOfInspectionList[__${iterStat.index}__].id}"/>
+                            <input type="hidden" th:field="*{scopeOfInspectionList[__${iterStat.index}__].id}" required/>
                             <!-- scopes -->
                             <td>
                                 <span th:text="*{scopeOfInspectionList[__${iterStat.index}__].scopeOfInspection.name}"></span>
                                 <input type="hidden"
-                                       th:field="*{scopeOfInspectionList[__${iterStat.index}__].scopeOfInspection}"/>
+                                       th:field="*{scopeOfInspectionList[__${iterStat.index}__].scopeOfInspection}" required/>
                             </td>
 
                             <!-- Status -->
@@ -54,7 +54,7 @@
                                         <label> <input type="radio"
                                                        th:field="*{scopeOfInspectionList[__${iterStat.index}__].status}"
                                                        th:value="${statusType}"
-                                                       th:checked="*{scopeOfInspectionList[__${iterStat.index}__].status} == ${statusType}"/>
+                                                       th:checked="*{scopeOfInspectionList[__${iterStat.index}__].status} == ${statusType}" required/>
                                             <span style="font-weight: normal;" th:text="${statusType.getName()}"></span>
                                         </label>
                                     </div>
@@ -78,19 +78,29 @@
                     <div class="form-group">
                         <label for="requirement">Requirement</label>
                         <textarea th:field="*{requirement}" id="requirement" class="form-control"
-                                  placeholder="Enter Requirement"></textarea>
+                                  placeholder="Enter Requirement" required
+                                  minlength="10" maxlength="1000"></textarea>
+                        <div class="invalid-feedback">
+                            Please provide inspection requirements (10-1000 characters).
+                        </div>
                     </div>
                     <!-- Reporting Format  -->
                     <div class="form-group">
                         <div class="form-group">
                             <label for="reportingFormat">Reporting Format</label>
-                            <div id="reportingFormat">
+                            <div id="reportingFormat" class="radio-group" required>
                                 <div th:each="reportFormat : ${T(com.stepup.ims.model.InspectionAdvise.ReportingFormats).values()}">
                                     <label style="font-weight: normal;">
-                                        <input type="radio" th:field="*{reportingFormat}" th:value="${reportFormat}"/>
+                                        <input type="radio"
+                                               th:field="*{reportingFormat}"
+                                               th:value="${reportFormat}"
+                                               required>
                                         <span th:text="${reportFormat}"></span>
                                     </label>
                                 </div>
+                            </div>
+                            <div class="invalid-feedback">
+                                Please select a reporting format.
                             </div>
                         </div>
                     </div>
@@ -117,13 +127,14 @@
 
                             <!-- Status -->
                             <td>
-                                <div>
+                                <div class="status-radio-group" required>
                                     <div th:each="statusType : ${T(com.stepup.ims.model.ClientInstructionToInspector.DocumentStatusTypes).values()}">
                                         <label>
                                             <input type="radio"
                                                    th:field="*{clientInstructionToInspectorList[__${iterStat.index}__].status}"
                                                    th:value="${statusType}"
-                                                   th:checked="*{clientInstructionToInspectorList[__${iterStat.index}__].status} == ${statusType}"/>
+                                                   th:checked="*{clientInstructionToInspectorList[__${iterStat.index}__].status} == ${statusType}"
+                                                   required>
                                             <span style="font-weight: normal;" th:text="${statusType.getName()}"></span>
                                         </label>
                                     </div>
@@ -145,7 +156,11 @@
                     <label for="instructionsFromTechnicalTeam">Instructions</label>
                     <textarea th:field="*{instructionsFromTechnicalTeam}" id="instructionsFromTechnicalTeam"
                               class="form-control"
-                              placeholder="Enter instructions from the technical team"></textarea>
+                              placeholder="Enter instructions from the technical team"
+                              required minlength="10" maxlength="1000"></textarea>
+                    <div class="invalid-feedback">
+                        Please provide technical team instructions (10-1000 characters).
+                    </div>
                 </div>
             </div><br/>
 
@@ -164,22 +179,24 @@
                     </thead>
                     <tbody>
                     <tr th:each="acknowledgement, iterStat : ${inspectionAdvise.acknowledgeFromInspectorList}">
-                        <input type="hidden" th:field="*{acknowledgeFromInspectorList[__${iterStat.index}__].id}"/>
+                        <input type="hidden" th:field="*{acknowledgeFromInspectorList[__${iterStat.index}__].id}" required/>
                         <!-- scopes -->
                         <td>
                             <span th:text="*{acknowledgeFromInspectorList[__${iterStat.index}__].acknowledgement.name}"></span>
                             <input type="hidden"
-                                   th:field="*{acknowledgeFromInspectorList[__${iterStat.index}__].acknowledgement}"/>
+                                   th:field="*{acknowledgeFromInspectorList[__${iterStat.index}__].acknowledgement}" required/>
                         </td>
 
                         <!-- Status -->
                         <td>
-                            <div>
+                            <div class="status-radio-group" required>
                                 <div th:each="statusType : ${T(com.stepup.ims.model.AcknowledgeFromInspector.DocumentStatusTypes).values()}">
-                                    <label> <input type="radio"
-                                                   th:field="*{acknowledgeFromInspectorList[__${iterStat.index}__].status}"
-                                                   th:value="${statusType}"
-                                                   th:checked="*{acknowledgeFromInspectorList[__${iterStat.index}__].status} == ${statusType}"/>
+                                    <label>
+                                        <input type="radio"
+                                               th:field="*{acknowledgeFromInspectorList[__${iterStat.index}__].status}"
+                                               th:value="${statusType}"
+                                               th:checked="*{acknowledgeFromInspectorList[__${iterStat.index}__].status} == ${statusType}"
+                                               required>
                                         <span style="font-weight: normal;" th:text="${statusType.getName()}"></span>
                                     </label>
                                 </div>

@@ -13,8 +13,8 @@
                 <h1 class="form-title">Review Inspection - IISPL # <span th:text="${inspection.inspectionNo}"></span></h1>
                 <p class="form-subtitle">Current Inspection Status - <span th:text="${inspection.inspectionStatus.description}"></span></p>
             </div>
-            <form th:object="${inspection}" method="post" class="needs-validation">
-                <input type="hidden" th:field="*{id}" id="id" />
+            <form th:object="${inspection}" method="post" class="needs-validation" novalidate>
+                <input type="hidden" th:field="*{id}" id="id" required />
 
                 <!-- notification details -->
                 <h4 class="section-header">
