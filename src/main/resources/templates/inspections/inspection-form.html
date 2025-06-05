@@ -39,7 +39,7 @@
                         <!-- Hidden field to ensure the value is sent even when the input is disabled -->
                         <input type="hidden" th:field="*{inspectionNo}" th:if="${edit}"/>
                         <div class="invalid-feedback">
-                            Please provide a valid inspection number.
+                            Inspection Number should be Numeric.
                         </div>
                     </div>
                 </div>
@@ -50,9 +50,9 @@
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-envelope"></i></span>
                         <input type="text" id="notificationNo" th:field="*{notificationNo}" class="form-control" required
-                               minlength="3" maxlength="50"/>
+                               minlength="3" maxlength="250"/>
                         <div class="invalid-feedback">
-                            Please provide a notification number (3-50 characters).
+                            Please provide a notification number (3-250 characters).
                         </div>
                     </div>
                 </div>
@@ -153,9 +153,6 @@
                                    name="inspectionType" th:field="*{inspectionType}" value="ELECTRICAL" required/>
                             Electrical
                         </div>
-                        <div class="invalid-feedback" style="display: block;">
-                            Please select an inspection type.
-                        </div>
                     </div>
                 </div>
 
@@ -175,9 +172,9 @@
                             <textarea id="inspectionActivityWithStages"
                                       th:field="*{inspectionActivityWithStages}"
                                       class="form-control" rows="3" placeholder="Enter Inspection Stages"
-                                      required minlength="10" maxlength="500"></textarea>
+                                      required minlength="10" maxlength="2500"></textarea>
                             <div class="invalid-feedback">
-                                Please provide inspection stages (10-500 characters).
+                                Please provide inspection stages (10-2500 characters).
                             </div>
                         </div>
                     </div>
@@ -190,9 +187,9 @@
                             <textarea id="inspectionLocationDetailsId" th:field="*{inspectionLocationDetails}"
                                       class="form-control" rows="3"
                                       onchange="initMap(this.value); showMapLoadingMessage();"
-                                      required minlength="10" maxlength="500"></textarea>
+                                      required minlength="10" maxlength="2500"></textarea>
                             <div class="invalid-feedback">
-                                Please provide location details (10-500 characters).
+                                Please provide location details (10-2500 characters).
                             </div>
                         </div>
                         <div id="mapLoadingMessage" class="mt-2 text-warning fw-bold" style="display: none;">
@@ -349,9 +346,9 @@
                         <span class="input-group-text"><i class="fas fa-industry"></i></span>
                         <input type="text" id="sectorScope" th:field="*{sectorScope}" class="form-control"
                                inputmode="numeric" pattern="[0-9]*" minlength="1" maxlength="3" required/>
-                    </div>
-                    <div class="invalid-feedback">
-                        Please provide a valid numeric scope (1-3 digits).
+                        <div class="invalid-feedback">
+                            Please provide a valid numeric scope (1-3 digits).
+                        </div>
                     </div>
                 </div>
                 
