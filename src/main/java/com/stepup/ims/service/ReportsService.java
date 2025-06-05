@@ -12,10 +12,7 @@ import com.stepup.ims.model.Inspector;
 import com.stepup.ims.model.ProposedCVs;
 import com.stepup.ims.modelmapper.InspectionModelMapper;
 import com.stepup.ims.repository.InspectionRepository;
-import org.apache.poi.ss.usermodel.FillPatternType;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -46,6 +43,18 @@ public class ReportsService {
 
     @Autowired
     private InspectionModelMapper inspectionModelMapper;
+
+    public byte[] generateISOReport(String isoType, String period, String from, String to, String format) throws IllegalAccessException {
+
+        List<Inspection> inspections = inspectionService.getInspectionsBetweenDates(from, to);
+        String reportName = isoType.toLowerCase() + "_" + period + "_" + from.split("T")[0] + "_" + to.split("T")[0] + "." + format.toLowerCase();
+
+        return switch (format.toLowerCase()) {
+            case "pdf" -> generatePdfReport(reportName, inspections);
+            case "excel" -> generateISOExcelReport(reportName, inspections, isoType);
+            default -> throw new IllegalArgumentException("Unsupported format: " + format);
+        };
+    }
 
     public byte[] generateReport(String client, String period, String from, String to, String format) throws IllegalAccessException {
 
@@ -401,5 +410,167 @@ public class ReportsService {
         }
 
         return out.toByteArray();
+    }
+
+    private byte[] generateISOExcelReport(String sheetName, List<Inspection> inspections, String isoType) {
+        if (inspections.isEmpty()) {
+            return new byte[0];
+        }
+
+        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            Sheet sheet = workbook.createSheet(sheetName);
+
+            var styles = createStyles(workbook);
+
+            if ("orderRegister".equalsIgnoreCase(isoType)) {
+                String[] headers = {
+                        "Job Alloted No (IISPL No)", "Notification received Date & Time", "Client Name",
+                        "Inspection Country", "Notification No", "Inspection Item", "Inspection Activity with Stages",
+                        "Inspection Date as per Notification", "IRN Sent to Client on"
+                };
+                createHeader(sheet, styles.headerCellStyle, headers);
+
+                for (int rowIndex = 0; rowIndex < inspections.size(); rowIndex++) {
+                    createOrderRegisterDataRow(sheet, inspections.get(rowIndex), rowIndex, styles);
+                }
+            } else if ("enquiryQuotationOrder".equalsIgnoreCase(isoType)) {
+                String[] headers = {
+                        "Job Alloted No (IISPL No)", "Notification received Date & Time", "Client Name",
+                        "Inspection Country", "Notification No", "Replied to Client", "Remarks /po Number /Email Confirmation",
+                        "Awarded or Not Awarded"
+                };
+                createHeader(sheet, styles.headerCellStyle, headers);
+
+                for (int rowIndex = 0; rowIndex < inspections.size(); rowIndex++) {
+                    createEquiryQuotationOrderDataRow(sheet, inspections.get(rowIndex), rowIndex, styles);
+                }
+            } else if ("inspectionCallStatus".equalsIgnoreCase(isoType)) {
+                String[] headers = {
+                        "Job Alloted No (IISPL No)", "Notification received Date & Time", "Client Name",
+                        "Inspection Date as per Notification", "Inspector", "Vendor and Location", "IRN number",
+                        "Reviewed", "IRN Sent Date"
+                };
+                createHeader(sheet, styles.headerCellStyle, headers);
+
+                for (int rowIndex = 0; rowIndex < inspections.size(); rowIndex++) {
+                    createInspectionCallStatusDataRow(sheet, inspections.get(rowIndex), rowIndex, styles);
+                }
+            }
+
+            for (int i = 0; i < sheet.getRow(0).getLastCellNum(); i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            workbook.write(out);
+            return out.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException("Error creating Excel report", e);
+        }
+    }
+
+    private void createHeader(Sheet sheet, CellStyle headerCellStyle, String[] headers) {
+        Row headerRow = sheet.createRow(0);
+        for (int i = 0; i < headers.length; i++) {
+            var cell = headerRow.createCell(i);
+            cell.setCellValue(headers[i]);
+            cell.setCellStyle(headerCellStyle);
+        }
+    }
+
+    private void createOrderRegisterDataRow(Sheet sheet, Inspection inspection, int rowIndex, CellStyles styles) {
+        Row dataRow = sheet.createRow(rowIndex + 1);
+        var style = (rowIndex % 2 == 0) ? styles.evenRowCellStyle : styles.oddRowCellStyle;
+
+        setCellValue(dataRow, 0, inspection.getInspectionNo(), style);
+        setCellValue(dataRow, 1, inspection.getNotificationReceivedDateTime() != null ?
+                inspection.getNotificationReceivedDateTime().toString() : "", style);
+        setCellValue(dataRow, 2, inspection.getClient().getClientName() + " - " + inspection.getClient().getCountry(), style);
+        setCellValue(dataRow, 3, inspection.getInspectionCountry(), style);
+        setCellValue(dataRow, 4, inspection.getNotificationNo(), style);
+        setCellValue(dataRow, 5, inspection.getInspectionItem(), style);
+        setCellValue(dataRow, 6, inspection.getInspectionActivityWithStages(), style);
+        setCellValue(dataRow, 7, inspection.getInspectionDateAsPerNotification() != null ?
+                inspection.getInspectionDateAsPerNotification().toString() : "", style);
+        setCellValue(dataRow, 8, inspection.getIrnSentDate() != null ? inspection.getIrnSentDate().toString() : "", style);
+    }
+
+    private void createEquiryQuotationOrderDataRow(Sheet sheet, Inspection inspection, int rowIndex, CellStyles styles) {
+        Row dataRow = sheet.createRow(rowIndex + 1);
+        var style = (rowIndex % 2 == 0) ? styles.evenRowCellStyle : styles.oddRowCellStyle;
+
+        setCellValue(dataRow, 0, inspection.getInspectionNo(), style);
+        setCellValue(dataRow, 1, inspection.getNotificationReceivedDateTime() != null ?
+                inspection.getNotificationReceivedDateTime().toString() : "", style);
+        setCellValue(dataRow, 2, inspection.getClient().getClientName() + " - " + inspection.getClient().getCountry(), style);
+        setCellValue(dataRow, 3, inspection.getInspectionCountry(), style);
+        setCellValue(dataRow, 4, inspection.getNotificationNo(), style);
+        setCellValue(dataRow, 5, (inspection.getProposedCVs() != null && !inspection.getProposedCVs().isEmpty() &&
+                inspection.getProposedCVs().get(0).getCvSubmittedToClientDate() != null) ?
+                inspection.getProposedCVs().get(0).getCvSubmittedToClientDate().toString() : "", style);
+        setCellValue(dataRow, 6, "Not Available", style);
+        setCellValue(dataRow, 7, Inspection.InspectionStatusType.INSPECTION_AWARDED.equals(inspection.getInspectionStatus()) ? "Awarded" : "Not Awarded", style);
+    }
+
+    private void createInspectionCallStatusDataRow(Sheet sheet, Inspection inspection, int rowIndex, CellStyles styles) {
+        Row dataRow = sheet.createRow(rowIndex + 1);
+        var style = (rowIndex % 2 == 0) ? styles.evenRowCellStyle : styles.oddRowCellStyle;
+
+        setCellValue(dataRow, 0, inspection.getInspectionNo(), style);
+        setCellValue(dataRow, 1, inspection.getNotificationReceivedDateTime() != null ?
+                inspection.getNotificationReceivedDateTime().toString() : "", style);
+        setCellValue(dataRow, 2, inspection.getClient().getClientName() + " - " + inspection.getClient().getCountry(), style);
+        setCellValue(dataRow, 3, inspection.getInspectionDateAsPerNotification() != null ?
+                inspection.getInspectionDateAsPerNotification().toString() : "", style);
+        setCellValue(dataRow, 4, inspection.getProposedCVs().stream()
+                .filter(cv -> cv.isCvStatus())
+                .findFirst()
+                .map(cv -> cv.getInspector().getInspectorName())
+                .orElse(""), style);
+        setCellValue(dataRow, 5, inspection.getInspectionLocationDetails(), style);
+        setCellValue(dataRow, 6, inspection.getInspectionReportNumber(), style);
+        setCellValue(dataRow, 7, inspection.getDocumentsReviewedByTechnicalCoordinator(), style);
+        setCellValue(dataRow, 8, inspection.getIrnSentDate() != null ? inspection.getIrnSentDate().toString() : "", style);
+    }
+
+    private static class CellStyles {
+        CellStyle headerCellStyle;
+        CellStyle evenRowCellStyle;
+        CellStyle oddRowCellStyle;
+    }
+
+    private CellStyles createStyles(Workbook workbook) {
+        CellStyles styles = new CellStyles();
+
+        // Header style
+        styles.headerCellStyle = workbook.createCellStyle();
+        var font = workbook.createFont();
+        font.setBold(true);
+        styles.headerCellStyle.setFont(font);
+        styles.headerCellStyle.setWrapText(true);
+        var lightGrey = new XSSFColor(new java.awt.Color(211, 211, 211), null);
+        ((XSSFCellStyle) styles.headerCellStyle).setFillForegroundColor(lightGrey);
+        styles.headerCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+        // Even row style
+        styles.evenRowCellStyle = workbook.createCellStyle();
+        ((XSSFCellStyle) styles.evenRowCellStyle).setFillForegroundColor(new XSSFColor(new java.awt.Color(245, 245, 245), null));
+        styles.evenRowCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        styles.evenRowCellStyle.setWrapText(true);
+
+        // Odd row style
+        styles.oddRowCellStyle = workbook.createCellStyle();
+        styles.oddRowCellStyle.setWrapText(true);
+
+        return styles;
+    }
+
+    private void setCellValue(Row row, int cellIndex, Object value, CellStyle style) {
+        var cell = row.createCell(cellIndex);
+        if (value instanceof String string) {
+            cell.setCellValue(string);
+        } else if (value instanceof Number number) {
+            cell.setCellValue(number.doubleValue());
+        }
+        cell.setCellStyle(style);
     }
 }

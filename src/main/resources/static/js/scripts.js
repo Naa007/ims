@@ -1575,9 +1575,13 @@ function generateRandomData(count, min, max) {
         }
 
         if(reports) {
-            // Set up event listeners for reports
+            // Set up event listeners for inspection reports
             document.getElementById('reportPeriodSelect').addEventListener('change', handleReportPeriodChange);
             document.getElementById('exportReportExcelBtn').addEventListener('click', () => exportData('reports', 'excel'));
+
+             // Set up event listeners for iso reports
+            document.getElementById('isoPeriodSelect').addEventListener('change', handleISOPeriodChange);
+            document.getElementById('exportISOReportExcelBtn').addEventListener('click', () => exportData('iso', 'excel'));
         }
     }
 
@@ -1607,6 +1611,20 @@ function generateRandomData(count, min, max) {
             reportsCustomRangeContainer.style.display = 'none';
         }
     }
+
+   // Handle iso period change
+    function handleISOPeriodChange() {
+            const periodSelect = document.getElementById('isoPeriodSelect');
+            const reportsCustomRangeContainer = document.getElementById('isoReportsCustomRangeContainer');
+
+            if (periodSelect.value === 'custom') {
+                document.getElementById('exportISOReportExcelBtn').disabled = true;
+                reportsCustomRangeContainer.style.display = 'block';
+            } else {
+                document.getElementById('exportISOReportExcelBtn').disabled = false;
+                reportsCustomRangeContainer.style.display = 'none';
+            }
+        }
 
     // Apply custom date range
     function applyCustomRange() {
@@ -1641,6 +1659,24 @@ function generateRandomData(count, min, max) {
             showNotification('Please select both start and end dates', 'error');
         }
     }
+
+     // Apply custom date range
+    function applyISOReportsCustomRange() {
+        const period = document.getElementById('isoPeriodSelect').value;
+        const startDate = document.getElementById('isoReportStartDate').value;
+        const endDate = document.getElementById('isoReportEndDate').value;
+
+        if (startDate && endDate) {
+            if (new Date(startDate) > new Date(endDate)) {
+                showNotification('Start date cannot be after end date', 'error');
+                return;
+              }
+            document.getElementById('exportISOReportExcelBtn').disabled = false;
+        } else {
+            showNotification('Please select both start and end dates', 'error');
+        }
+    }
+
 
     // Fetch data for a specific period
     function fetchDataForPeriod(period) {
@@ -1862,8 +1898,13 @@ function generateRandomData(count, min, max) {
         showNotification('Please select a period range before exporting.', 'warning');
         resetExportButton(exportBtn, originalText);
     };
+    
+     const showPhaseWarning = () => {
+            showNotification('Selected report will be available in next release', 'warning');
+            resetExportButton(exportBtn, originalText);
+        };
 
-    let endpoint, filename, client, period, startDate, endDate;
+    let endpoint, filename, client, period, startDate, endDate, isoType;
 
     switch (context) {
         case 'coordinator':
@@ -1906,6 +1947,21 @@ function generateRandomData(count, min, max) {
                 endpoint += `?client=${client}`;
             }
             filename = `inspections_report_${period}_${startDate}_${endDate}.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
+            break;
+        }
+        case 'iso': {
+            period = document.getElementById('isoPeriodSelect')?.value;
+            isoType = document.getElementById('isoSelect')?.value;
+            const validIsoTypes = ['orderRegister', 'enquiryQuotationOrder', 'inspectionCallStatus'];
+
+            if (!isoType || !validIsoTypes.includes(isoType)) {
+                return showPhaseWarning();
+            }
+            if (!period) return showPeriodWarning();
+
+            [startDate, endDate] = getStartAndEndDate(period, 'isoReportStartDate', 'isoReportEndDate');
+            endpoint = `/reports/iso/${isoType}/${period}/${startDate}/${endDate}/${format}`;
+            filename = `${isoType}_report_${period}_${startDate}_${endDate}.${format === 'pdf' ? 'pdf' : 'xlsx'}`;
             break;
         }
         default:

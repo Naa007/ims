@@ -30,6 +30,18 @@ public class ReportsController {
         return buildReportResponse(report, period + "-report." + format, format);
     }
 
+    @GetMapping("/iso/{isoType}/{period}/{from}/{to}/{format}")
+    public ResponseEntity<byte[]> getISOReports(@PathVariable String isoType,
+                                                @PathVariable String period,
+                                                @PathVariable String from,
+                                                @PathVariable String to,
+                                                @PathVariable String format,
+                                                Model model) throws IllegalAccessException {
+
+        byte[] report = reportsService.generateISOReport(isoType, period, from, to, format);
+        return buildReportResponse(report, period + "-report." + format, format);
+    }
+
     private ResponseEntity<byte[]> buildReportResponse(byte[] reportData, String filename, String format) {
         HttpHeaders headers = new HttpHeaders();
 

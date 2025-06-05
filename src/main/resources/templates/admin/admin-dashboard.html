@@ -34,8 +34,9 @@
             </a>
         </div>
 
-        <!-- Inspection Reports -->
+        <!-- Reports -->
         <div id="reportsContainer" class="cd-stats-container" style="display: none">
+            <!-- Inspection Reports -->
             <h4 class="section-header">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div style="display: flex; align-items: center; justify-content: flex-start;">
@@ -48,7 +49,6 @@
                     <span class="user-email" th:text="${userEmail}" style="display:none;"></span>
                 </div>
             </h4>
-            <!-- Performance Metrics Display -->
             <div class="cd-performance-metrics-container">
                 <div class="cd-metrics-display">
                     <!-- Time Period Selection -->
@@ -84,6 +84,70 @@
                         <div class="cd-export-wrapper">
                             <div class="bd-filter-group bd-export-group">
                                 <button class="bd-export-btn" id="exportReportExcelBtn">
+                                    <i class="fas fa-file-excel"></i> Excel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ISO Reports -->
+            <h4 class="section-header">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; justify-content: flex-start;">
+                        <i class="fas fa-chart-line me-2"></i>
+                        <span>Download ISO Reports</span>
+                    </div>
+                    <div class="bd-date-filter date">
+                        <span th:text="${#temporals.format(#temporals.createNow(), 'MMMM dd, yyyy')}">May 03, 2025</span>
+                    </div>
+                    <span class="user-email" th:text="${userEmail}" style="display:none;"></span>
+                </div>
+            </h4>
+            <div class="cd-performance-metrics-container">
+                <div class="cd-metrics-display">
+                    <!-- Time Period Selection -->
+                    <div class="cd-period-selection">
+                        <div class="cd-filter-group">
+
+                            <label for="isoSelect">ISO</label>
+                            <select class="cd-period-select" id="isoSelect">
+                                <option value="orderRegister" selected>Order Register</option>
+                                <option value="customerSatisfaction">Customer Satisfaction</option>
+                                <option value="customerComplaints">Customer Complaints</option>
+                                <option value="enquiryQuotationOrder">Enquiry Quotation Order</option>
+                                <option value="customerListYearWise">Customer List</option>
+                                <option value="customerFeedback">Customer Feedback</option>
+                                <option value="strikeRate">Strike Rate</option>
+                                <option value="onTimeDelivery">On Time Delivery</option>
+                                <option value="inspectionCallStatus">Inspection Call Status</option>
+                            </select>
+                            <label for="isoPeriodSelect">Period</label>
+                            <select class="cd-period-select" id="isoPeriodSelect">
+                                <option value="" disabled selected>Select a range</option>
+                                <option value="today">Today</option>
+                                <option value="week">Week</option>
+                                <option value="month">Month</option>
+                                <option value="year">Year</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                            <div id="isoReportsCustomRangeContainer" style="display: none;">
+                                <div class="cd-custom-range-content">
+                                    <input id="isoReportStartDate" name="startDate" type="date" style="width: calc(100% - 1.5rem); padding: 0.375rem 0.75rem; border-radius: 0.25rem; border: 1px solid #d1d3e2; font-size: 0.9rem;">
+                                    <input id="isoReportEndDate" name="endDate" type="date" style="width: calc(100% - 1.5rem); padding: 0.375rem 0.75rem; border-radius: 0.25rem; border: 1px solid #d1d3e2; font-size: 0.9rem;">
+
+                                    <button class="cd-filter-btn" style="width: calc(100% - 1.5rem);padding: 0.375rem 0.75rem;border-radius: 0.25rem;/* border: 1px solid #d1d3e2; */font-size: 0.9rem;" onclick="applyISOReportsCustomRange()" type="button">
+                                        <i class="fas fa-check-circle" style="margin-right: 5px;"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Export Options -->
+                        <div class="cd-export-wrapper">
+                            <div class="bd-filter-group bd-export-group">
+                                <button class="bd-export-btn" id="exportISOReportExcelBtn">
                                     <i class="fas fa-file-excel"></i> Excel
                                 </button>
                             </div>
