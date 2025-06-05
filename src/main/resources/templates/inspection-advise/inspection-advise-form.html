@@ -79,9 +79,9 @@
                         <label for="requirement">Requirement</label>
                         <textarea th:field="*{requirement}" id="requirement" class="form-control"
                                   placeholder="Enter Requirement" required
-                                  minlength="10" maxlength="1000"></textarea>
+                                  minlength="10" maxlength="2000"></textarea>
                         <div class="invalid-feedback">
-                            Please provide inspection requirements (10-1000 characters).
+                            Please provide inspection requirements (10-2000 characters).
                         </div>
                     </div>
                     <!-- Reporting Format  -->
@@ -98,9 +98,6 @@
                                         <span th:text="${reportFormat}"></span>
                                     </label>
                                 </div>
-                            </div>
-                            <div class="invalid-feedback">
-                                Please select a reporting format.
                             </div>
                         </div>
                     </div>
@@ -157,9 +154,9 @@
                     <textarea th:field="*{instructionsFromTechnicalTeam}" id="instructionsFromTechnicalTeam"
                               class="form-control"
                               placeholder="Enter instructions from the technical team"
-                              required minlength="10" maxlength="1000"></textarea>
+                              required minlength="10" maxlength="2000"></textarea>
                     <div class="invalid-feedback">
-                        Please provide technical team instructions (10-1000 characters).
+                        Please provide technical team instructions (10-2000 characters).
                     </div>
                 </div>
             </div><br/>

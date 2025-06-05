@@ -78,9 +78,6 @@
                             <option th:each="client : ${inspection.clientsList}" th:value="${client.clientId}"
                                     th:text="${client.clientName + ' - ' + client.country}"></option>
                         </select>
-                        <div class="invalid-feedback">
-                            Please select a client.
-                        </div>
                         </div>
                 </div>
 
@@ -104,9 +101,6 @@
                             <option th:each="country : ${inspection.countriesList}" th:value="${country}"
                                     th:text="${country}"></option>
                         </select>
-                        <div class="invalid-feedback">
-                            Please select a country.
-                        </div>
                     </div>
                 </div>
 
@@ -140,18 +134,16 @@
                 </div>
 
                 <!-- Inspection Type -->
-                <div class="col-md-6">
+                <div class="col-md-6 mb-3">
                     <label class="form-label required-field">Inspection Type</label>
-                    <div class="d-flex">
-                        <div class="form-check me-3">
-                            <input type="radio" id="MECHANICAL"
-                                   name="inspectionType" th:field="*{inspectionType}" value="MECHANICAL" required/>
-                            Mechanical
+                    <div class="input-group was-validated"> <!-- Add was-validated if you want instant feedback -->
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="inspectionTypeMechanical" th:field="*{inspectionType}" value="MECHANICAL" name="inspectionType" required>
+                            <label class="form-check-label" for="inspectionTypeMechanical">Mechanical</label>
                         </div>
-                        <div class="form-check">
-                            <input type="radio" id="ELECTRICAL"
-                                   name="inspectionType" th:field="*{inspectionType}" value="ELECTRICAL" required/>
-                            Electrical
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="inspectionTypeElectrical" th:field="*{inspectionType}" value="ELECTRICAL" name="inspectionType" required>
+                            <label class="form-check-label" for="inspectionTypeElectrical">Electrical</label>
                         </div>
                     </div>
                 </div>

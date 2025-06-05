@@ -124,9 +124,6 @@
                                    onchange="calculateScore()" class="form-check-input"/>
                             <span th:text="${educationItem.getQualification()}" style="font-size: smaller;"></span>
                         </div>
-                        <div class="invalid-feedback">
-                            Please select an education level.
-                        </div>
                     </div>
                 </div>
 
@@ -144,9 +141,6 @@
                                    th:data-factor="${exp.getFactor()}"
                                    onchange="calculateScore()" class="form-check-input"/>
                             <span th:text="${exp.getName()}" style="font-size: smaller;"></span>
-                        </div>
-                        <div class="invalid-feedback">
-                            Please select an experience level.
                         </div>
                     </div>
                 </div>
@@ -244,9 +238,6 @@
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-star"></i></span>
                         <input type="text" id="score" th:field="*{score}" class="form-control" required readonly/>
-                        <div class="invalid-feedback">
-                            Please calculate the score by filling all required fields.
-                        </div>
                     </div>
                 </div>
 
@@ -256,9 +247,9 @@
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-comments"></i></span>
                         <textarea id="remarks" th:field="*{remarks}" class="form-control" rows="4"
-                                  required minlength="10" maxlength="500"></textarea>
+                                  required minlength="10" maxlength="5000"></textarea>
                         <div class="invalid-feedback">
-                            Please provide remarks (10-500 characters).
+                            Please provide remarks (10-5000 characters).
                         </div>
                     </div>
                 </div>

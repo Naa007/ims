@@ -63,18 +63,15 @@
                                             <span style="font-weight: normal;" th:text="${statusType.getName()}"></span>
                                         </label>
                                     </div>
-                                    <div class="invalid-feedback">
-                                        Please select a status for this document
-                                    </div>
                                 </div>
                             </td>
 
                             <!-- Special Remarks -->
                             <td>
                                 <textarea th:field="*{contractDocumentList[__${iterStat.index}__].specialRemarks}"
-                                          class="form-control" maxlength="500"></textarea>
+                                          class="form-control" maxlength="2000"></textarea>
                                 <div class="invalid-feedback">
-                                    Special remarks cannot exceed 500 characters
+                                    Special remarks cannot exceed 2000 characters
                                 </div>
                             </td>
                         </tr>

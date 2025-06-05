@@ -621,9 +621,6 @@
                                         <option value="">Select Country</option>
                                         <option th:each="country : ${client.countriesList}" th:value="${country}" th:text="${country}"></option>
                                     </select>
-                                    <div class="invalid-feedback">
-                                        Please select a country.
-                                    </div>
                                 </div>
                             </div>
                             <!-- Address -->
@@ -632,11 +629,11 @@
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-map-marker-alt icon-blue"></i></span>
                                     <input type="text" class="form-control" id="address" name="address"
-                                           required minlength="5" maxlength="255"
+                                           required minlength="5" maxlength="2500"
                                            oninvalid="this.setCustomValidity('Please enter a valid address (5-255 characters)')"
                                            oninput="this.setCustomValidity('')">
                                     <div class="invalid-feedback">
-                                        Please provide a valid address (5-255 characters).
+                                        Please provide a valid address (5-2500 characters).
                                     </div>
                                 </div>
                             </div>
@@ -695,9 +692,6 @@
                                            required
                                            oninvalid="this.setCustomValidity('Please select a confirmation date')"
                                            oninput="this.setCustomValidity('')">
-                                    <div class="invalid-feedback">
-                                        Please provide a confirmation date.
-                                    </div>
                                 </div>
                             </div>
                             <!-- Coordinator -->
@@ -709,9 +703,6 @@
                                         <option value="">Select Coordinator</option>
                                         <option th:each="employee : ${employees}" th:value="${employee.empId}" th:text="${employee.empName}"></option>
                                     </select>
-                                    <div class="invalid-feedback">
-                                        Please select a coordinator.
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -768,9 +759,6 @@
                                         <option value="">Select Country</option>
                                         <option th:each="country : ${client.countriesList}" th:value="${country}" th:text="${country}"></option>
                                     </select>
-                                    <div class="invalid-feedback">
-                                        Please select a country.
-                                    </div>
                                 </div>
                             </div>
                             <!-- Address -->
@@ -779,11 +767,11 @@
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-map-marker-alt icon-blue"></i></span>
                                     <input type="text" class="form-control" id="editAddress" name="address"
-                                           required minlength="5" maxlength="255"
+                                           required minlength="5" maxlength="2500"
                                            oninvalid="this.setCustomValidity('Please enter a valid address (5-255 characters)')"
                                            oninput="this.setCustomValidity('')">
                                     <div class="invalid-feedback">
-                                        Please provide a valid address (5-255 characters).
+                                        Please provide a valid address (5-2500 characters).
                                     </div>
                                 </div>
                             </div>
@@ -845,9 +833,6 @@
                                            required
                                            oninvalid="this.setCustomValidity('Please select a confirmation date')"
                                            oninput="this.setCustomValidity('')">
-                                    <div class="invalid-feedback">
-                                        Please provide a confirmation date.
-                                    </div>
                                 </div>
                             </div>
                             <!-- Coordinator -->
@@ -859,9 +844,6 @@
                                         <option value="">Select Coordinator</option>
                                         <option th:each="employee : ${employees}" th:value="${employee.empId}" th:text="${employee.empName}"></option>
                                     </select>
-                                    <div class="invalid-feedback">
-                                        Please select a coordinator.
-                                    </div>
                                 </div>
                             </div>
                         </div>

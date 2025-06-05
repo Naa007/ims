@@ -56,9 +56,6 @@
                                max="2005-12-31"
                                oninvalid="this.setCustomValidity('Please enter a valid date of birth (must be at least 18 years old)')"
                                oninput="this.setCustomValidity('')" />
-                        <div class="invalid-feedback">
-                            Please provide a valid date of birth.
-                        </div>
                     </div>
                 </div>
 
@@ -103,11 +100,11 @@
                         <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
                         <input type="text" id="address" th:field="*{address}" class="form-control"
                                placeholder="Enter address" required
-                               minlength="5" maxlength="255"
+                               minlength="5" maxlength="2500"
                                oninvalid="this.setCustomValidity('Please enter a valid address (5-255 characters)')"
                                oninput="this.setCustomValidity('')" />
                         <div class="invalid-feedback">
-                            Please provide a valid address (5-255 characters).
+                            Please provide a valid address (5-2500 characters).
                         </div>
                     </div>
                 </div>
@@ -123,9 +120,6 @@
                             <option value="">Select Country</option>
                             <option th:each="country : ${inspector.countriesList}" th:value="${country}" th:text="${country}"></option>
                         </select>
-                        <div class="invalid-feedback">
-                            Please select a country.
-                        </div>
                     </div>
                 </div>
             </div>
@@ -141,11 +135,11 @@
                     <label for="educationDetails" class="form-label">Education Details</label>
                     <textarea id="educationDetails" th:field="*{educationDetails}" class="form-control" rows="3"
                               placeholder="Enter education details, qualifications, degrees, etc." required
-                              minlength="10" maxlength="1000"
+                              minlength="10" maxlength="3000"
                               oninvalid="this.setCustomValidity('Please enter education details (10-1000 characters)')"
                               oninput="this.setCustomValidity('')"></textarea>
                     <div class="invalid-feedback">
-                        Please provide education details (10-1000 characters).
+                        Please provide education details (10-3000 characters).
                     </div>
                 </div>
 
@@ -186,9 +180,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class="invalid-feedback" style="display: block;">
-                        Please select an inspector type.
-                    </div>
                 </div>
 
                 <!-- Inspector Status -->
@@ -204,9 +195,6 @@
                                 <label th:text="${status.description}" class="form-check-label"></label>
                             </div>
                         </div>
-                    </div>
-                    <div class="invalid-feedback" style="display: block;">
-                        Please select an inspector status.
                     </div>
                 </div>
             </div>
@@ -234,11 +222,11 @@
                             <td>
                                 <input type="text" th:field="*{certificates[__${iterStat.index}__].name}" class="form-control"
                                        placeholder="Certificate Name" required
-                                       minlength="2" maxlength="100"
+                                       minlength="2" maxlength="500"
                                        oninvalid="this.setCustomValidity('Please enter a certificate name (2-100 characters)')"
                                        oninput="this.setCustomValidity('')" />
                                 <div class="invalid-feedback">
-                                    Please provide a certificate name (2-100 characters).
+                                    Please provide a certificate name (2-500 characters).
                                 </div>
                             </td>
                             <td>
@@ -266,11 +254,11 @@
                             <td>
                                 <input type="text" th:field="*{certificates[__${iterStat.index}__].issuer}" class="form-control"
                                        placeholder="Issuer" required
-                                       minlength="2" maxlength="100"
+                                       minlength="2" maxlength="500"
                                        oninvalid="this.setCustomValidity('Please enter an issuer name (2-100 characters)')"
                                        oninput="this.setCustomValidity('')" />
                                 <div class="invalid-feedback">
-                                    Please provide an issuer name (2-100 characters).
+                                    Please provide an issuer name (2-500 characters).
                                 </div>
                             </td>
                             <td>
