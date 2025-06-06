@@ -283,13 +283,11 @@
                         <i class="fas fa-file"></i>
                         <div class="info-content">
                             <div class="info-label">Reference Documents</div>
-                            <div class="info-value"
-                                 th:text="${inspection.referenceDocumentsForInspectionStatus == true ? 'Available' : 'Not Available'}">
-                                <a href="#"
-                                   class="btn btn-link btn-sm"
-                                   th:href="${inspection.referenceDocumentsLink}"
+                            <div>
+                                <span class="info-value" th:text="${inspection.referenceDocumentsForInspectionStatus == true ? 'Available' : 'Not Available'}"></span>
+                                <a href="#" class="btn btn-link btn-sm" th:href="${inspection.referenceDocumentsLink}"
                                    target="_blank">
-                                    <i class="fas fa-link"></i>
+                                    <i class="fas fa-link" style="background-color: white; color: #007bff;"></i>
                                 </a>
                             </div>
                         </div>
