@@ -17,6 +17,40 @@
             });
         }, false);
     })();
+// Add this to your existing validation setup
+function setupDatePickerValidation() {
+    const datePickerInput = document.getElementById('inspectionDateAsPerNotification');
+
+    if (datePickerInput) {
+        // Listen for changes on the date picker
+        datePickerInput.addEventListener('change', function() {
+            validateDatePicker();
+        });
+
+        // Also validate when form is submitted
+        const form = datePickerInput.closest('form');
+        if (form) {
+            form.addEventListener('submit', function() {
+                validateDatePicker();
+            });
+        }
+    }
+}
+
+function validateDatePicker() {
+    const datePickerInput = document.getElementById('inspectionDateAsPerNotification');
+    const feedbackElement = datePickerInput.nextElementSibling;
+
+    if (datePickerInput && feedbackElement && feedbackElement.classList.contains('invalid-feedback')) {
+        if (!datePickerInput.value) {
+            datePickerInput.setCustomValidity('Please select inspection dates.');
+            datePickerInput.classList.add('is-invalid');
+        } else {
+            datePickerInput.setCustomValidity('');
+            datePickerInput.classList.remove('is-invalid');
+        }
+    }
+}
 
     // Function to validate international phone numbers more thoroughly
     function validatePhoneNumber(phone) {
@@ -105,4 +139,5 @@
         setupRadioValidation();
         setupPhoneValidation();
         setupCertificateDateValidation();
+        setupDatePickerValidation();
     });
