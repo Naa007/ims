@@ -53,12 +53,13 @@
 
                             <!-- Status -->
                             <td>
-                                <div>
+                                <div role="radiogroup" class="radio-group-required">
                                     <div th:each="statusType : ${T(com.stepup.ims.model.ContractDocument.DocumentStatusTypes).values()}">
                                         <label> <input type="radio"
                                                        th:field="*{contractDocumentList[__${iterStat.index}__].status}"
                                                        th:value="${statusType}"
-                                                       th:checked="*{contractDocumentList[__${iterStat.index}__].status} == ${statusType}"/>
+                                                       th:checked="*{contractDocumentList[__${iterStat.index}__].status} == ${statusType}"
+                                                       required/>
                                             <span style="font-weight: normal;" th:text="${statusType.getName()}"></span>
                                         </label>
                                     </div>
@@ -68,7 +69,10 @@
                             <!-- Special Remarks -->
                             <td>
                                 <textarea th:field="*{contractDocumentList[__${iterStat.index}__].specialRemarks}"
-                                          class="form-control"></textarea>
+                                          class="form-control" maxlength="2000"></textarea>
+                                <div class="invalid-feedback">
+                                    Special remarks cannot exceed 2000 characters
+                                </div>
                             </td>
                         </tr>
                         </tbody>
@@ -86,7 +90,11 @@
                 <div class="form-group">
                     <label for="submissionList">Submission List</label>
                     <textarea th:field="*{submissionList}" id="submissionList" class="form-control"
-                              placeholder="Enter Submission List"></textarea>
+                              placeholder="Enter Submission List" required
+                              minlength="10" maxlength="2000"></textarea>
+                    <div class="invalid-feedback">
+                        Please provide a submission list (10-2000 characters)
+                    </div>
                 </div>
             </div>
 
@@ -100,7 +108,11 @@
                 <div class="form-group">
                     <label for="conclusion">Conclusion</label>
                     <textarea th:field="*{conclusion}" id="conclusion" class="form-control"
-                              placeholder="Enter your conclusion here"></textarea>
+                              placeholder="Enter your conclusion here" required
+                              minlength="10" maxlength="2000"></textarea>
+                    <div class="invalid-feedback">
+                        Please provide a conclusion (10-2000 characters)
+                    </div>
                 </div>
             </div>
 
