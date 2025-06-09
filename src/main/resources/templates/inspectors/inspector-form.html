@@ -163,7 +163,8 @@
                 <i class="fas fa-id-badge me-2"></i> Inspector Status & Type
             </h4>
 
-            <div class="row g-3 mb-4">                <!-- Inspector Type -->
+            <div class="row g-3 mb-4">
+                <!-- Inspector Type -->
                 <div class="col-lg-6">
                     <label class="form-label">Inspector Type</label>
                     <div class="qualification-grid">
@@ -172,10 +173,10 @@
                             <div class="form-check">
                                 <input type="radio" th:field="*{inspectorType}" th:value="${type}"
                                        class="form-check-input" name="inspectorType" required
-                                       oninvalid="this.setCustomValidity('Please select an inspector type')"
-                                       onchange="handleInspectorTypeChange(this)"
-                                       oninput="this.setCustomValidity('')" />
-                                <label>
+                                       th:id="'inspectorType-' + ${type}"
+                                       oninvalid="document.getElementById('inspectorTypeError').style.display = 'block'"
+                                       oninput="document.getElementById('inspectorTypeError').style.display = 'none'" />
+                                <label th:for="'inspectorType-' + ${type}">
                                     <span th:text="${type.description}"></span>
                                 </label>
                             </div>
@@ -191,9 +192,10 @@
                             <div class="form-check">
                                 <input type="radio" th:field="*{inspectorStatus}" th:value="${status}"
                                        class="form-check-input" name="inspectorStatus" required
-                                       oninvalid="this.setCustomValidity('Please select an inspector status')"
-                                       oninput="this.setCustomValidity('')" />
-                                <label th:text="${status.description}" ></label>
+                                       th:id="'inspectorStatus-' + ${status}"
+                                       oninvalid="document.getElementById('inspectorStatusError').style.display = 'block'"
+                                       oninput="document.getElementById('inspectorStatusError').style.display = 'none'" />
+                                <label th:for="'inspectorStatus-' + ${status}" th:text="${status.description}"></label>
                             </div>
                         </div>
                     </div>

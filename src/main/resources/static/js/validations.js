@@ -114,15 +114,18 @@ function validateDatePicker() {
 
     function setupRadioValidation() {
         document.querySelectorAll('.needs-validation').forEach(form => {
-            form.addEventListener('submit', function(e) {
+            // On submit validation
+            form.addEventListener('submit', function (e) {
                 let allRadiosValid = true;
 
-                // Validate all radio groups
                 form.querySelectorAll('[role="radiogroup"]').forEach(group => {
                     const name = group.querySelector('input[type="radio"]')?.name;
-                    if (!name || !form.querySelector(`input[name="${name}"]:checked`)) {
+                    const checked = form.querySelector(`input[name="${name}"]:checked`);
+                    if (!name || !checked) {
                         group.classList.add('is-invalid');
                         allRadiosValid = false;
+                    } else {
+                        group.classList.remove('is-invalid');
                     }
                 });
 
@@ -131,8 +134,19 @@ function validateDatePicker() {
                     e.stopPropagation();
                 }
             });
+
+            // On change: clear error when one is selected
+            form.querySelectorAll('[role="radiogroup"] input[type="radio"]').forEach(radio => {
+                radio.addEventListener('change', function () {
+                    const group = this.closest('[role="radiogroup"]');
+                    if (group) {
+                        group.classList.remove('is-invalid');
+                    }
+                });
+            });
         });
     }
+
 
     function handleInspectorTypeChange(radio) {
         if (radio.value === 'TECHNICAL_COORDINATOR') {
@@ -343,4 +357,5 @@ function handleValidationError(status, message, form, inspection) {
         setupCertificateDateValidation();
         setupDatePickerValidation();
         setupInspectionStatusValidation();
+        setupRadioValidation();
     });
