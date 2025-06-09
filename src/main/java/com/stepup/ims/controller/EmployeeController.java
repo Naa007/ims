@@ -34,7 +34,7 @@ public class EmployeeController {
     @PostMapping("/save-employee")
     public String saveEmployee(@ModelAttribute Employee employee, RedirectAttributes redirectAttributes) {
         try {
-            employeeService.validateEmployee(employee.getEmpId(),employee.getEmail());
+            employeeService.validateEmployee(employee.getEmpId(),employee.getEmail(), "new");
             employeeService.saveEmployee(employee);
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
@@ -44,8 +44,13 @@ public class EmployeeController {
 
     // Save Employee
     @PostMapping("/update-employee")
-    public String updateEmployee(@ModelAttribute Employee employee) {
-        employeeService.saveEmployee(employee);
+    public String updateEmployee(@ModelAttribute Employee employee, RedirectAttributes redirectAttributes) {
+        try {
+            employeeService.validateEmployee(employee.getEmpId(),employee.getEmail(), "update");
+            employeeService.saveEmployee(employee);
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
         return REDIRECT_ADMIN_EMPLOYEE_MANAGEMENT;
     }
 }
