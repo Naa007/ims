@@ -134,10 +134,213 @@ function validateDatePicker() {
         });
     }
 
+    function handleInspectorTypeChange(radio) {
+        if (radio.value === 'TECHNICAL_COORDINATOR') {
+            showNotification('Important: For Technical Coordinators, the email must exactly match the employee records', 'warning');
+        }
+    }
+
+
+function setupInspectionStatusValidation() {
+    const statusSelect = document.getElementById('inspectionStatus');
+    if (!statusSelect) {
+        console.warn('Inspection status select element not found');
+        return;
+    }
+
+    // Initialize previous status field
+    const form = document.querySelector('form');
+    if (form && !form.querySelector('input[name="previousStatus"]')) {
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'previousStatus';
+        hiddenInput.value = statusSelect.value;
+        form.insertBefore(hiddenInput, form.firstChild);
+    }
+
+    statusSelect.addEventListener('change', handleStatusChange);
+}
+
+function handleStatusChange() {
+    const status = this.value;
+    const form = document.querySelector('form');
+
+    if (!form) {
+        console.warn('Form element not found');
+        return;
+    }
+
+    const inspection = gatherInspectionData();
+    const validationResult = validateInspectionStatus(status, inspection);
+
+    if (!validationResult.isValid) {
+        handleValidationError(status, validationResult.message, form, inspection);
+
+        const noResetStatuses = [
+            'INSPECTION_AWARDED',
+            'INSPECTOR_REVIEW_COMPLETED',
+            'REFERENCE_DOC_REVIEW_COMPLETED',
+            'INSPECTION_REJECTED',
+            'CLOSED'
+        ];
+
+        if (!noResetStatuses.includes(status)) {
+            this.value = form.querySelector('input[name="previousStatus"]')?.value || '';
+        }
+    }
+}
+
+function handleValidationError(status, message, form, inspection) {
+    const successStatuses = ['INSPECTION_AWARDED'];
+    const warningStatuses = ['INSPECTOR_REVIEW_COMPLETED', 'REFERENCE_DOC_REVIEW_COMPLETED'];
+
+    if (successStatuses.includes(status) && inspection.jobFolderLink) {
+        showNotification(message, 'success');
+    } else if (warningStatuses.includes(status)) {
+        showNotification(message, 'warning');
+    } else {
+        showNotification(message, 'warning');
+    }
+}
+
+function gatherInspectionData() {
+    return {
+        proposedCVs: Array.from(document.querySelectorAll('#proposedCVsTable tbody tr')).map(row => ({
+            cvCertificatesAvailable: row.querySelector('select[name$=".cvCertificatesAvailable"]')?.value === 'true',
+            cvReviewByTechnicalCoordinator: row.querySelector('select[name$=".cvReviewByTechnicalCoordinator.empId"]')?.value,
+            cvSubmittedToClientDate: row.querySelector('input[name$=".cvSubmittedToClientDate"]')?.value,
+            cvStatus: row.querySelector('select[name$=".cvStatus"]')?.value === 'true',
+            inspector: {
+                inspectorId: row.querySelector('select[name$=".inspector.inspectorId"]')?.value
+            }
+        })).filter(cv => cv.inspector.inspectorId),
+        referenceDocumentsForInspectionStatus: document.querySelector('input[name="referenceDocumentsForInspectionStatus"]:checked')?.value === 'true',
+        referenceDocumentsLink: document.getElementById('referenceDocumentsLink')?.value,
+        documentsReviewedByTechnicalCoordinator: document.getElementById('documentsReviewedByTechnicalCoordinator')?.value,
+        contractReviewPrepared: document.querySelector('input[name="contractReviewPrepared"]:checked')?.value === 'true',
+        inspectionAdviseNote: document.querySelector('input[name="inspectionAdviseNote"]:checked')?.value === 'true',
+        irnSentDate: document.getElementById('irnSentDate')?.value,
+        jobFolderLink: document.getElementById('jobFolderLink')?.value,
+        inspectionReportsReceivedDate: document.getElementById('inspectionReportsReceivedDate')?.value
+    };
+}
+
+function validateInspectionStatus(status, inspection) {
+    let isValid = true;
+    let message = '';
+
+    switch(status) {
+        case 'INSPECTOR_ASSIGNED':
+            if (inspection.proposedCVs.length === 0) {
+                isValid = false;
+                message = 'At least one inspector should be present in the CV';
+            }
+            break;
+
+        case 'INSPECTOR_REVIEW_AWAITING':
+            const allCVsHaveTechCoord = Array.from(document.querySelectorAll('select[name$=".cvReviewByTechnicalCoordinator.empId"]'))
+                .every(select => select.value && select.value !== "");
+            if (!allCVsHaveTechCoord) {
+                isValid = false;
+                message = 'Technical Coordinator should be assigned for all CVs';
+            }
+            break;
+
+        case 'INSPECTOR_REVIEW_COMPLETED':
+            isValid = false;
+            message = 'Please send Inspector CV details to Client and update here';
+            break;
+
+        case 'INSPECTOR_APPROVED':
+            if (inspection.proposedCVs.length === 0) {
+                isValid = false;
+                message = 'At least one CV must be provided before approving the inspector';
+            } else {
+                const invalidCVs = inspection.proposedCVs.filter(cv => {
+                    return !cv.cvSubmittedToClientDate || !cv.cvStatus;
+                });
+                if (invalidCVs.length > 0) {
+                    isValid = false;
+                    message = 'CV Submitted Date should not be empty and CV Status should be "Approved"';
+                }
+            }
+            break;
+
+        case 'REFERENCE_DOC_RECEIVED':
+            if (!inspection.referenceDocumentsForInspectionStatus || !inspection.referenceDocumentsLink) {
+                isValid = false;
+                message = 'Reference documents should be marked as available and link should be provided';
+            }
+            break;
+
+        case 'REFERENCE_DOC_REVIEW_COMPLETED':
+            isValid = false;
+            message = 'Hope contract review and inspection advise fields are up to date';
+            break;
+
+        case 'REFERENCE_DOC_REVIEW_AWAITING':
+            if (!inspection.documentsReviewedByTechnicalCoordinator) {
+                isValid = false;
+                message = 'Technical Coordinator should be assigned for document review';
+            }
+            break;
+
+        case 'INSPECTION_REPORTS_SENT_TO_CLIENT':
+            if (!inspection.irnSentDate) {
+                isValid = false;
+                message = 'IRN Sent Date should not be empty';
+            }
+            break;
+
+        case 'INSPECTION_AWARDED':
+            if (!inspection.jobFolderLink) {
+                isValid = false;
+                message = 'Job folder link is empty. please make sure to fill all the details';
+            } else {
+                isValid = false;
+                message = '🎉 Congratulations! The inspection has been awarded!';
+            }
+            break;
+
+        case 'INSPECTION_REJECTED':
+            isValid = false;
+            message = 'Cheer up, move on to the next Inspection';
+            break;
+
+        case 'INSPECTION_REPORTS_RECEIVED':
+            if (!inspection.inspectionReportsReceivedDate) {
+                isValid = false;
+                message = 'Inspection reports received date should not be empty';
+            }
+            break;
+
+        case 'CLOSED':
+            isValid = false;
+            message = 'Please ensure all documentation is complete before closing';
+            break;
+    }
+
+    return { isValid, message };
+}
+
+function handleValidationError(status, message, form, inspection) {
+    const successStatuses = ['INSPECTION_AWARDED'];
+    const warningStatuses = ['INSPECTOR_REVIEW_COMPLETED', 'REFERENCE_DOC_REVIEW_COMPLETED'];
+
+    if (successStatuses.includes(status) && inspection.jobFolderLink) {
+        showNotification(message, 'success');
+    } else if (warningStatuses.includes(status)) {
+        showNotification(message, 'warning');
+    } else {
+        showNotification(message, 'warning');
+    }
+}
+
     // Initialize all common validations
     document.addEventListener('DOMContentLoaded', function() {
         setupRadioValidation();
         setupPhoneValidation();
         setupCertificateDateValidation();
         setupDatePickerValidation();
+        setupInspectionStatusValidation();
     });

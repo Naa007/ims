@@ -70,10 +70,10 @@
                                oninvalid="this.setCustomValidity('Please enter a valid international phone number (6-14 digits, optional country code)')"
                                oninput="this.setCustomValidity('')" />
                         <div class="invalid-feedback">
-                            Please provide a valid phone number.
+                            Please provide a valid phone number (6-14 digits, optional country code).
                         </div>
-                        <small class="form-text text-muted">Format: +[country code] [number] or just number</small>
                     </div>
+                    <small class="form-text text-muted">Format: +[country code] [number] or just number</small>
                 </div>
 
                 <!-- Email -->
@@ -173,6 +173,7 @@
                                 <input type="radio" th:field="*{inspectorType}" th:value="${type}"
                                        class="form-check-input" name="inspectorType" required
                                        oninvalid="this.setCustomValidity('Please select an inspector type')"
+                                       onchange="handleInspectorTypeChange(this)"
                                        oninput="this.setCustomValidity('')" />
                                 <label>
                                     <span th:text="${type.description}"></span>
@@ -192,7 +193,7 @@
                                        class="form-check-input" name="inspectorStatus" required
                                        oninvalid="this.setCustomValidity('Please select an inspector status')"
                                        oninput="this.setCustomValidity('')" />
-                                <label th:text="${status.description}" class="form-check-label"></label>
+                                <label th:text="${status.description}" ></label>
                             </div>
                         </div>
                     </div>
@@ -291,11 +292,11 @@
                             <div class="mb-3">
                                 <div class="form-check mb-2">
                                     <input type="checkbox" id="ARAMCO" th:field="*{specialQualification.aramco}" class="form-check-input" />
-                                    <label for="ARAMCO" class="form-check-label">ARAMCO</label>
+                                    <label for="ARAMCO" >ARAMCO</label>
                                 </div>
                                 <div class="form-check mb-3">
                                     <input type="checkbox" id="SEC" th:field="*{specialQualification.sec}" class="form-check-input" />
-                                    <label for="SEC" class="form-check-label">SEC</label>
+                                    <label for="SEC" >SEC</label>
                                 </div>
                                 <label for="specialQualificationDetails" class="form-label">Special Qualification Details</label>
                                 <textarea id="specialQualificationDetails" th:field="*{specialQualification.specialQualificationDetails}" class="form-control"
@@ -317,23 +318,23 @@
                                 <div class="qualification-grid">
                                     <div class="form-check mb-2">
                                         <input type="checkbox" id="mechStatic" th:field="*{mainQualificationCategory.mechStatic}" class="form-check-input" />
-                                        <label for="mechStatic" class="form-check-label">Mechanical Static</label>
+                                        <label for="mechStatic" >Mechanical Static</label>
                                     </div>
                                     <div class="form-check mb-2">
                                         <input type="checkbox" id="mechRotating" th:field="*{mainQualificationCategory.mechRotating}" class="form-check-input" />
-                                        <label for="mechRotating" class="form-check-label">Mechanical Rotating</label>
+                                        <label for="mechRotating" >Mechanical Rotating</label>
                                     </div>
                                     <div class="form-check mb-2">
                                         <input type="checkbox" id="electrical" th:field="*{mainQualificationCategory.electrical}" class="form-check-input" />
-                                        <label for="electrical" class="form-check-label">Electrical</label>
+                                        <label for="electrical" >Electrical</label>
                                     </div>
                                     <div class="form-check mb-2">
                                         <input type="checkbox" id="piping" th:field="*{mainQualificationCategory.piping}" class="form-check-input" />
-                                        <label for="piping" class="form-check-label">Piping</label>
+                                        <label for="piping" >Piping</label>
                                     </div>
                                     <div class="form-check mb-2">
                                         <input type="checkbox" id="steelStructure" th:field="*{mainQualificationCategory.steelStructure}" class="form-check-input" />
-                                        <label for="steelStructure" class="form-check-label">Steel Structure</label>
+                                        <label for="steelStructure" >Steel Structure</label>
                                     </div>
                                 </div>
                             </div>

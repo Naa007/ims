@@ -77,4 +77,13 @@ public class EmployeeService {
         return employeeRepository.findEmpNameByEmpId(id);
     }
 
+    public void validateEmployee(String id, String email) {
+        if (getEmployeeById(Long.valueOf(id)).isPresent()) {
+            throw new IllegalArgumentException("Employee ID already exists");
+        }
+        if (getEmployeeByEmail(email) != null) {
+            throw new IllegalArgumentException("Employee email already exists");
+        }
+    }
+
 }
