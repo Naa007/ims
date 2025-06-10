@@ -173,9 +173,7 @@
                             <div class="form-check">
                                 <input type="radio" th:field="*{inspectorType}" th:value="${type}"
                                        class="form-check-input" name="inspectorType" required
-                                       th:id="'inspectorType-' + ${type}"
-                                       oninvalid="document.getElementById('inspectorTypeError').style.display = 'block'"
-                                       oninput="document.getElementById('inspectorTypeError').style.display = 'none'" />
+                                       th:id="'inspectorType-' + ${type}" onchange="handleInspectorTypeChange(this)"/>
                                 <label th:for="'inspectorType-' + ${type}">
                                     <span th:text="${type.description}"></span>
                                 </label>
@@ -192,9 +190,7 @@
                             <div class="form-check">
                                 <input type="radio" th:field="*{inspectorStatus}" th:value="${status}"
                                        class="form-check-input" name="inspectorStatus" required
-                                       th:id="'inspectorStatus-' + ${status}"
-                                       oninvalid="document.getElementById('inspectorStatusError').style.display = 'block'"
-                                       oninput="document.getElementById('inspectorStatusError').style.display = 'none'" />
+                                       th:id="'inspectorStatus-' + ${status}" />
                                 <label th:for="'inspectorStatus-' + ${status}" th:text="${status.description}"></label>
                             </div>
                         </div>

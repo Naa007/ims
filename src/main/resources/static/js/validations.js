@@ -191,9 +191,9 @@ function handleStatusChange() {
         handleValidationError(status, validationResult.message, form, inspection);
 
         const noResetStatuses = [
-            'INSPECTION_AWARDED',
-            'INSPECTOR_REVIEW_COMPLETED',
-            'REFERENCE_DOC_REVIEW_COMPLETED',
+//            'INSPECTION_AWARDED',
+//            'INSPECTOR_REVIEW_COMPLETED',
+//            'REFERENCE_DOC_REVIEW_COMPLETED',
             'INSPECTION_REJECTED',
             'CLOSED'
         ];
@@ -242,7 +242,7 @@ function gatherInspectionData() {
 function validateInspectionStatus(status, inspection) {
     let isValid = true;
     let message = '';
-
+    const currentStatus = document.querySelector('input[name="previousStatus"]')?.value || '';
     // workflow sequence
     const workflowSequence = [
         'INSPECTOR_ASSIGNED',
@@ -262,6 +262,14 @@ function validateInspectionStatus(status, inspection) {
 
     // Get current status index
     const currentStatusIndex = workflowSequence.indexOf(status);
+
+    // Special case: Allow transition from INSPECTOR_REVIEW_COMPLETED to INSPECTOR_APPROVED
+        if (currentStatus === 'INSPECTOR_REVIEW_COMPLETED' && status === 'INSPECTOR_APPROVED') {
+            const currentValidation = validateStatusRequirements(status, inspection);
+            isValid = currentValidation.isValid;
+            message = currentValidation.message;
+            return { isValid, message };
+        }
 
     if (status === 'INSPECTION_REJECTED') {
         // For rejection, check all steps except AWARDED must be complete
@@ -319,10 +327,16 @@ function validateStatusRequirements(status, inspection) {
 
     switch(status) {
         case 'INSPECTOR_ASSIGNED':
-            if (inspection.proposedCVs.length === 0) {
+        const isTechCoOrdPresent = Array.from(document.querySelectorAll('select[name$=".cvReviewByTechnicalCoordinator.empId"]'))
+                        .every(select => select.value && select.value !== "");
+            if (inspection.proposedCVs.length === 0 ) {
                 isValid = false;
                 message = 'At least one inspector should be present in the CV';
             }
+            if ( !isTechCoOrdPresent ) {
+                 isValid = false;
+                  message = 'At least one inspector and respective technical coordinator should be present in the CV';
+                }
             break;
 
         case 'INSPECTOR_REVIEW_AWAITING':
@@ -390,18 +404,18 @@ function validateStatusRequirements(status, inspection) {
             break;
 
         case 'INSPECTION_AWARDED':
-            if (!inspection.jobFolderLink) {
-                isValid = false;
-                message = 'Job folder link is empty. please make sure to fill all the details';
-            } else {
-                isValid = false;
-                message = '🎉 Congratulations! The inspection has been awarded!';
-            }
-            break;
+             if (!inspection.jobFolderLink) {
+                 isValid = false;
+                 message = '🏗️ The job folder is missing. Let’s not celebrate just yet!';
+             } else {
+                 isValid = false;
+                 message = '🎉 Boom! You did it! The inspection has been *officially* awarded!';
+             }
+             break;
 
         case 'INSPECTION_REJECTED':
             isValid = false;
-            message = 'Cheer up, move on to the next Inspection';
+            message = '😢 Rejection stings, but don\'t worry - the next one will be a winner!';
             break;
 
         case 'CLOSED':
