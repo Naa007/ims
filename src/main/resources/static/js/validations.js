@@ -192,8 +192,8 @@ function handleStatusChange() {
 
         const noResetStatuses = [
 //            'INSPECTION_AWARDED',
-//            'INSPECTOR_REVIEW_COMPLETED',
-//            'REFERENCE_DOC_REVIEW_COMPLETED',
+            'INSPECTOR_REVIEW_COMPLETED',
+            'REFERENCE_DOC_REVIEW_COMPLETED',
             'INSPECTION_REJECTED',
             'CLOSED'
         ];
