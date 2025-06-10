@@ -327,7 +327,7 @@ function validateStatusRequirements(status, inspection) {
 
     switch(status) {
         case 'INSPECTOR_ASSIGNED':
-        const isTechCoOrdPresent = Array.from(document.querySelectorAll('select[name$=".cvReviewByTechnicalCoordinator.empId"]'))
+            const isTechCoOrdPresent = Array.from(document.querySelectorAll('select[name$=".cvReviewByTechnicalCoordinator.empId"]'))
                         .every(select => select.value && select.value !== "");
             if (inspection.proposedCVs.length === 0 ) {
                 isValid = false;
@@ -336,7 +336,7 @@ function validateStatusRequirements(status, inspection) {
             if ( !isTechCoOrdPresent ) {
                  isValid = false;
                   message = 'At least one inspector and respective technical coordinator should be present in the CV';
-                }
+            }
             break;
 
         case 'INSPECTOR_REVIEW_AWAITING':
@@ -350,7 +350,7 @@ function validateStatusRequirements(status, inspection) {
 
         case 'INSPECTOR_REVIEW_COMPLETED':
             // This is a manual step - just show message
-            isValid = false;
+            isValid = true;
             message = 'Please send Inspector CV details to Client and update here';
             break;
 
@@ -385,7 +385,7 @@ function validateStatusRequirements(status, inspection) {
 
         case 'REFERENCE_DOC_REVIEW_COMPLETED':
             // This is a manual step - just show message
-            isValid = false;
+            isValid = true;
             message = 'Hope contract review and inspection advise fields are up to date';
             break;
 
