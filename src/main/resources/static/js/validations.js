@@ -243,6 +243,80 @@ function validateInspectionStatus(status, inspection) {
     let isValid = true;
     let message = '';
 
+    // workflow sequence
+    const workflowSequence = [
+        'INSPECTOR_ASSIGNED',
+        'INSPECTOR_REVIEW_AWAITING',
+        'INSPECTOR_REVIEW_COMPLETED',
+        'INSPECTOR_APPROVED',
+        'REFERENCE_DOC_RECEIVED',
+        'REFERENCE_DOC_REVIEW_AWAITING',
+        'REFERENCE_DOC_REVIEW_COMPLETED',
+        'INSPECTION_REPORTS_SENT_TO_CLIENT',
+        'INSPECTION_REPORTS_RECEIVED',
+        'INSPECTION_REPORTS_REVIEW_AWAITING',
+        'INSPECTION_REPORTS_REVIEW_COMPLETED',
+        'INSPECTION_AWARDED',
+        'CLOSED'
+    ];
+
+    // Get current status index
+    const currentStatusIndex = workflowSequence.indexOf(status);
+
+    if (status === 'INSPECTION_REJECTED') {
+        // For rejection, check all steps except AWARDED must be complete
+        const stepsToCheck = workflowSequence.filter(s => s !== 'INSPECTION_AWARDED');
+
+        for (const step of stepsToCheck) {
+            const stepValidation = validateStatusRequirements(step, inspection);
+            if (!stepValidation.isValid) {
+                isValid = false;
+                message = `Cannot reject inspection until ${step.replace(/_/g, ' ')} is completed`;
+                break;
+            }
+        }
+    }
+    else if (status === 'CLOSED') {
+        // For closed, ALL steps must be complete including AWARDED
+        for (const step of workflowSequence) {
+            const stepValidation = validateStatusRequirements(step, inspection);
+            if (!stepValidation.isValid) {
+                isValid = false;
+                message = `Cannot close inspection until ${step.replace(/_/g, ' ')} is completed`;
+                break;
+            }
+        }
+    }
+    else {
+        // Normal workflow validation
+        if (currentStatusIndex > 0) {
+            for (let i = 0; i < currentStatusIndex; i++) {
+                const previousStatus = workflowSequence[i];
+                const previousValidation = validateStatusRequirements(previousStatus, inspection);
+
+                if (!previousValidation.isValid) {
+                    isValid = false;
+                    message = `Please complete ${previousStatus.replace(/_/g, ' ')} step first`;
+                    break;
+                }
+            }
+        }
+
+        // If previous steps are valid, check current status requirements
+        if (isValid) {
+            const currentValidation = validateStatusRequirements(status, inspection);
+            isValid = currentValidation.isValid;
+            message = currentValidation.message;
+        }
+    }
+
+    return { isValid, message };
+}
+
+function validateStatusRequirements(status, inspection) {
+    let isValid = true;
+    let message = '';
+
     switch(status) {
         case 'INSPECTOR_ASSIGNED':
             if (inspection.proposedCVs.length === 0) {
@@ -261,6 +335,7 @@ function validateInspectionStatus(status, inspection) {
             break;
 
         case 'INSPECTOR_REVIEW_COMPLETED':
+            // This is a manual step - just show message
             isValid = false;
             message = 'Please send Inspector CV details to Client and update here';
             break;
@@ -287,11 +362,6 @@ function validateInspectionStatus(status, inspection) {
             }
             break;
 
-        case 'REFERENCE_DOC_REVIEW_COMPLETED':
-            isValid = false;
-            message = 'Hope contract review and inspection advise fields are up to date';
-            break;
-
         case 'REFERENCE_DOC_REVIEW_AWAITING':
             if (!inspection.documentsReviewedByTechnicalCoordinator) {
                 isValid = false;
@@ -299,10 +369,23 @@ function validateInspectionStatus(status, inspection) {
             }
             break;
 
+        case 'REFERENCE_DOC_REVIEW_COMPLETED':
+            // This is a manual step - just show message
+            isValid = false;
+            message = 'Hope contract review and inspection advise fields are up to date';
+            break;
+
         case 'INSPECTION_REPORTS_SENT_TO_CLIENT':
             if (!inspection.irnSentDate) {
                 isValid = false;
                 message = 'IRN Sent Date should not be empty';
+            }
+            break;
+
+        case 'INSPECTION_REPORTS_RECEIVED':
+            if (!inspection.inspectionReportsReceivedDate) {
+                isValid = false;
+                message = 'Inspection reports received date should not be empty';
             }
             break;
 
@@ -319,13 +402,6 @@ function validateInspectionStatus(status, inspection) {
         case 'INSPECTION_REJECTED':
             isValid = false;
             message = 'Cheer up, move on to the next Inspection';
-            break;
-
-        case 'INSPECTION_REPORTS_RECEIVED':
-            if (!inspection.inspectionReportsReceivedDate) {
-                isValid = false;
-                message = 'Inspection reports received date should not be empty';
-            }
             break;
 
         case 'CLOSED':
