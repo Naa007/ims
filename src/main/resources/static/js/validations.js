@@ -178,7 +178,30 @@ const NO_RESET_STATUSES = [
     'CLOSED'
 ];
 
-// Initialization
+// Initialize all validations when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    setupFormValidation();
+    setupInspectionStatusValidation();
+    setupDynamicValidations();
+    setupDatePickerValidation();
+});
+
+// Main form validation setup
+function setupFormValidation() {
+    const form = document.querySelector('form.needs-validation');
+    if (!form) return;
+
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+            highlightInvalidFields();
+        }
+        form.classList.add('was-validated');
+    }, false);
+}
+
+// Status validation initialization
 function setupInspectionStatusValidation() {
     const statusSelect = document.getElementById('inspectionStatus');
     if (!statusSelect) {
@@ -210,111 +233,344 @@ function setupInspectionStatusValidation() {
     statusSelect.addEventListener('change', handleStatusChange);
 }
 
-// Validation Functions
+// Setup dynamic validations for various fields
+function setupDynamicValidations() {
+    // Radio button validations
+    document.querySelectorAll('.form-check-input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const groupName = this.name;
+            const group = document.querySelectorAll(`input[name="${groupName}"]`);
+            const isChecked = Array.from(group).some(r => r.checked);
+            const container = this.closest('.input-group') || this.closest('.form-check');
+
+            if (!isChecked) {
+                showFieldError(container, 'This selection is required');
+            } else {
+                clearFieldError(container);
+            }
+        });
+    });
+
+    // Phone number validation
+    document.querySelectorAll('input[type="tel"]').forEach(input => {
+        input.addEventListener('input', function() {
+            const phonePattern = /^[0-9]{10,15}$/;
+            if (!phonePattern.test(this.value)) {
+                showFieldError(this, 'Please enter a valid phone number (10-15 digits)');
+            } else {
+                clearFieldError(this);
+            }
+        });
+    });
+
+    // URL validation
+    document.querySelectorAll('input[type="url"]').forEach(input => {
+        input.addEventListener('input', function() {
+            try {
+                new URL(this.value);
+                clearFieldError(this);
+            } catch (_) {
+                showFieldError(this, 'Please enter a valid URL');
+            }
+        });
+    });
+}
+
+// Date picker validation
+function setupDatePickerValidation() {
+    const datePicker = document.getElementById('inspectionDateAsPerNotification');
+    if (datePicker) {
+        datePicker.addEventListener('change', function() {
+            if (!this.value) {
+                showFieldError(this, 'Please select at least one date');
+            } else {
+                clearFieldError(this);
+            }
+        });
+    }
+}
+
+// Show error message below a field
+function showFieldError(field, message) {
+    // Remove any existing error message
+    clearFieldError(field);
+
+    // Create error message element
+    const errorElement = document.createElement('div');
+    errorElement.className = 'invalid-feedback d-block';
+    errorElement.textContent = message;
+
+    // Add error class to field
+    if (field.classList) {
+        field.classList.add('is-invalid');
+    } else {
+        // For radio/checkbox groups
+        const inputs = field.querySelectorAll('input');
+        inputs.forEach(input => input.classList.add('is-invalid'));
+    }
+
+    // Insert error message after the field or its container
+    if (field.parentNode && field.parentNode.classList.contains('input-group')) {
+        field.parentNode.parentNode.appendChild(errorElement);
+    } else {
+        field.parentNode.appendChild(errorElement);
+    }
+
+    // Scroll to the field
+    field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// Clear error message from a field
+function clearFieldError(field) {
+    // Remove error class
+    if (field.classList) {
+        field.classList.remove('is-invalid');
+    } else {
+        // For radio/checkbox groups
+        const inputs = field.querySelectorAll('input');
+        inputs.forEach(input => input.classList.remove('is-invalid'));
+    }
+
+    // Remove error message element
+    const parent = field.parentNode;
+    if (parent) {
+        const errorElements = parent.querySelectorAll('.invalid-feedback.d-block');
+        errorElements.forEach(el => el.remove());
+    }
+}
+
+// Highlight invalid fields
+function highlightInvalidFields(selector) {
+    if (selector) {
+        // Highlight specific fields
+        document.querySelectorAll(selector).forEach(el => {
+            el.classList.add('is-invalid');
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+    } else {
+        // Highlight all invalid fields
+        document.querySelectorAll('.form-control:invalid, .form-select:invalid').forEach(el => {
+            el.classList.add('is-invalid');
+        });
+    }
+}
+
+// Gather inspection data from form
+function gatherInspectionData() {
+    return {
+        proposedCVs: Array.from(document.querySelectorAll('#proposedCVsTable tbody tr')).map(row => ({
+            cvCertificatesAvailable: row.querySelector('select[name$=".cvCertificatesAvailable"]')?.value === 'true',
+            cvReviewByTechnicalCoordinator: row.querySelector('select[name$=".cvReviewByTechnicalCoordinator.empId"]')?.value,
+            cvSubmittedToClientDate: row.querySelector('input[name$=".cvSubmittedToClientDate"]')?.value,
+            cvStatus: row.querySelector('select[name$=".cvStatus"]')?.value === 'true',
+            inspector: {
+                inspectorId: row.querySelector('select[name$=".inspector.inspectorId"]')?.value
+            }
+        })).filter(cv => cv.inspector.inspectorId),
+        referenceDocumentsForInspectionStatus: document.querySelector('input[name="referenceDocumentsForInspectionStatus"]:checked')?.value === 'true',
+        referenceDocumentsLink: document.getElementById('referenceDocumentsLink')?.value,
+        documentsReviewedByTechnicalCoordinator: document.getElementById('documentsReviewedByTechnicalCoordinator')?.value,
+        irnSentDate: document.getElementById('irnSentDate')?.value,
+        jobFolderLink: document.getElementById('jobFolderLink')?.value,
+        inspectionReportsReceivedDate: document.getElementById('inspectionReportsReceivedDate')?.value
+    };
+}
+
+// Validate status requirements
 function validateStatusRequirements(status, inspection) {
     let isValid = true;
     let message = '';
 
     switch(status) {
         case 'INSPECTOR_ASSIGNED':
-        const isTechCoOrdPresent = Array.from(document.querySelectorAll('select[name$=".cvReviewByTechnicalCoordinator.empId"]'))
-                        .every(select => select.value && select.value !== "");
-            if (inspection.proposedCVs.length === 0 ) {
+            // Clear previous validation states
+            document.querySelectorAll('#proposedCVsTable select').forEach(select => {
+                select.classList.remove('is-invalid');
+            });
+
+            let inspectorErrors = [];
+
+            // 1. Validate at least one inspector is selected
+            if (inspection.proposedCVs.length === 0) {
                 isValid = false;
-                message = 'At least one inspector should be present in the CV';
+                inspectorErrors.push('At least one inspector should be present in the CV');
+                document.querySelectorAll('#proposedCVsTable select[name$=".inspector.inspectorId"]')
+                       .forEach(select => select.classList.add('is-invalid'));
             }
-            if ( !isTechCoOrdPresent ) {
-                 isValid = false;
-                  message = 'At least one inspector and respective technical coordinator should be present in the CV';
-                }
+
+            // 2. Validate all CVs have technical coordinators
+            const allHaveCoordinators = Array.from(document.querySelectorAll('select[name$=".cvReviewByTechnicalCoordinator.empId"]'))
+                                       .every(select => select.value && select.value !== "");
+            if (!allHaveCoordinators) {
+                isValid = false;
+                inspectorErrors.push('Technical Coordinator should be assigned for all CVs');
+                document.querySelectorAll('select[name$=".cvReviewByTechnicalCoordinator.empId"]')
+                       .forEach(select => select.classList.add('is-invalid'));
+            }
+
+            if (inspectorErrors.length > 0) {
+                showNotification(inspectorErrors.join('\n'), 'error');
+
+                // Focus first invalid field
+                setTimeout(() => {
+                    const firstInvalid = document.querySelector('.is-invalid');
+                    if (firstInvalid) {
+                        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        firstInvalid.focus();
+                    }
+                }, 100);
+            }
             break;
 
         case 'INSPECTOR_REVIEW_AWAITING':
-            const allCVsHaveTechCoord = Array.from(document.querySelectorAll('select[name$=".cvReviewByTechnicalCoordinator.empId"]'))
-                .every(select => select.value && select.value !== "");
-            if (!allCVsHaveTechCoord) {
+            document.querySelectorAll('select[name$=".cvReviewByTechnicalCoordinator.empId"]')
+                   .forEach(select => select.classList.remove('is-invalid'));
+
+            const coordinatorsValid = Array.from(document.querySelectorAll('select[name$=".cvReviewByTechnicalCoordinator.empId"]'))
+                                      .every(select => select.value && select.value !== "");
+            if (!coordinatorsValid) {
                 isValid = false;
                 message = 'Technical Coordinator should be assigned for all CVs';
+                showNotification(message, 'error');
+                document.querySelectorAll('select[name$=".cvReviewByTechnicalCoordinator.empId"]')
+                       .forEach(select => select.classList.add('is-invalid'));
             }
             break;
 
         case 'INSPECTOR_REVIEW_COMPLETED':
             isValid = true;
             message = 'Please send Inspector CV details to Client and update here';
+            showNotification(message, 'info');
             break;
 
         case 'INSPECTOR_APPROVED':
+            document.querySelectorAll('#proposedCVsTable input, #proposedCVsTable select')
+                   .forEach(field => field.classList.remove('is-invalid'));
+
+            let approvalErrors = [];
+
             if (inspection.proposedCVs.length === 0) {
                 isValid = false;
-                message = 'At least one CV must be provided before approving the inspector';
+                approvalErrors.push('At least one CV must be provided before approving the inspector');
+                document.getElementById('proposedCVsTable').classList.add('is-invalid');
             } else {
                 const invalidCVs = inspection.proposedCVs.filter(cv => {
                     return !cv.cvSubmittedToClientDate || !cv.cvStatus;
                 });
                 if (invalidCVs.length > 0) {
                     isValid = false;
-                    message = 'CV Submitted Date should not be empty and CV Status should be "Approved"';
+                    approvalErrors.push('CV Submitted Date should not be empty and CV Status should be "Approved"');
+                    document.querySelectorAll('input[name$=".cvSubmittedToClientDate"], select[name$=".cvStatus"]')
+                           .forEach(field => field.classList.add('is-invalid'));
                 }
+            }
+
+            if (approvalErrors.length > 0) {
+                showNotification(approvalErrors.join('\n'), 'error');
             }
             break;
 
         case 'REFERENCE_DOC_RECEIVED':
-            if (!inspection.referenceDocumentsForInspectionStatus || !inspection.referenceDocumentsLink) {
+            // Clear previous validation
+            document.querySelector('[name="referenceDocumentsForInspectionStatus"]').classList.remove('is-invalid');
+            document.getElementById('referenceDocumentsLink').classList.remove('is-invalid');
+
+            let docErrors = [];
+
+            if (!inspection.referenceDocumentsForInspectionStatus) {
+                docErrors.push('Reference documents should be marked as available');
+                document.querySelector('[name="referenceDocumentsForInspectionStatus"]').classList.add('is-invalid');
+            }
+
+            if (!inspection.referenceDocumentsLink) {
+                docErrors.push('Reference documents link should be provided');
+                document.getElementById('referenceDocumentsLink').classList.add('is-invalid');
+            }
+
+            if (docErrors.length > 0) {
                 isValid = false;
-                message = 'Reference documents should be marked as available and link should be provided';
+                showNotification(docErrors.join('\n'), 'error');
+
+                setTimeout(() => {
+                    const firstInvalid = document.querySelector('#referenceDocumentsLink.is-invalid, [name="referenceDocumentsForInspectionStatus"].is-invalid');
+                    if (firstInvalid) {
+                        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        if (firstInvalid.tagName === 'INPUT') firstInvalid.focus();
+                    }
+                }, 100);
             }
             break;
 
         case 'REFERENCE_DOC_REVIEW_AWAITING':
+            document.getElementById('documentsReviewedByTechnicalCoordinator').classList.remove('is-invalid');
+
             if (!inspection.documentsReviewedByTechnicalCoordinator) {
                 isValid = false;
                 message = 'Technical Coordinator should be assigned for document review';
+                showNotification(message, 'error');
+                document.getElementById('documentsReviewedByTechnicalCoordinator').classList.add('is-invalid');
             }
             break;
 
         case 'REFERENCE_DOC_REVIEW_COMPLETED':
             isValid = true;
             message = 'Hope contract review and inspection advise fields are up to date';
-            break;
-
-        case 'INSPECTION_REPORTS_SENT_TO_CLIENT':
-            if (!inspection.irnSentDate) {
-                isValid = false;
-                message = 'IRN Sent Date should not be empty';
-            }
+            showNotification(message, 'info');
             break;
 
         case 'INSPECTION_REPORTS_RECEIVED':
+            document.getElementById('inspectionReportsReceivedDate').classList.remove('is-invalid');
+
             if (!inspection.inspectionReportsReceivedDate) {
                 isValid = false;
                 message = 'Inspection reports received date should not be empty';
+                showNotification(message, 'error');
+                document.getElementById('inspectionReportsReceivedDate').classList.add('is-invalid');
+            }
+            break;
+
+        case 'INSPECTION_REPORTS_SENT_TO_CLIENT':
+            document.getElementById('irnSentDate').classList.remove('is-invalid');
+
+            if (!inspection.irnSentDate) {
+                isValid = false;
+                message = 'IRN Sent Date should not be empty';
+                showNotification(message, 'error');
+                document.getElementById('irnSentDate').classList.add('is-invalid');
             }
             break;
 
         case 'INSPECTION_AWARDED':
+            document.getElementById('jobFolderLink').classList.remove('is-invalid');
+
             if (!inspection.jobFolderLink) {
                 isValid = false;
-                message = '🏗️ The job folder is missing. Let’s not celebrate just yet!';
+                message = 'The job folder is missing';
+                showNotification(message, 'error');
+                document.getElementById('jobFolderLink').classList.add('is-invalid');
             } else {
-                isValid = true;
-                message = '🎉 Congratulations!  The inspection has been *officially* awarded!';
+                message = 'Congratulations! The inspection has been officially awarded!';
+                showNotification(message, 'success');
             }
             break;
 
         case 'INSPECTION_REJECTED':
             isValid = true;
-            message = 'Inspection rejected😢-don\'t worry - the next one will be a winner!';
+            message = 'Inspection rejected';
+            showNotification(message, 'info');
             break;
 
         case 'CLOSED':
             isValid = true;
             message = 'Inspection closed successfully';
+            showNotification(message, 'success');
             break;
     }
 
     return { isValid, message };
 }
 
+// Check if status is completed
 function isStatusCompleted(status, inspection, completedStatuses) {
     if (completedStatuses.includes(status)) return true;
 
@@ -331,6 +587,7 @@ function isStatusCompleted(status, inspection, completedStatuses) {
     return validateStatusRequirements(status, inspection).isValid;
 }
 
+// Main inspection status validation
 function validateInspectionStatus(status, inspection, completedStatuses = []) {
     if (status === 'CLOSED') {
         if (!completedStatuses.includes('INSPECTION_AWARDED')) {
@@ -366,49 +623,7 @@ function validateInspectionStatus(status, inspection, completedStatuses = []) {
     return validateStatusRequirements(status, inspection);
 }
 
-// Helper Functions
-function gatherInspectionData() {
-    return {
-        proposedCVs: Array.from(document.querySelectorAll('#proposedCVsTable tbody tr')).map(row => ({
-            cvCertificatesAvailable: row.querySelector('select[name$=".cvCertificatesAvailable"]')?.value === 'true',
-            cvReviewByTechnicalCoordinator: row.querySelector('select[name$=".cvReviewByTechnicalCoordinator.empId"]')?.value,
-            cvSubmittedToClientDate: row.querySelector('input[name$=".cvSubmittedToClientDate"]')?.value,
-            cvStatus: row.querySelector('select[name$=".cvStatus"]')?.value === 'true',
-            inspector: {
-                inspectorId: row.querySelector('select[name$=".inspector.inspectorId"]')?.value
-            }
-        })).filter(cv => cv.inspector.inspectorId),
-        referenceDocumentsForInspectionStatus: document.querySelector('input[name="referenceDocumentsForInspectionStatus"]:checked')?.value === 'true',
-        referenceDocumentsLink: document.getElementById('referenceDocumentsLink')?.value,
-        documentsReviewedByTechnicalCoordinator: document.getElementById('documentsReviewedByTechnicalCoordinator')?.value,
-        irnSentDate: document.getElementById('irnSentDate')?.value,
-        jobFolderLink: document.getElementById('jobFolderLink')?.value,
-        inspectionReportsReceivedDate: document.getElementById('inspectionReportsReceivedDate')?.value
-    };
-}
-
-function handleValidationError(status, message, form, inspection) {
-    if (status === 'INSPECTION_AWARDED') {
-        const validAward = validateStatusRequirements('INSPECTION_AWARDED', inspection).isValid;
-        if (validAward) {
-            showNotification(message, 'success');
-        } else {
-            showNotification(message, 'warning');
-        }
-        return;
-    }
-
-    if (status === 'CLOSED') {
-        showNotification(message, 'success');
-    } else if (status === 'INSPECTOR_REVIEW_COMPLETED' || status === 'REFERENCE_DOC_REVIEW_COMPLETED') {
-        showNotification(message, 'warning');
-    } else {
-        showNotification(message, 'error');
-    }
-}
-
-
-// Event Handler
+// Handle status change event
 function handleStatusChange() {
     const status = this.value;
     const form = document.querySelector('form');
@@ -431,8 +646,7 @@ function handleStatusChange() {
     const validation = validateInspectionStatus(status, inspection, completedStatuses);
 
     if (!validation.isValid) {
-        handleValidationError(status, validation.message, form, inspection);
-
+        // Errors are already shown in the UI via showFieldError()
         if (!NO_RESET_STATUSES.includes(status)) {
             this.value = previousStatusInput.value || '';
         }
@@ -459,5 +673,6 @@ function handleStatusChange() {
         setupPhoneValidation();
         setupCertificateDateValidation();
         setupDatePickerValidation();
-       // setupInspectionStatusValidation();
+        setupInspectionStatusValidation();
+
     });
