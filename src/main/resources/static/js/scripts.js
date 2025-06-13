@@ -434,8 +434,10 @@ function addCVRow() {
     if (previousRow) {
         const lastSelectInput = [...previousRow.querySelectorAll("select")].pop();
         if (lastSelectInput && lastSelectInput.value === "true") {
-            alert("Inspector is already approved.");
-            return;
+            const userConfirmed = confirm("Inspector is already approved. Do you want to proceed?");
+                if (!userConfirmed) {
+                     return;
+                }
         }
 
         const newRow = previousRow.cloneNode(true); // Clone the previous row

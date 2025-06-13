@@ -30,8 +30,9 @@
             <table id="inspectionsTable" class="table table-striped table-hover">
                 <thead>
                 <tr>
+                    <th>IISPL Job ID</th>
                     <th>Notification NO</th>
-                    <th>Client Name - Country</th>
+                    <th>Client - Country</th>
                     <th>Inspection Date</th>
                     <th>Inspection Item</th>
                     <th>Inspection Status</th>
@@ -40,6 +41,7 @@
                 </thead>
                 <tbody>
                 <tr th:each="inspection : ${inspections}">
+                    <td th:text="${inspection.inspectionNo}" class="text-sm"></td>
                     <td th:text="${inspection.notificationNo}" class="text-sm"></td>
                     <td th:text="${inspection.client.clientName + ' - ' + inspection.client.country}"
                         class="text-sm"></td>
