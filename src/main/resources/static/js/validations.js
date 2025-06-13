@@ -155,6 +155,30 @@ function validateDatePicker() {
     }
 
 
+const WORKFLOW_SEQUENCE = [
+    'INSPECTOR_ASSIGNED',
+    'INSPECTOR_REVIEW_AWAITING',
+    'INSPECTOR_REVIEW_COMPLETED',
+    'INSPECTOR_APPROVED',
+    'REFERENCE_DOC_RECEIVED',
+    'REFERENCE_DOC_REVIEW_AWAITING',
+    'REFERENCE_DOC_REVIEW_COMPLETED',
+    'INSPECTION_REPORTS_RECEIVED',
+    'INSPECTION_REPORTS_REVIEW_AWAITING',
+    'INSPECTION_REPORTS_REVIEW_COMPLETED',
+    'INSPECTION_REPORTS_SENT_TO_CLIENT',
+    'INSPECTION_AWARDED',
+    'CLOSED'
+];
+
+const NO_RESET_STATUSES = [
+    'INSPECTOR_REVIEW_COMPLETED',
+    'REFERENCE_DOC_REVIEW_COMPLETED',
+    'INSPECTION_REJECTED',
+    'CLOSED'
+];
+
+// Initialization
 function setupInspectionStatusValidation() {
     const statusSelect = document.getElementById('inspectionStatus');
     if (!statusSelect) {
@@ -162,9 +186,11 @@ function setupInspectionStatusValidation() {
         return;
     }
 
-    // Initialize previous status field
     const form = document.querySelector('form');
-    if (form && !form.querySelector('input[name="previousStatus"]')) {
+    if (!form) return;
+
+    // Initialize previous status field
+    if (!form.querySelector('input[name="previousStatus"]')) {
         const hiddenInput = document.createElement('input');
         hiddenInput.type = 'hidden';
         hiddenInput.name = 'previousStatus';
@@ -172,155 +198,19 @@ function setupInspectionStatusValidation() {
         form.insertBefore(hiddenInput, form.firstChild);
     }
 
+    // Initialize completed statuses tracking
+    if (!form.querySelector('input[name="completedStatuses"]')) {
+        const completedStatusesInput = document.createElement('input');
+        completedStatusesInput.type = 'hidden';
+        completedStatusesInput.name = 'completedStatuses';
+        completedStatusesInput.value = statusSelect.value ? JSON.stringify([statusSelect.value]) : '[]';
+        form.insertBefore(completedStatusesInput, form.firstChild);
+    }
+
     statusSelect.addEventListener('change', handleStatusChange);
 }
 
-function handleStatusChange() {
-    const status = this.value;
-    const form = document.querySelector('form');
-
-    if (!form) {
-        console.warn('Form element not found');
-        return;
-    }
-
-    const inspection = gatherInspectionData();
-    const validationResult = validateInspectionStatus(status, inspection);
-
-    if (!validationResult.isValid) {
-        handleValidationError(status, validationResult.message, form, inspection);
-
-        const noResetStatuses = [
-//            'INSPECTION_AWARDED',
-            'INSPECTOR_REVIEW_COMPLETED',
-            'REFERENCE_DOC_REVIEW_COMPLETED',
-            'INSPECTION_REJECTED',
-            'CLOSED'
-        ];
-
-        if (!noResetStatuses.includes(status)) {
-            this.value = form.querySelector('input[name="previousStatus"]')?.value || '';
-        }
-    }
-}
-
-function handleValidationError(status, message, form, inspection) {
-    const successStatuses = ['INSPECTION_AWARDED'];
-    const warningStatuses = ['INSPECTOR_REVIEW_COMPLETED', 'REFERENCE_DOC_REVIEW_COMPLETED'];
-
-    if (successStatuses.includes(status) && inspection.jobFolderLink) {
-        showNotification(message, 'success');
-    } else if (warningStatuses.includes(status)) {
-        showNotification(message, 'warning');
-    } else {
-        showNotification(message, 'warning');
-    }
-}
-
-function gatherInspectionData() {
-    return {
-        proposedCVs: Array.from(document.querySelectorAll('#proposedCVsTable tbody tr')).map(row => ({
-            cvCertificatesAvailable: row.querySelector('select[name$=".cvCertificatesAvailable"]')?.value === 'true',
-            cvReviewByTechnicalCoordinator: row.querySelector('select[name$=".cvReviewByTechnicalCoordinator.empId"]')?.value,
-            cvSubmittedToClientDate: row.querySelector('input[name$=".cvSubmittedToClientDate"]')?.value,
-            cvStatus: row.querySelector('select[name$=".cvStatus"]')?.value === 'true',
-            inspector: {
-                inspectorId: row.querySelector('select[name$=".inspector.inspectorId"]')?.value
-            }
-        })).filter(cv => cv.inspector.inspectorId),
-        referenceDocumentsForInspectionStatus: document.querySelector('input[name="referenceDocumentsForInspectionStatus"]:checked')?.value === 'true',
-        referenceDocumentsLink: document.getElementById('referenceDocumentsLink')?.value,
-        documentsReviewedByTechnicalCoordinator: document.getElementById('documentsReviewedByTechnicalCoordinator')?.value,
-        contractReviewPrepared: document.querySelector('input[name="contractReviewPrepared"]:checked')?.value === 'true',
-        inspectionAdviseNote: document.querySelector('input[name="inspectionAdviseNote"]:checked')?.value === 'true',
-        irnSentDate: document.getElementById('irnSentDate')?.value,
-        jobFolderLink: document.getElementById('jobFolderLink')?.value,
-        inspectionReportsReceivedDate: document.getElementById('inspectionReportsReceivedDate')?.value
-    };
-}
-
-function validateInspectionStatus(status, inspection) {
-    let isValid = true;
-    let message = '';
-    const currentStatus = document.querySelector('input[name="previousStatus"]')?.value || '';
-    // workflow sequence
-    const workflowSequence = [
-        'INSPECTOR_ASSIGNED',
-        'INSPECTOR_REVIEW_AWAITING',
-        'INSPECTOR_REVIEW_COMPLETED',
-        'INSPECTOR_APPROVED',
-        'REFERENCE_DOC_RECEIVED',
-        'REFERENCE_DOC_REVIEW_AWAITING',
-        'REFERENCE_DOC_REVIEW_COMPLETED',
-        'INSPECTION_REPORTS_SENT_TO_CLIENT',
-        'INSPECTION_REPORTS_RECEIVED',
-        'INSPECTION_REPORTS_REVIEW_AWAITING',
-        'INSPECTION_REPORTS_REVIEW_COMPLETED',
-        'INSPECTION_AWARDED',
-        'CLOSED'
-    ];
-
-    // Get current status index
-    const currentStatusIndex = workflowSequence.indexOf(status);
-
-    // Special case: Allow transition from INSPECTOR_REVIEW_COMPLETED to INSPECTOR_APPROVED
-        if (currentStatus === 'INSPECTOR_REVIEW_COMPLETED' && status === 'INSPECTOR_APPROVED') {
-            const currentValidation = validateStatusRequirements(status, inspection);
-            isValid = currentValidation.isValid;
-            message = currentValidation.message;
-            return { isValid, message };
-        }
-
-    if (status === 'INSPECTION_REJECTED') {
-        // For rejection, check all steps except AWARDED must be complete
-        const stepsToCheck = workflowSequence.filter(s => s !== 'INSPECTION_AWARDED');
-
-        for (const step of stepsToCheck) {
-            const stepValidation = validateStatusRequirements(step, inspection);
-            if (!stepValidation.isValid) {
-                isValid = false;
-                message = `Cannot reject inspection until ${step.replace(/_/g, ' ')} is completed`;
-                break;
-            }
-        }
-    }
-    else if (status === 'CLOSED') {
-        // For closed, ALL steps must be complete including AWARDED
-        for (const step of workflowSequence) {
-            const stepValidation = validateStatusRequirements(step, inspection);
-            if (!stepValidation.isValid) {
-                isValid = false;
-                message = `Cannot close inspection until ${step.replace(/_/g, ' ')} is completed`;
-                break;
-            }
-        }
-    }
-    else {
-        // Normal workflow validation
-        if (currentStatusIndex > 0) {
-            for (let i = 0; i < currentStatusIndex; i++) {
-                const previousStatus = workflowSequence[i];
-                const previousValidation = validateStatusRequirements(previousStatus, inspection);
-
-                if (!previousValidation.isValid) {
-                    isValid = false;
-                    message = `Please complete ${previousStatus.replace(/_/g, ' ')} step first`;
-                    break;
-                }
-            }
-        }
-
-        // If previous steps are valid, check current status requirements
-        if (isValid) {
-            const currentValidation = validateStatusRequirements(status, inspection);
-            isValid = currentValidation.isValid;
-            message = currentValidation.message;
-        }
-    }
-
-    return { isValid, message };
-}
-
+// Validation Functions
 function validateStatusRequirements(status, inspection) {
     let isValid = true;
     let message = '';
@@ -349,8 +239,7 @@ function validateStatusRequirements(status, inspection) {
             break;
 
         case 'INSPECTOR_REVIEW_COMPLETED':
-            // This is a manual step - just show message
-            isValid = false;
+            isValid = true;
             message = 'Please send Inspector CV details to Client and update here';
             break;
 
@@ -384,8 +273,7 @@ function validateStatusRequirements(status, inspection) {
             break;
 
         case 'REFERENCE_DOC_REVIEW_COMPLETED':
-            // This is a manual step - just show message
-            isValid = false;
+            isValid = true;
             message = 'Hope contract review and inspection advise fields are up to date';
             break;
 
@@ -404,39 +292,156 @@ function validateStatusRequirements(status, inspection) {
             break;
 
         case 'INSPECTION_AWARDED':
-             if (!inspection.jobFolderLink) {
-                 isValid = false;
-                 message = '🏗️ The job folder is missing. Let’s not celebrate just yet!';
-             } else {
-                 isValid = false;
-                 message = '🎉 Boom! You did it! The inspection has been *officially* awarded!';
-             }
-             break;
+            if (!inspection.jobFolderLink) {
+                isValid = false;
+                message = '🏗️ The job folder is missing. Let’s not celebrate just yet!';
+            } else {
+                isValid = true;
+                message = '🎉 Congratulations!  The inspection has been *officially* awarded!';
+            }
+            break;
 
         case 'INSPECTION_REJECTED':
-            isValid = false;
-            message = '😢 Rejection stings, but don\'t worry - the next one will be a winner!';
+            isValid = true;
+            message = 'Inspection rejected😢-don\'t worry - the next one will be a winner!';
             break;
 
         case 'CLOSED':
-            isValid = false;
-            message = 'Please ensure all documentation is complete before closing';
+            isValid = true;
+            message = 'Inspection closed successfully';
             break;
     }
 
     return { isValid, message };
 }
 
+function isStatusCompleted(status, inspection, completedStatuses) {
+    if (completedStatuses.includes(status)) return true;
+
+    if (status === 'INSPECTOR_REVIEW_COMPLETED') {
+        return completedStatuses.includes('INSPECTOR_REVIEW_AWAITING') ||
+               validateStatusRequirements('INSPECTOR_REVIEW_AWAITING', inspection).isValid;
+    }
+
+    if (status === 'REFERENCE_DOC_REVIEW_COMPLETED') {
+        return completedStatuses.includes('REFERENCE_DOC_REVIEW_AWAITING') ||
+               validateStatusRequirements('REFERENCE_DOC_REVIEW_AWAITING', inspection).isValid;
+    }
+
+    return validateStatusRequirements(status, inspection).isValid;
+}
+
+function validateInspectionStatus(status, inspection, completedStatuses = []) {
+    if (status === 'CLOSED') {
+        if (!completedStatuses.includes('INSPECTION_AWARDED')) {
+            return { isValid: false, message: 'Cannot close inspection until it has been awarded' };
+        }
+        return { isValid: true, message: 'Inspection closed successfully' };
+    }
+
+    if (status === 'INSPECTION_REJECTED') {
+        if (completedStatuses.includes('INSPECTION_AWARDED')) {
+            return { isValid: false, message: 'Cannot reject an inspection that has been awarded' };
+        }
+        return { isValid: true, message: 'Inspection rejected successfully' };
+    }
+
+    const currentIndex = WORKFLOW_SEQUENCE.indexOf(status);
+    if (currentIndex === -1) return { isValid: false, message: 'Invalid status' };
+
+    for (let i = 0; i < currentIndex; i++) {
+        const prevStatus = WORKFLOW_SEQUENCE[i];
+
+        if ((status === 'INSPECTOR_APPROVED' && prevStatus === 'INSPECTOR_REVIEW_COMPLETED') ||
+            (status === 'INSPECTION_REPORTS_SENT_TO_CLIENT' && prevStatus === 'REFERENCE_DOC_REVIEW_COMPLETED')) {
+            const awaitingStatus = prevStatus.replace('COMPLETED', 'AWAITING');
+            if (isStatusCompleted(awaitingStatus, inspection, completedStatuses)) continue;
+        }
+
+        if (!isStatusCompleted(prevStatus, inspection, completedStatuses)) {
+            return { isValid: false, message: `Please complete ${prevStatus.replace(/_/g, ' ')} step first` };
+        }
+    }
+
+    return validateStatusRequirements(status, inspection);
+}
+
+// Helper Functions
+function gatherInspectionData() {
+    return {
+        proposedCVs: Array.from(document.querySelectorAll('#proposedCVsTable tbody tr')).map(row => ({
+            cvCertificatesAvailable: row.querySelector('select[name$=".cvCertificatesAvailable"]')?.value === 'true',
+            cvReviewByTechnicalCoordinator: row.querySelector('select[name$=".cvReviewByTechnicalCoordinator.empId"]')?.value,
+            cvSubmittedToClientDate: row.querySelector('input[name$=".cvSubmittedToClientDate"]')?.value,
+            cvStatus: row.querySelector('select[name$=".cvStatus"]')?.value === 'true',
+            inspector: {
+                inspectorId: row.querySelector('select[name$=".inspector.inspectorId"]')?.value
+            }
+        })).filter(cv => cv.inspector.inspectorId),
+        referenceDocumentsForInspectionStatus: document.querySelector('input[name="referenceDocumentsForInspectionStatus"]:checked')?.value === 'true',
+        referenceDocumentsLink: document.getElementById('referenceDocumentsLink')?.value,
+        documentsReviewedByTechnicalCoordinator: document.getElementById('documentsReviewedByTechnicalCoordinator')?.value,
+        irnSentDate: document.getElementById('irnSentDate')?.value,
+        jobFolderLink: document.getElementById('jobFolderLink')?.value,
+        inspectionReportsReceivedDate: document.getElementById('inspectionReportsReceivedDate')?.value
+    };
+}
+
 function handleValidationError(status, message, form, inspection) {
-    const successStatuses = ['INSPECTION_AWARDED'];
+    const successStatuses = ['INSPECTION_AWARDED', 'CLOSED'];
     const warningStatuses = ['INSPECTOR_REVIEW_COMPLETED', 'REFERENCE_DOC_REVIEW_COMPLETED'];
 
-    if (successStatuses.includes(status) && inspection.jobFolderLink) {
+    if (successStatuses.includes(status)) {
         showNotification(message, 'success');
     } else if (warningStatuses.includes(status)) {
         showNotification(message, 'warning');
     } else {
-        showNotification(message, 'warning');
+        showNotification(message, 'error');
+    }
+}
+
+// Event Handler
+function handleStatusChange() {
+    const status = this.value;
+    const form = document.querySelector('form');
+    if (!form) return;
+
+    const previousStatusInput = form.querySelector('input[name="previousStatus"]');
+    const completedStatusesInput = form.querySelector('input[name="completedStatuses"]');
+    if (!previousStatusInput || !completedStatusesInput) return;
+
+    const inspection = gatherInspectionData();
+    let completedStatuses = [];
+
+    try {
+        completedStatuses = JSON.parse(completedStatusesInput.value || '[]');
+    } catch (e) {
+        console.error('Error parsing completed statuses:', e);
+        completedStatuses = [];
+    }
+
+    const validation = validateInspectionStatus(status, inspection, completedStatuses);
+
+    if (!validation.isValid) {
+        handleValidationError(status, validation.message, form, inspection);
+
+        if (!NO_RESET_STATUSES.includes(status)) {
+            this.value = previousStatusInput.value || '';
+        }
+    } else {
+        // Update completed statuses
+        if (status === 'INSPECTION_REJECTED') {
+            const currentIndex = WORKFLOW_SEQUENCE.indexOf(status);
+            completedStatuses = Array.from(new Set([
+                ...completedStatuses,
+                ...WORKFLOW_SEQUENCE.slice(0, currentIndex + 1)
+            ]));
+        } else if (!completedStatuses.includes(status)) {
+            completedStatuses.push(status);
+        }
+
+        completedStatusesInput.value = JSON.stringify(completedStatuses);
+        previousStatusInput.value = status;
     }
 }
 
