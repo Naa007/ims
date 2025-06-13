@@ -388,17 +388,25 @@ function gatherInspectionData() {
 }
 
 function handleValidationError(status, message, form, inspection) {
-    const successStatuses = ['INSPECTION_AWARDED', 'CLOSED'];
-    const warningStatuses = ['INSPECTOR_REVIEW_COMPLETED', 'REFERENCE_DOC_REVIEW_COMPLETED'];
+    if (status === 'INSPECTION_AWARDED') {
+        const validAward = validateStatusRequirements('INSPECTION_AWARDED', inspection).isValid;
+        if (validAward) {
+            showNotification(message, 'success');
+        } else {
+            showNotification(message, 'warning');
+        }
+        return;
+    }
 
-    if (successStatuses.includes(status)) {
+    if (status === 'CLOSED') {
         showNotification(message, 'success');
-    } else if (warningStatuses.includes(status)) {
+    } else if (status === 'INSPECTOR_REVIEW_COMPLETED' || status === 'REFERENCE_DOC_REVIEW_COMPLETED') {
         showNotification(message, 'warning');
     } else {
         showNotification(message, 'error');
     }
 }
+
 
 // Event Handler
 function handleStatusChange() {
