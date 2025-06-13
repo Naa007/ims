@@ -602,7 +602,14 @@
                                 <label for="clientName">Client Name</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-building icon-blue"></i></span>
-                                    <input type="text" class="form-control" id="clientName" name="clientName" required>
+                                    <input type="text" class="form-control" id="clientName" name="clientName"
+                                           required minlength="2" maxlength="100"
+                                           pattern="[A-Za-z\s\-.,]+"
+                                           oninvalid="this.setCustomValidity('Please enter a valid client name (2-100 characters, letters, spaces, hyphens, dots or commas only)')"
+                                           oninput="this.setCustomValidity('')">
+                                    <div class="invalid-feedback">
+                                        Please provide a valid client name (2-100 characters).
+                                    </div>
                                 </div>
                             </div>
                             <!-- Country -->
@@ -621,7 +628,13 @@
                                 <label for="address">Address</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-map-marker-alt icon-blue"></i></span>
-                                    <input type="text" class="form-control" id="address" name="address" required>
+                                    <input type="text" class="form-control" id="address" name="address"
+                                           required minlength="5" maxlength="2500"
+                                           oninvalid="this.setCustomValidity('Please enter a valid address (5-255 characters)')"
+                                           oninput="this.setCustomValidity('')">
+                                    <div class="invalid-feedback">
+                                        Please provide a valid address (5-2500 characters).
+                                    </div>
                                 </div>
                             </div>
                             <!-- Email -->
@@ -629,7 +642,14 @@
                                 <label for="email">Email</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-envelope icon-blue"></i></span>
-                                    <input type="email" class="form-control" id="email" name="email" required>
+                                    <input type="email" class="form-control" id="email" name="email"
+                                           required maxlength="100"
+                                           pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
+                                           oninvalid="this.setCustomValidity('Please enter a valid email address')"
+                                           oninput="this.setCustomValidity('')">
+                                    <div class="invalid-feedback">
+                                        Please provide a valid email address.
+                                    </div>
                                 </div>
                             </div>
                             <!-- Phone -->
@@ -637,8 +657,16 @@
                                 <label for="phone">Phone</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-phone icon-blue"></i></span>
-                                    <input type="text" class="form-control" id="phone" name="phone" required>
+                                    <input type="tel" class="form-control" id="phone" name="phone"
+                                           required
+                                           pattern="^(\+?\d{1,3}[- ]?)?\d{6,14}$"
+                                           oninvalid="this.setCustomValidity('Please enter a valid international phone number (6-14 digits, optional country code)')"
+                                           oninput="this.setCustomValidity('')">
+                                    <div class="invalid-feedback">
+                                        Please provide a valid phone number (6-14 digits, optional country code).
+                                    </div>
                                 </div>
+                                <small class="form-text text-muted">Format: +[country code] [number] or just number</small>
                             </div>
                             <!-- Reference Type -->
                             <div class="col-md-6 mb-3">
@@ -660,7 +688,10 @@
                                 <label for="confirmationDate">Confirmation Date</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-calendar-check icon-blue"></i></span>
-                                    <input type="date" class="form-control" id="confirmationDate" name="confirmationDate" required>
+                                    <input type="date" class="form-control" id="confirmationDate" name="confirmationDate"
+                                           required
+                                           oninvalid="this.setCustomValidity('Please select a confirmation date')"
+                                           oninput="this.setCustomValidity('')">
                                 </div>
                             </div>
                             <!-- Coordinator -->
@@ -709,7 +740,14 @@
                                 <label for="editClientName">Client Name</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-building icon-blue"></i></span>
-                                    <input type="text" class="form-control" id="editClientName" name="clientName" required>
+                                    <input type="text" class="form-control" id="editClientName" name="clientName"
+                                           required minlength="2" maxlength="100"
+                                           pattern="[A-Za-z\s\-.,]+"
+                                           oninvalid="this.setCustomValidity('Please enter a valid client name (2-100 characters, letters, spaces, hyphens, dots or commas only)')"
+                                           oninput="this.setCustomValidity('')">
+                                    <div class="invalid-feedback">
+                                        Please provide a valid client name (2-100 characters).
+                                    </div>
                                 </div>
                             </div>
                             <!-- Country -->
@@ -728,7 +766,13 @@
                                 <label for="editAddress">Address</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-map-marker-alt icon-blue"></i></span>
-                                    <input type="text" class="form-control" id="editAddress" name="address" required>
+                                    <input type="text" class="form-control" id="editAddress" name="address"
+                                           required minlength="5" maxlength="2500"
+                                           oninvalid="this.setCustomValidity('Please enter a valid address (5-255 characters)')"
+                                           oninput="this.setCustomValidity('')">
+                                    <div class="invalid-feedback">
+                                        Please provide a valid address (5-2500 characters).
+                                    </div>
                                 </div>
                             </div>
                             <!-- Email -->
@@ -736,7 +780,14 @@
                                 <label for="editEmail">Email</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-envelope icon-blue"></i></span>
-                                    <input type="email" class="form-control" id="editEmail" name="email" required>
+                                    <input type="email" class="form-control" id="editEmail" name="email"
+                                           required maxlength="100"
+                                           pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
+                                           oninvalid="this.setCustomValidity('Please enter a valid email address')"
+                                           oninput="this.setCustomValidity('')">
+                                    <div class="invalid-feedback">
+                                        Please provide a valid email address.
+                                    </div>
                                 </div>
                             </div>
                             <!-- Phone -->
@@ -744,8 +795,16 @@
                                 <label for="editPhone">Phone</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-phone icon-blue"></i></span>
-                                    <input type="text" class="form-control" id="editPhone" name="phone" required>
+                                    <input type="tel" class="form-control" id="editPhone" name="phone"
+                                           required
+                                           pattern="^(\+?\d{1,3}[- ]?)?\d{6,14}$"
+                                           oninvalid="this.setCustomValidity('Please enter a valid international phone number (6-14 digits, optional country code)')"
+                                           oninput="this.setCustomValidity('')">
+                                    <div class="invalid-feedback">
+                                        Please provide a valid phone number (6-14 digits, optional country code).
+                                    </div>
                                 </div>
+                                <small class="form-text text-muted">Format: +[country code] [number] or just number</small>
                             </div>
                             <!-- Reference Type -->
                             <div class="col-md-6 mb-3">
@@ -753,11 +812,11 @@
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-file-alt icon-blue"></i></span>
                                     <div class="form-check form-check-inline" style="margin-left: 10px;">
-                                        <input class="form-check-input" type="radio" id="editReferenceEmail" name="reference" value="EMAIL_CONFIRMATION">
+                                        <input class="form-check-input" type="radio" id="editReferenceEmail" name="reference" value="EMAIL_CONFIRMATION" required>
                                         <label class="form-check-label" for="editReferenceEmail">Email Confirmation</label>
                                     </div>
                                     <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" id="editReferencePhone" name="reference" value="PHONE_CONFIRMATION">
+                                        <input class="form-check-input" type="radio" id="editReferencePhone" name="reference" value="PHONE_CONFIRMATION" required>
                                         <label class="form-check-label" for="editReferencePhone">Phone Confirmation</label>
                                     </div>
                                 </div>
@@ -767,7 +826,10 @@
                                 <label for="editConfirmationDate">Confirmation Date</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-calendar-check icon-blue"></i></span>
-                                    <input type="date" class="form-control" id="editConfirmationDate" name="confirmationDate" required>
+                                    <input type="date" class="form-control" id="editConfirmationDate" name="confirmationDate"
+                                           required
+                                           oninvalid="this.setCustomValidity('Please select a confirmation date')"
+                                           oninput="this.setCustomValidity('')">
                                 </div>
                             </div>
                             <!-- Coordinator -->

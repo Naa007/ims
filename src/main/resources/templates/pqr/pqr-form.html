@@ -121,7 +121,7 @@
                                    id="${'education_' + iterStat.index}" name="education" required
                                    th:data-rating="${educationItem.getRating()}"
                                    th:data-factor="${educationItem.getFactor()}"
-                                   onchange="calculateScore()"/>
+                                   onchange="calculateScore()" class="form-check-input"/>
                             <span th:text="${educationItem.getQualification()}" style="font-size: smaller;"></span>
                         </div>
                     </div>
@@ -139,7 +139,7 @@
                                    id="${'experience_' + iterStat.index}"  name="experience" required
                                    th:data-rating="${exp.getRating()}"
                                    th:data-factor="${exp.getFactor()}"
-                                   onchange="calculateScore()"/>
+                                   onchange="calculateScore()" class="form-check-input"/>
                             <span th:text="${exp.getName()}" style="font-size: smaller;"></span>
                         </div>
                     </div>
@@ -246,7 +246,11 @@
                     <label for="remarks" class="form-label">Remarks</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-comments"></i></span>
-                        <textarea id="remarks" th:field="*{remarks}" class="form-control" rows="4" required></textarea>
+                        <textarea id="remarks" th:field="*{remarks}" class="form-control" rows="4"
+                                  required minlength="10" maxlength="5000"></textarea>
+                        <div class="invalid-feedback">
+                            Please provide remarks (10-5000 characters).
+                        </div>
                     </div>
                 </div>
 
@@ -267,4 +271,4 @@
 </main>
 
 </body>
-</html>
+    </html>

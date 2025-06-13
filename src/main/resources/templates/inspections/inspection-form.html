@@ -35,9 +35,12 @@
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-briefcase"></i></span>
                         <input type="text" id="inspectionNo" th:field="*{inspectionNo}" class="form-control" placeholder="Enter IISPL No" required
-                           th:disabled="${edit}"/>
+                               th:disabled="${edit}" pattern="[0-9]+" title="Please enter numbers only"/>
                         <!-- Hidden field to ensure the value is sent even when the input is disabled -->
                         <input type="hidden" th:field="*{inspectionNo}" th:if="${edit}"/>
+                        <div class="invalid-feedback">
+                            Inspection Number should be Numeric.
+                        </div>
                     </div>
                 </div>
 
@@ -46,7 +49,11 @@
                     <label for="notificationNo" class="form-label required-field">Notification No</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                        <input type="text" id="notificationNo" th:field="*{notificationNo}" class="form-control" required/>
+                        <input type="text" id="notificationNo" th:field="*{notificationNo}" class="form-control" required
+                               minlength="3" maxlength="250"/>
+                        <div class="invalid-feedback">
+                            Please provide a notification number (3-250 characters).
+                        </div>
                     </div>
                 </div>
 
@@ -107,6 +114,9 @@
                                type="text" placeholder="Pick dates"
                                th:attr="value=${inspection.inspectionDateAsPerNotification != null ? inspection.inspectionDateAsPerNotification : ''}"
                                multiple data-toggle="datepicker" required/>
+                        <div class="invalid-feedback">
+                            Please select inspection dates.
+                        </div>
                     </div>
                 </div>
 
@@ -115,23 +125,25 @@
                     <label for="inspectionItem" class="form-label required-field">Inspection Item</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-box"></i></span>
-                         <input type="text" id="inspectionItem" th:field="*{inspectionItem}" class="form-control" required/>
+                        <input type="text" id="inspectionItem" th:field="*{inspectionItem}" class="form-control"
+                               required minlength="3" maxlength="100"/>
+                        <div class="invalid-feedback">
+                            Please provide an inspection item (3-100 characters).
+                        </div>
                     </div>
                 </div>
 
                 <!-- Inspection Type -->
-                <div class="col-md-6">
+                <div class="col-md-6 mb-3">
                     <label class="form-label required-field">Inspection Type</label>
-                    <div class="d-flex">
-                        <div class="form-check me-3">
-                            <input type="radio" id="MECHANICAL"
-                                   name="inspectionType" th:field="*{inspectionType}" value="MECHANICAL" required/>
-                            Mechanical
+                    <div class="input-group was-validated"> <!-- Add was-validated if you want instant feedback -->
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="inspectionTypeMechanical" th:field="*{inspectionType}" value="MECHANICAL" name="inspectionType" required>
+                            <label  for="inspectionTypeMechanical">Mechanical</label>
                         </div>
-                        <div class="form-check">
-                            <input type="radio" id="ELECTRICAL"
-                                   name="inspectionType" th:field="*{inspectionType}" value="ELECTRICAL" required/>
-                            Electrical
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="inspectionTypeElectrical" th:field="*{inspectionType}" value="ELECTRICAL" name="inspectionType" required>
+                            <label for="inspectionTypeElectrical">Electrical</label>
                         </div>
                     </div>
                 </div>
@@ -151,7 +163,11 @@
                             <span class="input-group-text"><i class="fas fa-tasks"></i></span>
                             <textarea id="inspectionActivityWithStages"
                                       th:field="*{inspectionActivityWithStages}"
-                                      class="form-control" rows="3" placeholder="Enter Inspection Stages" required></textarea>
+                                      class="form-control" rows="3" placeholder="Enter Inspection Stages"
+                                      required minlength="10" maxlength="2500"></textarea>
+                            <div class="invalid-feedback">
+                                Please provide inspection stages (10-2500 characters).
+                            </div>
                         </div>
                     </div>
 
@@ -162,7 +178,11 @@
                             <span class="input-group-text"><i class="fas fa-location-pin"></i></span>
                             <textarea id="inspectionLocationDetailsId" th:field="*{inspectionLocationDetails}"
                                       class="form-control" rows="3"
-                                      onchange="initMap(this.value); showMapLoadingMessage();" required></textarea>
+                                      onchange="initMap(this.value); showMapLoadingMessage();"
+                                      required minlength="10" maxlength="2500"></textarea>
+                            <div class="invalid-feedback">
+                                Please provide location details (10-2500 characters).
+                            </div>
                         </div>
                         <div id="mapLoadingMessage" class="mt-2 text-warning fw-bold" style="display: none;">
                             Wait for the map to load nearby inspectors...
@@ -316,7 +336,11 @@
                     <label for="sectorScope" class="form-label">Scope Sector</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-industry"></i></span>
-                        <input type="text" id="sectorScope" th:field="*{sectorScope}" class="form-control" />
+                        <input type="text" id="sectorScope" th:field="*{sectorScope}" class="form-control"
+                               inputmode="numeric" pattern="[0-9]*" minlength="1" maxlength="3" required/>
+                        <div class="invalid-feedback">
+                            Please provide a valid numeric scope (1-3 digits).
+                        </div>
                     </div>
                 </div>
                 

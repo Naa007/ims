@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -48,7 +49,7 @@ public class InspectorController {
      * Handles exception when geocoding the address.
      */
     @PostMapping("/save")
-    public String saveInspector(Inspector inspector) {
+    public String saveInspector(Inspector inspector, RedirectAttributes redirectAttributes) {
         if (inspector.getAddress() != null && !inspector.getAddress().isEmpty()) {
             try {
                 LatLng coordinates = googleMapsService.geocodeAddress(inspector.getAddress());
@@ -60,7 +61,17 @@ public class InspectorController {
                 inspector.setAddressCoordinates(null);
             }
         }
-        inspectorService.saveInspector(inspector);
+
+        try {
+            inspectorService.saveInspector(inspector);
+        } catch (Exception e) {
+            if (e.getCause().getMessage().contains("Duplicate entry")) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Inspector with the email already present");
+            } else {
+                redirectAttributes.addFlashAttribute("errorMessage", "Something went wrong, contact Admin");
+            }
+        }
+        
         return REDIRECT_TO_INSPECTOR_MANAGEMENT;
     }
 

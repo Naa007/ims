@@ -34,21 +34,23 @@ public class EmployeeController {
     @PostMapping("/save-employee")
     public String saveEmployee(@ModelAttribute Employee employee, RedirectAttributes redirectAttributes) {
         try {
-            if (employeeService.getEmployeeById(Long.valueOf(employee.getEmpId())).isPresent()) {
-                throw new IllegalArgumentException("Employee ID already exists");
-            }
+            employeeService.validateEmployee(employee.getEmpId(),employee.getEmail(), "new");
             employeeService.saveEmployee(employee);
-            return REDIRECT_ADMIN_EMPLOYEE_MANAGEMENT;
-        }catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return REDIRECT_ADMIN_EMPLOYEE_MANAGEMENT; // Adjust this to your redirect path
         }
+        return REDIRECT_ADMIN_EMPLOYEE_MANAGEMENT;
     }
 
     // Save Employee
     @PostMapping("/update-employee")
-    public String updateEmployee(@ModelAttribute Employee employee) {
-        employeeService.saveEmployee(employee);
+    public String updateEmployee(@ModelAttribute Employee employee, RedirectAttributes redirectAttributes) {
+        try {
+            employeeService.validateEmployee(employee.getEmpId(),employee.getEmail(), "update");
+            employeeService.saveEmployee(employee);
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
         return REDIRECT_ADMIN_EMPLOYEE_MANAGEMENT;
     }
 }

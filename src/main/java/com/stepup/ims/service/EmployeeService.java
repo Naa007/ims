@@ -62,7 +62,9 @@ public class EmployeeService {
     }
 
     public Employee getEmployeeByEmail(String email) {
-        return employeeModelMapper.toModel(employeeRepository.findByEmail(email));
+        return Optional.ofNullable(employeeRepository.findByEmail(email))
+                .map(employeeModelMapper::toModel)
+                .orElse(null);
     }
 
     public String getEmployeeIdByEmail(String email) {
@@ -75,6 +77,23 @@ public class EmployeeService {
 
     public String getEmployeeNameByEmpId(String id) {
         return employeeRepository.findEmpNameByEmpId(id);
+    }
+
+    public void validateEmployee(String id, String email, String flow) {
+
+        if ("update".equalsIgnoreCase(flow)) {
+            Employee existingEmployee = getEmployeeByEmail(email);
+            if (existingEmployee != null && !existingEmployee.getEmpId().equals(id)) {
+                throw new IllegalArgumentException("Updated email already exists for another employee");
+            }
+        } else {
+            if (getEmployeeById(Long.valueOf(id)).isPresent()) {
+                throw new IllegalArgumentException("Employee ID already exists");
+            }
+            if (getEmployeeByEmail(email) != null) {
+                throw new IllegalArgumentException("Employee email already exists");
+            }
+        }
     }
 
 }
