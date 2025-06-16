@@ -624,7 +624,8 @@
 
             <!-- Submit Button -->
             <div class="col-12 d-flex justify-content-center">
-                <button type="submit" class="btn btn-primary" th:text="${edit ? 'Edit Inspection' : 'Add Inspection'}">
+                <button type="submit" class="btn btn-primary" th:text="${edit ? 'Edit Inspection' : 'Add Inspection'}"
+                        onclick="setupInspectionStatusValidations(event)">
                     Add Inspection
                 </button>
             </div>

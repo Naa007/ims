@@ -2068,3 +2068,65 @@ button:hover {
     .breadcrumb li:last-child a {
         pointer-events: none; /* Disable link for the current page */
     }
+
+/* General container style */
+.popup-container {
+    position: fixed;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 400px;
+    padding: 20px;
+    z-index: 1000;
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+/* Icon styles */
+.popup-icon {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+.popup-icon.error {
+    color: #ff4d4f;
+}
+.popup-icon.info {
+    color: #1890ff;
+}
+.popup-icon.success {
+    color: #52c41a;
+}
+
+/* Title style */
+.popup-title {
+    font-size: 1.5rem;
+    margin: 10px 0;
+    color: #333;
+}
+
+/* Message style */
+.popup-message {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #555;
+    margin: 15px 0;
+}
+
+/* Button style */
+.popup-button {
+    background-color: #1890ff;
+    border: none;
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.popup-button:hover {
+    background-color: #40a9ff;
+}

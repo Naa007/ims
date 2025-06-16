@@ -39,6 +39,7 @@ function setupDatePickerValidation() {
     }
 }
 
+// Function to validate the date picker
 function validateDatePicker() {
     const datePickerInput = document.getElementById('inspectionDateAsPerNotification');
     const feedbackElement = datePickerInput.nextElementSibling;
@@ -150,225 +151,187 @@ function setupRadioValidation() {
     });
 }
 
+// If tech coord then match email while adding inspector
 function handleInspectorTypeChange(radio) {
     if (radio.value === 'TECHNICAL_COORDINATOR') {
         showNotification('Important: For Technical Coordinators, the email must exactly match the employee records', 'warning');
     }
 }
 
+// Initialize all common validations
+document.addEventListener('DOMContentLoaded', function() {
+    setupRadioValidation();
+    setupPhoneValidation();
+    setupCertificateDateValidation();
+    setupDatePickerValidation();
+});
 
-const WORKFLOW_SEQUENCE = [
-    'INSPECTOR_ASSIGNED',
-    'INSPECTOR_REVIEW_AWAITING',
-    'INSPECTOR_REVIEW_COMPLETED',
-    'INSPECTOR_APPROVED',
-    'REFERENCE_DOC_RECEIVED',
-    'REFERENCE_DOC_REVIEW_AWAITING',
-    'REFERENCE_DOC_REVIEW_COMPLETED',
-    'INSPECTION_REPORTS_RECEIVED',
-    'INSPECTION_REPORTS_REVIEW_AWAITING',
-    'INSPECTION_REPORTS_REVIEW_COMPLETED',
-    'INSPECTION_REPORTS_SENT_TO_CLIENT',
-    'INSPECTION_AWARDED',
-    'CLOSED'
-];
+function setupInspectionStatusValidations(event) {
+    const data = gatherInspectionData();
+    const currentStatus = document.getElementById('inspectionStatus').value;
 
-const NO_RESET_STATUSES = [
-    'INSPECTOR_REVIEW_COMPLETED',
-    'REFERENCE_DOC_REVIEW_COMPLETED',
-    'INSPECTION_REJECTED',
-    'CLOSED'
-];
+     if (handleRejectionOrClosure(event, currentStatus)) {
+             return false;
+         }
 
-// Initialization
-function setupInspectionStatusValidation() {
-    const statusSelect = document.getElementById('inspectionStatus');
-    if (!statusSelect) {
-        console.warn('Inspection status select element not found');
-        return;
-    }
+    // Define all status checks with requirements
+   const STATUS_CHECKS = getStatusChecksConfig();
 
-    const form = document.querySelector('form');
-    if (!form) return;
+    // Complete workflow order
+    const workflowOrder = getWorkflowOrder();
 
-    // Initialize previous status field
-    if (!form.querySelector('input[name="previousStatus"]')) {
-        const hiddenInput = document.createElement('input');
-        hiddenInput.type = 'hidden';
-        hiddenInput.name = 'previousStatus';
-        hiddenInput.value = statusSelect.value;
-        form.insertBefore(hiddenInput, form.firstChild);
-    }
+    const currentIndex = workflowOrder.indexOf(currentStatus);
 
-    // Initialize completed statuses tracking
-    if (!form.querySelector('input[name="completedStatuses"]')) {
-        const completedStatusesInput = document.createElement('input');
-        completedStatusesInput.type = 'hidden';
-        completedStatusesInput.name = 'completedStatuses';
-        completedStatusesInput.value = statusSelect.value ? JSON.stringify([statusSelect.value]) : '[]';
-        form.insertBefore(completedStatusesInput, form.firstChild);
-    }
+    // 1. First validate all critical previous steps
+     if (!validatePreviousCriticalSteps(event, currentStatus, STATUS_CHECKS, workflowOrder)) {
+            return false;
+        }
 
-    statusSelect.addEventListener('change', handleStatusChange);
+     // 2. Handle current status
+      return handleCurrentStatus(event, currentStatus, STATUS_CHECKS);
 }
 
-// Validation Functions
-function validateStatusRequirements(status, inspection) {
-    let isValid = true;
-    let message = '';
+// Helper functions
+function handleRejectionOrClosure(event, currentStatus) {
+    if (currentStatus === 'INSPECTION_REJECTED' || currentStatus === 'CLOSED') {
+        event.preventDefault();
+        const isReject = currentStatus === 'INSPECTION_REJECTED';
 
-    switch(status) {
-        case 'INSPECTOR_ASSIGNED':
-        const isTechCoOrdPresent = Array.from(document.querySelectorAll('select[name$=".cvReviewByTechnicalCoordinator.empId"]'))
-                        .every(select => select.value && select.value !== "");
-            if (inspection.proposedCVs.length === 0 ) {
-                isValid = false;
-                message = 'At least one inspector should be present in the CV';
+        Swal.fire({
+            title: isReject ? 'Confirm Rejection' : 'Confirm Closure',
+            text: isReject
+                ? 'Are you sure you want to reject this inspection?'
+                : 'Are you sure you want to close this inspection?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: isReject ? 'Yes, reject it' : 'Yes, close it',
+            cancelButtonText: 'No, cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                event.target.submit();
             }
-            if ( !isTechCoOrdPresent ) {
-                 isValid = false;
-                  message = 'At least one inspector and respective technical coordinator should be present in the CV';
+        });
+
+        return true;
+    }
+    return false;
+}
+
+function getStatusChecksConfig() {
+    return {
+        'INSPECTOR_ASSIGNED': {
+            check: (data) => {
+                const hasInspectors = data.proposedCVs.length > 0;
+                const hasTechCoords = data.proposedCVs.every(cv => cv.cvReviewByTechnicalCoordinator);
+                return hasInspectors && hasTechCoords;
+            },
+            message: (data) => {
+                const hasInspectors = data.proposedCVs.length > 0;
+                const hasTechCoords = data.proposedCVs.every(cv => cv.cvReviewByTechnicalCoordinator);
+                if (!hasInspectors) {
+                    return "Please ensure that at least one inspector is assigned in the CV table before proceeding.";
                 }
-            break;
-
-        case 'INSPECTOR_REVIEW_AWAITING':
-            const allCVsHaveTechCoord = Array.from(document.querySelectorAll('select[name$=".cvReviewByTechnicalCoordinator.empId"]'))
-                .every(select => select.value && select.value !== "");
-            if (!allCVsHaveTechCoord) {
-                isValid = false;
-                message = 'Technical Coordinator should be assigned for all CVs';
-            }
-            break;
-
-        case 'INSPECTOR_REVIEW_COMPLETED':
-            isValid = true;
-            message = 'Please send Inspector CV details to Client and update here';
-            break;
-
-        case 'INSPECTOR_APPROVED':
-            if (inspection.proposedCVs.length === 0) {
-                isValid = false;
-                message = 'At least one CV must be provided before approving the inspector';
-            } else {
-                const invalidCVs = inspection.proposedCVs.filter(cv => {
-                    return !cv.cvSubmittedToClientDate || !cv.cvStatus;
-                });
-                if (invalidCVs.length > 0) {
-                    isValid = false;
-                    message = 'CV Submitted Date should not be empty and CV Status should be "Approved"';
+                if (!hasTechCoords) {
+                    return "Each inspector must have a Technical Coordinator assigned prior to moving forward.";
                 }
-            }
-            break;
+                return "";
+            },
+            isCritical: true
+        },
 
-        case 'REFERENCE_DOC_RECEIVED':
-            if (!inspection.referenceDocumentsForInspectionStatus || !inspection.referenceDocumentsLink) {
-                isValid = false;
-                message = 'Reference documents should be marked as available and link should be provided';
-            }
-            break;
-
-        case 'REFERENCE_DOC_REVIEW_AWAITING':
-            if (!inspection.documentsReviewedByTechnicalCoordinator) {
-                isValid = false;
-                message = 'Technical Coordinator should be assigned for document review';
-            }
-            break;
-
-        case 'REFERENCE_DOC_REVIEW_COMPLETED':
-            isValid = true;
-            message = 'Hope contract review and inspection advise fields are up to date';
-            break;
-
-        case 'INSPECTION_REPORTS_SENT_TO_CLIENT':
-            if (!inspection.irnSentDate) {
-                isValid = false;
-                message = 'IRN Sent Date should not be empty';
-            }
-            break;
-
-        case 'INSPECTION_REPORTS_RECEIVED':
-            if (!inspection.inspectionReportsReceivedDate) {
-                isValid = false;
-                message = 'Inspection reports received date should not be empty';
-            }
-            break;
-
-        case 'INSPECTION_AWARDED':
-            if (!inspection.jobFolderLink) {
-                isValid = false;
-                message = '🏗️ The job folder is missing. Let’s not celebrate just yet!';
-            } else {
-                isValid = true;
-                message = '🎉 Congratulations!  The inspection has been *officially* awarded!';
-            }
-            break;
-
-        case 'INSPECTION_REJECTED':
-            isValid = true;
-            message = 'Inspection rejected😢-don\'t worry - the next one will be a winner!';
-            break;
-
-        case 'CLOSED':
-            isValid = true;
-            message = 'Inspection closed successfully';
-            break;
-    }
-
-    return { isValid, message };
+        'INSPECTOR_REVIEW_AWAITING': {
+            check: (data) => data.proposedCVs.every(cv => cv.cvReviewByTechnicalCoordinator),
+            message: "All inspectors must have a Technical Coordinator assigned before proceeding.",
+            isCritical: true
+        },
+        'INSPECTOR_APPROVED': {
+            check: (data) => data.proposedCVs.every(cv =>
+                cv.cvSubmittedToClientDate &&
+                cv.cvStatus === true
+            ),
+            message: (data) => {
+                if (data.proposedCVs.some(cv => !cv.cvSubmittedToClientDate)) {
+                    return "Inspector(s) cv submitted to client date is missing. Please provide the date.";
+                }
+                if (data.proposedCVs.some(cv => cv.cvStatus !== true)) {
+                    return "Inspector(s) approval from client needs to update. Please update as approved.";
+                }
+                return "";
+            },
+            isCritical: true
+        },
+        'REFERENCE_DOC_RECEIVED': {
+            check: (data) => data.referenceDocumentsForInspectionStatus && data.referenceDocumentsLink,
+            message: (data) => {
+                if (!data.referenceDocumentsForInspectionStatus) {
+                    return "Please mark the reference documents as 'Available' before proceeding.";
+                }
+                if (!data.referenceDocumentsLink) {
+                    return "The document link is missing. Please provide the document link.";
+                }
+                return "";
+            },
+            isCritical: true
+        },
+        'REFERENCE_DOC_REVIEW_AWAITING': {
+            check: (data) => data.documentsReviewedByTechnicalCoordinator,
+            message: "A Technical Coordinator must present to complete the document review.",
+            isCritical: true
+        },
+        'INSPECTION_REPORTS_RECEIVED': {
+            check: (data) => data.inspectionReportsReceivedDate,
+            message: "Please provide the date when the inspection reports were received.",
+            isCritical: true
+        },
+        'INSPECTION_REPORTS_REVIEW_AWAITING': {
+            check: (data) => data.inspectionReviewedBy,
+            message: "A Technical Coordinator must present to review the inspection reports.",
+            isCritical: true
+        },
+        'INSPECTION_REPORTS_SENT_TO_CLIENT': {
+            check: (data) => data.irnSentDate,
+            message: "Please provide the date when the IRN was sent to the client.",
+            isCritical: true
+        },
+        'INSPECTION_AWARDED': {
+            check: (data) => data.jobFolderLink,
+            message: "The job folder link is required to proceed with the inspection.",
+            successMessage: "The inspection has been successfully awarded. Great job!",
+            isCritical: true
+        },
+        'INSPECTOR_REVIEW_COMPLETED': {
+            message: "Inspector CVs have been reviewed. Please share them with the client and update all necessary records.",
+            isCritical: false
+        },
+        'REFERENCE_DOC_REVIEW_COMPLETED': {
+            message: "Please verify that the contract review and inspection advice fields are updated.",
+            isCritical: false
+        },
+        'INSPECTION_REPORTS_REVIEW_COMPLETED': {
+            message: "The inspection report review has been completed. Prepare the reports for client submission.",
+            isCritical: false
+        }
+    };
 }
 
-function isStatusCompleted(status, inspection, completedStatuses) {
-    if (completedStatuses.includes(status)) return true;
-
-    if (status === 'INSPECTOR_REVIEW_COMPLETED') {
-        return completedStatuses.includes('INSPECTOR_REVIEW_AWAITING') ||
-               validateStatusRequirements('INSPECTOR_REVIEW_AWAITING', inspection).isValid;
-    }
-
-    if (status === 'REFERENCE_DOC_REVIEW_COMPLETED') {
-        return completedStatuses.includes('REFERENCE_DOC_REVIEW_AWAITING') ||
-               validateStatusRequirements('REFERENCE_DOC_REVIEW_AWAITING', inspection).isValid;
-    }
-
-    return validateStatusRequirements(status, inspection).isValid;
+function getWorkflowOrder() {
+    return [
+        'NEW',
+        'INSPECTOR_ASSIGNED',
+        'INSPECTOR_REVIEW_AWAITING',
+        'INSPECTOR_REVIEW_COMPLETED',
+        'INSPECTOR_APPROVED',
+        'REFERENCE_DOC_RECEIVED',
+        'REFERENCE_DOC_REVIEW_AWAITING',
+        'REFERENCE_DOC_REVIEW_COMPLETED',
+        'INSPECTION_REPORTS_RECEIVED',
+        'INSPECTION_REPORTS_REVIEW_AWAITING',
+        'INSPECTION_REPORTS_REVIEW_COMPLETED',
+        'INSPECTION_REPORTS_SENT_TO_CLIENT',
+        'INSPECTION_AWARDED'
+    ];
 }
 
-function validateInspectionStatus(status, inspection, completedStatuses = []) {
-    if (status === 'CLOSED') {
-        if (!completedStatuses.includes('INSPECTION_AWARDED')) {
-            return { isValid: false, message: 'Cannot close inspection until it has been awarded' };
-        }
-        return { isValid: true, message: 'Inspection closed successfully' };
-    }
-
-    if (status === 'INSPECTION_REJECTED') {
-        if (completedStatuses.includes('INSPECTION_AWARDED')) {
-            return { isValid: false, message: 'Cannot reject an inspection that has been awarded' };
-        }
-        return { isValid: true, message: 'Inspection rejected successfully' };
-    }
-
-    const currentIndex = WORKFLOW_SEQUENCE.indexOf(status);
-    if (currentIndex === -1) return { isValid: false, message: 'Invalid status' };
-
-    for (let i = 0; i < currentIndex; i++) {
-        const prevStatus = WORKFLOW_SEQUENCE[i];
-
-        if ((status === 'INSPECTOR_APPROVED' && prevStatus === 'INSPECTOR_REVIEW_COMPLETED') ||
-            (status === 'INSPECTION_REPORTS_SENT_TO_CLIENT' && prevStatus === 'REFERENCE_DOC_REVIEW_COMPLETED')) {
-            const awaitingStatus = prevStatus.replace('COMPLETED', 'AWAITING');
-            if (isStatusCompleted(awaitingStatus, inspection, completedStatuses)) continue;
-        }
-
-        if (!isStatusCompleted(prevStatus, inspection, completedStatuses)) {
-            return { isValid: false, message: `Please complete ${prevStatus.replace(/_/g, ' ')} step first` };
-        }
-    }
-
-    return validateStatusRequirements(status, inspection);
-}
-
-// Helper Functions
 function gatherInspectionData() {
     return {
         proposedCVs: Array.from(document.querySelectorAll('#proposedCVsTable tbody tr')).map(row => ({
@@ -383,83 +346,135 @@ function gatherInspectionData() {
         referenceDocumentsForInspectionStatus: document.querySelector('input[name="referenceDocumentsForInspectionStatus"]:checked')?.value === 'true',
         referenceDocumentsLink: document.getElementById('referenceDocumentsLink')?.value,
         documentsReviewedByTechnicalCoordinator: document.getElementById('documentsReviewedByTechnicalCoordinator')?.value,
+        inspectionReportsReceivedDate: document.getElementById('inspectionReportsReceivedDate')?.value,
+        inspectionReviewedBy: document.getElementById('inspectionReviewedBy')?.value,
         irnSentDate: document.getElementById('irnSentDate')?.value,
-        jobFolderLink: document.getElementById('jobFolderLink')?.value,
-        inspectionReportsReceivedDate: document.getElementById('inspectionReportsReceivedDate')?.value
+        jobFolderLink: document.getElementById('jobFolderLink')?.value
     };
 }
 
-function handleValidationError(status, message, form, inspection) {
-    if (status === 'INSPECTION_AWARDED') {
-        const validAward = validateStatusRequirements('INSPECTION_AWARDED', inspection).isValid;
-        if (validAward) {
-            showNotification(message, 'success');
-        } else {
-            showNotification(message, 'warning');
-        }
-        return;
-    }
+function validatePreviousCriticalSteps(event, currentStatus, STATUS_CHECKS, workflowOrder) {
+    const currentIndex = workflowOrder.indexOf(currentStatus);
+    const data = gatherInspectionData();
 
-    if (status === 'CLOSED') {
-        showNotification(message, 'success');
-    } else if (status === 'INSPECTOR_REVIEW_COMPLETED' || status === 'REFERENCE_DOC_REVIEW_COMPLETED') {
-        showNotification(message, 'warning');
-    } else {
-        showNotification(message, 'error');
+    for (let i = 0; i < currentIndex; i++) {
+        const status = workflowOrder[i];
+        const check = STATUS_CHECKS[status];
+
+        if (check?.isCritical && check.check && !check.check(data)) {
+            const errorMessage = typeof check.message === 'function'
+                ? check.message(data)
+                : check.message;
+
+            showError(`${errorMessage}\n\n(Complete "${formatStatusName(status)}" first)`);
+            event.preventDefault();
+            return false;
+        }
     }
+    return true;
 }
 
+function handleCurrentStatus(event, currentStatus, STATUS_CHECKS) {
+    const data = gatherInspectionData();
+    const currentCheck = STATUS_CHECKS[currentStatus];
 
-// Event Handler
-function handleStatusChange() {
-    const status = this.value;
-    const form = document.querySelector('form');
-    if (!form) return;
+    if (!currentCheck) return true;
 
-    const previousStatusInput = form.querySelector('input[name="previousStatus"]');
-    const completedStatusesInput = form.querySelector('input[name="completedStatuses"]');
-    if (!previousStatusInput || !completedStatusesInput) return;
+    if (currentCheck.isCritical) {
+        if (!currentCheck.check(data)) {
+            const errorMessage = typeof currentCheck.message === 'function'
+                ? currentCheck.message(data)
+                : currentCheck.message;
 
-    const inspection = gatherInspectionData();
-    let completedStatuses = [];
+            showError(`${errorMessage}\n\n(Cannot proceed to "${formatStatusName(currentStatus)}")`);
+            event.preventDefault();
+            return false;
+        }
 
-    try {
-        completedStatuses = JSON.parse(completedStatusesInput.value || '[]');
-    } catch (e) {
-        console.error('Error parsing completed statuses:', e);
-        completedStatuses = [];
-    }
-
-    const validation = validateInspectionStatus(status, inspection, completedStatuses);
-
-    if (!validation.isValid) {
-        handleValidationError(status, validation.message, form, inspection);
-
-        if (!NO_RESET_STATUSES.includes(status)) {
-            this.value = previousStatusInput.value || '';
+        if (currentStatus === 'INSPECTION_AWARDED' && currentCheck.successMessage) {
+            showSuccess(currentCheck.successMessage);
         }
     } else {
-        // Update completed statuses
-        if (status === 'INSPECTION_REJECTED') {
-            const currentIndex = WORKFLOW_SEQUENCE.indexOf(status);
-            completedStatuses = Array.from(new Set([
-                ...completedStatuses,
-                ...WORKFLOW_SEQUENCE.slice(0, currentIndex + 1)
-            ]));
-        } else if (!completedStatuses.includes(status)) {
-            completedStatuses.push(status);
-        }
+        const infoMessage = typeof currentCheck.message === 'function'
+            ? currentCheck.message(data)
+            : currentCheck.message;
 
-        completedStatusesInput.value = JSON.stringify(completedStatuses);
-        previousStatusInput.value = status;
+        showInfo(`Status set to "${formatStatusName(currentStatus)}":\n\n${infoMessage}`);
     }
+
+    return true;
 }
 
-    // Initialize all common validations
-    document.addEventListener('DOMContentLoaded', function() {
-        setupRadioValidation();
-        setupPhoneValidation();
-        setupCertificateDateValidation();
-        setupDatePickerValidation();
-        setupInspectionStatusValidation();
+function formatStatusName(status) {
+    return status.split('_').map(word =>
+        word.charAt(0) + word.slice(1).toLowerCase()
+    ).join(' ');
+}
+
+function showPopup({ iconType, title, message, buttonText = 'OK' }) {
+    // Create a container for the popup
+    const popup = document.createElement('div');
+    popup.className = 'popup-container';
+
+    // Icon section
+    const icon = document.createElement('div');
+    icon.className = `popup-icon ${iconType}`;
+    popup.appendChild(icon);
+
+    // Title section
+    const popupTitle = document.createElement('h2');
+    popupTitle.className = 'popup-title';
+    popupTitle.innerText = title;
+    popup.appendChild(popupTitle);
+
+    // Message section
+    const popupMessage = document.createElement('div');
+    popupMessage.className = 'popup-message';
+    popupMessage.innerHTML = message.replace(/\n/g, '<br>');
+    popup.appendChild(popupMessage);
+
+    // Button section
+    const button = document.createElement('button');
+    button.className = 'popup-button';
+    button.innerText = buttonText;
+    button.addEventListener('click', () => {
+        document.body.removeChild(popup);
     });
+    popup.appendChild(button);
+
+    // Append popup to body and show it
+    document.body.appendChild(popup);
+}
+
+// Function to show error
+function showError(message) {
+    showPopup({
+        iconType: 'error',
+        title: 'Validation Error',
+        message: message,
+        buttonText: 'OK'
+    });
+}
+
+// Function to show info
+function showInfo(message) {
+    showPopup({
+        iconType: 'info',
+        title: 'Information',
+        message: message,
+        buttonText: 'Got it'
+    });
+}
+
+// Function to show success
+function showSuccess(message) {
+    showPopup({
+        iconType: 'success',
+        title: 'Success',
+        message: message,
+        buttonText: 'OK'
+    });
+}
+
+
+
