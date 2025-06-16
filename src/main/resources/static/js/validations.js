@@ -190,6 +190,7 @@ function setupInspectionStatusValidations(event) {
      // 2. Handle current status
       return handleCurrentStatus(event, currentStatus, STATUS_CHECKS);
 }
+
 // Helper functions
 function handleRejectionOrClosure(event, currentStatus) {
     if (currentStatus === 'INSPECTION_REJECTED' || currentStatus === 'CLOSED') {
@@ -228,10 +229,10 @@ function getStatusChecksConfig() {
                 const hasInspectors = data.proposedCVs.length > 0;
                 const hasTechCoords = data.proposedCVs.every(cv => cv.cvReviewByTechnicalCoordinator);
                 if (!hasInspectors) {
-                    return "👷‍♂️ Heads up! You need to assign at least one inspector in the CV table before moving forward.";
+                    return "Please ensure that at least one inspector is assigned in the CV table before proceeding.";
                 }
                 if (!hasTechCoords) {
-                    return "👋 Hello buddy,not so fast! Each inspector needs a Technical Coordinator before we can move forward";
+                    return "Each inspector must have a Technical Coordinator assigned prior to moving forward.";
                 }
                 return "";
             },
@@ -240,7 +241,7 @@ function getStatusChecksConfig() {
 
         'INSPECTOR_REVIEW_AWAITING': {
             check: (data) => data.proposedCVs.every(cv => cv.cvReviewByTechnicalCoordinator),
-            message: "📋 Oops! All inspectors need a Technical Coordinator assigned. Let's loop them in!",
+            message: "All inspectors must have a Technical Coordinator assigned before proceeding.",
             isCritical: true
         },
         'INSPECTOR_APPROVED': {
@@ -250,10 +251,10 @@ function getStatusChecksConfig() {
             ),
             message: (data) => {
                 if (data.proposedCVs.some(cv => !cv.cvSubmittedToClientDate)) {
-                    return "📅 Looks like some CVs are still waiting for a submission date. Let's not keep the client guessing! ⏳";
+                    return "Inspector(s) cv submitted to client date is missing. Please provide the date.";
                 }
                 if (data.proposedCVs.some(cv => cv.cvStatus !== true)) {
-                    return "✅ Approval alert! Some CVs still need the green signal. Give them the stamp of approval! 🟢";
+                    return "Inspector(s) approval from client needs to update. Please update as approved.";
                 }
                 return "";
             },
@@ -262,48 +263,52 @@ function getStatusChecksConfig() {
         'REFERENCE_DOC_RECEIVED': {
             check: (data) => data.referenceDocumentsForInspectionStatus && data.referenceDocumentsLink,
             message: (data) => {
-                if (!data.referenceDocumentsForInspectionStatus) return "📄 Heads up! Don't forget to mark the reference documents as 'Available'. We can't inspect thin air! 😉";
-                if (!data.referenceDocumentsLink) return "🔗 Oops! The document link is missing. Even Sherlock Holmes needs a clue!";
+                if (!data.referenceDocumentsForInspectionStatus) {
+                    return "Please mark the reference documents as 'Available' before proceeding.";
+                }
+                if (!data.referenceDocumentsLink) {
+                    return "The document link is missing. Please provide the document link.";
+                }
                 return "";
             },
             isCritical: true
         },
         'REFERENCE_DOC_REVIEW_AWAITING': {
             check: (data) => data.documentsReviewedByTechnicalCoordinator,
-            message: "🧐 Technical Coordinator needed for document review! Let's call in the experts!",
+            message: "A Technical Coordinator must present to complete the document review.",
             isCritical: true
         },
         'INSPECTION_REPORTS_RECEIVED': {
             check: (data) => data.inspectionReportsReceivedDate,
-            message: "📅 Please provide the inspection reports received date.",
+            message: "Please provide the date when the inspection reports were received.",
             isCritical: true
         },
         'INSPECTION_REPORTS_REVIEW_AWAITING': {
-            check: (data) => data.documentsReviewedByTechnicalCoordinator,
-            message: "🧠 Don't forget! Assign a Technical Coordinator to review the reports.",
+            check: (data) => data.inspectionReviewedBy,
+            message: "A Technical Coordinator must present to review the inspection reports.",
             isCritical: true
         },
         'INSPECTION_REPORTS_SENT_TO_CLIENT': {
             check: (data) => data.irnSentDate,
-            message: "📤 IRN sent date is missing! Let's not leave the client hanging",
+            message: "Please provide the date when the IRN was sent to the client.",
             isCritical: true
         },
         'INSPECTION_AWARDED': {
             check: (data) => data.jobFolderLink,
-            message: "🔗 Where's the job folder link? Job folder link must be provided",
-            successMessage: "Mission accomplished🎯! The inspection is now Awarded. Let's keep the momentum going!",
+            message: "The job folder link is required to proceed with the inspection.",
+            successMessage: "The inspection has been successfully awarded. Great job!",
             isCritical: true
         },
         'INSPECTOR_REVIEW_COMPLETED': {
-            message: "📬 Time to hit send! Share those Inspector CVs with the client and don't forget to update the records. Good job so far! 🛠️",
+            message: "Inspector CVs have been reviewed. Please share them with the client and update all necessary records.",
             isCritical: false
         },
         'REFERENCE_DOC_REVIEW_COMPLETED': {
-            message: "📋 Quick checklist! Make sure the contract review and inspection advice fields are updated🏁",
+            message: "Please verify that the contract review and inspection advice fields are updated.",
             isCritical: false
         },
         'INSPECTION_REPORTS_REVIEW_COMPLETED': {
-            message: "🎯 Reports review completed! Time to prep for client submission like a pro.",
+            message: "The inspection report review has been completed. Prepare the reports for client submission.",
             isCritical: false
         }
     };
@@ -326,6 +331,7 @@ function getWorkflowOrder() {
         'INSPECTION_AWARDED'
     ];
 }
+
 function gatherInspectionData() {
     return {
         proposedCVs: Array.from(document.querySelectorAll('#proposedCVsTable tbody tr')).map(row => ({
@@ -341,6 +347,7 @@ function gatherInspectionData() {
         referenceDocumentsLink: document.getElementById('referenceDocumentsLink')?.value,
         documentsReviewedByTechnicalCoordinator: document.getElementById('documentsReviewedByTechnicalCoordinator')?.value,
         inspectionReportsReceivedDate: document.getElementById('inspectionReportsReceivedDate')?.value,
+        inspectionReviewedBy: document.getElementById('inspectionReviewedBy')?.value,
         irnSentDate: document.getElementById('irnSentDate')?.value,
         jobFolderLink: document.getElementById('jobFolderLink')?.value
     };
@@ -404,34 +411,68 @@ function formatStatusName(status) {
     ).join(' ');
 }
 
+function showPopup({ iconType, title, message, buttonText = 'OK' }) {
+    // Create a container for the popup
+    const popup = document.createElement('div');
+    popup.className = 'popup-container';
+
+    // Icon section
+    const icon = document.createElement('div');
+    icon.className = `popup-icon ${iconType}`;
+    popup.appendChild(icon);
+
+    // Title section
+    const popupTitle = document.createElement('h2');
+    popupTitle.className = 'popup-title';
+    popupTitle.innerText = title;
+    popup.appendChild(popupTitle);
+
+    // Message section
+    const popupMessage = document.createElement('div');
+    popupMessage.className = 'popup-message';
+    popupMessage.innerHTML = message.replace(/\n/g, '<br>');
+    popup.appendChild(popupMessage);
+
+    // Button section
+    const button = document.createElement('button');
+    button.className = 'popup-button';
+    button.innerText = buttonText;
+    button.addEventListener('click', () => {
+        document.body.removeChild(popup);
+    });
+    popup.appendChild(button);
+
+    // Append popup to body and show it
+    document.body.appendChild(popup);
+}
+
+// Function to show error
 function showError(message) {
-    Swal.fire({
-        icon: 'error',
-        title: 'Validation Required',
-        html: message.replace(/\n/g, '<br>'),
-        confirmButtonText: 'OK'
+    showPopup({
+        iconType: 'error',
+        title: 'Validation Error',
+        message: message,
+        buttonText: 'OK'
     });
 }
 
+// Function to show info
 function showInfo(message) {
-    Swal.fire({
-        icon: 'info',
-        title: 'Status Update',
-        html: message.replace(/\n/g, '<br>'),
-        confirmButtonText: 'Got it'
+    showPopup({
+        iconType: 'info',
+        title: 'Information',
+        message: message,
+        buttonText: 'Got it'
     });
 }
 
+// Function to show success
 function showSuccess(message) {
-    Swal.fire({
-        icon: 'success',
-        title: '🎉 Congratulations!',
-        html: `
-            ${message.replace(/\n/g, '<br>')}
-            <br>
-            <img src="https://media.giphy.com/media/l0MYEqEzwMWFCg8rm/giphy.gif" width="200" style="margin-top:15px;">
-        `,
-        confirmButtonText: 'Celebrate 🎊'
+    showPopup({
+        iconType: 'success',
+        title: 'Success',
+        message: message,
+        buttonText: 'OK'
     });
 }
 
