@@ -16,12 +16,13 @@ import static com.stepup.ims.constants.ApplicationConstants.*;
 public class SecurityConfig {
 
     private static final String[] OPEN_ACCESS = {"/auth/**", "/js/**", "/css/**", "/images/**", "/login", "/", "/error/**"};
-    private static final String[] ADMIN_ACCESS = {"/admin/**", "/client/**"};
+    private static final String[] ADMIN_ACCESS = {"/admin/**"};
     private static final String[] BUSINESS_ACCESS = {"/business/**"};
     private static final String[] COORDINATOR_ACCESS = {"/coordinator/**", "/inspection/**"};
     private static final String[] TECHNICAL_COORDINATOR_ACCESS = {"/technical-coordinator/**"};
     private static final String[] INSPECTOR_ACCESS = {"/inspector/**"};
     private static final String[] EMPLOYEE_ACCESS = {"/employee/**"};
+    private static final String[] CLIENT_ACCESS = {"/client/**"};
     private static final String[] INSPECTORS_ACCESS = {"/inspectors/**"};
     private static final String[] STATS_ACCESS = {"/stats/**"};
     private static final String[] REPORT_ACCESS = {"/reports/**"};
@@ -38,6 +39,7 @@ public class SecurityConfig {
                         .requestMatchers(TECHNICAL_COORDINATOR_ACCESS).hasAnyRole(TECHNICAL_COORDINATOR)
                         .requestMatchers(INSPECTOR_ACCESS).hasAnyRole(INSPECTOR, TECHNICAL_COORDINATOR)
                         .requestMatchers(EMPLOYEE_ACCESS).hasAnyRole(ADMIN)
+                        .requestMatchers(CLIENT_ACCESS).hasAnyRole(ADMIN, COORDINATOR)
                         .requestMatchers(INSPECTORS_ACCESS).hasAnyRole(ADMIN, COORDINATOR)
                         .requestMatchers(STATS_ACCESS).hasAnyRole(BUSINESS, COORDINATOR, TECHNICAL_COORDINATOR, INSPECTOR)
                         .requestMatchers(REPORT_ACCESS).hasAnyRole(COORDINATOR, ADMIN)
