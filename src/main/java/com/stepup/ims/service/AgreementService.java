@@ -8,93 +8,192 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class AgreementService {
 
     private static final String TEMPLATE_DIR = "inspector-agreement/";
     private static final String INDIA_TEMPLATE = "INDIA-Empaneled_Inspector_Agreement.docx";
-    private static final String INTERNATIONAL_TEMPLATE = "INTERNATIONAL-Inspector_Agreement.docx";
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    public byte[] generateIndiaEmpaneledInspectorAgreement(
-            String inspectorName,
-            String address,
-            String email,
-            String phone) throws IOException {
-
+    /**
+     * Generate India-specific agreement for an inspector.
+     *
+     * @param inspectorName the name of the inspector
+     * @param address       the address of the inspector
+     * @param email         the email of the inspector
+     * @param phone         the phone number of the inspector
+     * @return Byte array of the generated agreement
+     * @throws IOException if the template file cannot be loaded or errors occur during processing
+     */
+    public byte[] generateIndiaEmpaneledInspectorAgreement(String inspectorName, String address, String email, String phone) throws IOException {
         System.out.println("Generating India agreement for: " + inspectorName);
-        return generateAgreementDocument(INDIA_TEMPLATE, inspectorName, address, email, phone, "India");
+        return generateAgreement(INDIA_TEMPLATE, inspectorName, address, email, phone, "India");
     }
 
-    private byte[] generateAgreementDocument(
-            String templateName,
-            String inspectorName,
-            String address,
-            String email,
-            String phone,
-            String country) throws IOException {
+    /**
+     * Generate an agreement based on the provided template and details.
+     *
+     * @param templateName  Name of the template file
+     * @param inspectorName Name of the inspector
+     * @param address       Address of the inspector
+     * @param email         Email address of the inspector
+     * @param phone         Contact phone number of the inspector
+     * @param country       Country where the inspector is located
+     * @return Byte array containing the generated agreement document
+     * @throws IOException If the template file is missing or cannot be read
+     */
+    private byte[] generateAgreement(String templateName, String inspectorName, String address, String email, String phone, String country) throws IOException {
+        Resource templateResource = loadTemplate(templateName);
 
+        try (InputStream inputStream = templateResource.getInputStream();
+             XWPFDocument document = new XWPFDocument(inputStream)) {
+
+            System.out.println("Template loaded successfully. Replacing placeholders...");
+
+            // Prepare placeholder values
+            Map<String, String> placeholders = preparePlaceholders(inspectorName, address, email, phone, country);
+
+            // Replace placeholders throughout the document
+            replacePlaceholdersInDocument(document, placeholders);
+
+            // Convert the document to a byte array
+            return convertDocumentToByteArray(document);
+        }
+    }
+
+    /**
+     * Load the template document as a resource.
+     *
+     * @param templateName Name of the template file
+     * @return Resource pointing to the template
+     * @throws FileNotFoundException If the file is not found
+     */
+    private Resource loadTemplate(String templateName) throws FileNotFoundException {
         String fullPath = TEMPLATE_DIR + templateName;
         Resource resource = new ClassPathResource(fullPath);
-
-        System.out.println("Looking for template at: " + fullPath);
         if (!resource.exists()) {
             throw new FileNotFoundException("Template file not found: " + fullPath);
         }
-
-        try (InputStream is = resource.getInputStream();
-             XWPFDocument doc = new XWPFDocument(is)) {
-
-            System.out.println("Template loaded successfully.");
-
-            // Replace placeholders with values
-            replacePlaceholder(doc, "{{DATE}}", LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-            replacePlaceholder(doc, "{{NAME}}", inspectorName);
-            replacePlaceholder(doc, "{{ADDRESS}}", address);
-            replacePlaceholder(doc, "{{EMAIL}}", email);
-            replacePlaceholder(doc, "{{CONTACT}}", phone);
-            replacePlaceholder(doc, "{{POSITION}}", "India".equalsIgnoreCase(country) ? "Empaneled Inspector" : "International Inspector");
-            replacePlaceholder(doc, "{{SIGN_NAME}}", inspectorName);
-
-            // Write to byte array
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            doc.write(out);
-            System.out.println("Document generation complete.");
-            return out.toByteArray();
-        }
+        return resource;
     }
 
-    private void replacePlaceholder(XWPFDocument doc, String placeholder, String replacement) {
-        System.out.println("Replacing placeholder: " + placeholder + " -> " + replacement);
+    /**
+     * Prepare placeholders to be replaced in the document.
+     *
+     * @param inspectorName Name of the inspector
+     * @param address       Address of the inspector
+     * @param email         Email of the inspector
+     * @param phone         Contact information of the inspector
+     * @param country       Country where the inspector works
+     * @return Map containing placeholder keys and the corresponding replacements
+     */
+    private Map<String, String> preparePlaceholders(String inspectorName, String address, String email, String phone, String country) {
+        Map<String, String> placeholders = new HashMap<>();
+        placeholders.put("\"DATE\"", LocalDate.now().format(DATE_FORMATTER));
+        placeholders.put("NAME", inspectorName);
+        placeholders.put("ADDRESS", address);
+        placeholders.put("EMAIL", email);
+        placeholders.put("CONTACT", phone);
+        placeholders.put("POSITION", "Inspector/Sr.Inspector");
+        placeholders.put("IISPL_NAME}}", "G.S Rao");
+        return placeholders;
+    }
 
-        // Paragraphs
-        for (XWPFParagraph paragraph : doc.getParagraphs()) {
-            replaceInParagraph(paragraph, placeholder, replacement);
+    /**
+     * Replace all placeholders in the given Word document.
+     *
+     * @param document     Document in which placeholders will be replaced
+     * @param placeholders Map of placeholders and corresponding replacements
+     */
+    private void replacePlaceholdersInDocument(XWPFDocument document, Map<String, String> placeholders) {
+        // Replace in paragraphs
+        for (XWPFParagraph paragraph : document.getParagraphs()) {
+            replacePlaceholdersInParagraph(paragraph, placeholders);
         }
 
-        // Tables
-        for (XWPFTable table : doc.getTables()) {
+        // Replace in tables
+        for (XWPFTable table : document.getTables()) {
             for (XWPFTableRow row : table.getRows()) {
                 for (XWPFTableCell cell : row.getTableCells()) {
                     for (XWPFParagraph paragraph : cell.getParagraphs()) {
-                        replaceInParagraph(paragraph, placeholder, replacement);
+                        replacePlaceholdersInParagraph(paragraph, placeholders);
                     }
                 }
             }
         }
+
+        // Replace in headers and footers
+        for (XWPFHeader header : document.getHeaderList()) {
+            for (XWPFParagraph paragraph : header.getParagraphs()) {
+                replacePlaceholdersInParagraph(paragraph, placeholders);
+            }
+        }
+        for (XWPFFooter footer : document.getFooterList()) {
+            for (XWPFParagraph paragraph : footer.getParagraphs()) {
+                replacePlaceholdersInParagraph(paragraph, placeholders);
+            }
+        }
     }
 
-    private void replaceInParagraph(XWPFParagraph paragraph, String placeholder, String replacement) {
-        String fullText = paragraph.getText();
-        if (fullText.contains(placeholder)) {
-            System.out.println("Found placeholder in paragraph: " + fullText);
-            String updatedText = fullText.replace(placeholder, replacement);
-            int runs = paragraph.getRuns().size();
-            for (int i = runs - 1; i >= 0; i--) {
-                paragraph.removeRun(i);
+    /**
+     * Replace all placeholders in a paragraph.
+     *
+     * @param paragraph    Paragraph to process
+     * @param placeholders Map of placeholders and their replacements
+     */
+    private void replacePlaceholdersInParagraph(XWPFParagraph paragraph, Map<String, String> placeholders) {
+        // Combine all runs' text into one string
+        StringBuilder fullTextBuilder = new StringBuilder();
+        for (XWPFRun run : paragraph.getRuns()) {
+            String text = run.getText(0);
+            if (text != null) {
+                fullTextBuilder.append(text);
             }
+        }
+
+        String fullText = fullTextBuilder.toString();
+        if (fullText.isEmpty()) return;
+
+        String updatedText = fullText;
+        for (Map.Entry<String, String> entry : placeholders.entrySet()) {
+            updatedText = updatedText.replace(entry.getKey(), entry.getValue());
+        }
+
+        if (!fullText.equals(updatedText)) {
+            System.out.println("Replacing text: " + fullText + " -> " + updatedText);
+            clearParagraphRuns(paragraph);
             XWPFRun run = paragraph.createRun();
-            run.setText(updatedText);
+            run.setText(updatedText, 0);
+        }
+    }
+
+    /**
+     * Clear all runs in a paragraph for text replacement.
+     *
+     * @param paragraph Paragraph to clear
+     */
+    private void clearParagraphRuns(XWPFParagraph paragraph) {
+        int runs = paragraph.getRuns().size();
+        for (int i = runs - 1; i >= 0; i--) {
+            paragraph.removeRun(i);
+        }
+    }
+
+    /**
+     * Convert the Word document to a byte array.
+     *
+     * @param document Document to be converted
+     * @return Byte array representation of the document
+     * @throws IOException If an error occurs during writing
+     */
+    private byte[] convertDocumentToByteArray(XWPFDocument document) throws IOException {
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            document.write(outputStream);
+            System.out.println("Document generation complete.");
+            return outputStream.toByteArray();
         }
     }
 }
