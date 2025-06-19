@@ -33,11 +33,11 @@
             <div style="flex: 30%;">
                 <div class="cd-export-wrapper">
                     <div class="bd-filter-group bd-export-group"  style="flex-direction: row-reverse;">
-                        <button class="btn btn-primary ml-2" onclick="openAgreementDialog()">
-                            <i class="fas fa-file-download"></i> Generate Agreement
+                        <button class="bd-export-btn" onclick="openAgreementDialog()">
+                            <i class="fas fa-file-download"></i> Agreements
                         </button>
                         <button class="bd-export-btn" id="exportInspectorsExcelBtn">
-                            <i class="fas fa-file-excel"></i> Excel
+                            <i class="fas fa-file-excel"></i> Inspectors
                         </button>
                     </div>
                 </div>
@@ -92,14 +92,14 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="agreementModalLabel">Download Agreement</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" aria-label="Close" onclick="$('#agreementModal').modal('hide')">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="inspectorSelect">Select Inspector:</label>
-                        <select class="form-control" id="inspectorSelect" required>
+                        <select class="form-control" id="inspectorSelect" required style="height: auto;">
                             <option value="">-- Select Inspector --</option>
                             <!-- Using same data as in the table -->
                             <option th:each="inspector : ${inspectors}"
@@ -115,7 +115,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" onclick="$('#agreementModal').modal('hide')">Cancel</button>
                     <button type="button" class="btn btn-primary" onclick="downloadAgreement()">Download</button>
                 </div>
             </div>
@@ -126,96 +126,5 @@
 <!-- Footer -->
 <footer th:replace="~{fragments/footer :: footer}"></footer>
 </body>
-<script>
-    // Define the function that was being called via onclick
-    function openAgreementDialog() {
-        $('#agreementModal').modal('show');
-    }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize modal using jQuery (since you're using Bootstrap 4)
-        const agreementModal = $('#agreementModal');
-
-        // Get the correct buttons (using the IDs/classes from your HTML)
-        const generateAgreementBtn = document.querySelector('.btn.btn-primary.ml-2');
-        const downloadAgreementBtn = document.querySelector('#agreementModal .btn-primary');
-        const inspectorSelect = document.getElementById('inspectorSelect');
-
-        // Open modal when Generate Agreement button is clicked
-        if (generateAgreementBtn) {
-            generateAgreementBtn.addEventListener('click', function() {
-                agreementModal.modal('show');
-            });
-        }
-
-        // Handle download when Download button is clicked
-        if (downloadAgreementBtn) {
-            downloadAgreementBtn.addEventListener('click', async function() {
-                await downloadAgreement();
-            });
-        }
-
-        // Main download function
-        async function downloadAgreement() {
-            const selectedOption = inspectorSelect.options[inspectorSelect.selectedIndex];
-
-            if (!selectedOption.value) {
-                alert('Please select an inspector first');
-                return;
-            }
-
-            // Get all required data from data attributes
-            const params = {
-                inspectorId: selectedOption.value,
-                inspectorName: selectedOption.dataset.name,
-                address: selectedOption.dataset.address,
-                email: selectedOption.dataset.email,
-                phone: selectedOption.dataset.phone,
-                country: selectedOption.dataset.country
-            };
-
-            try {
-                // Show loading state
-                const downloadBtn = $('#agreementModal .btn-primary');
-                downloadBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generating...');
-
-                // Make API call
-                const response = await fetch('/reports/inspectors/agreement?' + new URLSearchParams(params), {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                // Create download
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `Inspector_Agreement_${params.inspectorName.replace(/\s+/g, '_')}.docx`;
-                document.body.appendChild(a);
-                a.click();
-
-                // Clean up
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                    window.URL.revokeObjectURL(url);
-                }, 100);
-
-            } catch (error) {
-                console.error('Download failed:', error);
-                alert('Failed to generate agreement. Please try again.');
-            } finally {
-                // Reset button state
-                const downloadBtn = $('#agreementModal .btn-primary');
-                downloadBtn.prop('disabled', false).text('Download');
-                agreementModal.modal('hide');
-            }
-        }
-    });
-</script>
 </html>

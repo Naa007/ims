@@ -16,7 +16,9 @@ public class AgreementService {
 
     private static final String TEMPLATE_DIR = "inspector-agreement/";
     private static final String INDIA_TEMPLATE = "INDIA-Empaneled_Inspector_Agreement.docx";
+    private static final String INTERNATIONAL_TEMPLATE = "INTERNATIONAL-Empaneled_Inspector_Agreement.docx";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
 
     /**
      * Generate India-specific agreement for an inspector.
@@ -31,6 +33,11 @@ public class AgreementService {
     public byte[] generateIndiaEmpaneledInspectorAgreement(String inspectorName, String address, String email, String phone) throws IOException {
         System.out.println("Generating India agreement for: " + inspectorName);
         return generateAgreement(INDIA_TEMPLATE, inspectorName, address, email, phone, "India");
+    }
+
+    public byte[] generateInternationalEmpaneledInspectorAgreement(String inspectorName, String address, String email, String phone) throws IOException {
+        System.out.println("Generating India agreement for: " + inspectorName);
+        return generateAgreement(INTERNATIONAL_TEMPLATE, inspectorName, address, email, phone, "India");
     }
 
     /**
@@ -92,13 +99,13 @@ public class AgreementService {
      */
     private Map<String, String> preparePlaceholders(String inspectorName, String address, String email, String phone, String country) {
         Map<String, String> placeholders = new HashMap<>();
-        placeholders.put("\"DATE\"", LocalDate.now().format(DATE_FORMATTER));
-        placeholders.put("NAME", inspectorName);
-        placeholders.put("ADDRESS", address);
-        placeholders.put("EMAIL", email);
-        placeholders.put("CONTACT", phone);
-        placeholders.put("POSITION", "Inspector/Sr.Inspector");
-        placeholders.put("IISPL_NAME}}", "G.S Rao");
+        placeholders.put("AGREEMENTDATE", LocalDate.now().format(DATE_FORMATTER));
+        placeholders.put("INSPNAME", inspectorName);
+        placeholders.put("INSPADDRESS", address);
+        placeholders.put("INSPEMAIL", email);
+        placeholders.put("INSPCONTACT", phone);
+        placeholders.put("INSPOSITION", "Inspector/Sr.Inspector");
+        placeholders.put("IISPL_NAME", "G.S Rao");
         return placeholders;
     }
 
@@ -169,6 +176,7 @@ public class AgreementService {
             run.setText(updatedText, 0);
         }
     }
+
 
     /**
      * Clear all runs in a paragraph for text replacement.

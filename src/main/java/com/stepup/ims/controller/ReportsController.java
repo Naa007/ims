@@ -77,7 +77,6 @@ public class ReportsController {
         return buildReportResponse(report, "inspectors_report" + ".xlsx", "excel");
     }
 
-
     @GetMapping("/inspectors/agreement")
     public ResponseEntity<byte[]> generateInspectorAgreement(
             @RequestParam Long inspectorId,
@@ -87,13 +86,10 @@ public class ReportsController {
             @RequestParam String phone,
             @RequestParam String country) throws IOException {
 
-        byte[] documentContent = new byte[0];
+        byte[] documentContent = "India".equalsIgnoreCase(country)
+                ? agreementService.generateIndiaEmpaneledInspectorAgreement(inspectorName, address, email, phone)
+                : agreementService.generateInternationalEmpaneledInspectorAgreement(inspectorName, address, email, phone);
 
-
-        if ("India".equalsIgnoreCase(country)) {
-            documentContent = agreementService.generateIndiaEmpaneledInspectorAgreement(
-                    inspectorName, address, email, phone);
-        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.wordprocessingml.document"));
@@ -103,4 +99,5 @@ public class ReportsController {
 
         return new ResponseEntity<>(documentContent, headers, HttpStatus.OK);
     }
+
 }
