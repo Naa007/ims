@@ -2167,12 +2167,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Main download function
     async function downloadAgreement() {
         const selectedOption = inspectorSelect.options[inspectorSelect.selectedIndex];
 
         if (!selectedOption.value) {
-          showNotification(`Please select an inspector first.`, 'warning');
+            showNotification(`Please select an inspector first.`, 'warning');
             return;
         }
 
@@ -2191,7 +2190,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const downloadBtn = $('#agreementModal .btn-primary');
             downloadBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generating...');
 
-            // Make API call
+            // First download: Inspector Agreement
             const response = await fetch('/reports/inspectors/agreement?' + new URLSearchParams(params), {
                 method: 'GET',
                 headers: {
@@ -2203,21 +2202,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            // Create download
+            // Create download for Inspector Agreement
             const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Inspector_Agreement_${params.inspectorName.replace(/\s+/g, '_')}.docx`;
-            document.body.appendChild(a);
-            a.click();
-         showNotification(`Agreements downloaded successfully.`, 'success');
-            // Clean up
-            setTimeout(() => {
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
-            }, 100);
+            await downloadFile(blob, `Inspector_Agreement_${params.inspectorName.replace(/\s+/g, '_')}.docx`);
 
+            // Only proceed to download Impartiality Agreement if the first was successful
+            await downloadImpartialityAgreement(params.inspectorName);
+
+            showNotification(`Agreements downloaded successfully.`, 'success');
         } catch (error) {
             console.error('Download failed:', error);
             showNotification(`Failed to generate agreement. Please try again.`, 'error');
@@ -2227,5 +2219,46 @@ document.addEventListener('DOMContentLoaded', function() {
             downloadBtn.prop('disabled', false).text('Download');
             agreementModal.modal('hide');
         }
+    }
+
+    // Separate function to download Impartiality Agreement
+    async function downloadImpartialityAgreement(inspectorName) {
+        try {
+            const response = await fetch('/reports/inspectors/impartiality-doc?inspectorName=' + encodeURIComponent(inspectorName), {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const blob = await response.blob();
+            await downloadFile(blob, `Impartiality_Agreement_${inspectorName.replace(/\s+/g, '_')}.docx`);
+        } catch (error) {
+            console.error('Impartiality agreement download failed:', error);
+            throw error; // Re-throw to handle in the calling function
+        }
+    }
+
+    // Helper function to handle file download
+    function downloadFile(blob, filename) {
+        return new Promise((resolve) => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+
+            // Clean up
+            setTimeout(() => {
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                resolve();
+            }, 100);
+        });
     }
 });

@@ -11,12 +11,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.stepup.ims.constants.FilePathConstants.*;
+
 @Service
 public class AgreementService {
 
-    private static final String TEMPLATE_DIR = "inspector-agreement/";
-    private static final String INDIA_TEMPLATE = "INDIA-Empaneled_Inspector_Agreement.docx";
-    private static final String INTERNATIONAL_TEMPLATE = "INTERNATIONAL-Empaneled_Inspector_Agreement.docx";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
 
@@ -31,12 +30,10 @@ public class AgreementService {
      * @throws IOException if the template file cannot be loaded or errors occur during processing
      */
     public byte[] generateIndiaEmpaneledInspectorAgreement(String inspectorName, String address, String email, String phone) throws IOException {
-        System.out.println("Generating India agreement for: " + inspectorName);
         return generateAgreement(INDIA_TEMPLATE, inspectorName, address, email, phone, "India");
     }
 
     public byte[] generateInternationalEmpaneledInspectorAgreement(String inspectorName, String address, String email, String phone) throws IOException {
-        System.out.println("Generating India agreement for: " + inspectorName);
         return generateAgreement(INTERNATIONAL_TEMPLATE, inspectorName, address, email, phone, "India");
     }
 
@@ -170,7 +167,6 @@ public class AgreementService {
         }
 
         if (!fullText.equals(updatedText)) {
-            System.out.println("Replacing text: " + fullText + " -> " + updatedText);
             clearParagraphRuns(paragraph);
             XWPFRun run = paragraph.createRun();
             run.setText(updatedText, 0);
@@ -200,7 +196,6 @@ public class AgreementService {
     private byte[] convertDocumentToByteArray(XWPFDocument document) throws IOException {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             document.write(outputStream);
-            System.out.println("Document generation complete.");
             return outputStream.toByteArray();
         }
     }
