@@ -2138,3 +2138,127 @@ function exportInspectorsData(context, format) {
             resetExportButton(exportBtn, originalText);
         });
     }
+
+// Define the function that was being called via onclick
+function openAgreementDialog() {
+    $('#agreementModal').modal('show');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize modal using jQuery (since you're using Bootstrap 4)
+    const agreementModal = $('#agreementModal');
+
+    // Get the correct buttons (using the IDs/classes from your HTML)
+    const generateAgreementBtn = document.querySelector('.btn.btn-primary.ml-2');
+    const downloadAgreementBtn = document.querySelector('#agreementModal .btn-primary');
+    const inspectorSelect = document.getElementById('inspectorSelect');
+
+    // Open modal when Generate Agreement button is clicked
+    if (generateAgreementBtn) {
+        generateAgreementBtn.addEventListener('click', function() {
+            agreementModal.modal('show');
+        });
+    }
+
+    // Handle download when Download button is clicked
+    if (downloadAgreementBtn) {
+        downloadAgreementBtn.addEventListener('click', async function() {
+            await downloadAgreement();
+        });
+    }
+
+    async function downloadAgreement() {
+        const selectedOption = inspectorSelect.options[inspectorSelect.selectedIndex];
+
+        if (!selectedOption.value) {
+            showNotification(`Please select an inspector first.`, 'warning');
+            return;
+        }
+
+        // Get all required data from data attributes
+        const params = {
+            inspectorId: selectedOption.value,
+            inspectorName: selectedOption.dataset.name,
+            address: selectedOption.dataset.address,
+            email: selectedOption.dataset.email,
+            phone: selectedOption.dataset.phone,
+            country: selectedOption.dataset.country
+        };
+
+        try {
+            // Show loading state
+            const downloadBtn = $('#agreementModal .btn-primary');
+            downloadBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generating...');
+
+            // First download: Inspector Agreement
+            const response = await fetch('/reports/inspectors/agreement?' + new URLSearchParams(params), {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            // Create download for Inspector Agreement
+            const blob = await response.blob();
+            await downloadFile(blob, `Inspector_Agreement_${params.inspectorName.replace(/\s+/g, '_')}.docx`);
+
+            // Only proceed to download Impartiality Agreement if the first was successful
+            await downloadImpartialityAgreement(params.inspectorName);
+
+            showNotification(`Agreements downloaded successfully.`, 'success');
+        } catch (error) {
+            console.error('Download failed:', error);
+            showNotification(`Failed to generate agreement. Please try again.`, 'error');
+        } finally {
+            // Reset button state
+            const downloadBtn = $('#agreementModal .btn-primary');
+            downloadBtn.prop('disabled', false).text('Download');
+            agreementModal.modal('hide');
+        }
+    }
+
+    // Separate function to download Impartiality Agreement
+    async function downloadImpartialityAgreement(inspectorName) {
+        try {
+            const response = await fetch('/reports/inspectors/impartiality-doc?inspectorName=' + encodeURIComponent(inspectorName), {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const blob = await response.blob();
+            await downloadFile(blob, `Impartiality_Agreement_${inspectorName.replace(/\s+/g, '_')}.docx`);
+        } catch (error) {
+            console.error('Impartiality agreement download failed:', error);
+            throw error; // Re-throw to handle in the calling function
+        }
+    }
+
+    // Helper function to handle file download
+    function downloadFile(blob, filename) {
+        return new Promise((resolve) => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+
+            // Clean up
+            setTimeout(() => {
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                resolve();
+            }, 100);
+        });
+    }
+});

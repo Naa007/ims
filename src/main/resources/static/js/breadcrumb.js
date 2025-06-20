@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     const breadcrumbContainer = document.getElementById('breadcrumbContainer');
+    if(!breadcrumbContainer) return;
     const roleElement = document.getElementById('role');
     if (!breadcrumbContainer && !roleElement) return;
 

@@ -1,14 +1,13 @@
 package com.stepup.ims.model;
 
 import com.google.maps.model.LatLng;
+import com.stepup.ims.utils.DataUtils;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 @Data
 public class Inspector {
@@ -66,8 +65,6 @@ public class Inspector {
     }
 
     public List<String> getCountriesList() {
-        return Arrays.stream(Locale.getISOCountries())
-                .map(countryCode -> new Locale("", countryCode).getDisplayCountry())
-                .toList();
+        return DataUtils.getCountriesList();
     }
 }

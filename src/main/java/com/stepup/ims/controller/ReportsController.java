@@ -1,7 +1,10 @@
 package com.stepup.ims.controller;
 
+import com.stepup.ims.service.AgreementService;
 import com.stepup.ims.service.ReportsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,12 +13,22 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.io.IOException;
+
+import static com.stepup.ims.constants.FilePathConstants.IMPARTIALITY_TEMPLATE;
+import static com.stepup.ims.constants.FilePathConstants.TEMPLATE_DIR;
+
 @Controller
 @RequestMapping("/reports")
 public class ReportsController {
 
     @Autowired
     ReportsService reportsService;
+    @Autowired
+    AgreementService agreementService;
+
+
+
 
 
     @GetMapping("/inspections/{period}/{from}/{to}/{format}")
@@ -67,6 +80,42 @@ public class ReportsController {
 
         byte[] report = reportsService.generateInspectorsReport();
         return buildReportResponse(report, "inspectors_report" + ".xlsx", "excel");
+    }
+
+    @GetMapping("/inspectors/agreement")
+    public ResponseEntity<byte[]> generateInspectorAgreement(
+            @RequestParam Long inspectorId,
+            @RequestParam String inspectorName,
+            @RequestParam String address,
+            @RequestParam String email,
+            @RequestParam String phone,
+            @RequestParam String country) throws IOException {
+
+        byte[] documentContent = "India".equalsIgnoreCase(country)
+                ? agreementService.generateIndiaEmpaneledInspectorAgreement(inspectorName, address, email, phone)
+                : agreementService.generateInternationalEmpaneledInspectorAgreement(inspectorName, address, email, phone);
+
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.wordprocessingml.document"));
+        headers.setContentDisposition(ContentDisposition.builder("attachment")
+                .filename("Inspector_Agreement_" + inspectorName.replace(" ", "_") + ".docx")
+                .build());
+
+        return new ResponseEntity<>(documentContent, headers, HttpStatus.OK);
+    }
+
+    @GetMapping("/inspectors/impartiality-doc")
+    public ResponseEntity<byte[]> generateImpartialityReport(@RequestParam String inspectorName) throws IOException {
+        Resource filePath = new ClassPathResource(TEMPLATE_DIR+IMPARTIALITY_TEMPLATE);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.wordprocessingml.document"));
+        headers.setContentDisposition(ContentDisposition.builder("attachment")
+                .filename("Impartiality_Agreement_" + inspectorName.replace(" ", "_") + ".docx")
+                .build());
+
+        return new ResponseEntity<>(filePath.getInputStream().readAllBytes(), headers, HttpStatus.OK);
     }
 
 }

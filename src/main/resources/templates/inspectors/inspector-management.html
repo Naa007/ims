@@ -33,8 +33,11 @@
             <div style="flex: 30%;">
                 <div class="cd-export-wrapper">
                     <div class="bd-filter-group bd-export-group"  style="flex-direction: row-reverse;">
+                        <button class="bd-export-btn" onclick="openAgreementDialog()">
+                            <i class="fas fa-file-download"></i> Agreements
+                        </button>
                         <button class="bd-export-btn" id="exportInspectorsExcelBtn">
-                            <i class="fas fa-file-excel"></i> Excel
+                            <i class="fas fa-file-excel"></i> Inspectors
                         </button>
                     </div>
                 </div>
@@ -82,8 +85,46 @@
             </table>
         </div>
     </div>
+
+    <!-- Agreement Download Modal -->
+    <div class="modal fade" id="agreementModal" tabindex="-1" role="dialog" aria-labelledby="agreementModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="agreementModalLabel">Download Agreement</h5>
+                    <button type="button" class="close" aria-label="Close" onclick="$('#agreementModal').modal('hide')">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="inspectorSelect">Select Inspector:</label>
+                        <select class="form-control" id="inspectorSelect" required style="height: auto;">
+                            <option value="">-- Select Inspector --</option>
+                            <!-- Using same data as in the table -->
+                            <option th:each="inspector : ${inspectors}"
+                                    th:value="${inspector.inspectorId}"
+                                    th:data-name="${inspector.inspectorName}"
+                                    th:data-address="${inspector.address}"
+                                    th:data-email="${inspector.email}"
+                                    th:data-phone="${inspector.phone}"
+                                    th:data-country="${inspector.country}"
+                                    th:text="${inspector.inspectorName + ' (' + inspector.country + ')'}">
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="$('#agreementModal').modal('hide')">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="downloadAgreement()">Download</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </main>
 <!-- Footer -->
 <footer th:replace="~{fragments/footer :: footer}"></footer>
 </body>
+
 </html>
