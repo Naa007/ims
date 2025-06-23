@@ -107,7 +107,7 @@ public class ReportsController {
 
     @GetMapping("/inspectors/impartiality-doc")
     public ResponseEntity<byte[]> generateImpartialityReport(@RequestParam String inspectorName) throws IOException {
-        Resource filePath = new ClassPathResource(TEMPLATE_DIR+IMPARTIALITY_TEMPLATE);
+        byte[] documentContent = agreementService.generateImpartialityDocument(inspectorName);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.wordprocessingml.document"));
@@ -115,7 +115,7 @@ public class ReportsController {
                 .filename("Impartiality_Agreement_" + inspectorName.replace(" ", "_") + ".docx")
                 .build());
 
-        return new ResponseEntity<>(filePath.getInputStream().readAllBytes(), headers, HttpStatus.OK);
+        return new ResponseEntity<>(documentContent, headers, HttpStatus.OK);
     }
 
 }
