@@ -1,7 +1,6 @@
 package com.stepup.ims.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.stepup.ims.entity.ContractReview;
 import com.stepup.ims.utils.DataUtils;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -74,6 +73,8 @@ public class Inspection {
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
     private LocalDate inspectionSupportDocumentsSentDate;
+
+    private List<InspectionReports> inspectionReports;
 
     private String inspectionReportNumber;
 

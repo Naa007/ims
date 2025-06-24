@@ -538,6 +538,102 @@
                     </div>
                 </div>
 
+                <!-- Inspection Reports -->
+                <div class="row g-3 mb-4">
+
+                    <!-- Inspection Reports Iteration -->
+                    <div class="col-md-12 mt-4">
+                        <label class="form-label mb-2">Inspection Reports</label>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped" id="InspectionReportsTable">
+                                <thead>
+                                <tr class="text-center">
+                                    <th>Report Date</th>
+                                    <th>Inspector Name</th>
+                                    <th>Report Number</th>
+                                    <th>Report Type</th>
+                                    <th>Report Link</th>
+                                    <th>Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <!-- Existing Reports -->
+                                <tr th:each="report, iterStat : ${inspection.inspectionReports}">
+                                    <input type="hidden" th:field="*{inspectionReports[__${iterStat.index}__].id}"
+                                           th:value="${report.id}"/>
+                                    
+                                    <!-- Report Date -->
+                                    <td>
+                                        <div class="d-flex justify-content-center align-items-center">
+                                            <input type="datetime-local" class="form-control form-control-sm"
+                                                   th:field="*{inspectionReports[__${iterStat.index}__].reportDate}"
+                                                   th:value="${report.reportDate != null ? report.reportDate : ''}"/>
+                                        </div>
+                                    </td>
+                                    
+                                    <!-- Inspector Name -->
+                                    <td>
+                                        <select class="form-select form-select-sm"
+                                                th:field="*{inspectionReports[__${iterStat.index}__].inspector.inspectorId}">
+                                            <option value="">Select Inspector</option>
+                                            <option th:each="inspector : ${inspection.inspectorsList}"
+                                                    th:value="${inspector.inspectorId}"
+                                                    th:text="${inspector.inspectorName}"></option>
+                                        </select>
+                                    </td>
+                                   
+                                    <!-- Report Number -->
+                                    <td>
+                                        <div class="d-flex justify-content-center align-items-center">
+                                            <input type="text" class="form-control form-control-sm"
+                                                   th:field="*{inspectionReports[__${iterStat.index}__].reportNumber}"
+                                                   th:value="${report.reportNumber != null ? report.reportNumber : ''}"/>
+                                        </div>
+                                    </td>
+                                    
+                                    <!-- Report Type -->
+                                    <td>
+                                        <select class="form-select form-select-sm"
+                                                th:field="*{inspectionReports[__${iterStat.index}__].reportType}">
+                                            <option value="">Select Report Type</option>
+                                            <option th:each="type : ${T(com.stepup.ims.model.InspectionReports.ReportType).values()}"
+                                                    th:value="${type}"
+                                                    th:selected="${report.reportType == type}"
+                                                    th:text="${type.description}">
+                                            </option>
+                                        </select>
+
+                                    </td>
+
+                                    <!-- Report Link -->
+                                    <td>
+                                        <button type="button" class="btn btn-link btn-sm"
+                                                th:data-index="${iterStat.index}"
+                                                th:onclick="|openReportsLinkPopup(this)|">
+                                            <i class="fas fa-link"></i>
+                                        </button>
+                                        <input type="hidden"
+                                               th:field="*{inspectionReports[__${iterStat.index}__].reportLink}"
+                                               th:id="'reportLink' + __${iterStat.index}__"
+                                               th:value="${report.reportLink}">
+                                    </td>
+
+                                    <!-- Actions -->
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-danger btn-sm" onclick="deleteReportRow(this)">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Add Report Button -->
+                        <button type="button" class="btn btn-primary btn-sm" onclick="addReportRow()">Add Report</button>
+                    </div>
+                </div>
+
                 <!-- Inspection Report Number -->
                 <div class="col-md-6">
                     <label for="inspectionReportNumber" class="form-label">

@@ -506,6 +506,60 @@ function deleteCVRow(button) {
       row.remove();
   }
 
+function addReportRow() {
+
+    const tableBody = document.querySelector("#InspectionReportsTable tbody");
+    const previousRow = tableBody.querySelector("tr:last-child");
+    const index = tableBody.querySelectorAll("tr").length -1;
+
+    if (previousRow) {
+        const lastSelectInput = [...previousRow.querySelectorAll("select")].pop();
+//        if (lastSelectInput && lastSelectInput.value === "true") {
+//            const userConfirmed = confirm("Inspector is already approved. Do you want to proceed?");
+//                if (!userConfirmed) {
+//                     return;
+//                }
+//        }
+
+        const newRow = previousRow.cloneNode(true); // Clone the previous row
+
+        newRow.querySelectorAll("input, select, button").forEach(input => {
+
+            input.id = input.id.replace(index, index + 1);
+            input.name = input.name.replace(index, index + 1);
+
+            if (input.tagName === "SELECT") {
+                input.selectedIndex = 0; // Reset dropdowns
+            } else if (input.type === "datetime-local" || input.type === "text" || (input.type === "hidden" && input.id.includes("reportLink"))) {
+                input.value = ""; // Reset datetime-local input
+            } else if (input.type === "button" && input.hasAttribute("data-index")) {
+               input.setAttribute("data-index", index + 1); // Update button data-index
+            }
+        });
+        tableBody.appendChild(newRow); // Append the cloned row as a new row
+    }
+
+  }
+
+function deleteReportRow(button) {
+      const tableBody = document.querySelector("#InspectionReportsTable tbody");
+      const rows = tableBody.querySelectorAll("tr");
+      const row = button.closest("tr");
+      if (row === rows[0]) {
+          alert("At least one IR/FR document should be present !");
+          return;
+      }
+      if (row) {
+        const lastSelectInput = [...row.querySelectorAll("select")].pop();
+        if (lastSelectInput && lastSelectInput.value === "true") {
+           document.getElementById("inspectionReportNumber").value = "";
+        }
+      }
+      row.remove();
+  }
+
+
+
 function initMap(inspectionLocation) {
 
        fetch('/api/inspectors?address=' + inspectionLocation )
@@ -589,6 +643,21 @@ function openCertificateLinkPopup(button) {
     // If a new link is provided, update the hidden input field value
     if (newLink !== null) {
     certificateLinkField.value = newLink;
+    }
+}
+
+function openReportsLinkPopup(button) {
+    const index = button.getAttribute('data-index');
+    // Get the current value of the hidden input field for the certificate link
+    const reportLinkField = document.getElementById('reportLink' + index);
+    const currentLink = reportLinkField ? reportLinkField.value : '';
+
+    // Prompt the user to enter or edit the link
+    const newLink = prompt("Enter the reports link:", currentLink);
+
+    // If a new link is provided, update the hidden input field value
+    if (newLink !== null) {
+    reportLinkField.value = newLink;
     }
 }
 

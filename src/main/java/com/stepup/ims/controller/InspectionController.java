@@ -1,6 +1,7 @@
 package com.stepup.ims.controller;
 
 import com.stepup.ims.model.Inspection;
+import com.stepup.ims.model.InspectionReports;
 import com.stepup.ims.model.ProposedCVs;
 import com.stepup.ims.modelmapper.InspectionModelMapper;
 import com.stepup.ims.service.*;
@@ -54,8 +55,11 @@ public class InspectionController {
         inspection.setTechnicalCoordinatorsList(employeeService.getAllTechnicalCoordinateEmployees());
 
         ProposedCVs proposedCVs = new ProposedCVs();
-
         inspection.setProposedCVs(List.of(proposedCVs));
+
+        InspectionReports inspectionReports = new InspectionReports();
+        inspection.setInspectionReports(List.of(inspectionReports));
+
 
         model.addAttribute(INSPECTION, inspection);
         model.addAttribute("edit", false);
@@ -80,6 +84,10 @@ public class InspectionController {
 
         if (inspection.getProposedCVs() == null || inspection.getProposedCVs().isEmpty()) {
             inspection.setProposedCVs(List.of(new ProposedCVs()));
+        }
+
+        if (inspection.getInspectionReports() == null || inspection.getInspectionReports().isEmpty()) {
+            inspection.setInspectionReports(List.of(new InspectionReports()));
         }
         
         inspection.setClientsList(clientService.getAllClients());

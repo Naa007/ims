@@ -112,6 +112,9 @@ public class InspectionService {
         if (inspectionEntity.getProposedCVs().size() == 1 && inspectionEntity.getProposedCVs().get(0).getId() == null && inspectionEntity.getProposedCVs().get(0).getInspector().getInspectorId() == null) {
             inspectionEntity.setProposedCVs(null);
         }
+        if (inspectionEntity.getInspectionReports().size() == 1 && inspectionEntity.getInspectionReports().get(0).getInspector().getInspectorId() == null) {
+            inspectionEntity.setInspectionReports(null);
+        }
         if (inspectionEntity.getId() == null) {
             inspectionEntity.setCoordinatorName(employeeService.getEmployeeNameByEmail(SecurityContextHolder.getContext().getAuthentication().getName()));
         }

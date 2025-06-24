@@ -112,6 +112,10 @@ public class Inspection extends Auditable {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
     private LocalDate inspectionSupportDocumentsSentDate;
 
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "inspection_id", referencedColumnName = "inspection_id")
+    private List<InspectionReports> inspectionReports;
+
     @Column(name = "inspection_report_number")
     private String inspectionReportNumber;
 

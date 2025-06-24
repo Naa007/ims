@@ -67,6 +67,10 @@ public class EmployeeService {
                 .orElse(null);
     }
 
+    public com.stepup.ims.entity.Employee getEmployeeEntityByEmail(String email) {
+        return employeeRepository.findByEmail(email);
+    }
+
     public String getEmployeeIdByEmail(String email) {
         return employeeRepository.findEmpIdByEmail(email);
     }
