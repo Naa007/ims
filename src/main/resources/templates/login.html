@@ -25,7 +25,8 @@
                 <form id="request-otp-form">
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
+                        <input type="email" id="email" class="form-control" placeholder="Enter your email" required
+                               onkeydown="if(event.key === 'Enter'){ event.preventDefault(); document.getElementById('send-otp-btn').click();}">
                     </div>
                     <button type="button" id="send-otp-btn" ><i class="fas fa-paper-plane me-2"></i> Send OTP</button>
                 </form>
@@ -36,7 +37,8 @@
                 <form id="verify-otp-form">
                     <div class="mb-3">
                         <label for="otp" class="form-label">Enter OTP</label>
-                        <input type="text" id="otp" class="form-control" placeholder="Enter OTP" required>
+                        <input type="text" id="otp" class="form-control" placeholder="Enter OTP" required
+                               onkeydown="if(event.key === 'Enter') { event.preventDefault(); document.getElementById('verify-otp-btn').click(); }">
                     </div>
                     <button type="button" id="verify-otp-btn" class="btn btn-success w-100">Verify OTP</button>
                 </form>
