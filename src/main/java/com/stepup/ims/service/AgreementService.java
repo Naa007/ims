@@ -199,4 +199,18 @@ public class AgreementService {
             return outputStream.toByteArray();
         }
     }
+
+    public byte[] generateImpartialityDocument(String inspectorName) throws IOException {
+        Resource templateResource = loadTemplate(IMPARTIALITY_TEMPLATE);
+
+        try (InputStream inputStream = templateResource.getInputStream();
+             XWPFDocument document = new XWPFDocument(inputStream)) {
+            Map<String, String> placeholders = new HashMap<>();
+            placeholders.put("INSPNAME", inspectorName);
+            placeholders.put("AGREEMENTDATE", LocalDate.now().format(DATE_FORMATTER));
+            replacePlaceholdersInDocument(document, placeholders);
+            return convertDocumentToByteArray(document);
+        }
+    }
+
 }
