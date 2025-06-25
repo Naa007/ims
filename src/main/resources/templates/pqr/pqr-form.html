@@ -153,7 +153,7 @@
                     <div class="info-content mt-2">
                         <div th:each="englishSkill, iterStat : ${T(com.stepup.ims.model.PQR.EnglishSkills).values()}">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox"
+                                <input class="form-check-input" type="radio"
                                        th:field="*{englishSkills}" th:value="${englishSkill}"
                                        th:checked="${englishSkills != null and englishSkills.contains(englishSkill)}"
                                        id="${'englishSkill_' + iterStat.index}" name="englishSkills"
@@ -259,8 +259,16 @@
             <div class="text-end mt-3">
                 <button type="submit" class="btn btn-success btn-sm"
                         th:formaction="@{'/pqr/update/approve/' + ${inspectionId}}"
-                         onclick="this.innerText='Approving...'">Approve
-                </button>
+                        onclick="if (isNaN(parseFloat(document.getElementById('score').value))) { 
+                                    if (!confirm('The score is invalid. Are you sure you want to approve?')) {
+                                        return false;
+                                    }
+                                } else if (parseFloat(document.getElementById('score').value) < 20) {
+                                    if (!confirm('The score is less than 20. Are you sure you want to approve?')) {
+                                        return false;
+                                    }
+                                }
+                                this.innerText='Processing Approval...';">Approve</button>
                 <button type="submit" class="btn btn-danger btn-sm"
                         th:formaction="@{'/pqr/update/reject/' + ${inspectionId}}"
                         onclick="this.innerText='Rejecting...'">Reject
