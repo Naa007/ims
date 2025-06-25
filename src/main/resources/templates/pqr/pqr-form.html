@@ -258,10 +258,12 @@
 
             <div class="text-end mt-3">
                 <button type="submit" class="btn btn-success btn-sm"
-                        th:formaction="@{'/pqr/update/approve/' + ${inspectionId}}">Approve
+                        th:formaction="@{'/pqr/update/approve/' + ${inspectionId}}"
+                         onclick="this.innerText='Approving...'">Approve
                 </button>
                 <button type="submit" class="btn btn-danger btn-sm"
-                        th:formaction="@{'/pqr/update/reject/' + ${inspectionId}}">Reject
+                        th:formaction="@{'/pqr/update/reject/' + ${inspectionId}}"
+                        onclick="this.innerText='Rejecting...'">Reject
                 </button>
                 <button type="button" class="btn btn-secondary" onclick="window.close()">Close</button>
             </div>

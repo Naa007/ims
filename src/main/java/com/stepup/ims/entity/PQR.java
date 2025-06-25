@@ -36,7 +36,7 @@ public class PQR extends Auditable {
     private Experience experience;
 
     @Column(name = "score", nullable = true)
-    private int score;
+    private Double score;
 
     @ElementCollection
     @CollectionTable(name = "pqr_other_professional_skills", joinColumns = @JoinColumn(name = "pqr_id"))

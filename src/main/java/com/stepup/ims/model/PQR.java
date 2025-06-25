@@ -15,7 +15,7 @@ public class PQR {
     private EnglishSkills englishSkills;
     private List<ProfessionalQualifications> professionalQualifications;
     private Experience experience;
-    private int score;
+    private Double score;
     private List<OtherProfessionalSkills> otherProfessionalSkills;
     private String remarks;
     private Long inspectorId;
