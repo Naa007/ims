@@ -2,7 +2,6 @@ package com.stepup.ims.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
@@ -21,10 +20,8 @@ public class InspectionReports {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime reportDate;
 
-    @ManyToOne
-    @JoinColumn(name = "inspector_id", referencedColumnName = "inspector_id", unique = false)
-    @ToString.Exclude
-    private Inspector inspector;
+    @Column(name = "inspector_name")
+    private String inspectorName;
 
     @Column(name = "report_number")
     private String reportNumber;

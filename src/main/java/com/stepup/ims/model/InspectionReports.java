@@ -14,8 +14,7 @@ public class InspectionReports {
     private Long id;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime reportDate;
-    @ToString.Exclude
-    private Inspector inspector;
+    private String inspectorName;
     private String reportNumber;
     private ReportType reportType;
     private String reportLink;

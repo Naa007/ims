@@ -157,6 +157,7 @@
 
                 <!-- Inspection Stages -->
                 <div class="col-md-6">
+                    <!-- Inspection Stages -->
                     <div class="mb-4">
                         <label for="inspectionActivityWithStages" class="form-label required-field">Inspection Stages</label>
                         <div class="input-group">
@@ -224,7 +225,8 @@
                             <tbody>
                             <!-- Existing CVs -->
                             <tr th:each="cv, iterStat : ${inspection.proposedCVs}">
-                                <input type="hidden" th:field="*{proposedCVs[__${iterStat.index}__].id}" th:value="${cv.id}"/>
+                                <input type="hidden" th:id="'cvid' + __${iterStat.index}__"
+                                       th:field="*{proposedCVs[__${iterStat.index}__].id}" th:value="${cv.id}"/>
                                 <td>
                                     <select class="form-select form-select-sm" th:field="*{proposedCVs[__${iterStat.index}__].inspector.inspectorId}">
                                         <option value="">Select Inspector</option>
@@ -281,7 +283,7 @@
                                     <div class="d-flex justify-content-center align-items-center">
                                         <select class="form-select form-select-sm"
                                                 th:name="proposedCVs[__${iterStat.index}__].cvStatus"
-                                                th:onchange="'approvedInspector(' + ${iterStat.index} + ', this.value === \'true\')'">
+                                                th:onchange="|approvedInspector(this)|">
                                             <option value="" disabled selected>Select</option> <!-- Placeholder -->
                                             <option value="true" th:selected="${cv.cvStatus == true}">Approved</option>
                                             <option value="false" th:selected="${cv.cvStatus == false}">Not Approved</option>
@@ -310,36 +312,47 @@
             
             <div class="row g-3 mb-4">
 
-                <!-- Approved Inspector Name -->
+                <!-- First Column -->
                 <div class="col-md-6">
-                    <label for="approvedInspectorName" class="form-label">Approved Inspector Name</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-user"></i></span>
-                        <input type="text" id="approvedInspectorName" th:field="*{approvedInspectorName}"
-                           class="form-control" readonly/>
+                    <!-- Approved Inspector Names -->
+                    <div class="col-12">
+                        <label for="approvedInspectorNames" class="form-label">Approved Inspector Names</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                            <select id="approvedInspectorNames" th:field="*{approvedInspectorNames}" class="form-select"
+                                    multiple>
+                                <option th:each="inspector : ${inspection.approvedInspectorNames}"
+                                        th:value="${inspector}"
+                                        th:text="${inspector}"
+                                        th:selected="true"></option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Order Confirmation Date -->
+                <!-- Second Column -->
                 <div class="col-md-6">
-                    <label for="orderConfirmationDate" class="form-label">Date of Order Confirmation</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-calendar-check"></i></span>
-                        <input type="date" id="orderConfirmationDate" th:field="*{orderConfirmationDate}"
-                           th:value="*{orderConfirmationDate != null ? orderConfirmationDate : ''}"
-                           class="form-control" />
+                    <!-- Order Confirmation Date -->
+                    <div class="col-12">
+                        <label for="orderConfirmationDate" class="form-label">Date of Order Confirmation</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-calendar-check"></i></span>
+                            <input type="date" id="orderConfirmationDate" th:field="*{orderConfirmationDate}"
+                                   th:value="*{orderConfirmationDate != null ? orderConfirmationDate : ''}"
+                                   class="form-control"/>
+                        </div>
                     </div>
-                </div>
 
-                <!--- Sector Scope -->
-                <div class="col-md-6">
-                    <label for="sectorScope" class="form-label">Scope Sector</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-industry"></i></span>
-                        <input type="text" id="sectorScope" th:field="*{sectorScope}" class="form-control"
-                               inputmode="numeric" pattern="[0-9]*" minlength="1" maxlength="3" required/>
-                        <div class="invalid-feedback">
-                            Please provide a valid numeric scope (1-3 digits).
+                    <!--- Sector Scope -->
+                    <div class="col-12">
+                        <label for="sectorScope" class="form-label">Scope Sector</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-industry"></i></span>
+                            <input type="text" id="sectorScope" th:field="*{sectorScope}" class="form-control"
+                                   inputmode="numeric" pattern="[0-9]*" minlength="1" maxlength="3" required/>
+                            <div class="invalid-feedback">
+                                Please provide a valid numeric scope (1-3 digits).
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -361,6 +374,7 @@
                         <input type="text" id="projectName" th:field="*{projectName}" class="form-control" />
                     </div>
                 </div>
+
             </div>
 
             <h4 class="section-header">
@@ -574,11 +588,11 @@
                                     <!-- Inspector Name -->
                                     <td>
                                         <select class="form-select form-select-sm"
-                                                th:field="*{inspectionReports[__${iterStat.index}__].inspector.inspectorId}">
+                                                th:field="*{inspectionReports[__${iterStat.index}__].inspectorName}">
                                             <option value="">Select Inspector</option>
-                                            <option th:each="inspector : ${inspection.inspectorsList}"
-                                                    th:value="${inspector.inspectorId}"
-                                                    th:text="${inspector.inspectorName}"></option>
+                                            <option th:each="inspector : ${inspection.approvedInspectorNames}"
+                                                    th:value="${inspector}"
+                                                    th:text="${inspector}"></option>
                                         </select>
                                     </td>
                                    

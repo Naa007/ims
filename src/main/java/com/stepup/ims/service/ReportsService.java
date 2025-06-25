@@ -230,7 +230,8 @@ public class ReportsService {
                         dataRow.getCell(15).setCellStyle(style);
                     }
 
-                    dataRow.createCell(16).setCellValue(inspection.getApprovedInspectorName());
+                    dataRow.createCell(16).setCellValue(inspection.getApprovedInspectorNames() != null && !inspection.getApprovedInspectorNames().isEmpty()
+                            ? String.join(", ", inspection.getApprovedInspectorNames()) : "");
                     dataRow.getCell(16).setCellStyle(style);
 
                     dataRow.createCell(17).setCellValue(inspection.getOrderConfirmationDate() != null ? inspection.getOrderConfirmationDate().toString() : "");

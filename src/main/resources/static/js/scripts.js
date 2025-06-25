@@ -433,26 +433,62 @@ function redirectToViewInspection(inspectionId) {
  window.location.href = '/inspection/view/' + inspectionId;
 }
 
-// if CVStatus is approved then the inspector becomes approvedInspector
-function approvedInspector(index, approved) {
-        if(!approved) {
-            document.getElementById("approvedInspectorName").value = "";
-        }else{
-            const proposedCVsTable = document.querySelector("#proposedCVsTable tbody");
-            const row = proposedCVsTable.querySelector(`tr:nth-child(${index + 1})`);
-            if (row) {
-                const selectedOption = row.querySelector("select").selectedOptions[0];
-                if (selectedOption) {
-                    document.getElementById("approvedInspectorName").value = "";
-                    document.getElementById("approvedInspectorName").value = selectedOption.textContent.trim()
-                } else {
-                    alert("No Inspector is selected.");
+function approvedInspector(element) {
+    
+
+    const index = Array.from(element.closest('tr').parentElement.children).indexOf(element.closest('tr'));
+    const approved = element.value;
+
+    // Get the select box that stores the approved inspector names
+    const approvedInspectorSelectBox = document.getElementById("approvedInspectorNames");
+
+    // Get the table row containing the inspector data
+    const proposedCVsTable = document.querySelector("#proposedCVsTable tbody");
+    const row = proposedCVsTable.querySelector(`tr:nth-child(${index + 1})`);
+
+    if (row) {
+        // Get the currently selected inspector option from the dropdown
+        const selectedOption = row.querySelector("select").selectedOptions[0];
+        if (selectedOption) {
+            const inspectorName = selectedOption.textContent.trim();
+            const inspectorId = selectedOption.value.trim();
+
+            if (approved == "true") {
+                // Check if the inspector is already in the select box
+                const exists = Array.from(approvedInspectorSelectBox.options).some(
+                    (option) => option.value === inspectorName
+                );
+
+                if (!exists) {
+                    // Add a new option to the select box for the approved inspector
+                    const newOption = document.createElement("option");
+                    newOption.value = inspectorName;
+                    newOption.textContent = inspectorName;
+                    newOption.selected = true; // Set the new option as selected
+                    approvedInspectorSelectBox.appendChild(newOption);
                 }
             } else {
-                console.log("Specified row not found in the proposedCVsTable.");
+                // Remove the inspector from the select box if they are disapproved
+                Array.from(approvedInspectorSelectBox.options).forEach((option) => {
+                    if (option.value === inspectorName) {
+                        approvedInspectorSelectBox.removeChild(option);
+                    }
+                });
             }
+
+            console.log(
+                "Current options in approvedInspectorNames:",
+                Array.from(approvedInspectorSelectBox.options).map((option) => option.value)
+            );
+        } else {
+            alert("No Inspector is selected.");
         }
+    } else {
+        console.log("Specified row not found in the proposedCVsTable.");
     }
+}
+
+
 
 function addCVRow() {
 
@@ -478,7 +514,7 @@ function addCVRow() {
 
             if (input.tagName === "SELECT") {
                 input.selectedIndex = 0; // Reset dropdowns
-            } else if (input.type === "datetime-local"  || (input.type === "hidden" && input.id.includes("cvCertificatesLink"))) {
+            } else if (input.type === "datetime-local"  || input.type === "hidden") {
                 input.value = ""; // Reset datetime-local input
             } else if (input.type === "button" && input.hasAttribute("data-index")) {
                input.setAttribute("data-index", index + 1); // Update button data-index
@@ -493,14 +529,20 @@ function deleteCVRow(button) {
       const tableBody = document.querySelector("#proposedCVsTable tbody");
       const rows = tableBody.querySelectorAll("tr");
       const row = button.closest("tr");
-      if (row === rows[0]) {
+      if (row === rows[0] && rows.length === 1) {
           alert("At least one Inspector should be assigned to the Inspection !");
           return;
       }
       if (row) {
         const lastSelectInput = [...row.querySelectorAll("select")].pop();
         if (lastSelectInput && lastSelectInput.value === "true") {
-           document.getElementById("approvedInspectorName").value = "";
+           const inspectorName = row.querySelector("select").selectedOptions[0].textContent.trim();
+            // Remove the inspector from the select box if they are disapproved
+           Array.from(document.getElementById("approvedInspectorNames").options).forEach((option) => {
+               if (option.value === inspectorName) {
+                   document.getElementById("approvedInspectorNames").removeChild(option);
+               }
+           });
         }
       }
       row.remove();

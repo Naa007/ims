@@ -59,8 +59,10 @@ public class Inspection extends Auditable {
     @JoinColumn(name = "inspection_id", referencedColumnName = "inspection_id")
     private List<ProposedCVs> proposedCVs;
 
-    @Column(name = "approved_inspector_name")
-    private String approvedInspectorName;
+    @ElementCollection
+    @CollectionTable(name = "approved_inspectors", joinColumns = @JoinColumn(name = "inspection_id"))
+    @Column(name = "approved_inspector_names", nullable = true)
+    private List<String> approvedInspectorNames;
 
     @Column(name = "order_confirmation_date")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")

@@ -37,7 +37,7 @@ public class Inspection {
 
     private List<ProposedCVs> proposedCVs;
 
-    private String approvedInspectorName;
+    private List<String> approvedInspectorNames;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
     private LocalDate orderConfirmationDate;
