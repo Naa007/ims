@@ -230,8 +230,10 @@
                     <div class="info-item">
                         <i class="fas fa-user"></i>
                         <div class="info-content">
-                            <div class="info-label">Approved Inspector Name</div>
-                            <div class="info-value" th:text="${inspection.approvedInspectorName}"></div>
+                            <div class="info-label">Approved Inspector Name(s)</div>
+                            <ul class="list-unstyled">
+                                <li th:each="name : ${inspection.approvedInspectorNames}" th:text="${name}"></li>
+                            </ul>
                         </div>
                     </div>
 
