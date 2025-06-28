@@ -638,7 +638,7 @@
                                     <div class="col-md-6">
                                             <!-- Technical Coordinator Remarks -->
                                             <label th:for="technicalCoordinatorRemarks[__${iterStat.index}__]" class="form-label">Technical Coordinator Remarks</label>
-                                            <textarea class="form-control"
+                                             <textarea class="form-control"
                                                       th:field="*{inspectionReports[__${iterStat.index}__].technicalCoordinatorRemarks}"
                                                       th:id="technicalCoordinatorRemarks[__${iterStat.index}__]"
                                                       th:text="${report.technicalCoordinatorRemarks != null ? report.technicalCoordinatorRemarks : ''}"

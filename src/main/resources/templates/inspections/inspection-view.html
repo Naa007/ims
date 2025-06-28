@@ -168,7 +168,8 @@
             </table>
         </div>
 
-        <div class="section-title"><i class="fas fa-cogs process-icon"></i> Inspection Process</div>
+        <div class="section-title"><i class="fas fa-cogs process-icon"></i> Inspection Progress</div>
+
         <div class="info-section">
 
             <!-- Approved Inspector Name -->
@@ -182,7 +183,8 @@
                 </div>
             </div>
 
-            <!-- Order Confirmation Date --><div class="info-item">
+            <!-- Order Confirmation Date -->
+            <div class="info-item">
                 <i class="fas fa-calendar-check"></i>
                 <div class="info-content">
                     <div class="info-label">Date of Order Confirmation</div>
@@ -216,6 +218,12 @@
                     <div class="info-value" th:text="${inspection.projectName}"></div>
                 </div>
             </div>
+
+        </div>
+
+        <div class="section-title"><i class="fas fa-file-alt"></i> Documentation Process</div>
+
+        <div class="info-section">
 
             <!-- Reference Documents for Inspection Status -->
             <div class="info-item">
@@ -293,42 +301,78 @@
                          th:text="${inspection.anyInspectionIssues != null && inspection.anyInspectionIssues ? 'Yes' : 'No'}"></div>
                 </div>
             </div>
+        </div>
 
-            <!-- FR Sent To Client Date -->
-            <div class="info-item">
-                <i class="fas fa-share-square"></i>
-                <div class="info-content">
-                    <div class="info-label">FR Sent To Client Date</div>
-                    <div class="info-value" th:text="${inspection.frSentToClientDate}"></div>
+        <div class="section-title"><i class="fas fa-cogs"></i> Inspection Process</div>
+
+        <div class="d-flex flex-wrap align-items-center justify-content-between">
+            <div th:each="report, iterStat : ${inspection.inspectionReports}">
+                <div class="report-item mb-3 p-3 border rounded">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between">
+                        <div class="d-flex flex-row flex-wrap w-100 align-items-center justify-content-between">
+                            <!-- Report Date -->
+                            <div class="info-item me-3" style="flex: 1 0 23%; max-width: 23%;">
+                                <i class="fas fa-calendar-alt"></i>
+                                <div class="info-content">
+                                    <div class="info-label">Report Date</div>
+                                    <div class="info-value" th:text="${report.reportDate}"></div>
+                                </div>
+                            </div>
+
+                            <!-- Inspector Name -->
+                            <div class="info-item me-3" style="flex: 1 0 23%; max-width: 23%;">
+                                <i class="fas fa-user"></i>
+                                <div class="info-content">
+                                    <div class="info-label">Inspector Name</div>
+                                    <div class="info-value" th:text="${report.inspectorName}"></div>
+                                </div>
+                            </div>
+
+                            <!-- Report Number -->
+                            <div class="info-item me-3" style="flex: 1 0 23%; max-width: 23%;">
+                                <i class="fas fa-hashtag"></i>
+                                <div class="info-content">
+                                    <div class="info-label">Report Number</div>
+                                    <div class="info-value" th:text="${report.reportNumber}"></div>
+                                </div>
+                            </div>
+
+                            <!-- Report Type -->
+                            <div class="info-item me-3" style="flex: 1 0 23%; max-width: 23%;">
+                                <i class="fas fa-file-alt"></i>
+                                <div class="info-content">
+                                    <div class="info-label">Report Type</div>
+                                    <div>
+                                        <span class="info-value" th:text="${report.reportType}"></span>
+                                        <a class="btn btn-link btn-sm" th:href="${report.reportLink}"
+                                           target="_blank">
+                                            <i class="fas fa-link"
+                                               style="background-color: white; color: #007bff;"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Technical Coordinator Remarks -->
+                        <div class="d-flex flex-row flex-wrap w-100 align-items-center justify-content-between">
+                            <div class="d-flex flex-column w-100">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-comments me-2"></i>
+                                    <div class="info-label">Comments by <span th:text="${report.technicalCoordinator.empName}"></span></div>
+                                </div>
+                                <div class="info-value w-100">
+                                        <span th:text="${report.technicalCoordinatorRemarks}" class="w-100">
+                                        </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Inspection Reports Received Date -->
-            <div class="info-item">
-                <i class="fas fa-file-download"></i>
-                <div class="info-content">
-                    <div class="info-label">Inspection Reports Received Date</div>
-                    <div class="info-value" th:text="${inspection.inspectionReportsReceivedDate}"></div>
-                </div>
-            </div>
-
-            <!-- Inspection Reviewed By -->
-            <div class="info-item">
-                <i class="fas fa-user-edit"></i>
-                <div class="info-content">
-                    <div class="info-label">Inspection Reviewed By</div>
-                    <div class="info-value" th:text="${inspection.inspectionReviewedBy}"></div>
-                </div>
-            </div>
-
-            <!-- Inspection Support Documents Sent Date -->
-            <div class="info-item">
-                <i class="fas fa-paper-plane"></i>
-                <div class="info-content">
-                    <div class="info-label">Inspection Support Documents Sent Date</div>
-                    <div class="info-value" th:text="${inspection.inspectionSupportDocumentsSentDate}"></div>
-                </div>
-            </div>
+        <div class="info-section">
 
             <!-- Inspection Report Number -->
             <div class="info-item">
