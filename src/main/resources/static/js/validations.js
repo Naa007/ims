@@ -279,12 +279,12 @@ function getStatusChecksConfig() {
             isCritical: true
         },
         'INSPECTION_REPORTS_RECEIVED': {
-            check: (data) => data.inspectionReportsReceivedDate,
+            check: (data) => true,
             message: "Please provide the date when the inspection reports were received.",
-            isCritical: true
+            isCritical: false
         },
         'INSPECTION_REPORTS_REVIEW_AWAITING': {
-            check: (data) => data.inspectionReviewedBy,
+            check: (data) => true,
             message: "A Technical Coordinator must present to review the inspection reports.",
             isCritical: true
         },
@@ -346,8 +346,6 @@ function gatherInspectionData() {
         referenceDocumentsForInspectionStatus: document.querySelector('input[name="referenceDocumentsForInspectionStatus"]:checked')?.value === 'true',
         referenceDocumentsLink: document.getElementById('referenceDocumentsLink')?.value,
         documentsReviewedByTechnicalCoordinator: document.getElementById('documentsReviewedByTechnicalCoordinator')?.value,
-        inspectionReportsReceivedDate: document.getElementById('inspectionReportsReceivedDate')?.value,
-        inspectionReviewedBy: document.getElementById('inspectionReviewedBy')?.value,
         irnSentDate: document.getElementById('irnSentDate')?.value,
         jobFolderLink: document.getElementById('jobFolderLink')?.value
     };

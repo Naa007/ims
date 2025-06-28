@@ -549,57 +549,97 @@ function deleteCVRow(button) {
   }
 
 function addReportRow() {
-
-    const tableBody = document.querySelector("#InspectionReportsTable tbody");
-    const previousRow = tableBody.querySelector("tr:last-child");
-    const index = tableBody.querySelectorAll("tr").length -1;
-
-    if (previousRow) {
-        const lastSelectInput = [...previousRow.querySelectorAll("select")].pop();
-//        if (lastSelectInput && lastSelectInput.value === "true") {
-//            const userConfirmed = confirm("Inspector is already approved. Do you want to proceed?");
-//                if (!userConfirmed) {
-//                     return;
-//                }
-//        }
-
-        const newRow = previousRow.cloneNode(true); // Clone the previous row
-
-        newRow.querySelectorAll("input, select, button").forEach(input => {
-
-            input.id = input.id.replace(index, index + 1);
-            input.name = input.name.replace(index, index + 1);
-
-            if (input.tagName === "SELECT") {
-                input.selectedIndex = 0; // Reset dropdowns
-            } else if (input.type === "datetime-local" || input.type === "text" || (input.type === "hidden" && input.id.includes("reportLink"))) {
-                input.value = ""; // Reset datetime-local input
-            } else if (input.type === "button" && input.hasAttribute("data-index")) {
-               input.setAttribute("data-index", index + 1); // Update button data-index
-            }
-        });
-        tableBody.appendChild(newRow); // Append the cloned row as a new row
+    // Find the target container which holds all `.inspection-report` containers
+    const targetDiv = document.getElementById("inspectionReportId");
+    if (!targetDiv) {
+        console.error("'inspectionReportId' not found.");
+        return;
     }
 
-  }
+    // Find the last `.inspection-report` to use as a template
+    const lastContainer = targetDiv.querySelector(".inspection-report:last-child");
+    if (!lastContainer) {
+        console.error("No container found to clone.");
+        return;
+    }
+
+    // Clone only the last container (not the entire `inspectionReportId` div)
+    const newContainer = lastContainer.cloneNode(true);
+
+    // Get the current number of `.inspection-report` containers
+    const currentIndex = targetDiv.querySelectorAll(".inspection-report").length;
+    const newIndex = currentIndex; // New index for the cloned container
+    
+    
+    // Adjust the ID of the new container (if applicable)
+    const containerId = newContainer.getAttribute("id");
+    if (containerId) {
+        newContainer.setAttribute("id", containerId.replace(/\[(\d+)\]/g, `[${newIndex}]`)); // Replace the index in the ID
+    }
+
+     // Update IDs, names, for attributes, and reset input values in the cloned container
+     newContainer.querySelectorAll("[id], [name], label[for]").forEach((element) => {
+     let id = element.getAttribute("id");
+     let name = element.getAttribute("name");
+     let forAttr = element.getAttribute("for"); // Check for the 'for' attribute in labels
+
+     // Update `id` attributes to reflect the new index
+     if (id) {
+         id = id.replace(/\[(\d+)\]/g, `[${newIndex}]`); // Replace index in `id`
+         element.setAttribute("id", id);
+     }
+
+     // Update `name` attributes for Thymeleaf or general data binding purposes
+     if (name) {
+         name = name.replace(/\[(\d+)\]/g, `[${newIndex}]`); // Replace index in `name`
+         element.setAttribute("name", name);
+         element.setAttribute("th:field", `*{${name}}`); // Ensure Thymeleaf binding works
+     }
+
+     // Update `for` attributes in labels
+     if (forAttr) {
+         forAttr = forAttr.replace(/\[(\d+)\]/g, `[${newIndex}]`); // Replace index in `for`
+         element.setAttribute("for", forAttr);
+     }
+
+     // Reset form inputs
+     if (element.tagName === "INPUT" || element.tagName === "TEXTAREA") {
+         element.value = ""; // Clear the value for the new container
+     } else if (element.tagName === "SELECT") {
+         element.selectedIndex = 0; // Reset dropdowns to their default state
+     }
+ });
+
+    // Append the cloned container (not the entire div) to the target container
+    targetDiv.appendChild(newContainer);
+}
 
 function deleteReportRow(button) {
-      const tableBody = document.querySelector("#InspectionReportsTable tbody");
-      const rows = tableBody.querySelectorAll("tr");
-      const row = button.closest("tr");
-      if (row === rows[0]) {
-          alert("At least one IR/FR document should be present !");
-          return;
-      }
-      if (row) {
-        const lastSelectInput = [...row.querySelectorAll("select")].pop();
-        if (lastSelectInput && lastSelectInput.value === "true") {
-           document.getElementById("inspectionReportNumber").value = "";
-        }
-      }
-      row.remove();
-  }
+    // Select the main container holding all the IR/FR documents
+    const containerHub = document.getElementById("inspectionReportsContainerHub");
+    const containers = containerHub.querySelectorAll(".inspection-report"); // All containers (or rows)
 
+    // Find the container (div) that corresponds to the clicked button
+    const container = button.closest(".inspection-report");
+
+    // Prevent deletion of the first container
+    if (container === containers[0]) {
+        alert("At least one IR/FR document should be present!");
+        return;
+    }
+
+    // Handle resetting values if applicable
+    if (container) {
+        const lastSelectInput = [...container.querySelectorAll("select")].pop();
+        if (lastSelectInput && lastSelectInput.value === "true") {
+            const reportNumberField = document.getElementById("inspectionReportNumber");
+            if (reportNumberField) {
+                reportNumberField.value = ""; // Clear the value of the specific field
+            }
+        }
+        container.remove(); // Remove the selected container
+    }
+}
 
 
 function initMap(inspectionLocation) {
@@ -691,7 +731,7 @@ function openCertificateLinkPopup(button) {
 function openReportsLinkPopup(button) {
     const index = button.getAttribute('data-index');
     // Get the current value of the hidden input field for the certificate link
-    const reportLinkField = document.getElementById('reportLink' + index);
+    const reportLinkField = document.getElementById('reportLink[' + index + ']');
     const currentLink = reportLinkField ? reportLinkField.value : '';
 
     // Prompt the user to enter or edit the link

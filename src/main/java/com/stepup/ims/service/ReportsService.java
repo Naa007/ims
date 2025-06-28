@@ -263,17 +263,17 @@ public class ReportsService {
 
                     dataRow.createCell(26).setCellValue(inspection.isAnyInspectionIssues() ? "Yes" : "No");
                     dataRow.getCell(26).setCellStyle(style);
-
-                    dataRow.createCell(27).setCellValue(inspection.getFrSentToClientDate() != null ? inspection.getFrSentToClientDate().toString() : "");
+                    //TODO
+                    dataRow.createCell(27).setCellValue(inspection.getInspectionReports().get(0).getSentToClientDate() != null ? inspection.getInspectionReports().get(0).getSentToClientDate().toString() : "");
                     dataRow.getCell(27).setCellStyle(style);
 
-                    dataRow.createCell(28).setCellValue(inspection.getInspectionReportsReceivedDate() != null ? inspection.getInspectionReportsReceivedDate().toString() : "");
+                    dataRow.createCell(28).setCellValue(inspection.getInspectionReports().get(0).getReportDate() != null ? inspection.getInspectionReports().get(0).getReportDate().toString() : "");
                     dataRow.getCell(28).setCellStyle(style);
 
-                    dataRow.createCell(29).setCellValue(inspection.getInspectionReviewedBy());
+                    dataRow.createCell(29).setCellValue(inspection.getInspectionReports().get(0).getTechnicalCoordinator() != null ? inspection.getInspectionReports().get(0).getTechnicalCoordinator().getEmpName() : "");
                     dataRow.getCell(29).setCellStyle(style);
 
-                    dataRow.createCell(30).setCellValue(inspection.getInspectionSupportDocumentsSentDate() != null ? inspection.getInspectionSupportDocumentsSentDate().toString() : "");
+                    dataRow.createCell(30).setCellValue(inspection.getInspectionReports().get(0).getSentToClientDate() != null ? inspection.getInspectionReports().get(0).getSentToClientDate().toString() : "");
                     dataRow.getCell(30).setCellStyle(style);
 
                     dataRow.createCell(31).setCellValue(inspection.getInspectionReportNumber());

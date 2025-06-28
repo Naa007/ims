@@ -63,17 +63,6 @@ public class Inspection {
 
     private boolean anyInspectionIssues;
 
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
-    private LocalDate frSentToClientDate;
-
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
-    private LocalDate inspectionReportsReceivedDate;
-
-    private String inspectionReviewedBy;
-
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
-    private LocalDate inspectionSupportDocumentsSentDate;
-
     private List<InspectionReports> inspectionReports;
 
     private String inspectionReportNumber;

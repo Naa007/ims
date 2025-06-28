@@ -450,35 +450,27 @@
 
                 <!-- Inspection Advise Note -->
                 <div class="col-md-6">
-                <label class="form-label me-3">Inspection Advise Note</label>
-                <div class="input-group">
-                    <span class="input-group-text me-3"><i class="fas fa-sticky-note"></i></span>
-                    <div class="d-flex align-items-center">
-                        <div class="form-check me-3">
-                            <input type="radio" id="adviseNoteYes" name="inspectionAdviseNote" value="true" th:checked="${inspection.inspectionAdviseNote == true}" class="form-check-input" />
-                            Yes
+                    <label class="form-label me-3">Inspection Advise Note</label>
+                    <div class="input-group">
+                        <span class="input-group-text me-3"><i class="fas fa-sticky-note"></i></span>
+                        <div class="d-flex align-items-center">
+                            <div class="form-check me-3">
+                                <input type="radio" id="adviseNoteYes" name="inspectionAdviseNote" value="true" th:checked="${inspection.inspectionAdviseNote == true}" class="form-check-input" />
+                                Yes
+                            </div>
+                            <div class="form-check">
+                                <input type="radio" id="adviseNoteNo" name="inspectionAdviseNote" value="false" th:checked="${inspection.inspectionAdviseNote == false}" class="form-check-input" />
+                                No
+                            </div>
+                            <button type="button"
+                                    class="btn btn-link btn-sm"
+                                    th:if="${inspection.id != null}"
+                                    th:onclick="|viewInspectionAdvise(${inspection.id})|">
+                                <i class="fas fa-eye"></i>
+                            </button>
                         </div>
-                        <div class="form-check">
-                            <input type="radio" id="adviseNoteNo" name="inspectionAdviseNote" value="false" th:checked="${inspection.inspectionAdviseNote == false}" class="form-check-input" />
-                            No
-                        </div>
-                        <button type="button"
-                                class="btn btn-link btn-sm"
-                                th:if="${inspection.id != null}"
-                                th:onclick="|viewInspectionAdvise(${inspection.id})|">
-                            <i class="fas fa-eye"></i>
-                        </button>
                     </div>
                 </div>
-            </div>
-            </div>
-
-            <!-- Inspection Process -->
-            <h4 class="section-header">
-                <i class="fas fa-cogs"></i> Inspection Process
-            </h4>
-
-            <div class="row g-3 mb-4">
 
                 <!-- Instructions to Inspector Date -->
                 <div class="col-md-6">
@@ -507,146 +499,178 @@
                     </div>
                 </div>
 
-                <!-- FR Sent To Client Date -->
-                <div class="col-md-6">
-                    <label for="frSentToClientDate" class="form-label">FR Sent To Client Date</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-share-square"></i></span>
-                        <input type="date" id="frSentToClientDate" th:field="*{frSentToClientDate}" class="form-control"/>
-                    </div>
-                </div>
+            </div>
 
-                <!-- Inspection Reports Received Date -->
-                <div class="col-md-6">
-                    <label for="inspectionReportsReceivedDate" class="form-label">Inspection Reports Received
-                        Date</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-file-download"></i></span>
-                        <input type="date" id="inspectionReportsReceivedDate" th:field="*{inspectionReportsReceivedDate}"
-                           class="form-control" />
-                    </div>
-                </div>
+            <!-- Inspection Process -->
+            <h4 class="section-header">
+                <i class="fas fa-cogs"></i> Inspection Process
+            </h4>
 
-                <!-- Inspection Reviewed By -->
-                <div class="col-md-6">
-                    <label for="inspectionReviewedBy" class="form-label">Inspection Reviewed By</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-user-edit"></i></span>
-                        <select id="inspectionReviewedBy" class="form-select" th:field="*{inspectionReviewedBy}" >
-                        <option value="">Select Reviewer</option>
-                        <option th:each="coordinator : ${inspection.technicalCoordinatorsList}"
-                                th:value="${coordinator.empId}"
-                                th:text="${coordinator.empName}"></option>
-                    </select>
-                    </div>
-                </div>
+            <!-- Inspection Reports -->
+            <div class="row g-3 mb-4">
 
-                <!-- Inspection Support Documents Sent Date -->
-                <div class="col-md-6">
-                    <label for="inspectionSupportDocumentsSentDate" class="form-label">Inspection Support Documents
-                        Sent Date</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-paper-plane"></i></span>
-                        <input type="date" id="inspectionSupportDocumentsSentDate"
-                           th:field="*{inspectionSupportDocumentsSentDate}" class="form-control" />
-                    </div>
-                </div>
+                <!-- Inspection Reports Iteration -->
+                <div>
+                    <label class="form-label mb-2">Inspection Reports</label>
+                    <div id="inspectionReportsContainerHub" class="table-responsive" style="border: 1px solid lightgrey;">
+                        <div id="inspectionReportId" th:each="report, iterStat : ${inspection.inspectionReports}">
+                            <div th:id="inspectionReportsContainer[__${iterStat.index}__]" style="margin: 1.25rem;"
+                                 class="inspection-report" >
+                                <input type="hidden" th:id="reportId[__${iterStat.index}__]" th:field="*{inspectionReports[__${iterStat.index}__].id}"
+                                       th:value="${report.id}"/>
 
-                <!-- Inspection Reports -->
-                <div class="row g-3 mb-4">
+                                <div class="row g-3 mb-4">
 
-                    <!-- Inspection Reports Iteration -->
-                    <div class="col-md-12 mt-4">
-                        <label class="form-label mb-2">Inspection Reports</label>
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-striped" id="InspectionReportsTable">
-                                <thead>
-                                <tr class="text-center">
-                                    <th>Report Date</th>
-                                    <th>Inspector Name</th>
-                                    <th>Report Number</th>
-                                    <th>Report Type</th>
-                                    <th>Report Link</th>
-                                    <th>Actions</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <!-- Existing Reports -->
-                                <tr th:each="report, iterStat : ${inspection.inspectionReports}">
-                                    <input type="hidden" th:field="*{inspectionReports[__${iterStat.index}__].id}"
-                                           th:value="${report.id}"/>
-                                    
                                     <!-- Report Date -->
-                                    <td>
-                                        <div class="d-flex justify-content-center align-items-center">
-                                            <input type="datetime-local" class="form-control form-control-sm"
+                                    <div class="col-md-6">
+                                        <label th:for="reportDate[__${iterStat.index}__]" class="form-label">Report Date</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                                            <input type="datetime-local" class="form-control"
                                                    th:field="*{inspectionReports[__${iterStat.index}__].reportDate}"
-                                                   th:value="${report.reportDate != null ? report.reportDate : ''}"/>
+                                                   th:value="${report.reportDate != null ? report.reportDate : ''}"
+                                                   th:id="reportDate[__${iterStat.index}__]"/>
                                         </div>
-                                    </td>
-                                    
-                                    <!-- Inspector Name -->
-                                    <td>
-                                        <select class="form-select form-select-sm"
-                                                th:field="*{inspectionReports[__${iterStat.index}__].inspectorName}">
-                                            <option value="">Select Inspector</option>
-                                            <option th:each="inspector : ${inspection.approvedInspectorNames}"
-                                                    th:value="${inspector}"
-                                                    th:text="${inspector}"></option>
-                                        </select>
-                                    </td>
-                                   
+                                    </div>
+
                                     <!-- Report Number -->
-                                    <td>
-                                        <div class="d-flex justify-content-center align-items-center">
-                                            <input type="text" class="form-control form-control-sm"
+                                    <div class="col-md-6">
+                                        <label th:for="reportNumber[__${iterStat.index}__]" class="form-label">Report Number</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-hashtag"></i></span>
+                                            <input type="text" class="form-control"
                                                    th:field="*{inspectionReports[__${iterStat.index}__].reportNumber}"
-                                                   th:value="${report.reportNumber != null ? report.reportNumber : ''}"/>
+                                                   th:value="${report.reportNumber != null ? report.reportNumber : ''}"
+                                                   th:id="reportNumber[__${iterStat.index}__]"/>
                                         </div>
-                                    </td>
-                                    
+                                    </div>
+
+                                    <!-- Inspector Name -->
+                                    <div class="col-md-6">
+                                        <label th:for="inspectorName[__${iterStat.index}__]" class="form-label">Inspector Name</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                            <select class="form-select"
+                                                    th:field="*{inspectionReports[__${iterStat.index}__].inspectorName}"
+                                                    th:id="inspectorName[__${iterStat.index}__]">
+                                                <option value="">Select Inspector</option>
+                                                <option th:each="inspector : ${inspection.approvedInspectorNames}"
+                                                        th:value="${inspector}"
+                                                        th:text="${inspector}">
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+
                                     <!-- Report Type -->
-                                    <td>
-                                        <select class="form-select form-select-sm"
-                                                th:field="*{inspectionReports[__${iterStat.index}__].reportType}">
-                                            <option value="">Select Report Type</option>
-                                            <option th:each="type : ${T(com.stepup.ims.model.InspectionReports.ReportType).values()}"
-                                                    th:value="${type}"
-                                                    th:selected="${report.reportType == type}"
-                                                    th:text="${type.description}">
-                                            </option>
-                                        </select>
+                                    <div class="col-md-6">
+                                        <label th:for="reportTypes[__${iterStat.index}__]" class="form-label">Report Type</label>
+                                        <div class="d-flex align-items-center">
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
+                                                <select class="form-select"
+                                                        th:field="*{inspectionReports[__${iterStat.index}__].reportType}"
+                                                        th:id="reportTypes[__${iterStat.index}__]">
+                                                    <option value="">Select Report Type</option>
+                                                    <option th:each="type : ${T(com.stepup.ims.model.InspectionReports.ReportType).values()}"
+                                                            th:value="${type}"
+                                                            th:selected="${report.reportType == type}"
+                                                            th:text="${type.description}">
+                                                    </option>
+                                                </select>
+                                            </div>
+                                            <!-- Report Link -->
+                                            <button type="button" class="btn btn-link btn-sm"
+                                                    th:data-index="${iterStat.index}"
+                                                    th:onclick="|openReportsLinkPopup(this)|">
+                                                <i class="fas fa-link"></i>
+                                            </button>
+                                            <input type="hidden"
+                                                   th:field="*{inspectionReports[__${iterStat.index}__].reportLink}"
+                                                   th:id="reportLink[__${iterStat.index}__]"
+                                                   th:value="${report.reportLink}"/>
+                                        </div>
+                                    </div>
 
-                                    </td>
+                                </div>
 
-                                    <!-- Report Link -->
-                                    <td>
-                                        <button type="button" class="btn btn-link btn-sm"
-                                                th:data-index="${iterStat.index}"
-                                                th:onclick="|openReportsLinkPopup(this)|">
-                                            <i class="fas fa-link"></i>
+                                <div class="row g-3 mb-4">
+                                    <!-- First Column -->
+                                    <div class="col-md-6 mb-4">
+                                        <div class="row">
+
+                                            <!-- Technical Coordinator -->
+                                            <div class="col-md-12 mb-2">
+                                                <label th:for="technicalCoordinator[__${iterStat.index}__]" class="form-label">Technical Coordinator</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                                    <select class="form-select"
+                                                            th:field="*{inspectionReports[__${iterStat.index}__].technicalCoordinator}"
+                                                            th:id="technicalCoordinator[__${iterStat.index}__]">
+                                                        <option value="">Select Technical Coordinator</option>
+                                                        <option th:each="coordinator : ${inspection.technicalCoordinatorsList}"
+                                                                th:value="${coordinator.empId}"
+                                                                th:text="${coordinator.empName}">
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <!-- Sent to Client Date -->
+                                            <div class="col-md-12">
+                                                <label th:for="sentToClientDate[__${iterStat.index}__]"
+                                                       class="form-label">Sent to Client Date</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i
+                                                            class="fas fa-calendar-alt"></i></span>
+                                                    <input type="datetime-local"
+                                                           th:id="sentToClientDate[__${iterStat.index}__]"
+                                                           th:field="*{inspectionReports[__${iterStat.index}__].sentToClientDate}"
+                                                           th:value="${report.sentToClientDate != null ? report.sentToClientDate : ''}"
+                                                           class="form-control"/>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>    
+
+                                    <!-- Second Column -->
+                                    <div class="col-md-6">
+                                            <!-- Technical Coordinator Remarks -->
+                                            <label th:for="technicalCoordinatorRemarks[__${iterStat.index}__]" class="form-label">Technical Coordinator Remarks</label>
+                                            <textarea class="form-control"
+                                                      th:field="*{inspectionReports[__${iterStat.index}__].technicalCoordinatorRemarks}"
+                                                      th:id="technicalCoordinatorRemarks[__${iterStat.index}__]"
+                                                      th:text="${report.technicalCoordinatorRemarks != null ? report.technicalCoordinatorRemarks : ''}"
+                                                      rows="4" readonly>
+                                            </textarea>
+                                        </div>
+                                </div>
+
+                                <!-- Actions -->
+                                <div class="row mb-3">
+                                    <div class="col-md-12 text-end">
+                                        <!-- Add Report Button -->
+                                        <button type="button" class="btn btn-primary btn-sm" onclick="addReportRow()">
+                                            <i class="fas fa-plus"></i>Add Report
                                         </button>
-                                        <input type="hidden"
-                                               th:field="*{inspectionReports[__${iterStat.index}__].reportLink}"
-                                               th:id="'reportLink' + __${iterStat.index}__"
-                                               th:value="${report.reportLink}">
-                                    </td>
-
-                                    <!-- Actions -->
-                                    <td class="text-center">
-                                        <button type="button" class="btn btn-danger btn-sm" onclick="deleteReportRow(this)">
-                                            <i class="fas fa-trash-alt"></i>
+                                        <!-- Delete Report Button -->
+                                        <button type="button" class="btn btn-danger btn-sm" style="padding:0.3rem 0.5rem"
+                                                onclick="deleteReportRow(this)">
+                                            <i class="fas fa-trash-alt"></i> Remove
                                         </button>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
+                                    </div>
+                                </div>
+
+                                <hr>
+                            </div>
                         </div>
-
-                        <!-- Add Report Button -->
-                        <button type="button" class="btn btn-primary btn-sm" onclick="addReportRow()">Add Report</button>
                     </div>
                 </div>
+
+            </div>
+
+            <div class="row g-3 mb-4">
 
                 <!-- Inspection Report Number -->
                 <div class="col-md-6">
@@ -713,7 +737,6 @@
                            placeholder="Enter the URL" />
                     </div>
                 </div>
-                
 
                 <!-- Inspection Status -->
                 <div class="col-md-6">
@@ -728,9 +751,8 @@
                         </select>
                     </div>
                 </div>
-                                
 
-        </div>
+            </div>
 
             <!-- Submit Button -->
             <div class="col-12 d-flex justify-content-center">

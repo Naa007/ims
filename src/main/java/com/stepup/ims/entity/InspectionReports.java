@@ -2,6 +2,8 @@ package com.stepup.ims.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
+import org.hibernate.annotations.Filter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
@@ -32,6 +34,19 @@ public class InspectionReports {
 
     @Column(name = "report_link")
     private String reportLink;
+
+    @ManyToOne
+    @JoinColumn(name = "technical_coordinator_id", referencedColumnName = "emp_id")
+    @Filter(name = "technicalCoordinatorFilter", condition = "role = 'TECHNICAL_COORDINATOR'")
+    @ToString.Exclude
+    private Employee technicalCoordinator;
+
+    @Column(name = "technical_coordinator_remarks")
+    private String technicalCoordinatorRemarks;
+
+    @Column(name = "sent_to_client_date")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime sentToClientDate;
 
     public enum ReportType {
         FR, IR
