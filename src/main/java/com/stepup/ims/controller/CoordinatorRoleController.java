@@ -4,6 +4,8 @@ import com.stepup.ims.model.Employee;
 import com.stepup.ims.model.InspectionStatsByRole;
 import com.stepup.ims.service.ClientService;
 import com.stepup.ims.service.StatsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -21,6 +23,8 @@ import static com.stepup.ims.constants.UIRoutingConstants.RETURN_TO_COORDINATOR_
 @PreAuthorize("hasRole('COORDINATOR')")
 public class CoordinatorRoleController extends BaseDashboardsController {
 
+    private static final Logger logger = LoggerFactory.getLogger(CoordinatorRoleController.class);
+
     @Autowired
     private StatsService statsService;
 
@@ -29,15 +33,20 @@ public class CoordinatorRoleController extends BaseDashboardsController {
     
     @GetMapping("/dashboard")
     public String showDashboard(Model model) {
+        logger.info("Coordinator dashboard accessed.");
         String email = getCurrentUserEmail();
+        logger.debug("Fetching current employee by email.");
         Employee employee = getCurrentEmployee(email);
+
+        logger.debug("Calculating start and end date for one-month stats window.");
         LocalDateTime endDate = LocalDateTime.now().withHour(00).withMinute(00).withSecond(00).withNano(000000001);
         LocalDateTime startDate = endDate.minusMonths(1).withHour(23).withMinute(59).withSecond(59).withNano(999999999);
-        // Get coordinator-specific stats for one month
+        logger.debug("Retrieving coordinator stats from statsService.");
         InspectionStatsByRole stats = statsService.getCoordinatorStats(email, TOTAL, startDate, endDate);
+        logger.debug("Populating model with common dashboard attributes.");
         populateCommonDashboardAttributes(model, employee, email, stats);
 
-        // Get clients list and add to the model
+        logger.debug("Fetching client list for coordinator view.");
         model.addAttribute("clients", clientService.getAllClients());
 
         return RETURN_TO_COORDINATOR_DASHBOARD;

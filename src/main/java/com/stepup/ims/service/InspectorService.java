@@ -5,6 +5,8 @@ import com.stepup.ims.model.Inspector;
 import com.stepup.ims.modelmapper.InspectorModelMapper;
 import com.stepup.ims.repository.InspectorRepository;
 import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +18,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class InspectorService {
+
+    private static final Logger logger = LoggerFactory.getLogger(InspectorService.class);
 
     @Autowired
     private final InspectorRepository inspectorRepository;
@@ -31,6 +35,7 @@ public class InspectorService {
      * Fetch all inspectors from the database.
      */
     public List<Inspector> getAllActiveInspectors() {
+        logger.info("Fetching all active inspectors");
         return inspectorModelMapper.toModelList(inspectorRepository.findAllByInspectorStatus(com.stepup.ims.entity.Inspector.InspectorStatusType.ACTIVE));
     }
 
@@ -38,6 +43,7 @@ public class InspectorService {
      * Fetch all inspectors from the database.
      */
     public List<Inspector> getAllInspectors() {
+        logger.info("Fetching all inspectors");
         return inspectorModelMapper.toModelList(inspectorRepository.findAll());
     }
 
@@ -45,6 +51,7 @@ public class InspectorService {
      * Fetch all inspectors of type TECHNICAL_COORDINATOR from the database.
      */
     public List<Inspector> getAllTechnicalCoordinators() {
+        logger.info("Fetching all technical coordinators");
         return inspectorModelMapper.toModelList(inspectorRepository.findByInspectorType(com.stepup.ims.entity.Inspector.InspectorType.TECHNICAL_COORDINATOR));
     }
 
@@ -52,6 +59,7 @@ public class InspectorService {
      * Fetch an Inspector by ID.
      */
     public Optional<Inspector> getInspectorById(Long id) {
+        logger.info("Fetching inspector by ID: {}", id);
         return inspectorRepository.findById(id).map(inspectorModelMapper::toModel);
     }
 
@@ -60,6 +68,7 @@ public class InspectorService {
      */
     @Transactional
     public Inspector saveInspector(Inspector inspector) {
+        logger.info("Saving inspector");
         var inspectorEntity = inspectorModelMapper.toEntity(inspector);
 
         var savedInspectorEntity = inspectorRepository.save(inspectorEntity);
@@ -69,6 +78,7 @@ public class InspectorService {
 
 
     public Map<String, List<Pair<String, LatLng>>> getActiveInspectorsLatLang() {
+        logger.info("Fetching coordinates of all active inspectors");
         return  inspectorRepository.findAllByInspectorStatus(com.stepup.ims.entity.Inspector.InspectorStatusType.ACTIVE).stream()
                 .map(inspectorModelMapper::toModel)
                 .filter(inspector -> inspector.getAddressCoordinates() != null)
@@ -82,15 +92,18 @@ public class InspectorService {
     }
 
     public List<Inspector> getInspectorsListByCountry(String country) {
+        logger.info("Fetching inspectors for country: {}", country);
         return inspectorModelMapper.toModelList(
                 inspectorRepository.findAllByCountryAndInspectorStatus(country, com.stepup.ims.entity.Inspector.InspectorStatusType.ACTIVE));
     }
 
     public String getInspectorIdByEmail(String email) {
+        logger.debug("Fetching inspector ID by email: {}", email);
         return inspectorRepository.findInspectorIdByEmail(email);
     }
 
-    public String getInspectorNameByEmail(String emaill) {
-        return inspectorRepository.findInspectorNameByEmail(emaill);
+    public String getInspectorNameByEmail(String email) {
+        logger.debug("Fetching inspector name by email: {}", email);
+        return inspectorRepository.findInspectorNameByEmail(email);
     }
 }

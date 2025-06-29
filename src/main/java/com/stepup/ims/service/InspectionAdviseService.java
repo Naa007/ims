@@ -5,6 +5,8 @@ import com.stepup.ims.model.InspectionAdvise;
 import com.stepup.ims.modelmapper.InspectionAdviseModelMapper;
 import com.stepup.ims.modelmapper.InspectionModelMapper;
 import com.stepup.ims.repository.InspectionRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +15,8 @@ import java.util.Optional;
 
 @Service
 public class InspectionAdviseService {
+
+    private static final Logger logger = LoggerFactory.getLogger(InspectionAdviseService.class);
 
     @Autowired
     private InspectionRepository inspectionRepository;
@@ -27,10 +31,13 @@ public class InspectionAdviseService {
     private EmailService emailService;
 
     public Inspection getInspectionAdviseByInspectionId(Long inspectionId) {
+        logger.info("Fetching inspection advise for inspection ID: {}", inspectionId);
         Optional<com.stepup.ims.entity.Inspection> inspection = inspectionRepository.findById(inspectionId);
         if (inspection.isPresent()) {
+            logger.debug("Inspection found for ID: {}", inspectionId);
             com.stepup.ims.entity.Inspection inspectionEntity = inspection.get();
             if (inspectionEntity.getInspectionAdvise() == null) {
+                logger.info("No existing inspection advise found. Creating new advise for ID: {}", inspectionId);
                 com.stepup.ims.entity.InspectionAdvise newInspectionAdvise = new com.stepup.ims.entity.InspectionAdvise();
                 newInspectionAdvise.setInspectionId(inspectionId);
 
@@ -70,6 +77,7 @@ public class InspectionAdviseService {
 
                 inspectionEntity.setInspectionAdvise(newInspectionAdvise);
                 inspectionRepository.save(inspectionEntity);
+                logger.info("New inspection advise saved for inspection ID: {}", inspectionId);
             }
         }
 
@@ -77,11 +85,14 @@ public class InspectionAdviseService {
     }
 
     public Inspection updateInspectionContactReview(Long inspectionId, InspectionAdvise updatedInspectionAdvise) {
+        logger.info("Updating inspection advise for inspection ID: {}", inspectionId);
         Optional<com.stepup.ims.entity.Inspection> inspectionOptional = inspectionRepository.findById(inspectionId);
         com.stepup.ims.entity.Inspection inspectionEntity = inspectionOptional.orElseThrow(() -> new IllegalArgumentException("Inspection not found with id: " + inspectionId));
         inspectionEntity.setInspectionAdvise(inspectionAdviseModelMapper.toEntity(updatedInspectionAdvise));
         com.stepup.ims.entity.Inspection updatedInspectionEntity = inspectionRepository.save(inspectionEntity);
+        logger.debug("Inspection advise updated successfully for ID: {}", inspectionId);
         emailService.sendInspectionAdviseNotification(updatedInspectionEntity);
+        logger.info("Notification email sent after inspection advise update for ID: {}", inspectionId);
         return inspectionModelMapper.toModel(updatedInspectionEntity);
     }
 

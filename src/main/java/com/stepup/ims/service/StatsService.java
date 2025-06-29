@@ -20,6 +20,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +39,8 @@ import static com.stepup.ims.constants.ApplicationConstants.*;
 @Service
 public class StatsService {
 
+    private static final Logger logger = LoggerFactory.getLogger(StatsService.class);
+
     private final StatsRepository statsRepository;
     @Autowired
     private InspectionRepository inspectionRepository;
@@ -52,6 +56,7 @@ public class StatsService {
     }
 
     public Map<String, Object> getBusinessStats() {
+        logger.info("Fetching business statistics...");
         BusinessStats stats = statsRepository.getBusinessStats();
 
         Map<String, Object> result = new LinkedHashMap<>();
@@ -65,6 +70,7 @@ public class StatsService {
     }
 
     private Map<String, Object> createEmployeeStats(BusinessStats stats) {
+        logger.debug("Preparing employee stats...");
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("Total Employees", stats.getTotalEmployees());
         map.put("Active Employees", stats.getActiveEmployees());
@@ -74,6 +80,7 @@ public class StatsService {
     }
 
     private Map<String, Object> createClientStats(BusinessStats stats) {
+        logger.debug("Preparing client stats...");
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("Total Clients", stats.getTotalClients());
         map.put("Recently Onboarded", stats.getRecentlyOnboardedClients());
@@ -81,6 +88,7 @@ public class StatsService {
     }
 
     private Map<String, Object> createInspectorStats(BusinessStats stats) {
+        logger.debug("Preparing inspector stats...");
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("Total Inspectors", stats.getTotalInspectors());
         map.put("Active Inspectors", stats.getActiveInspectors());
@@ -92,6 +100,7 @@ public class StatsService {
     }
 
     private Map<String, Object> createInspectionStats(BusinessStats stats) {
+        logger.debug("Preparing inspection stats...");
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("Total Inspections", stats.getTotalInspections());
         map.put("New", stats.getNewInspections());
@@ -107,6 +116,7 @@ public class StatsService {
     }
 
     private Map<String, Object> createInspectionStatusStats(BusinessStats stats) {
+        logger.debug("Preparing inspection status stats...");
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("New", stats.getNewInspections());
         map.put("Inspector Assigned", stats.getInspectorAssigned());
@@ -119,23 +129,26 @@ public class StatsService {
     }
 
     public InspectionStatsByRole getCoordinatorStats(String email, String period, LocalDateTime startDate, LocalDateTime endDate) {
+        logger.info("Fetching coordinator stats for: {} between {} and {}", email, startDate, endDate);
         List<Inspection> inspections = inspectionRepository.findByCreatedByAndCreatedDateBetween(email, startDate, endDate);
         return getInspectionStatsByRole(inspections, period);
     }
 
     public InspectionStatsByRole getInspectorStats(String email, String period, LocalDateTime startDate, LocalDateTime endDate) {
+        logger.info("Fetching inspector stats for: {} between {} and {}", email, startDate, endDate);
         List<Inspection> inspections = inspectionRepository.findByProposedCVs_Inspector_EmailAndCreatedDateBetween(email, startDate, endDate);
         return getInspectionStatsByRole(inspections, period);
     }
 
     public InspectionStatsByRole getTechnicalCoordinatorStats(String empId, String period, LocalDateTime startDate, LocalDateTime endDate) {
+        logger.info("Fetching technical coordinator stats for: {} between {} and {}", empId, startDate, endDate);
         List<Inspection> inspections = inspectionRepository.inspectionsReviewedByTechnicalCoordinatorsBetweenDates(empId, empId, empId, startDate, endDate);
 
         return getInspectionStatsByRole(inspections, period);
     }
 
     public InspectionStatsByRole getInspectionStatsByRole(List<Inspection> inspections, String period) {
-
+        logger.debug("Calculating inspection stats by role for period: {}", period);
         long totalInspections = inspections.size();
         long newInspections = inspections.stream().filter(inspection -> "NEW".equalsIgnoreCase(inspection.getInspectionStatus().toString())).count();
         long completedInspections = inspections.stream().filter(inspection -> "INSPECTION_AWARDED".equalsIgnoreCase(inspection.getInspectionStatus().toString())).count();
@@ -160,6 +173,7 @@ public class StatsService {
                                  Long ongoingInspections,
                                  Long rejectedInspections) {
         InspectionStatsByRole stats;
+        logger.info("Generating {} report for id={} in {} format", role, id, format);
         String empName = getEmployeeName(id, role);
         stats = new InspectionStatsByRole(totalInspections, newInspections, completedInspections, ongoingInspections, rejectedInspections, InspectionStatsByRole.PeriodType.valueOf(period.toUpperCase()));
 
@@ -198,6 +212,7 @@ public class StatsService {
 
     private byte[] generatePdfReport(String title, String label, String nameLabel, String id, String empName, String period, InspectionStatsByRole stats) {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            logger.debug("Generating PDF report: {}", title);
             PdfWriter writer = new PdfWriter(out);
             PdfDocument pdf = new PdfDocument(writer);
             Document document = new Document(pdf);
@@ -237,6 +252,7 @@ public class StatsService {
             document.close();
             return out.toByteArray();
         } catch (IOException e) {
+            logger.error("Error generating PDF report", e);
             throw new RuntimeException("Error while generating PDF", e);
         }
     }
@@ -244,7 +260,7 @@ public class StatsService {
 
     private byte[] generateExcelReport(String title, String label, String nameLabel, String id, String name, String period, InspectionStatsByRole stats, String sheetName) {
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-
+            logger.debug("Generating Excel report: {}", sheetName);
             Sheet sheet = workbook.createSheet(sheetName);
 
             // Title and metadata
@@ -280,6 +296,7 @@ public class StatsService {
             workbook.write(out);
             return out.toByteArray();
         } catch (IOException e) {
+            logger.error("Error generating Excel report", e);
             throw new RuntimeException("Failed to generate Excel", e);
         }
     }
@@ -291,6 +308,7 @@ public class StatsService {
     }
 
     public PerformanceTrendResponse getPerformanceTrendData(String coordinator, String technical, String inspector) {
+        logger.info("Generating performance trend data...");
         List<String> labels = List.of("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
 
         List<PerformanceTrendResponse.Dataset> datasets = new ArrayList<>();
@@ -300,16 +318,19 @@ public class StatsService {
         datasets.add(new PerformanceTrendResponse.Dataset("All Inspections", groupByMonth(allInspections)));
 
         if (coordinator != null && !coordinator.isBlank()) {
+            logger.debug("Including coordinator trend: {}", coordinator);
             List<Inspection> inspections = inspectionRepository.findByCreatedBy(coordinator);
             datasets.add(new PerformanceTrendResponse.Dataset("Coordinator - " + coordinator, groupByMonth(inspections)));
         }
 
         if (technical != null && !technical.isBlank()) {
+            logger.debug("Including technical trend: {}", technical);
             List<Inspection> inspections = inspectionRepository.findByProposedCVs_CvReviewBytechnicalCoordinator_EmpIdOrDocumentsReviewedByTechnicalCoordinatorOrInspectionReviewedBy(technical, technical, technical);
             datasets.add(new PerformanceTrendResponse.Dataset("Technical - " + technical, groupByMonth(inspections)));
         }
 
         if (inspector != null && !inspector.isBlank()) {
+            logger.debug("Including inspector trend: {}", inspector);
             List<Inspection> inspections = inspectionRepository.findByProposedCVs_Inspector_Email(inspector);
             datasets.add(new PerformanceTrendResponse.Dataset("Inspector - " + inspector, groupByMonth(inspections)));
         }
@@ -318,6 +339,7 @@ public class StatsService {
     }
 
     private List<Integer> groupByMonth(List<Inspection> inspections) {
+        logger.debug("Grouping inspections by month...");
         Map<Integer, Long> grouped = inspections.stream().filter(i -> i.getCreatedDate() != null).collect(Collectors.groupingBy(i -> i.getCreatedDate().getMonthValue(), Collectors.counting()));
 
         List<Integer> counts = new ArrayList<>();
@@ -336,8 +358,10 @@ public class StatsService {
                 default -> "Unknown";
             };
         } catch (NumberFormatException e) {
+            logger.warn("Invalid ID format for role: {}", role, e);
             return "Invalid ID format";
         } catch (Exception e) {
+            logger.warn("Unable to fetch employee name for {}: {}", role, id, e);
             return "Name not available";
         }
     }

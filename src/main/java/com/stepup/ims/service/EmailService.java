@@ -5,6 +5,8 @@ import com.stepup.ims.model.Inspector;
 import com.stepup.ims.repository.InspectionRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -17,6 +19,8 @@ import static com.stepup.ims.constants.ApplicationConstants.STATUS_CHANGE_EMAIL_
 
 @Service
 public class EmailService {
+
+    private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
 
     @Autowired
     private JavaMailSender mailSender;
@@ -35,22 +39,24 @@ public class EmailService {
 
     public void sendNotificationEmail(Inspection originalInspection, Inspection updatedInspection) {
         try {
+            logger.debug("Preparing to send notification email...");
             if (originalInspection != null && originalInspection.getId() == null && Inspection.InspectionStatusType.NEW.equals(originalInspection.getInspectionStatus())) {
+                logger.info("Sending new notification email for inspection");
                 sendNewNotificationEmail(originalInspection);
             } else if (originalInspection != null && !originalInspection.getInspectionStatus().equals(updatedInspection.getInspectionStatus())) {
+                logger.info("Sending status change notification for inspection");
                 sendStatusChangeNotificationEmail(originalInspection, updatedInspection);
             }
         } catch (MessagingException e) {
-            // TODO: Add appropriate logging for MessagingException
+            logger.error("MessagingException occurred while sending notification email: {}", e.getMessage(), e);
         } catch (Exception e) {
-            // TODO: Add appropriate logging for generic Exception
-            System.err.println("error" + e.getMessage());
+            logger.error("Unexpected error occurred: {}", e.getMessage(), e);
         }
 
     }
 
     public void sendNewNotificationEmail(Inspection inspection) throws MessagingException {
-        
+        logger.debug("Sending new inspection email to inspectors for country: {}", inspection.getInspectionCountry());
         String[] to = new String[]{SecurityContextHolder.getContext().getAuthentication().getName()};
         String[] bcc = getInspectorsEmailListByCountry(inspection.getInspectionCountry());
 
@@ -74,9 +80,11 @@ public class EmailService {
         );
 
         sendHtmlEmailWithCcBcc(to, null, bcc, subject, body);
+        logger.info("New inspection notification email sent successfully.");
     }
 
     private void sendStatusChangeNotificationEmail(Inspection originalInspection, Inspection updatedInspection) throws MessagingException {
+        logger.debug("Preparing status change email for inspection ID: {}", originalInspection.getId());
         String[] to = new String[]{SecurityContextHolder.getContext().getAuthentication().getName()};
         String[] cc = inspectionService.getTechnicalCoordinatorsByInspectionId(originalInspection.getId());
         
@@ -96,10 +104,12 @@ public class EmailService {
         );
 
         sendHtmlEmailWithCcBcc(to, cc, null, subject, body);
+        logger.info("Status change email sent for inspection: {}", originalInspection.getInspectionNo());
     }
 
     public void sendInspectionAdviseNotification(com.stepup.ims.entity.Inspection inspection) {
         if (inspection == null || inspection.getInspectionAdvise() == null || inspection.getInspectionAdvise().getId() == null) {
+            logger.debug("No inspection advise found, skipping email.");
             return;
         }
 
@@ -128,15 +138,15 @@ public class EmailService {
         try {
             sendHtmlEmailWithCcBcc(to, cc, null, subject, body);
         } catch (MessagingException e) {
-            // TODO: Add appropriate logging for MessagingException
+            logger.error("Failed to send inspection advise notification: {}", e.getMessage(), e);
         } catch (Exception e) {
-            // TODO: Add appropriate logging for generic Exception
-            System.err.println("Error occurred while sending inspection advise notification: " + e.getMessage());
+            logger.error("Unexpected error while sending inspection advise email: {}", e.getMessage(), e);
         }
     }
 
     public void sendContractReviewNotification(com.stepup.ims.entity.Inspection inspection) {
         if (inspection == null || inspection.getContractReview() == null || inspection.getContractReview().getId() == null) {
+            logger.debug("No contract review found, skipping email.");
             return;
         }
 
@@ -164,23 +174,27 @@ public class EmailService {
 
         try {
             sendHtmlEmailWithCcBcc(to, cc, null, subject, body);
+            logger.info("Contract review email sent successfully for inspection: {}", inspection.getNotificationNo());
         } catch (MessagingException e) {
-            // TODO: Add appropriate logging for MessagingException
+            logger.error("Failed to send contract review notification: {}", e.getMessage(), e);
         } catch (Exception e) {
-            // TODO: Add appropriate logging for generic Exception
-            System.err.println("Error occurred while sending contract review notification: " + e.getMessage());
+            logger.error("Unexpected error while sending contract review email: {}", e.getMessage(), e);
         }
     }
 
     public void sendPQRNotification(Inspector inspector, String action, Long inspectionId) {
         if (inspector == null || action == null || inspectionId == null) {
+            logger.debug("PQR email skipped due to missing input.");
             return;
         }
 
         Optional<com.stepup.ims.entity.Inspection> inspection = inspectionRepository.findById(inspectionId);
         if (inspection.isEmpty()) {
+            logger.warn("No inspection found for PQR email. ID: {}", inspectionId);
             return;
         }
+        logger.debug("Sending PQR email for inspection: {}", inspection.get().getNotificationNo());
+
         String[] to = {inspection.get().getCreatedBy()};
         String[] cc = inspectionService.getTechnicalCoordinatorsByInspectionId(inspection.get().getId());
 
@@ -207,15 +221,16 @@ public class EmailService {
 
         try {
             sendHtmlEmailWithCcBcc(to, cc, null, subject, body);
+            logger.info("PQR email sent successfully for inspection: {}", inspection.get().getNotificationNo());
         } catch (MessagingException e) {
-            // TODO: Add appropriate logging for MessagingException
+            logger.error("Failed to send PQR notification: {}", e.getMessage(), e);
         } catch (Exception e) {
-            // TODO: Add appropriate logging for generic Exception
-            System.err.println("Error occurred while sending Inspector PQR notification: " + e.getMessage());
+            logger.error("Unexpected error while sending PQR email: {}", e.getMessage(), e);
         }
     }
 
     public void sendHtmlEmailWithCcBcc(String[] to, String[] cc, String[] bcc, String subject, String body) throws MessagingException {
+        logger.debug("Composing HTML email with subject: {}", subject);
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);
 
@@ -232,9 +247,11 @@ public class EmailService {
         helper.setText(body, true);
 
         mailSender.send(message);
+        logger.info("Email sent to: {}", (to != null ? String.join(",", to) : "[]"));
     }
 
     public void sendEmail(String to, String subject, String body) throws MessagingException {
+        logger.debug("Sending email to {}", to);
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);
 
@@ -243,9 +260,11 @@ public class EmailService {
         helper.setText(body);
 
         mailSender.send(message);
+        logger.info(" email sent to {}", to);
     }
 
     public String[] getInspectorsEmailListByCountry(String country) {
+        logger.debug("Fetching inspector emails for country: {}", country);
         return inspectorService.getInspectorsListByCountry(country)
                 .stream()
                 .map(Inspector::getEmail)

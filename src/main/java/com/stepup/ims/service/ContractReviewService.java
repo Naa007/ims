@@ -5,6 +5,8 @@ import com.stepup.ims.model.Inspection;
 import com.stepup.ims.modelmapper.ContractReviewModelMapper;
 import com.stepup.ims.modelmapper.InspectionModelMapper;
 import com.stepup.ims.repository.InspectionRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +15,8 @@ import java.util.Optional;
 
 @Service
 public class ContractReviewService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ContractReviewService.class);
 
     @Autowired
     private InspectionRepository inspectionRepository;
@@ -27,10 +31,14 @@ public class ContractReviewService {
     private EmailService emailService;
 
     public Inspection getContractReviewByInspectionId(Long inspectionId) {
+        logger.debug("Fetching inspection with ID: {}", inspectionId);
         Optional<com.stepup.ims.entity.Inspection> inspection = inspectionRepository.findById(inspectionId);
         if (inspection.isPresent()) {
+            logger.info("Inspection found with ID: {}", inspectionId);
             com.stepup.ims.entity.Inspection inspectionEntity = inspection.get();
             if (inspectionEntity.getContractReview() == null) {
+                logger.info("No ContractReview found for inspection ID: {}, initializing new ContractReview", inspectionId);
+
                 com.stepup.ims.entity.ContractReview newContractReview = new com.stepup.ims.entity.ContractReview();
 
                 newContractReview.setInspectionId(inspectionId);
@@ -48,6 +56,7 @@ public class ContractReviewService {
                 );
                 inspectionEntity.setContractReview(newContractReview);
                 inspectionRepository.save(inspectionEntity);
+                logger.info("New ContractReview created and saved for inspection ID: {}", inspectionId);
             }
         }
 
@@ -56,11 +65,13 @@ public class ContractReviewService {
     }
 
     public Inspection updateInspectionContactReview(Long inspectionId, ContractReview updatedContractReview) {
+        logger.debug("Updating ContractReview for inspection ID: {}", inspectionId);
         Optional<com.stepup.ims.entity.Inspection> inspectionOptional = inspectionRepository.findById(inspectionId);
         com.stepup.ims.entity.Inspection inspectionEntity = inspectionOptional.orElseThrow(() ->
                 new IllegalArgumentException("Inspection not found with id: " + inspectionId));
         inspectionEntity.setContractReview(contractReviewModelMapper.toEntity(updatedContractReview));
         com.stepup.ims.entity.Inspection updatedInspectionEntity = inspectionRepository.save(inspectionEntity);
+        logger.info("ContractReview updated for inspection ID: {}", inspectionId);
         emailService.sendContractReviewNotification(updatedInspectionEntity);
         return inspectionModelMapper.toModel(updatedInspectionEntity);
     }

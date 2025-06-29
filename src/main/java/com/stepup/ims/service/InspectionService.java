@@ -6,6 +6,8 @@ import com.stepup.ims.model.Inspection;
 import com.stepup.ims.modelmapper.InspectionModelMapper;
 import com.stepup.ims.modelmapper.InspectorModelMapper;
 import com.stepup.ims.repository.InspectionRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,8 @@ import static com.stepup.ims.constants.ApplicationConstants.*;
 
 @Service
 public class InspectionService {
+
+    private static final Logger logger = LoggerFactory.getLogger(InspectionService.class);
 
     @Autowired
     private EmployeeService employeeService;
@@ -41,6 +45,7 @@ public class InspectionService {
      * Get all inspections.
      */
     public List<Inspection> getAllInspections() {
+        logger.info("Fetching all inspections");
         return inspectionModelMapper.toModelList(inspectionRepository.findAll());
     }
 
@@ -49,10 +54,12 @@ public class InspectionService {
      */
     public List<Inspection> getInspectionsByDate(String date) {
         try {
+            logger.info("Fetching inspections by date: {}", date);
             LocalDateTime selectedDate = LocalDate.parse(date, inputFormatter).atStartOfDay();
             List<com.stepup.ims.entity.Inspection> inspections = inspectionRepository.findByCreatedDate(selectedDate);
             return inspectionModelMapper.toModelList(inspections);
         } catch (Exception e) {
+            logger.error("Invalid date format for getInspectionsByDate: {}", date, e);
             throw new IllegalArgumentException("Invalid date format. Please use the correct format: " + inputFormatter.toString(), e);
         }
     }
@@ -63,11 +70,13 @@ public class InspectionService {
      */
     public List<Inspection> getInspectionsBetweenDates(String fromDate, String toDate) {
         try {
+            logger.info("Fetching inspections between {} and {}", fromDate, toDate);
             LocalDateTime start = LocalDateTime.parse(fromDate);
             LocalDateTime end = LocalDateTime.parse(toDate);
             List<com.stepup.ims.entity.Inspection> inspections = inspectionRepository.findByCreatedDateBetween(start, end);
             return inspectionModelMapper.toModelList(inspections);
         } catch (Exception e) {
+            logger.error("Error parsing date range: {} - {}", fromDate, toDate, e);
             throw new IllegalArgumentException(
                     "Invalid date format. Please use the correct format: " + inputFormatter.toString(), e);
         }
@@ -78,11 +87,13 @@ public class InspectionService {
      */
     public List<Inspection> getInspectionsByClientAndBetweenDates(String client, String fromDate, String toDate) {
         try {
+            logger.info("Fetching inspections for client {} between {} and {}", client, fromDate, toDate);
             LocalDateTime start = LocalDateTime.parse(fromDate);
             LocalDateTime end = LocalDateTime.parse(toDate);
             List<com.stepup.ims.entity.Inspection> inspections = inspectionRepository.findByClient_ClientIdAndCreatedDateBetween(Long.valueOf(client), start, end);
             return inspectionModelMapper.toModelList(inspections);
         } catch (Exception e) {
+            logger.error("Error parsing client/date range for client {}: {} - {}", client, fromDate, toDate, e);
             throw new IllegalArgumentException(
                     "Invalid date format. Please use the correct format: " + inputFormatter.toString(), e);
         }
@@ -92,6 +103,7 @@ public class InspectionService {
      * Get all inspections created by the current user.
      */
     public List<Inspection> getAllInspectionsByCreatedBy() {
+        logger.info("Fetching inspections created by user");
         return inspectionModelMapper.toModelList(inspectionRepository.findByCreatedBy(SecurityContextHolder.getContext().getAuthentication().getName()));
     }
 
@@ -99,6 +111,7 @@ public class InspectionService {
      * Get an inspection by its ID.
      */
     public Optional<Inspection> getInspectionById(Long inspectionId) {
+        logger.info("Fetching inspection by ID: {}", inspectionId);
         return inspectionModelMapper.getOptionalModel(inspectionRepository.findById(inspectionId));
     }
 
@@ -107,19 +120,22 @@ public class InspectionService {
      */
     @Transactional
     public Inspection saveInspection(Inspection inspection) {
+        logger.info("Saving inspection");
         var inspectionEntity = inspectionModelMapper.toEntity(inspection);
 
         if (inspectionEntity.getProposedCVs().size() == 1 && inspectionEntity.getProposedCVs().get(0).getId() == null && inspectionEntity.getProposedCVs().get(0).getInspector().getInspectorId() == null) {
             inspectionEntity.setProposedCVs(null);
+            logger.debug("Proposed CVs cleared due to empty inspector data");
         }
         if (inspectionEntity.getInspectionReports().size() == 1 && inspectionEntity.getInspectionReports().get(0).getReportNumber() == null) {
             inspectionEntity.setInspectionReports(null);
+            logger.debug("Inspection reports cleared due to missing report number");
         }
         if (inspectionEntity.getId() == null) {
             inspectionEntity.setCoordinatorName(employeeService.getEmployeeNameByEmail(SecurityContextHolder.getContext().getAuthentication().getName()));
         }
         var savedInspectionEntity = inspectionRepository.save(inspectionEntity);
-
+        logger.info("Inspection saved successfully with ID: {}", savedInspectionEntity.getId());
         return inspectionModelMapper.toModel(savedInspectionEntity);
     }
 
@@ -130,6 +146,7 @@ public class InspectionService {
     public List<Inspection> getInspectionsReviewedByLoggedUser() {
         String currentUser = employeeService.getEmployeeIdByEmail(
                 SecurityContextHolder.getContext().getAuthentication().getName());
+        logger.info("Fetching inspections reviewed by user ID: {}", currentUser);
         return inspectionModelMapper.toModelList(
                 inspectionRepository.findByProposedCVs_CvReviewBytechnicalCoordinator_EmpIdOrDocumentsReviewedByTechnicalCoordinatorOrInspectionReviewedBy(
                        currentUser, currentUser, currentUser ));
@@ -139,11 +156,13 @@ public class InspectionService {
      * Get all inspections assigned to the current user.
      */
     public List<Inspection> getInspectionsOfInspectorByLoggedUser() {
+        logger.info("Fetching inspections assigned to inspector");
         return inspectionModelMapper.toModelList(
                 inspectionRepository.findByProposedCVs_Inspector_Email(SecurityContextHolder.getContext().getAuthentication().getName()));
     }
 
     public String[] getTechnicalCoordinatorsByInspectionId(Long inspectionId) {
+        logger.info("Fetching technical coordinators for inspection ID: {}", inspectionId);
         List<String> techCoordinators = inspectionRepository.findAllTechnicalCoordinatorsOfInspection(inspectionId);
         return techCoordinators == null || techCoordinators.isEmpty()
                 ? new String[0]
@@ -151,6 +170,7 @@ public class InspectionService {
     }
 
     public List<Map<String, String>> fetchInspectionStats(String period) {
+        logger.info("Fetching inspection statistics for period: {}", period);
         String startDate;
         String endDate;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -175,11 +195,13 @@ public class InspectionService {
             }
             default -> throw new IllegalArgumentException("Invalid period. Allowed values are: month, quarter, year.");
         }
+        logger.debug("Fetching inspections between {} and {}", startDate, endDate);
         List<com.stepup.ims.entity.Inspection> inspections = inspectionRepository.findByInspectionDateAsPerNotificationBetween(startDate, endDate);
         return getInspectionCalendarStats(inspections);
     }
 
     private List<Map<String, String>> getInspectionCalendarStats(List<com.stepup.ims.entity.Inspection> inspections) {
+        logger.debug("Generating inspection calendar stats for {} inspections", inspections.size());
         List<Map<String, String>> detailsList = new ArrayList<>();
 
         // Pre-calculate inspection dates and participating inspectors
@@ -246,7 +268,7 @@ public class InspectionService {
                 }
             })
         );
-
+        logger.debug("Inspection calendar stats built with {} records", detailsList.size());
         return detailsList;
     }
 
