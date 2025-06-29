@@ -1,6 +1,8 @@
 package com.stepup.ims.service;
 
 import org.apache.poi.xwpf.usermodel.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -16,140 +18,94 @@ import static com.stepup.ims.constants.FilePathConstants.*;
 @Service
 public class AgreementService {
 
+    private static final Logger logger = LoggerFactory.getLogger(AgreementService.class);
+
+    // Formatters
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
+    // Placeholder Keys
+    private static final String PLACEHOLDER_DATE = "AGREEMENTDATE";
+    private static final String PLACEHOLDER_NAME = "INSPNAME";
+    private static final String PLACEHOLDER_ADDRESS = "INSPADDRESS";
+    private static final String PLACEHOLDER_EMAIL = "INSPEMAIL";
+    private static final String PLACEHOLDER_PHONE = "INSPCONTACT";
+    private static final String PLACEHOLDER_POSITION = "INSPOSITION";
+    private static final String PLACEHOLDER_APPROVER = "IISPL_NAME";
 
-    /**
-     * Generate India-specific agreement for an inspector.
-     *
-     * @param inspectorName the name of the inspector
-     * @param address       the address of the inspector
-     * @param email         the email of the inspector
-     * @param phone         the phone number of the inspector
-     * @return Byte array of the generated agreement
-     * @throws IOException if the template file cannot be loaded or errors occur during processing
-     */
+    // Default Values
+    private static final String DEFAULT_POSITION = "Inspector/Sr.Inspector";
+    private static final String DEFAULT_APPROVER = "G.S Rao";
+    private static final String COUNTRY_INDIA = "India";
+    private static final String COUNTRY_INTERNATIONAL = "International";
+
+    // Content Types
+    private static final String DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    private static final String PDF_MIME = "application/pdf";
+    private static final String EXCEL_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
     public byte[] generateIndiaEmpaneledInspectorAgreement(String inspectorName, String address, String email, String phone) throws IOException {
-        return generateAgreement(INDIA_TEMPLATE, inspectorName, address, email, phone, "India");
+        return generateAgreement(INDIA_TEMPLATE, inspectorName, address, email, phone, COUNTRY_INDIA);
     }
 
     public byte[] generateInternationalEmpaneledInspectorAgreement(String inspectorName, String address, String email, String phone) throws IOException {
-        return generateAgreement(INTERNATIONAL_TEMPLATE, inspectorName, address, email, phone, "India");
+        return generateAgreement(INTERNATIONAL_TEMPLATE, inspectorName, address, email, phone, COUNTRY_INTERNATIONAL);
     }
 
-    /**
-     * Generate an agreement based on the provided template and details.
-     *
-     * @param templateName  Name of the template file
-     * @param inspectorName Name of the inspector
-     * @param address       Address of the inspector
-     * @param email         Email address of the inspector
-     * @param phone         Contact phone number of the inspector
-     * @param country       Country where the inspector is located
-     * @return Byte array containing the generated agreement document
-     * @throws IOException If the template file is missing or cannot be read
-     */
     private byte[] generateAgreement(String templateName, String inspectorName, String address, String email, String phone, String country) throws IOException {
         Resource templateResource = loadTemplate(templateName);
 
         try (InputStream inputStream = templateResource.getInputStream();
              XWPFDocument document = new XWPFDocument(inputStream)) {
 
-            System.out.println("Template loaded successfully. Replacing placeholders...");
+            logger.info("Loaded template '{}' for inspector '{}'", templateName, inspectorName);
 
-            // Prepare placeholder values
             Map<String, String> placeholders = preparePlaceholders(inspectorName, address, email, phone, country);
+            logger.debug("Placeholders prepared: {}", placeholders);
 
-            // Replace placeholders throughout the document
             replacePlaceholdersInDocument(document, placeholders);
-
-            // Convert the document to a byte array
             return convertDocumentToByteArray(document);
         }
     }
 
-    /**
-     * Load the template document as a resource.
-     *
-     * @param templateName Name of the template file
-     * @return Resource pointing to the template
-     * @throws FileNotFoundException If the file is not found
-     */
     private Resource loadTemplate(String templateName) throws FileNotFoundException {
         String fullPath = TEMPLATE_DIR + templateName;
         Resource resource = new ClassPathResource(fullPath);
         if (!resource.exists()) {
+            logger.error("Template not found: {}", fullPath);
             throw new FileNotFoundException("Template file not found: " + fullPath);
         }
         return resource;
     }
 
-    /**
-     * Prepare placeholders to be replaced in the document.
-     *
-     * @param inspectorName Name of the inspector
-     * @param address       Address of the inspector
-     * @param email         Email of the inspector
-     * @param phone         Contact information of the inspector
-     * @param country       Country where the inspector works
-     * @return Map containing placeholder keys and the corresponding replacements
-     */
     private Map<String, String> preparePlaceholders(String inspectorName, String address, String email, String phone, String country) {
         Map<String, String> placeholders = new HashMap<>();
-        placeholders.put("AGREEMENTDATE", LocalDate.now().format(DATE_FORMATTER));
-        placeholders.put("INSPNAME", inspectorName);
-        placeholders.put("INSPADDRESS", address);
-        placeholders.put("INSPEMAIL", email);
-        placeholders.put("INSPCONTACT", phone);
-        placeholders.put("INSPOSITION", "Inspector/Sr.Inspector");
-        placeholders.put("IISPL_NAME", "G.S Rao");
+        placeholders.put(PLACEHOLDER_DATE, LocalDate.now().format(DATE_FORMATTER));
+        placeholders.put(PLACEHOLDER_NAME, inspectorName);
+        placeholders.put(PLACEHOLDER_ADDRESS, address);
+        placeholders.put(PLACEHOLDER_EMAIL, email);
+        placeholders.put(PLACEHOLDER_PHONE, phone);
+        placeholders.put(PLACEHOLDER_POSITION, DEFAULT_POSITION);
+        placeholders.put(PLACEHOLDER_APPROVER, DEFAULT_APPROVER);
         return placeholders;
     }
 
-    /**
-     * Replace all placeholders in the given Word document.
-     *
-     * @param document     Document in which placeholders will be replaced
-     * @param placeholders Map of placeholders and corresponding replacements
-     */
     private void replacePlaceholdersInDocument(XWPFDocument document, Map<String, String> placeholders) {
-        // Replace in paragraphs
-        for (XWPFParagraph paragraph : document.getParagraphs()) {
-            replacePlaceholdersInParagraph(paragraph, placeholders);
-        }
+        document.getParagraphs().forEach(paragraph -> replacePlaceholdersInParagraph(paragraph, placeholders));
 
-        // Replace in tables
-        for (XWPFTable table : document.getTables()) {
-            for (XWPFTableRow row : table.getRows()) {
-                for (XWPFTableCell cell : row.getTableCells()) {
-                    for (XWPFParagraph paragraph : cell.getParagraphs()) {
-                        replacePlaceholdersInParagraph(paragraph, placeholders);
-                    }
-                }
-            }
-        }
+        document.getTables().forEach(table ->
+                table.getRows().forEach(row ->
+                        row.getTableCells().forEach(cell ->
+                                cell.getParagraphs().forEach(paragraph ->
+                                        replacePlaceholdersInParagraph(paragraph, placeholders)))));
 
-        // Replace in headers and footers
-        for (XWPFHeader header : document.getHeaderList()) {
-            for (XWPFParagraph paragraph : header.getParagraphs()) {
-                replacePlaceholdersInParagraph(paragraph, placeholders);
-            }
-        }
-        for (XWPFFooter footer : document.getFooterList()) {
-            for (XWPFParagraph paragraph : footer.getParagraphs()) {
-                replacePlaceholdersInParagraph(paragraph, placeholders);
-            }
-        }
+        document.getHeaderList().forEach(header ->
+                header.getParagraphs().forEach(paragraph -> replacePlaceholdersInParagraph(paragraph, placeholders)));
+
+        document.getFooterList().forEach(footer ->
+                footer.getParagraphs().forEach(paragraph -> replacePlaceholdersInParagraph(paragraph, placeholders)));
     }
 
-    /**
-     * Replace all placeholders in a paragraph.
-     *
-     * @param paragraph    Paragraph to process
-     * @param placeholders Map of placeholders and their replacements
-     */
     private void replacePlaceholdersInParagraph(XWPFParagraph paragraph, Map<String, String> placeholders) {
-        // Combine all runs' text into one string
         StringBuilder fullTextBuilder = new StringBuilder();
         for (XWPFRun run : paragraph.getRuns()) {
             String text = run.getText(0);
@@ -173,12 +129,6 @@ public class AgreementService {
         }
     }
 
-
-    /**
-     * Clear all runs in a paragraph for text replacement.
-     *
-     * @param paragraph Paragraph to clear
-     */
     private void clearParagraphRuns(XWPFParagraph paragraph) {
         int runs = paragraph.getRuns().size();
         for (int i = runs - 1; i >= 0; i--) {
@@ -186,13 +136,6 @@ public class AgreementService {
         }
     }
 
-    /**
-     * Convert the Word document to a byte array.
-     *
-     * @param document Document to be converted
-     * @return Byte array representation of the document
-     * @throws IOException If an error occurs during writing
-     */
     private byte[] convertDocumentToByteArray(XWPFDocument document) throws IOException {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             document.write(outputStream);
@@ -205,12 +148,16 @@ public class AgreementService {
 
         try (InputStream inputStream = templateResource.getInputStream();
              XWPFDocument document = new XWPFDocument(inputStream)) {
+
             Map<String, String> placeholders = new HashMap<>();
-            placeholders.put("INSPNAME", inspectorName);
-            placeholders.put("AGREEMENTDATE", LocalDate.now().format(DATE_FORMATTER));
+            placeholders.put(PLACEHOLDER_NAME, inspectorName);
+            placeholders.put(PLACEHOLDER_DATE, LocalDate.now().format(DATE_FORMATTER));
+            placeholders.put(PLACEHOLDER_POSITION, DEFAULT_POSITION);
+
+            logger.info("Generating impartiality agreement for '{}'", inspectorName);
+
             replacePlaceholdersInDocument(document, placeholders);
             return convertDocumentToByteArray(document);
         }
     }
-
 }

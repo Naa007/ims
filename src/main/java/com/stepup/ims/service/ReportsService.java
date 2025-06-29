@@ -16,6 +16,8 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,8 @@ import java.util.List;
 
 @Service
 public class ReportsService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ReportsService.class);
 
     @Autowired
     private InspectionService inspectionService;
@@ -45,19 +49,28 @@ public class ReportsService {
     private InspectionModelMapper inspectionModelMapper;
 
     public byte[] generateISOReport(String isoType, String period, String from, String to, String format) throws IllegalAccessException {
-
+        logger.info("Generating ISO report. Type: {}, Period: {}, From: {}, To: {}, Format: {}", isoType, period, from, to, format);
         List<Inspection> inspections = inspectionService.getInspectionsBetweenDates(from, to);
         String reportName = isoType.toLowerCase() + "_" + period + "_" + from.split("T")[0] + "_" + to.split("T")[0] + "." + format.toLowerCase();
 
         return switch (format.toLowerCase()) {
-            case "pdf" -> generatePdfReport(reportName, inspections);
-            case "excel" -> generateISOExcelReport(reportName, inspections, isoType);
-            default -> throw new IllegalArgumentException("Unsupported format: " + format);
+            case "pdf" -> {
+                logger.info("Generating PDF ISO report: {}", reportName);
+                yield generatePdfReport(reportName, inspections);
+            }
+            case "excel" -> {
+                logger.info("Generating Excel ISO report: {}", reportName);
+                yield generateISOExcelReport(reportName, inspections, isoType);
+            }
+            default -> {
+                logger.error("Unsupported format requested: {}", format);
+                throw new IllegalArgumentException("Unsupported format: " + format);
+            }
         };
     }
 
     public byte[] generateReport(String client, String period, String from, String to, String format) throws IllegalAccessException {
-
+        logger.info("Generating report for client: {}, Period: {}, From: {}, To: {}, Format: {}", client, period, from, to, format);
         List<Inspection> inspections;
         String reportName;
 
@@ -68,14 +81,25 @@ public class ReportsService {
             inspections = inspectionService.getInspectionsByClientAndBetweenDates(client, from, to);
             reportName = client.toUpperCase() + "Inspections_" + period + "_" + from.split("T")[0] + "_" + to.split("T")[0] + "." + format.toLowerCase();
         }
+        logger.debug("Total inspections fetched: {}", inspections.size());
         return switch (format.toLowerCase()) {
-            case "pdf" -> generatePdfReport(reportName, inspections);
-            case "excel" -> generateExcelReport(reportName, inspections);
-            default -> throw new IllegalArgumentException("Unsupported format: " + format);
+            case "pdf" -> {
+                logger.info("Generating PDF report: {}", reportName);
+                yield generatePdfReport(reportName, inspections);
+            }
+            case "excel" -> {
+                logger.info("Generating Excel report: {}", reportName);
+                yield generateExcelReport(reportName, inspections);
+            }
+            default -> {
+                logger.error("Unsupported format requested.: {}", format);
+                throw new IllegalArgumentException("Unsupported format: " + format);
+            }
         };
     }
 
     private byte[] generatePdfReport(String reportName, List<Inspection> inspections) throws IllegalAccessException {
+        logger.info("Starting PDF report generation: {}", reportName);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         PdfWriter writer = new PdfWriter(out);
         PdfDocument pdf = new PdfDocument(writer);
@@ -89,6 +113,7 @@ public class ReportsService {
 
         // Create a table with dynamic column count based on the number of Inspection fields
         if (!inspections.isEmpty()) {
+            logger.warn("No inspections to add in PDF report: {}", reportName);
             Inspection sampleInspection = inspections.get(0);
             var fields = sampleInspection.getClass().getDeclaredFields();
 
@@ -113,12 +138,14 @@ public class ReportsService {
             document.add(table);
         }
         document.close();
+        logger.info("PDF report generated successfully: {}", reportName);
         return out.toByteArray();
     }
 
     private byte[] generateExcelReport(String sheetName, List<Inspection> inspections) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         if (inspections.isEmpty()) {
+            logger.warn("No inspections to include in Excel report: {}", sheetName);
             return new byte[0];
         }
         try (Workbook workbook = new XSSFWorkbook()) {
@@ -298,16 +325,19 @@ public class ReportsService {
             }
 
             workbook.write(out);
+            logger.info("Excel report successfully created: {}", sheetName);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error generating Excel report: {}", sheetName, e);
             throw new RuntimeException("Error creating Excel report", e);
         }
         return out.toByteArray();
     }
 
     public byte[] generateInspectorsReport() {
-        List<Inspector> inspectors = inspectorService.getAllInspectors();
+        logger.info("Generating Inspectors Report");
 
+        List<Inspector> inspectors = inspectorService.getAllInspectors();
+        logger.debug("Fetched {} inspectors for report", inspectors.size());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try (Workbook workbook = new XSSFWorkbook()) {
 
@@ -405,8 +435,9 @@ public class ReportsService {
             }
 
             workbook.write(out);
+            logger.info("Inspectors report generated successfully.");
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error generating Inspectors Excel report", e);
             throw new RuntimeException("Error creating Inspectors Excel report", e);
         }
 
@@ -414,6 +445,7 @@ public class ReportsService {
     }
 
     private byte[] generateISOExcelReport(String sheetName, List<Inspection> inspections, String isoType) {
+        logger.info("Generating ISO Excel Report: {}, ISO Type: {}", sheetName, isoType);
         if (inspections.isEmpty()) {
             return new byte[0];
         }
@@ -424,6 +456,7 @@ public class ReportsService {
             var styles = createStyles(workbook);
 
             if ("orderRegister".equalsIgnoreCase(isoType)) {
+                logger.debug("Creating Order Register Sheet");
                 String[] headers = {
                         "Job Alloted No (IISPL No)", "Notification received Date & Time", "Client Name",
                         "Inspection Country", "Notification No", "Inspection Item", "Inspection Activity with Stages",
@@ -435,6 +468,7 @@ public class ReportsService {
                     createOrderRegisterDataRow(sheet, inspections.get(rowIndex), rowIndex, styles);
                 }
             } else if ("enquiryQuotationOrder".equalsIgnoreCase(isoType)) {
+                logger.debug("Creating Enquiry Quotation Sheet");
                 String[] headers = {
                         "Job Alloted No (IISPL No)", "Notification received Date & Time", "Client Name",
                         "Inspection Country", "Notification No", "Replied to Client", "Remarks /po Number /Email Confirmation",
@@ -446,6 +480,7 @@ public class ReportsService {
                     createEquiryQuotationOrderDataRow(sheet, inspections.get(rowIndex), rowIndex, styles);
                 }
             } else if ("inspectionCallStatus".equalsIgnoreCase(isoType)) {
+                logger.debug("Creating Inspection Call Status Sheet");
                 String[] headers = {
                         "Job Alloted No (IISPL No)", "Notification received Date & Time", "Client Name",
                         "Inspection Date as per Notification", "Inspector", "Vendor and Location", "IRN number",
@@ -463,8 +498,10 @@ public class ReportsService {
             }
 
             workbook.write(out);
+            logger.info("ISO Excel Report created successfully: {}", sheetName);
             return out.toByteArray();
         } catch (IOException e) {
+            logger.error("Error generating ISO Excel report: {}", sheetName, e);
             throw new RuntimeException("Error creating Excel report", e);
         }
     }

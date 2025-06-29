@@ -2,6 +2,8 @@ package com.stepup.ims.controller;
 
 import com.stepup.ims.service.AgreementService;
 import com.stepup.ims.service.ReportsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -22,6 +24,8 @@ import static com.stepup.ims.constants.FilePathConstants.TEMPLATE_DIR;
 @RequestMapping("/reports")
 public class ReportsController {
 
+    private static final Logger logger = LoggerFactory.getLogger(ReportsController.class);
+
     @Autowired
     ReportsService reportsService;
     @Autowired
@@ -38,7 +42,7 @@ public class ReportsController {
                                                        @PathVariable String format,
                                                        @RequestParam(required = false) String client,
                                                        Model model) throws IllegalAccessException {
-
+        logger.info("Generating inspection report. Period: {}, Format: {}", period, format);
         byte[] report = reportsService.generateReport(client, period, from, to, format);
         return buildReportResponse(report, period + "-report." + format, format);
     }
@@ -50,7 +54,7 @@ public class ReportsController {
                                                 @PathVariable String to,
                                                 @PathVariable String format,
                                                 Model model) throws IllegalAccessException {
-
+        logger.info("Generating ISO report. ISO Type: {}, Period: {}, Format: {}", isoType, period, format);
         byte[] report = reportsService.generateISOReport(isoType, period, from, to, format);
         return buildReportResponse(report, period + "-report." + format, format);
     }
@@ -58,6 +62,7 @@ public class ReportsController {
     private ResponseEntity<byte[]> buildReportResponse(byte[] reportData, String filename, String format) {
         HttpHeaders headers = new HttpHeaders();
 
+        logger.debug("Building report response. Filename: {}, Format: {}", filename, format);
         switch (format.toLowerCase()) {
             case "pdf":
                 headers.setContentType(MediaType.APPLICATION_PDF);
@@ -66,6 +71,7 @@ public class ReportsController {
                 headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
                 break;
             default:
+                logger.error("Unsupported report format: {}", format);
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
@@ -77,7 +83,7 @@ public class ReportsController {
     public ResponseEntity<byte[]> getInspectorsReports(@RequestParam(required = false) String country,
                                                        @RequestParam(required = false) String skill,
                                                        Model model) {
-
+        logger.info("Generating inspectors report.");
         byte[] report = reportsService.generateInspectorsReport();
         return buildReportResponse(report, "inspectors_report" + ".xlsx", "excel");
     }
@@ -91,6 +97,7 @@ public class ReportsController {
             @RequestParam String phone,
             @RequestParam String country) throws IOException {
 
+        logger.info("Generating inspector agreement for inspectorId: {}", inspectorId);
         byte[] documentContent = "India".equalsIgnoreCase(country)
                 ? agreementService.generateIndiaEmpaneledInspectorAgreement(inspectorName, address, email, phone)
                 : agreementService.generateInternationalEmpaneledInspectorAgreement(inspectorName, address, email, phone);
@@ -107,6 +114,7 @@ public class ReportsController {
 
     @GetMapping("/inspectors/impartiality-doc")
     public ResponseEntity<byte[]> generateImpartialityReport(@RequestParam String inspectorName) throws IOException {
+        logger.info("Generating impartiality document for inspector: {}", inspectorName);
         byte[] documentContent = agreementService.generateImpartialityDocument(inspectorName);
 
         HttpHeaders headers = new HttpHeaders();
