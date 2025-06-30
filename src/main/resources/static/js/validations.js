@@ -245,15 +245,17 @@ function getStatusChecksConfig() {
             isCritical: true
         },
         'INSPECTOR_APPROVED': {
-            check: (data) => data.proposedCVs.every(cv =>
+            check: (data) => data.proposedCVs.some(cv =>
                 cv.cvSubmittedToClientDate &&
                 cv.cvStatus === true
             ),
             message: (data) => {
-                if (data.proposedCVs.some(cv => !cv.cvSubmittedToClientDate)) {
+                const missingDate = data.proposedCVs.every(cv => !cv.cvSubmittedToClientDate);
+                const notApproved = data.proposedCVs.every(cv => cv.cvStatus !== true);
+                if (missingDate) {
                     return "Inspector(s) cv submitted to client date is missing. Please provide the date.";
                 }
-                if (data.proposedCVs.some(cv => cv.cvStatus !== true)) {
+                 if (notApproved) {
                     return "Inspector(s) approval from client needs to update. Please update as approved.";
                 }
                 return "";
@@ -283,16 +285,76 @@ function getStatusChecksConfig() {
             message: "Please provide the date when the inspection reports were received.",
             isCritical: false
         },
-        'INSPECTION_REPORTS_REVIEW_AWAITING': {
-            check: (data) => true,
-            message: "A Technical Coordinator must present to review the inspection reports.",
-            isCritical: true
+     'INSPECTION_REPORTS_REVIEW_AWAITING': {
+         check: (data) => {
+             return data.inspectionReports?.length > 0 && data.inspectionReports.every(report =>
+                 report.reportDate &&
+                 report.reportNumber &&
+                 report.inspectorName &&
+                 report.reportType &&
+                 report.technicalCoordinator &&
+                 report.reportLink
+             );
+         },
+         message: (data) => {
+             if (!data.inspectionReports?.length) {
+                 return "At least one inspection report is required.";
+             }
+
+             const missingFields = [];
+
+             data.inspectionReports.forEach((report, index) => {
+                 const reportIssues = [];
+                 if (!report.reportDate) reportIssues.push("Report Date");
+                 if (!report.reportNumber) reportIssues.push("Report Number");
+                 if (!report.inspectorName) reportIssues.push("Inspector Name");
+                 if (!report.reportType) reportIssues.push("Report Type");
+                 if (!report.technicalCoordinator) reportIssues.push("Technical Coordinator");
+                 if (!report.reportLink) reportIssues.push("Report Link");
+
+                 if (reportIssues.length) {
+                     missingFields.push(`Report ${index + 1}: ${reportIssues.join(', ')}`);
+                 }
+             });
+
+             return missingFields.length
+                 ? `Please fill in all required fields for each report:\n\n${missingFields.join('\n')}`
+                 : "A Technical Coordinator must present to review the inspection reports.";
+         },
+         isCritical: true
+     },
+
+    'INSPECTION_REPORTS_SENT_TO_CLIENT': {
+        check: (data) => {
+            return data.inspectionReports?.length > 0 &&
+                data.inspectionReports.every(report =>
+                    report.sentToClientDate &&
+                    report.technicalCoordinatorRemarks
+                );
         },
-        'INSPECTION_REPORTS_SENT_TO_CLIENT': {
-            check: (data) => data.irnSentDate,
-            message: "Please provide the date when the IRN was sent to the client.",
-            isCritical: true
+        message: (data) => {
+            if (!data.inspectionReports?.length) {
+                return "No inspection reports found. Please add at least one.";
+            }
+
+            const issues = [];
+
+            data.inspectionReports.forEach((report, index) => {
+                const missing = [];
+                if (!report.sentToClientDate) missing.push("Sent to Client Date");
+                if (!report.technicalCoordinatorRemarks) missing.push("Technical Coordinator Remarks");
+
+                if (missing.length) {
+                    issues.push(`Report ${index + 1}: Missing ${missing.join(", ")}`);
+                }
+            });
+
+            return issues.length
+                ? `Please fill the following fields before proceeding:\n\n${issues.join('\n')}`
+                : "Each inspection report must have both Sent to Client Date and Technical Coordinator Remarks.";
         },
+        isCritical: true
+    },
         'INSPECTION_AWARDED': {
             check: (data) => data.jobFolderLink,
             message: "The job folder link is required to proceed with the inspection.",
@@ -347,7 +409,17 @@ function gatherInspectionData() {
         referenceDocumentsLink: document.getElementById('referenceDocumentsLink')?.value,
         documentsReviewedByTechnicalCoordinator: document.getElementById('documentsReviewedByTechnicalCoordinator')?.value,
         irnSentDate: document.getElementById('irnSentDate')?.value,
-        jobFolderLink: document.getElementById('jobFolderLink')?.value
+        jobFolderLink: document.getElementById('jobFolderLink')?.value,
+        inspectionReports: Array.from(document.querySelectorAll('.inspection-report')).map(report => ({
+            reportDate: report.querySelector('input[name$=".reportDate"]')?.value,
+            reportNumber: report.querySelector('input[name$=".reportNumber"]')?.value?.trim(),
+            inspectorName: report.querySelector('select[name$=".inspectorName"]')?.value,
+            reportType: report.querySelector('select[name$=".reportType"]')?.value,
+            technicalCoordinator: report.querySelector('select[name$=".technicalCoordinator"]')?.value,
+            reportLink: report.querySelector('input[name$=".reportLink"]')?.value?.trim(),
+            sentToClientDate: report.querySelector('input[name$=".sentToClientDate"]')?.value,
+            technicalCoordinatorRemarks: report.querySelector('textarea[name$=".technicalCoordinatorRemarks"]')?.value?.trim()
+        }))
     };
 }
 
