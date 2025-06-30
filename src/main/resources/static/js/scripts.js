@@ -768,6 +768,87 @@ function redirectToTechnicalCoordinatorEditInspection(inspectionId) {
  };
 }
 
+function updateTechCoordComment(reportItem) {
+    // Extract remarks and id from the current reportItem
+    const remarks = reportItem.querySelector('textarea').value.trim();
+    const id = reportItem.querySelector('input[type="hidden"]').value.trim();
+
+    // Find the server message span and button from the current reportItem
+    const serverMessageContainer = reportItem.querySelector("#serverMessageSpan");
+    const commentButton = reportItem.querySelector("button.btn-info"); // Target the comment button
+
+    if (commentButton) {
+        // Disable the button and update the text to "Commenting..."
+        const originalText = commentButton.textContent;
+        commentButton.textContent = "Commenting...";
+        commentButton.disabled = true;
+
+        // Build the JSON payload
+        const payload = {
+            id: id,
+            remarks: remarks,
+        };
+
+        // Send the POST request with a JSON body
+        fetch('/technical-coordinator/inspectionReports/updateComments', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json', // Indicates the request body is JSON
+            },
+            body: JSON.stringify(payload), // Converts the payload to a JSON string
+        })
+        .then((response) => {
+            // Ensure we process the body only once
+            if (!response.ok) {
+                return response.text().then((errorMessage) => {
+                    throw new Error(errorMessage || 'Failed to update remarks');
+                });
+            }
+            return response.text(); // Read response body only once
+        })
+        .then((result) => {
+            // Show success or failure message based on the result
+            if (serverMessageContainer) {
+                if (result === "Remarks updated successfully!") {
+                    serverMessageContainer.textContent = "Comment updated successfully!";
+                    serverMessageContainer.classList.remove("text-danger");
+                    serverMessageContainer.classList.add("text-success");
+                } else {
+                    serverMessageContainer.textContent = result || "Failed to update comment. Please try again.";
+                    serverMessageContainer.classList.remove("text-success");
+                    serverMessageContainer.classList.add("text-danger");
+                }
+
+                // Remove the message after 8 seconds
+                setTimeout(() => {
+                    serverMessageContainer.textContent = "";
+                }, 8000);
+            }
+        })
+        .catch((error) => {
+            // Handle any unexpected errors
+            console.error('Error:', error);
+
+            if (serverMessageContainer) {
+                serverMessageContainer.textContent = "An unexpected error occurred. Please try again.";
+                serverMessageContainer.classList.remove("text-success");
+                serverMessageContainer.classList.add("text-danger");
+
+                // Remove the message after 8 seconds
+                setTimeout(() => {
+                    serverMessageContainer.textContent = "";
+                }, 8000);
+            }
+        })
+        .finally(() => {
+            // Re-enable the button and revert its text
+            if (commentButton) {
+                commentButton.textContent = originalText;
+                commentButton.disabled = false;
+            }
+        });
+    }
+}
 /** =================== Contract Review ================= **/
 
 function prepareContractReview(inspectionId) {

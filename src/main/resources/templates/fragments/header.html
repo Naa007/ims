@@ -7,7 +7,7 @@
         <h1 class="company-name">Inspection Management Services</h1>
     </div>
     <div style="flex: 1 1 15%; display: flex; align-items: center;">
-        <span th:if="${session.employeeName != null}" th:text="${session.employeeName}">Guest</span>
+        <span id="loggedInUser" th:if="${session.employeeName != null}" th:text="${session.employeeName}">Guest</span>
         <a th:if="${session.employeeName != null}" href="/logout" class="logout-btn"
            onclick="return confirm('Are you sure you want to log out?');">
             <i class="fas fa-sign-out-alt"></i>

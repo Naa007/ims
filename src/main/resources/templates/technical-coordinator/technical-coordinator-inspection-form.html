@@ -371,26 +371,49 @@
                                     </div>
                                 </div>
 
-                            <!-- Technical Coordinator Remarks -->
-                            <div class="d-flex flex-row flex-wrap w-100 align-items-center justify-content-between">
-                                <div class="d-flex flex-column w-100">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fas fa-comments me-2"></i>
-                                        <div class="info-label">Comments by <span th:text="${report.technicalCoordinator.empName}"></span></div>
+                                <!-- Technical Coordinator Remarks -->
+                                <div class="d-flex flex-row flex-wrap w-100 align-items-center justify-content-between">
+                                    <div class="d-flex flex-column w-100">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="fas fa-comments me-2"></i>
+                                            <div class="info-label">Comments by <span
+                                                    th:text="${report.technicalCoordinator.empName}"></span></div>
+                                        </div>
+                                        <div class="info-value w-100">
+                                            <textarea
+                                                    th:name="technicalCoordinatorRemarks"
+                                                    th:value="${report.technicalCoordinatorRemarks}"
+                                                    th:field="*{inspectionReports[__${iterStat.index}__].technicalCoordinatorRemarks}"
+                                                    th:id="${report.id}"
+                                                    rows="6"
+                                                    class="w-100"
+                                                    th:readonly="${session.employeeName != report.technicalCoordinator.empName}"
+                                                    onclick="if(this.value === '') { this.focus(); } else { this.setSelectionRange(this.value.length, this.value.length); this.focus(); }">
+</textarea>
+                                        </div>
                                     </div>
-                                    <div class="info-value w-100">
-                                        <textarea
-                                                th:field="*{inspectionReports[__${iterStat.index}__].technicalCoordinatorRemarks}"
-                                                id="technicalCoordinatorRemarks[__${iterStat.index}__]" rows="6"
-                                                class="w-100">
-                                        </textarea>
+                                </div>
+
+                                <!-- Comment Button and Server Message -->
+                                <div class="d-flex w-100 mt-3 align-items-center justify-content-between">
+                                    <div id="serverMessageDiv" class="me-auto">
+                                        <span id="serverMessageSpan" class="text-success"></span>
+                                    </div>
+                                    <div>
+                                        <button type="button" class="btn btn-sm btn-info"
+                                                th:disabled="${session.employeeName != report.technicalCoordinator.empName}"
+                                                onclick="updateTechCoordComment(this.closest('.report-item'))">
+                                            Comment
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                </div>
+                    <script>
+
+                    </script>
                 
                 </div>
             </form>

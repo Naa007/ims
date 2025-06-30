@@ -4,7 +4,9 @@ import com.stepup.ims.model.Employee;
 import com.stepup.ims.model.Inspection;
 import com.stepup.ims.model.InspectionStatsByRole;
 import com.stepup.ims.service.InspectionService;
+import com.stepup.ims.service.InspectionReportsService;
 import com.stepup.ims.service.StatsService;
+import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,9 @@ public class TechnicalCoordinatorRoleController extends BaseDashboardsController
     private InspectionService inspectionService;
     @Autowired
     private StatsService statsService;
+
+    @Autowired
+    private InspectionReportsService inspectionReportsService;
 
     @GetMapping("/inspection-management")
     public String getInspectionsReviewedByLoggedUser(Model model) {
@@ -67,5 +72,22 @@ public class TechnicalCoordinatorRoleController extends BaseDashboardsController
         populateCommonDashboardAttributes(model, employee, email, stats);
         return RETURN_TO_TECHNICAL_COORDINATOR_DASHBOARD;
     }
+    @PostMapping(value = "/inspectionReports/updateComments", consumes = "application/json")
+    @ResponseBody
+    public String updateInspectionReportComments(@RequestBody CommentRequestDto request) {
+        logger.info("Starting update of inspection report comments for ID: {}", request.getId());
+        String result = inspectionReportsService.updateTechnicalCoordinatorRemarksById(request.getId(), request.getRemarks());
+        logger.info("InspectionReportsService.updateReportComments() called successfully for ID: {}", request.getId());
+        logger.info("Result: {}", result);
+        return result;
+    }
+
+    // DTO to map JSON data
+    @Data
+    public static class CommentRequestDto {
+        private Long id;
+        private String remarks;
+    }
+
 
 }
