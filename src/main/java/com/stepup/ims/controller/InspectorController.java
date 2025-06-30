@@ -4,6 +4,8 @@ import com.google.maps.model.LatLng;
 import com.stepup.ims.model.Inspector;
 import com.stepup.ims.service.GoogleMapsService;
 import com.stepup.ims.service.InspectorService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,6 +24,8 @@ import static com.stepup.ims.constants.UIRoutingConstants.*;
 @RequestMapping("/inspectors")
 public class InspectorController {
 
+    private static final Logger logger = LoggerFactory.getLogger(InspectorController.class);
+
     @Autowired
     private InspectorService inspectorService;
 
@@ -33,6 +37,7 @@ public class InspectorController {
      */
     @GetMapping("/list")
     public String listInspectors(Model model) {
+        logger.info("Fetching list of all inspectors.");
         List<Inspector> inspectors = inspectorService.getAllInspectors();
 
         // Add the list of inspectors to the model
@@ -40,7 +45,7 @@ public class InspectorController {
 
         // Add a new Inspector object to the model for the form
         model.addAttribute(INSPECTOR_LOWERCASE, new Inspector());
-
+        logger.debug("Total inspectors loaded: {}", inspectors.size());
         return RETURN_TO_INSPECTOR_MANAGEMENT;
     }
 
@@ -50,20 +55,26 @@ public class InspectorController {
      */
     @PostMapping("/save")
     public String saveInspector(Inspector inspector, RedirectAttributes redirectAttributes) {
+        logger.info("Saving inspector data.");
         if (inspector.getAddress() != null && !inspector.getAddress().isEmpty()) {
             try {
+                logger.debug("Attempting to geocode inspector address.");
                 LatLng coordinates = googleMapsService.geocodeAddress(inspector.getAddress());
                 inspector.setAddressCoordinates(coordinates);
+                logger.debug("Geocoding successful.");
             } catch (InterruptedException ie) {
+                logger.warn("Geocoding interrupted, setting coordinates to null.");
                 Thread.currentThread().interrupt();
                 inspector.setAddressCoordinates(null);
             } catch (Exception e) {
+                logger.error("Error occurred during geocoding: {}", e.getMessage());
                 inspector.setAddressCoordinates(null);
             }
         }
 
         try {
             inspectorService.saveInspector(inspector);
+            logger.info("Inspector saved successfully.");
         } catch (Exception e) {
             if (e.getCause().getMessage().contains("Duplicate entry")) {
                 redirectAttributes.addFlashAttribute("errorMessage", "Inspector with the email already present");
@@ -80,10 +91,12 @@ public class InspectorController {
      */
     @GetMapping("/edit/{id}")
     public String editInspector(@PathVariable Long id, Model model) {
+        logger.info("Editing inspector with ID: {}", id);
         Inspector inspector = inspectorService.getInspectorById(id).orElseThrow(() -> new IllegalArgumentException("Inspector not found for ID: " + id));
 
         model.addAttribute(INSPECTOR_LOWERCASE, inspector);
         model.addAttribute("edit", true);
+        logger.debug("Inspector data loaded for editing.");
         return REDIRECT_TO_INSPECTOR_FORM; // Return the name of the Thymeleaf template for the inspector form
     }
 
@@ -92,9 +105,11 @@ public class InspectorController {
      */
     @GetMapping("/view/{id}")
     public String viewInspector(@PathVariable Long id, Model model) {
+        logger.info("Viewing inspector with ID: {}", id);
         Inspector inspector = inspectorService.getInspectorById(id).orElseThrow(() -> new IllegalArgumentException("Inspector not found for ID: " + id));
 
         model.addAttribute(INSPECTOR_LOWERCASE, inspector);
+        logger.debug("Inspector data loaded for viewing.");
         return REDIRECT_TO_INSPECTOR_VIEW; // Thymeleaf template name
     }
 
@@ -103,6 +118,7 @@ public class InspectorController {
      */
     @GetMapping("/form")
     public String showInspectorForm(Model model) {
+        logger.info("Accessing new inspector form.");
         model.addAttribute(INSPECTOR_LOWERCASE, new Inspector());
         return REDIRECT_TO_INSPECTOR_FORM;
     }
