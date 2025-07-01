@@ -194,27 +194,25 @@ function setupInspectionStatusValidations(event) {
 // Helper functions
 function handleRejectionOrClosure(event, currentStatus) {
     if (currentStatus === 'INSPECTION_REJECTED' || currentStatus === 'CLOSED') {
-        event.preventDefault();
+        event.preventDefault(); // Prevent default submission initially
+
         const isReject = currentStatus === 'INSPECTION_REJECTED';
+        const message = isReject
+            ? 'Are you sure you want to reject this inspection?'
+            : 'Are you sure you want to close this inspection?';
 
-        Swal.fire({
-            title: isReject ? 'Confirm Rejection' : 'Confirm Closure',
-            text: isReject
-                ? 'Are you sure you want to reject this inspection?'
-                : 'Are you sure you want to close this inspection?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: isReject ? 'Yes, reject it' : 'Yes, close it',
-            cancelButtonText: 'No, cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                event.target.submit();
+        if (confirm(message)) {
+            const form = event.target.closest('form'); // Find the closest parent form
+            if (form) {
+                form.submit(); // Submit the form programmatically
+            } else {
+                console.error("No form found to submit");
             }
-        });
-
-        return true;
+            return true;
+        }
+        return false; // Do nothing if the user cancels
     }
-    return false;
+    return false; // Return false if the status doesn't match
 }
 
 function getStatusChecksConfig() {
