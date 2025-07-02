@@ -578,7 +578,7 @@ function addReportRow() {
     }
 
      // Update IDs, names, for attributes, and reset input values in the cloned container
-     newContainer.querySelectorAll("[id], [name], label[for]").forEach((element) => {
+     newContainer.querySelectorAll("[id], [name], label[for], [data-index]").forEach((element) => {
      let id = element.getAttribute("id");
      let name = element.getAttribute("name");
      let forAttr = element.getAttribute("for"); // Check for the 'for' attribute in labels
@@ -607,7 +607,9 @@ function addReportRow() {
          element.value = ""; // Clear the value for the new container
      } else if (element.tagName === "SELECT") {
          element.selectedIndex = 0; // Reset dropdowns to their default state
-     }
+     }  else if (element.tagName === "BUTTON" && element.hasAttribute("data-index")) {
+          element.setAttribute("data-index", newIndex); // Update button data-index
+       }
  });
 
     // Append the cloned container (not the entire div) to the target container
