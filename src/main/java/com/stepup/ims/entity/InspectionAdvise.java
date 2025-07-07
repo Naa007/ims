@@ -29,7 +29,8 @@ public class InspectionAdvise extends Auditable {
     @JoinColumn(name = "inspection_advise_id", referencedColumnName = "id")
     private List<ClientInstructionToInspector> clientInstructionToInspectorList;
 
-    @Column(name = "instructions_from_technical_team")
+    @Lob
+    @Column(name = "instructions_from_technical_team",columnDefinition = "TEXT")
     private String instructionsFromTechnicalTeam;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
