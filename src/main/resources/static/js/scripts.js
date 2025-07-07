@@ -607,9 +607,9 @@ function addReportRow() {
          element.value = ""; // Clear the value for the new container
      } else if (element.tagName === "SELECT") {
          element.selectedIndex = 0; // Reset dropdowns to their default state
-     }  else if (element.tagName === "BUTTON" && element.hasAttribute("data-index")) {
-          element.setAttribute("data-index", newIndex); // Update button data-index
-       }
+     } else if (element.tagName === "BUTTON" && element.hasAttribute("data-index")) {
+        element.setAttribute("data-index", newIndex); // Update button data-index
+     }
  });
 
     // Append the cloned container (not the entire div) to the target container

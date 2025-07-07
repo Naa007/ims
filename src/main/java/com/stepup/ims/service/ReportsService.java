@@ -8,6 +8,7 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.UnitValue;
 import com.stepup.ims.model.Inspection;
+import com.stepup.ims.model.InspectionReports;
 import com.stepup.ims.model.Inspector;
 import com.stepup.ims.model.ProposedCVs;
 import com.stepup.ims.modelmapper.InspectionModelMapper;
@@ -290,18 +291,25 @@ public class ReportsService {
 
                     dataRow.createCell(26).setCellValue(inspection.isAnyInspectionIssues() ? "Yes" : "No");
                     dataRow.getCell(26).setCellStyle(style);
+                    
                     //TODO
-                    dataRow.createCell(27).setCellValue(inspection.getInspectionReports().get(0).getSentToClientDate() != null ? inspection.getInspectionReports().get(0).getSentToClientDate().toString() : "");
-                    dataRow.getCell(27).setCellStyle(style);
+                    if (inspection.getInspectionReports() != null && !inspection.getInspectionReports().isEmpty()) {
+                        InspectionReports latestReport = inspection.getInspectionReports().stream()
+                                .max(Comparator.comparing(InspectionReports::getId))
+                                .orElse(null);
 
-                    dataRow.createCell(28).setCellValue(inspection.getInspectionReports().get(0).getReportDate() != null ? inspection.getInspectionReports().get(0).getReportDate().toString() : "");
-                    dataRow.getCell(28).setCellStyle(style);
+                        dataRow.createCell(27).setCellValue(latestReport != null && latestReport.getSentToClientDate() != null ? latestReport.getSentToClientDate().toString() : "");
+                        dataRow.getCell(27).setCellStyle(style);
 
-                    dataRow.createCell(29).setCellValue(inspection.getInspectionReports().get(0).getTechnicalCoordinator() != null ? inspection.getInspectionReports().get(0).getTechnicalCoordinator().getEmpName() : "");
-                    dataRow.getCell(29).setCellStyle(style);
+                        dataRow.createCell(28).setCellValue(latestReport != null && latestReport.getReportDate() != null ? latestReport.getReportDate().toString() : "");
+                        dataRow.getCell(28).setCellStyle(style);
 
-                    dataRow.createCell(30).setCellValue(inspection.getInspectionReports().get(0).getSentToClientDate() != null ? inspection.getInspectionReports().get(0).getSentToClientDate().toString() : "");
-                    dataRow.getCell(30).setCellStyle(style);
+                        dataRow.createCell(29).setCellValue(latestReport != null && latestReport.getTechnicalCoordinator() != null ? latestReport.getTechnicalCoordinator().getEmpName() : "");
+                        dataRow.getCell(29).setCellStyle(style);
+
+                        dataRow.createCell(30).setCellValue(latestReport != null && latestReport.getSentToClientDate() != null ? latestReport.getSentToClientDate().toString() : "");
+                        dataRow.getCell(30).setCellStyle(style);
+                    }
 
                     dataRow.createCell(31).setCellValue(inspection.getInspectionReportNumber());
                     dataRow.getCell(31).setCellStyle(style);

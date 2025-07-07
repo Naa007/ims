@@ -127,9 +127,9 @@ public class InspectionService {
             inspectionEntity.setProposedCVs(null);
             logger.debug("Proposed CVs cleared due to empty inspector data");
         }
-        if (inspectionEntity.getInspectionReports().size() == 1 && inspectionEntity.getInspectionReports().get(0).getReportNumber() == null) {
+        if (inspectionEntity.getInspectionReports().size() == 1 && (inspectionEntity.getInspectionReports().get(0).getReportNumber().isEmpty() || inspectionEntity.getInspectionReports().get(0).getInspectorName().isEmpty())) {
             inspectionEntity.setInspectionReports(null);
-            logger.debug("Inspection reports cleared due to missing report number");
+            logger.debug("Inspection reports cleared due to missing report number and inspector name");
         }
         if (inspectionEntity.getId() == null) {
             inspectionEntity.setCoordinatorName(employeeService.getEmployeeNameByEmail(SecurityContextHolder.getContext().getAuthentication().getName()));

@@ -605,7 +605,7 @@
                                                 <div class="input-group">
                                                     <span class="input-group-text"><i class="fas fa-user"></i></span>
                                                     <select class="form-select"
-                                                            th:field="*{inspectionReports[__${iterStat.index}__].technicalCoordinator}"
+                                                            th:field="*{inspectionReports[__${iterStat.index}__].technicalCoordinator.empId}"
                                                             th:id="technicalCoordinator[__${iterStat.index}__]">
                                                         <option value="">Select Technical Coordinator</option>
                                                         <option th:each="coordinator : ${inspection.technicalCoordinatorsList}"
