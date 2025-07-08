@@ -261,7 +261,7 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center">
-                                        <select class="form-select form-select-sm" th:name="proposedCVs[__${iterStat.index}__].pqrAvailable">
+                                        <select class="form-select form-select-sm" th:name="proposedCVs[__${iterStat.index}__].pqrAvailable" onchange="validatePQR(this)">
                                             <option value="" disabled selected>Select</option> 
                                             <!-- Placeholder -->
                                             <option value="true" th:selected="${cv.pqrAvailable == true}">Yes</option>

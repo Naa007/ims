@@ -413,7 +413,7 @@ function gatherInspectionData() {
             reportNumber: report.querySelector('input[name$=".reportNumber"]')?.value?.trim(),
             inspectorName: report.querySelector('select[name$=".inspectorName"]')?.value,
             reportType: report.querySelector('select[name$=".reportType"]')?.value,
-            technicalCoordinator: report.querySelector('select[name$=".technicalCoordinator"]')?.value,
+            technicalCoordinator: report.querySelector('select[name$=".technicalCoordinator.empId"]')?.value,
             reportLink: report.querySelector('input[name$=".reportLink"]')?.value?.trim(),
             sentToClientDate: report.querySelector('input[name$=".sentToClientDate"]')?.value,
             technicalCoordinatorRemarks: report.querySelector('textarea[name$=".technicalCoordinatorRemarks"]')?.value?.trim()
@@ -543,6 +543,56 @@ function showSuccess(message) {
         buttonText: 'OK'
     });
 }
+
+function validatePQR(selectElement) {
+    const selectedValue = selectElement.value;
+    const inspectorId = selectElement.closest('tr').querySelector('select[name$=".inspector.inspectorId"]').value;
+
+    if (selectedValue === 'true' && inspectorId) {
+        showLoadingState(selectElement);
+        fetch(`/pqr/validate/${inspectorId}`)
+            .then(response => response.text())
+            .then(result => {
+             hideLoadingState(selectElement);
+                if (result === "true") {
+                    showSuccess("PQR form is valid.");
+                } else {
+                    selectElement.value = "false";
+                    showError("PQR form is not valid. Please check the details.");
+                }
+            })
+            .catch(error => {
+                hideLoadingState(selectElement);
+                console.error('Error:', error);
+                showError("An error occurred while validating the PQR form.");
+            });
+    }
+}
+
+function showLoadingState(selectElement) {
+    const loadingSpinner = document.createElement('div');
+    loadingSpinner.className = 'loading-spinner';
+    loadingSpinner.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    loadingSpinner.style.position = 'absolute';
+    loadingSpinner.style.right = '5px';
+    loadingSpinner.style.top = '50%';
+    loadingSpinner.style.transform = 'translateY(-50%)';
+    const container = selectElement.closest('.d-flex');
+    container.style.position = 'relative';
+    container.appendChild(loadingSpinner);
+    selectElement.disabled = true;
+}
+
+function hideLoadingState(selectElement) {
+    const container = selectElement.closest('.d-flex');
+    const spinner = container.querySelector('.loading-spinner');
+    if (spinner) {
+        spinner.remove();
+    }
+    selectElement.disabled = false;
+}
+
+
 
 
 
