@@ -30,7 +30,6 @@ public class Certificate {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
     private LocalDate dateIssued;
 
-    @FutureOrPresent
     @Column(name = "expiry_date", nullable = true)
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
     private LocalDate expiryDate;
