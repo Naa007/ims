@@ -73,14 +73,17 @@ public class InspectorController {
         }
 
         try {
+            if(inspector.getInspectorType() != Inspector.InspectorType.PARTNER_INSPECTOR) {
+                String existingId = inspectorService.getInspectorIdByEmail(inspector.getEmail());
+                if (existingId != null && !existingId.isEmpty()) {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Inspector with the email already exists");
+                    return REDIRECT_TO_INSPECTOR_MANAGEMENT;
+                }
+            }
             inspectorService.saveInspector(inspector);
             logger.info("Inspector saved successfully.");
         } catch (Exception e) {
-            if (e.getCause().getMessage().contains("Duplicate entry")) {
-                redirectAttributes.addFlashAttribute("errorMessage", "Inspector with the email already present");
-            } else {
                 redirectAttributes.addFlashAttribute("errorMessage", "Something went wrong, contact Admin");
-            }
         }
         
         return REDIRECT_TO_INSPECTOR_MANAGEMENT;

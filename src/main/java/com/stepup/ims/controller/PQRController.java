@@ -60,4 +60,12 @@ public class PQRController {
         logger.info("PQR updated and notification sent.");
         return RETURN_TO_PQR_FORM;
     }
+
+    @GetMapping("/validate/{inspectorId}")
+    @ResponseBody
+    public String validatePQRForm(@PathVariable Long inspectorId) {
+        Inspector inspector = pqrService.getPQRByInspectorId(inspectorId);
+        return (inspector != null && inspector.getPqr().getRemarks() != null && !inspector.getPqr().getRemarks().isEmpty())
+                ? "true" : "false";
+    }
 }

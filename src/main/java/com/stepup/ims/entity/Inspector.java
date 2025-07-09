@@ -28,7 +28,7 @@ public class Inspector extends Auditable {
     @Column(nullable = false, length = 15)
     private String phone;
 
-    @Column(name = "email", nullable = false, unique = true, length = 255)
+    @Column(name = "email", nullable = false, length = 255)
     private String email;
 
     @Column(nullable = false, length = 100)
