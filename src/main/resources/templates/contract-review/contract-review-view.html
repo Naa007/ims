@@ -35,7 +35,7 @@
 
                         <!-- Document Description -->
                         <td>
-                            <span th:text="*{contractReview.contractDocumentList[__${iterStat.index}__].documentDescription}"></span>
+                            <span th:text="*{contractReview.contractDocumentList[__${iterStat.index}__].documentDescription.getName()}"></span>
                         </td>
 
                         <!-- Status -->
@@ -45,8 +45,7 @@
 
                         <!-- Special Remarks -->
                         <td>                            
-                            <span th:text="*{contractReview.contractDocumentList[__${iterStat.index}__].specialRemarks}"
-                                  class="form-control"></span>
+                            <span th:text="*{contractReview.contractDocumentList[__${iterStat.index}__].specialRemarks}"></span>
                         </td>
                     </tr>
                     </tbody>
@@ -85,6 +84,20 @@
                 <div class="info-content">
                     <div class="info-label">Conclusion</div>
                     <div th:text="${contractReview.conclusion}"></div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="info-section">
+
+            <!-- Scope Sector-->
+            <div class="info-item">
+                <i class="fas fa-info-circle me-2"></i>
+                <div class="info-content">
+                    <div class="info-label">Scope Sector</div>
+                    <div th:text="${contractReview.scopeSector}"></div>
                 </div>
             </div>
 

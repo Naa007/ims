@@ -14,7 +14,7 @@ public class ContractDocument {
     @Getter
     @AllArgsConstructor
     public enum DocumentDescriptionTypes {
-        NOI("NOI"), ITP("ITP"), DATA_SHEET("Data Sheet"), PERFORMANCE_CURVE("Performance Curve"), GAD("GAD"), SHOP_INSPECTION_TEST_PROCEDURE("Shop Inspection & Test Procedure"), FR_IR_NCR_IRN_PL(""), PROCEDURES_AS_PER_ITP("Procedures as Per ITP"), OTHER("Other");
+        NOI("NOI"), ITP("ITP"), DATA_SHEET("Data Sheet"), PERFORMANCE_CURVE("Performance Curve"), GAD("GAD"), SHOP_INSPECTION_TEST_PROCEDURE("Shop Inspection & Test Procedure"), FR_IR_NCR_IRN_PL("FR,IR,NCR,IRN,PL"), PROCEDURES_AS_PER_ITP("Procedures as Per ITP"), OTHER("Other");
 
         @Getter
         private final String name;

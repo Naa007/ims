@@ -32,7 +32,7 @@
             <div>
                 <!-- Contract Documents -->
                 <div>
-                    <table class="table table-bordered">
+                    <table class="table table-bordered" id="contractDocumentTableId">
                         <thead>
                         <tr>
                             <th>Document Description</th>
@@ -46,9 +46,9 @@
 
                             <!-- Document Description -->
                             <td>
-                                <input type="text"
-                                       th:field="*{contractDocumentList[__${iterStat.index}__].documentDescription}"
-                                       readonly/>
+                                <span th:text="*{contractDocumentList[__${iterStat.index}__].documentDescription.getName()}"></span>
+                                <input type="hidden"
+                                       th:field="*{contractDocumentList[__${iterStat.index}__].documentDescription}" required/>
                             </td>
 
                             <!-- Status -->
@@ -91,7 +91,7 @@
                     <label for="submissionList">Submission List</label>
                     <textarea th:field="*{submissionList}" id="submissionList" class="form-control"
                               placeholder="Enter Submission List" required
-                              minlength="10" maxlength="2000"></textarea>
+                              minlength="10" maxlength="2000" rows="5" readonly></textarea>
                     <div class="invalid-feedback">
                         Please provide a submission list (10-2000 characters)
                     </div>
@@ -109,9 +109,19 @@
                     <label for="conclusion">Conclusion</label>
                     <textarea th:field="*{conclusion}" id="conclusion" class="form-control"
                               placeholder="Enter your conclusion here" required
-                              minlength="10" maxlength="2000"></textarea>
+                              minlength="10" maxlength="10000" rows="5"></textarea>
                     <div class="invalid-feedback">
-                        Please provide a conclusion (10-2000 characters)
+                        Please provide a conclusion (10-10000 characters)
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="form-group">
+                    <label for="scopeSector">Scope Sector</label>
+                    <input type="number" th:field="*{scopeSector}" id="scopeSector" class="form-control"
+                           min="0" max="99" style="width:100px" required/>
+                    <div class="invalid-feedback">
+                        Scope Sector must be a number between 0 and 99
                     </div>
                 </div>
             </div>

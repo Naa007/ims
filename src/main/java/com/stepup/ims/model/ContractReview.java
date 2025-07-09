@@ -7,6 +7,7 @@ import java.util.List;
 @Data
 public class ContractReview {
     private Long id;
+    private Integer scopeSector;
     private List<ContractDocument> contractDocumentList;
     private String submissionList;
     private String conclusion;

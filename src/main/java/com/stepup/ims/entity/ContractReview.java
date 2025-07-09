@@ -14,6 +14,9 @@ public class ContractReview extends Auditable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "scope_sector", nullable = true)
+    private Integer scopeSector;
+
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "contract_review_id", referencedColumnName = "id")
     private List<ContractDocument> contractDocumentList;
@@ -21,7 +24,8 @@ public class ContractReview extends Auditable {
     @Column(name = "special_remarks")
     private String submissionList;
 
-    @Column(name = "conclusion")
+    @Lob
+    @Column(name = "conclusion", columnDefinition = "TEXT")
     private String conclusion;
 
     @Column(name = "inspection_id", nullable = true)

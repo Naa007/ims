@@ -871,6 +871,51 @@ function prepareContractReview(inspectionId) {
    window.open(url, '_blank', `width=${width},height=${height},left=${left},top=${top}`);
   }
 
+  // Add event listener to the entire table
+  document.addEventListener('DOMContentLoaded', () => {
+      const table = document.getElementById("contractDocumentTableId");
+      if(!table){
+        return;
+      }
+      const submissionListTextarea = document.getElementById("submissionList");
+
+      // Attach an event listener to the radio buttons inside the table
+      table.addEventListener("change", (event) => {
+          if (event.target.type === "radio") {
+              // Get the parent row of the selected radio button
+              const row = event.target.closest("tr");
+              const descriptionInput = row.querySelector("span"); // Document description field
+              const documentDescription = descriptionInput.innerText; // Get the document description
+              const selectedValue = event.target.value; // Get the value of the selected radio button ("Yes" or "No")
+
+              // Handle the selection logic
+              if (selectedValue.toLowerCase() === "yes") {
+                  // Add the description to submissionList if selected as Yes
+                  addToSubmissionList(documentDescription, submissionListTextarea);
+              } else {
+                  // Remove the description from submissionList if selected as No
+                  removeFromSubmissionList(documentDescription, submissionListTextarea);
+              }
+          }
+      });
+
+      // Function to add a description to the submissionList textarea
+      function addToSubmissionList(description, textarea) {
+          const items = textarea.value.split("\n").filter(item => item.trim() !== ""); // Get current lines (non-empty)
+          if (!items.includes(description)) {
+              items.push(description); // Add description if not already in the list
+          }
+          textarea.value = items.join("\n"); // Update the textarea
+      }
+
+      // Function to remove a description from the submissionList textarea
+      function removeFromSubmissionList(description, textarea) {
+          const items = textarea.value.split("\n").filter(item => item.trim() !== ""); // Get current lines (non-empty)
+          const updatedItems = items.filter(item => item !== description); // Remove the description
+          textarea.value = updatedItems.join("\n"); // Update the textarea
+      }
+  });
+
 /** =================== Inspection Advise ================= **/
 
 function prepareInspectionAdvise(inspectionId) {
