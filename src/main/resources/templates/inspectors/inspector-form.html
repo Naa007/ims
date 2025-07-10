@@ -84,7 +84,7 @@
                         <input type="email" id="email" th:field="*{email}" class="form-control"
                                placeholder="Enter email address" required
                                maxlength="100"
-                               pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$"
+                               pattern="[a-zA-Z0-9._%+\-]+@[a-z0-9.\-]+\.[a-zA-Z]{2,}$"
                                oninvalid="this.setCustomValidity('Please enter a valid email address')"
                                oninput="this.setCustomValidity('')" />
                         <div class="invalid-feedback">
