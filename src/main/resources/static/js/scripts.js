@@ -549,72 +549,73 @@ function deleteCVRow(button) {
   }
 
 function addReportRow() {
-    // Find the target container which holds all `.inspection-report` containers
-    const targetDiv = document.getElementById("inspectionReportId");
+    const masterDiv = document.getElementById("inspectionReportsId");
+    if (!masterDiv) {
+        console.error("'inspectionReportsId' not found.");
+        return;
+    }
+
+    const targetDiv = document.getElementById("inspectionReportsContainerHub");
     if (!targetDiv) {
-        console.error("'inspectionReportId' not found.");
+        console.error("'inspectionReportsContainerHub' not found.");
         return;
     }
 
-    // Find the last `.inspection-report` to use as a template
-    const lastContainer = targetDiv.querySelector(".inspection-report:last-child");
+    const lastContainer = masterDiv.querySelector(".inspection-report:last-child");
     if (!lastContainer) {
-        console.error("No container found to clone.");
+        console.error("No '.inspection-report' container found to clone.");
         return;
     }
 
-    // Clone only the last container (not the entire `inspectionReportId` div)
+    // Clone the last container and determine the new index
     const newContainer = lastContainer.cloneNode(true);
+    const newIndex = masterDiv.querySelectorAll(".inspection-report").length;
 
-    // Get the current number of `.inspection-report` containers
-    const currentIndex = targetDiv.querySelectorAll(".inspection-report").length;
-    const newIndex = currentIndex; // New index for the cloned container
-    
-    
-    // Adjust the ID of the new container (if applicable)
-    const containerId = newContainer.getAttribute("id");
-    if (containerId) {
-        newContainer.setAttribute("id", containerId.replace(/\[(\d+)\]/g, `[${newIndex}]`)); // Replace the index in the ID
-    }
+    updateContainerAttributes(newContainer, newIndex);
 
-     // Update IDs, names, for attributes, and reset input values in the cloned container
-     newContainer.querySelectorAll("[id], [name], label[for], [data-index]").forEach((element) => {
-     let id = element.getAttribute("id");
-     let name = element.getAttribute("name");
-     let forAttr = element.getAttribute("for"); // Check for the 'for' attribute in labels
-
-     // Update `id` attributes to reflect the new index
-     if (id) {
-         id = id.replace(/\[(\d+)\]/g, `[${newIndex}]`); // Replace index in `id`
-         element.setAttribute("id", id);
-     }
-
-     // Update `name` attributes for Thymeleaf or general data binding purposes
-     if (name) {
-         name = name.replace(/\[(\d+)\]/g, `[${newIndex}]`); // Replace index in `name`
-         element.setAttribute("name", name);
-         element.setAttribute("th:field", `*{${name}}`); // Ensure Thymeleaf binding works
-     }
-
-     // Update `for` attributes in labels
-     if (forAttr) {
-         forAttr = forAttr.replace(/\[(\d+)\]/g, `[${newIndex}]`); // Replace index in `for`
-         element.setAttribute("for", forAttr);
-     }
-
-     // Reset form inputs
-     if (element.tagName === "INPUT" || element.tagName === "TEXTAREA") {
-         element.value = ""; // Clear the value for the new container
-     } else if (element.tagName === "SELECT") {
-         element.selectedIndex = 0; // Reset dropdowns to their default state
-     } else if (element.tagName === "BUTTON" && element.hasAttribute("data-index")) {
-        element.setAttribute("data-index", newIndex); // Update button data-index
-     }
- });
-
-    // Append the cloned container (not the entire div) to the target container
+    // Append the new container to the target div
     targetDiv.appendChild(newContainer);
 }
+
+function updateContainerAttributes(container, newIndex) {
+    // Helper function to update an attribute by replacing the index
+    const updateAttribute = (element, attribute, newIndex) => {
+        const attrValue = element.getAttribute(attribute);
+        if (attrValue) {
+            element.setAttribute(attribute, attrValue.replace(/\[(\d+)\]/g, `[${newIndex}]`));
+        }
+    };
+
+    // Update attributes in the cloned container
+    container.querySelectorAll("[id], [name], label[for], [data-index]").forEach((element) => {
+        updateAttribute(element, "id", newIndex);
+        updateAttribute(element, "name", newIndex);
+        updateAttribute(element, "for", newIndex);
+
+        // Special case for Thymeleaf 'th:field' attribute
+        const nameAttr = element.getAttribute("name");
+        if (nameAttr) {
+            element.setAttribute("th:field", `*{${nameAttr}}`);
+        }
+
+        // Update data-index attributes for buttons
+        if (element.tagName === "BUTTON" && element.hasAttribute("data-index")) {
+            element.setAttribute("data-index", newIndex);
+        }
+
+        // Reset input, textarea, and select element values
+        resetElementValue(element);
+    });
+}
+
+function resetElementValue(element) {
+    if (element.tagName === "INPUT" || element.tagName === "TEXTAREA") {
+        element.value = ""; // Clear input or textarea values
+    } else if (element.tagName === "SELECT") {
+        element.selectedIndex = 0; // Reset dropdown to default state
+    }
+}
+
 
 function deleteReportRow(button) {
     // Select the main container holding all the IR/FR documents

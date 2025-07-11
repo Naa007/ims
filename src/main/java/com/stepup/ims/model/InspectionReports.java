@@ -28,7 +28,16 @@ public class InspectionReports {
     @Getter
     @AllArgsConstructor
     public enum ReportType {
-        FR("Flash Report"), IR("Inspection Report");
+        FR("Flash Report"),
+        IR("Inspection Report"),
+        IRN("IRN Report"),
+        EXPEDITING("Expediting Report"),
+        AUDIT("Audit Report"),
+        REVISED_FR("Revised Flash Report"),
+        REVISED_IR("Revised Inspection Report"),
+        REVISED_IRN("Revised IRN Report"),
+        REVISED_EXPEDITING("Revised Expediting Report"),
+        REVISED_AUDIT("Revised Audit Report");
         private final String description;
     }
 

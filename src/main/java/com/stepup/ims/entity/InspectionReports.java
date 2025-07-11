@@ -49,7 +49,7 @@ public class InspectionReports {
     private LocalDateTime sentToClientDate;
 
     public enum ReportType {
-        FR, IR
+        FR, IR, IRN, EXPEDITING, AUDIT, REVISED_FR, REVISED_IR, REVISED_IRN, REVISED_EXPEDITING, REVISED_AUDIT
     }
 
 }

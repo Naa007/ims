@@ -510,10 +510,10 @@
             <div class="row g-3 mb-4">
 
                 <!-- Inspection Reports Iteration -->
-                <div>
+                <div id="inspectionReportsId">
                     <label class="form-label mb-2">Inspection Reports</label>
                     <div id="inspectionReportsContainerHub" class="table-responsive" style="border: 1px solid lightgrey;">
-                        <div id="inspectionReportId" th:each="report, iterStat : ${inspection.inspectionReports}">
+                        <div th:each="report, iterStat : ${inspection.inspectionReports}">
                             <div th:id="inspectionReportsContainer[__${iterStat.index}__]" style="margin: 1.25rem;"
                                  class="inspection-report" >
                                 <input type="hidden" th:id="reportId[__${iterStat.index}__]" th:field="*{inspectionReports[__${iterStat.index}__].id}"
