@@ -84,7 +84,7 @@ public class InspectionAdviseService {
         return inspectionModelMapper.getOptionalModel(inspection).orElseThrow(() -> new IllegalArgumentException("Inspection not found with id: " + inspectionId));
     }
 
-    public Inspection updateInspectionContactReview(Long inspectionId, InspectionAdvise updatedInspectionAdvise) {
+    public Inspection updateInspectionAdvise(Long inspectionId, InspectionAdvise updatedInspectionAdvise) {
         logger.info("Updating inspection advise for inspection ID: {}", inspectionId);
         Optional<com.stepup.ims.entity.Inspection> inspectionOptional = inspectionRepository.findById(inspectionId);
         com.stepup.ims.entity.Inspection inspectionEntity = inspectionOptional.orElseThrow(() -> new IllegalArgumentException("Inspection not found with id: " + inspectionId));

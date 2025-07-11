@@ -49,7 +49,7 @@ public class InspectionAdviseController {
     public String updateInspectionAdvise(@ModelAttribute InspectionAdvise inspectionAdvise, Model model) {
         logger.info("Updating inspection advise for inspectionId: {}", inspectionAdvise.getInspectionId());
         logger.debug("Calling service to update inspection advise.");
-        Inspection inspection = inspectionAdviseService.updateInspectionContactReview(inspectionAdvise.getInspectionId(), inspectionAdvise);
+        Inspection inspection = inspectionAdviseService.updateInspectionAdvise(inspectionAdvise.getInspectionId(), inspectionAdvise);
         model.addAttribute(INSPECTION, inspection);
         model.addAttribute(INSPECTION_ADVISE, inspection.getInspectionAdvise());
         model.addAttribute(SUCCESS_MESSAGE, "Inspection Advise Document was updated successfully!");

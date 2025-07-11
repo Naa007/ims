@@ -78,6 +78,13 @@ public class InspectionController {
         logger.info("Saving inspection (create or update).");
         Inspection originalInspection = inspection.getId() == null ? inspection :
                 inspectionService.getInspectionById(inspection.getId()).orElse(null);
+        if (inspection.getId() != null) {
+            logger.debug("Updating existing inspection with ID: {}", inspection.getId());
+            if (originalInspection != null) {
+                inspection.setContractReview(originalInspection.getContractReview());
+                inspection.setInspectionAdvise(originalInspection.getInspectionAdvise());
+            }
+        }
         Inspection savedInspection = inspectionService.saveInspection(inspection);
         logger.debug("Inspection saved with ID: {}", savedInspection.getId());
         emailService.sendNotificationEmail(originalInspection, savedInspection);
